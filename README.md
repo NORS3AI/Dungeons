@@ -57,6 +57,32 @@ Tools for running your game:
 - **Session Notes**: Per-character notes and reminders
 - **Internal Links**: Click any spell, skill, or feature for instant reference
 
+### DM Character Editing
+Modify player characters in real-time:
+
+- **Health Management**: Adjust HP, temp HP, death saves
+- **Condition Tracking**: Add/remove status effects (poisoned, stunned, etc.)
+- **Charge Tokens**: Track limited-use abilities (spell slots, Action Surge, etc.)
+- **Rest Resets**: One-click short rest / long rest to restore charges
+
+### NPC Creator
+Build NPCs with full stat blocks:
+
+- Type, race, alignment, Challenge Rating
+- Combat stats (AC, HP dice, speeds, ability scores)
+- Optional class levels with spell slots
+- Actions, reactions, legendary actions
+- Resistances, immunities, senses, languages
+- Save as templates for reuse
+
+### Multi-Panel View
+View multiple sheets simultaneously:
+
+- **Combat Mode**: Player sheets + enemy stats side-by-side
+- **Trade Mode**: Two inventories for easy item exchange
+- **Conversation Mode**: NPC + player for social encounters
+- Drag-and-drop panels, color-coded (ally/enemy/neutral)
+
 ## Supported Content
 
 ### Current Development (Phase 1)

@@ -128,10 +128,79 @@ Track character possessions:
 - Health/status tracking
 - Initiative order management
 
-### Character Sheet Access
+### Character Sheet Access & Editing
 - One-click to open any character's full sheet
-- Edit mode for DM adjustments
+- **DM Edit Mode** for real-time adjustments:
+  - Modify current/max HP
+  - Add/remove conditions (poisoned, stunned, etc.)
+  - Adjust temporary HP, death saves
+- **Charge/Token Tracking**:
+  - Visual tokens for limited-use abilities
+  - Track spell slots used/remaining
+  - Track class features (Action Surge, Second Wind, etc.)
+  - Automatic reset on short/long rest
+  - Manual override for DM adjustments
 - Session notes per character
+
+### NPC Creator
+Full NPC creation system similar to character creation:
+
+**Basic Info:**
+- NPC Name
+- NPC Type (humanoid, beast, undead, fiend, etc.)
+- Race (if applicable)
+- Alignment
+- Challenge Rating (CR)
+
+**Combat Stats:**
+- Armor Class (with armor type)
+- Hit Points (dice formula: e.g., 4d8+8)
+- Speed (walk, fly, swim, climb, burrow)
+- Ability Scores (STR, DEX, CON, INT, WIS, CHA)
+
+**Class Features (optional):**
+- Class and Level (for classed NPCs)
+- Spell Slots by level
+- Spells Known/Prepared
+- Class abilities
+
+**Actions & Abilities:**
+- Actions (attacks, special abilities)
+- Bonus Actions
+- Reactions
+- Legendary Actions (if applicable)
+- Lair Actions (if applicable)
+
+**Additional:**
+- Skills and Saving Throw proficiencies
+- Damage resistances/immunities/vulnerabilities
+- Condition immunities
+- Senses (darkvision, blindsight, etc.)
+- Languages
+- Equipment/Loot
+- Notes/Description
+
+### Multi-Panel View System
+Run encounters with multiple sheets visible simultaneously:
+
+**Panel Layout Options:**
+- Side-by-side (2 panels)
+- Grid view (4 panels)
+- Main + sidebar (1 large + 2 small)
+- Floating windows (drag anywhere)
+
+**Use Cases:**
+- **Combat**: Player sheets + enemy NPC stats visible together
+- **Trade**: Player inventory + merchant NPC inventory side-by-side
+- **Conversation**: Player sheet + NPC sheet for social encounters
+- **Party View**: All player sheets in grid for group decisions
+
+**Panel Features:**
+- Drag-and-drop panel arrangement
+- Minimize/maximize individual panels
+- Quick-switch between saved layouts
+- Pin important panels (always visible)
+- Color-coding: green (ally), red (enemy), blue (neutral)
 
 ### Internal Linking System
 Clickable links throughout the app:
@@ -295,12 +364,53 @@ Eldritch-themed warlock with psychic abilities:
 
 ### Phase 2: DM Tools
 
+#### Campaign Dashboard
 - [ ] Create campaign management dashboard
 - [ ] Build party overview with character cards
-- [ ] Implement initiative tracker
+- [ ] Implement initiative tracker with drag-to-reorder
 - [ ] Add session notes per character
+
+#### DM Character Management
+- [ ] Add DM edit mode for character sheets
+- [ ] Implement HP modification (current, max, temp)
+- [ ] Create condition tracker (add/remove status effects)
+- [ ] Build charge/token system for limited-use abilities
+- [ ] Track spell slot usage with visual indicators
+- [ ] Track class feature uses (Action Surge, Second Wind, etc.)
+- [ ] Implement short rest / long rest reset buttons
+- [ ] Add DM override for manual adjustments
+
+#### NPC Creator
+- [ ] Create `NPCCreator` page component
+- [ ] Build NPC type selector (humanoid, beast, undead, fiend, etc.)
+- [ ] Add race/alignment/CR inputs
+- [ ] Create combat stats form (AC, HP dice, speeds)
+- [ ] Build ability score allocator for NPCs
+- [ ] Add optional class/level selection
+- [ ] Create spell slot and spell list manager
+- [ ] Build actions/reactions/legendary actions editor
+- [ ] Add skills, saves, resistances, immunities checkboxes
+- [ ] Create senses and languages selector
+- [ ] Add equipment/loot and notes fields
+- [ ] Create `src/data/npcs/` folder for saved NPCs
+- [ ] Build NPC templates (commoner, guard, mage, etc.)
+
+#### Multi-Panel View System
+- [ ] Create panel layout manager component
+- [ ] Implement side-by-side (2 panel) view
+- [ ] Implement grid (4 panel) view
+- [ ] Implement main + sidebar layout
+- [ ] Add floating/draggable window option
+- [ ] Build panel minimize/maximize controls
+- [ ] Add panel color-coding (ally/enemy/neutral)
+- [ ] Create saved layout presets
+- [ ] Implement drag-and-drop panel arrangement
+
+#### Encounter Management
 - [ ] Create encounter builder
-- [ ] Add NPC quick-create tool
+- [ ] Add NPC to encounter from library
+- [ ] Track NPC health during combat
+- [ ] Quick-roll NPC attacks and saves
 
 ### Phase 3: Content Expansion
 
