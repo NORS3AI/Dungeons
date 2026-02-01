@@ -91,6 +91,96 @@ const RACE_LORE: Record<string, RaceLoreData> = {
       surnames: ['Virtue names are common: Glory, Hope, Fear, Despair, Poetry'],
     },
   },
+  human: {
+    imageUrl: '/images/races/human.png',
+    lore: [
+      'Humans are the most adaptable and ambitious people among the common races. Whatever drives them, humans are the innovators, the achievers, and the pioneers of the worlds.',
+      'In the reckonings of most worlds, humans are the youngest of the common races, late to arrive on the world scene and short-lived in comparison to dwarves, elves, and dragons. Perhaps it is because of their shorter lives that they strive to achieve as much as they can in the years they are given.',
+      'Humans are more physically diverse than other common races. Their skin shades range from nearly black to very pale, hair from black to blond, and facial hair from sparse to thick. A human can live to be around 100 years old.',
+    ],
+    physicalTraits: [
+      'Height ranges from barely 5 feet to well over 6 feet tall',
+      'Skin tones from pale to dark brown',
+      'Hair colors including black, brown, blond, and red',
+      'Average build varies widely by region and lifestyle',
+      'Lifespan of about 80-100 years',
+      'Reach physical adulthood in late teens',
+    ],
+    culture: [
+      'Humans build lasting institutions and leave legacies',
+      'Diverse customs, religion, and governance across regions',
+      'Known for adaptability and ambition',
+      'Often serve as bridges between other races',
+      'Value individual achievement and freedom',
+      'Quick to form alliances and organizations',
+    ],
+    adventurers: 'Human adventurers are driven by countless motivations: glory, wealth, knowledge, or simply wanderlust. Their short lifespans push them to make their mark quickly, leading to bold decisions and daring exploits. Humans fit into any adventuring role with ease.',
+    nameExamples: {
+      male: ['Marcus', 'Erik', 'Roland', 'Gareth', 'Thomas'],
+      female: ['Elena', 'Mira', 'Sarah', 'Diana', 'Rose'],
+      surnames: ['Blackwood', 'Ashford', 'Greenfield', 'Stormwind', 'Brightblade'],
+    },
+  },
+  'half-elf': {
+    imageUrl: '/images/races/half-elf.png',
+    lore: [
+      'Half-elves combine what some say are the best qualities of their elf and human parents: human curiosity, inventiveness, and ambition tempered by the refined senses, love of nature, and artistic tastes of the elves.',
+      'Some half-elves live among humans, set apart by their emotional and physical differences. Others live with elves, growing restless as they reach adulthood while their peers continue to live as children.',
+      'Many half-elves, unable to fit into either society, choose lives of solitary wandering or join with other misfits and outcasts in the adventuring life.',
+    ],
+    physicalTraits: [
+      'Height similar to humans, typically 5 to 6 feet',
+      'More slender than humans but heavier than elves',
+      'Pointed ears, though less prominent than full elves',
+      'Often strikingly attractive by both human and elven standards',
+      'Lifespan of about 180 years',
+      'Mature at roughly the same rate as humans',
+    ],
+    culture: [
+      'No lands of their own; live in human or elven settlements',
+      'Often serve as diplomats between races',
+      'Value both elven artistry and human progress',
+      'May feel like outsiders in both parent cultures',
+      'Form strong bonds with other half-elves',
+      'Adaptable social chameleons',
+    ],
+    adventurers: 'Half-elves often become adventurers because they don\'t truly belong anywhere else. They combine elven patience with human drive, making them excellent at long-term plans while remaining adaptable. Their natural charisma makes them effective leaders and negotiators.',
+    nameExamples: {
+      male: ['Aramil', 'Kerwyn', 'Therion', 'Elaris', 'Daelen'],
+      female: ['Aerith', 'Lyria', 'Seraphina', 'Evelyn', 'Celeste'],
+      surnames: ['Moonwhisper', 'Starling', 'Dawnbreaker', 'Silverleaf'],
+    },
+  },
+  dwarf: {
+    imageUrl: '/images/races/dwarf.png',
+    lore: [
+      'Bold and hardy, dwarves are known as skilled warriors, miners, and workers of stone and metal. They stand well under 5 feet tall but are so broad and compact that they can weigh as much as a human standing nearly two feet taller.',
+      'Dwarven kingdoms stretch deep beneath the mountains where the dwarves mine gems and precious metals and forge items of wonder. They love the beauty and artistry of precious metals and fine jewelry.',
+      'Dwarves who take up the adventuring life might be motivated by a desire to recover lost treasures of their ancestors, to experience the wonders of the world, or to seek glory in battle.',
+    ],
+    physicalTraits: [
+      'Height averages 4 to 4.5 feet',
+      'Broad and compact, weighing as much as taller humans',
+      'Skin ranges from deep brown to pale, often ruddy',
+      'Hair typically black, gray, or brown, worn long',
+      'Males (and some females) have elaborate beards',
+      'Lifespan of 350+ years',
+    ],
+    culture: [
+      'Deep respect for elders and ancestors',
+      'Organized into clans with long histories',
+      'Master craftspeople, especially in stone and metal',
+      'Value honor, tradition, and hard work',
+      'Grudges can last generations',
+      'Strong sense of justice and fairness',
+    ],
+    adventurers: 'Dwarves who leave their mountain homes often do so to reclaim lost artifacts, avenge ancient wrongs, or fulfill oaths made to allies. Their resilience and combat training make them stalwart companions. A dwarf\'s word is their bond, and they never abandon their friends.',
+    nameExamples: {
+      male: ['Thorin', 'Bruenor', 'Gimli', 'Balin', 'Dwalin'],
+      female: ['Amber', 'Helga', 'Dagnal', 'Gurdis', 'Mardred'],
+      surnames: ['Ironfist', 'Stonehammer', 'Fireforge', 'Battlebeard', 'Goldvein'],
+    },
+  },
 }
 
 // Spell quick reference data

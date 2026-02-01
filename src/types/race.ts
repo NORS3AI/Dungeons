@@ -149,3 +149,114 @@ export const TIEFLING: Race = {
     { spellId: 'darkness', spellName: 'Darkness', levelGained: 5, castingAbility: 'charisma', usesPerDay: 1 },
   ],
 }
+
+/**
+ * Human race definition (2024 PHB)
+ */
+export const HUMAN: Race = {
+  id: 'human',
+  name: 'Human',
+  description: 'Humans are the most adaptable and ambitious people among the common races. They are also the most numerous.',
+  abilityBonuses: {
+    // 2024 PHB: Humans get +2 to one ability and +1 to another (player choice)
+    // For simplicity, we default to common choices, but this could be made dynamic
+    strength: 1,
+    dexterity: 1,
+    constitution: 1,
+    intelligence: 1,
+    wisdom: 1,
+    charisma: 1,
+  },
+  size: 'medium',
+  speed: 30,
+  vision: 'normal',
+  languages: ['Common'],
+  traits: [
+    {
+      id: 'resourceful',
+      name: 'Resourceful',
+      description: 'You gain Inspiration whenever you finish a Long Rest.',
+    },
+    {
+      id: 'skillful',
+      name: 'Skillful',
+      description: 'You gain proficiency in one skill of your choice.',
+    },
+    {
+      id: 'versatile',
+      name: 'Versatile',
+      description: 'You gain an Origin feat of your choice (Skilled feat recommended for new players).',
+    },
+  ],
+  skillProficiencies: ['any'], // Player chooses one skill
+}
+
+/**
+ * Half-Elf race definition
+ */
+export const HALF_ELF: Race = {
+  id: 'half-elf',
+  name: 'Half-Elf',
+  description: 'Half-elves combine what some say are the best qualities of their elf and human parents.',
+  abilityBonuses: {
+    charisma: 2,
+    // +1 to two other abilities of choice - using common defaults
+    constitution: 1,
+    wisdom: 1,
+  },
+  size: 'medium',
+  speed: 30,
+  vision: 'darkvision',
+  visionRange: 60,
+  languages: ['Common', 'Elvish'],
+  traits: [
+    {
+      id: 'fey-ancestry',
+      name: 'Fey Ancestry',
+      description: 'You have advantage on saving throws against being charmed, and magic can\'t put you to sleep.',
+    },
+    {
+      id: 'skill-versatility',
+      name: 'Skill Versatility',
+      description: 'You gain proficiency in two skills of your choice.',
+    },
+  ],
+  conditionImmunities: ['magical sleep'],
+}
+
+/**
+ * Dwarf race definition
+ */
+export const DWARF: Race = {
+  id: 'dwarf',
+  name: 'Dwarf',
+  description: 'Bold and hardy, dwarves are known as skilled warriors, miners, and workers of stone and metal.',
+  abilityBonuses: {
+    constitution: 2,
+    wisdom: 1,
+  },
+  size: 'medium',
+  speed: 25, // Not reduced by heavy armor
+  vision: 'darkvision',
+  visionRange: 60,
+  languages: ['Common', 'Dwarvish'],
+  traits: [
+    {
+      id: 'dwarven-resilience',
+      name: 'Dwarven Resilience',
+      description: 'You have advantage on saving throws against poison, and you have resistance against poison damage.',
+    },
+    {
+      id: 'dwarven-combat-training',
+      name: 'Dwarven Combat Training',
+      description: 'You have proficiency with the battleaxe, handaxe, light hammer, and warhammer.',
+    },
+    {
+      id: 'stonecunning',
+      name: 'Stonecunning',
+      description: 'Whenever you make an Intelligence (History) check related to the origin of stonework, you are considered proficient and add double your proficiency bonus.',
+    },
+  ],
+  damageResistances: ['poison'],
+  weaponProficiencies: ['battleaxe', 'handaxe', 'light-hammer', 'warhammer'],
+}

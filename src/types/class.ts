@@ -287,3 +287,179 @@ export const GREAT_OLD_ONE: Subclass = {
     { level: 5, spells: ['dominate-person', 'telekinesis'] },
   ],
 }
+
+/**
+ * Champion subclass for Fighter
+ */
+export const CHAMPION: Subclass = {
+  id: 'champion',
+  name: 'Champion',
+  description: 'The archetypal Champion focuses on the development of raw physical power honed to deadly perfection.',
+  parentClassId: 'fighter',
+  features: [
+    {
+      id: 'improved-critical',
+      name: 'Improved Critical',
+      description: 'Your weapon attacks score a critical hit on a roll of 19 or 20.',
+      level: 3,
+    },
+    {
+      id: 'remarkable-athlete',
+      name: 'Remarkable Athlete',
+      description: 'Add half your proficiency bonus (round up) to any STR, DEX, or CON check that doesn\'t already use your proficiency bonus. Running long jump distance increases by feet equal to your STR modifier.',
+      level: 7,
+    },
+    {
+      id: 'additional-fighting-style',
+      name: 'Additional Fighting Style',
+      description: 'You can choose a second Fighting Style option.',
+      level: 10,
+    },
+    {
+      id: 'superior-critical',
+      name: 'Superior Critical',
+      description: 'Your weapon attacks score a critical hit on a roll of 18-20.',
+      level: 15,
+    },
+    {
+      id: 'survivor',
+      name: 'Survivor',
+      description: 'At the start of each of your turns, you regain HP equal to 5 + CON modifier if you have no more than half your HP remaining. This doesn\'t work if you have 0 HP.',
+      level: 18,
+    },
+  ],
+}
+
+/**
+ * Battle Master subclass for Fighter
+ */
+export const BATTLE_MASTER: Subclass = {
+  id: 'battle-master',
+  name: 'Battle Master',
+  description: 'Battle Masters employ martial techniques passed down through generations, using superiority dice to fuel powerful maneuvers.',
+  parentClassId: 'fighter',
+  features: [
+    {
+      id: 'combat-superiority',
+      name: 'Combat Superiority',
+      description: 'You learn three maneuvers and gain four superiority dice (d8). You regain all expended dice on a short or long rest.',
+      level: 3,
+      charges: { amount: 4, rechargeOn: 'shortRest' },
+    },
+    {
+      id: 'student-of-war',
+      name: 'Student of War',
+      description: 'You gain proficiency with one type of artisan\'s tools of your choice.',
+      level: 3,
+    },
+    {
+      id: 'know-your-enemy',
+      name: 'Know Your Enemy',
+      description: 'If you spend 1 minute observing a creature, you can learn certain information about its capabilities compared to your own.',
+      level: 7,
+    },
+    {
+      id: 'improved-combat-superiority',
+      name: 'Improved Combat Superiority',
+      description: 'Your superiority dice turn into d10s.',
+      level: 10,
+    },
+    {
+      id: 'relentless',
+      name: 'Relentless',
+      description: 'When you roll initiative and have no superiority dice remaining, you regain one superiority die.',
+      level: 15,
+    },
+  ],
+}
+
+/**
+ * Fiend patron subclass for Warlock
+ */
+export const FIEND: Subclass = {
+  id: 'fiend',
+  name: 'The Fiend',
+  description: 'You have made a pact with a fiend from the lower planes of existence. Devils, demons, and other dark powers grant you abilities fueled by fire and destruction.',
+  parentClassId: 'warlock',
+  features: [
+    {
+      id: 'dark-ones-blessing',
+      name: 'Dark One\'s Blessing',
+      description: 'When you reduce a hostile creature to 0 HP, you gain temporary HP equal to your CHA modifier + your warlock level (minimum 1).',
+      level: 1,
+    },
+    {
+      id: 'dark-ones-own-luck',
+      name: 'Dark One\'s Own Luck',
+      description: 'When you make an ability check or saving throw, you can add a d10 to your roll. Once used, you can\'t use this again until a short or long rest.',
+      level: 6,
+      charges: { amount: 1, rechargeOn: 'shortRest' },
+    },
+    {
+      id: 'fiendish-resilience',
+      name: 'Fiendish Resilience',
+      description: 'You can choose one damage type when you finish a short or long rest. You gain resistance to that damage type until you choose a different one.',
+      level: 10,
+    },
+    {
+      id: 'hurl-through-hell',
+      name: 'Hurl Through Hell',
+      description: 'When you hit a creature with an attack, you can instantly transport it through the lower planes. The creature takes 10d10 psychic damage if it isn\'t a fiend.',
+      level: 14,
+      charges: { amount: 1, rechargeOn: 'longRest' },
+    },
+  ],
+  expandedSpells: [
+    { level: 1, spells: ['burning-hands', 'command'] },
+    { level: 2, spells: ['blindness-deafness', 'scorching-ray'] },
+    { level: 3, spells: ['fireball', 'stinking-cloud'] },
+    { level: 4, spells: ['fire-shield', 'wall-of-fire'] },
+    { level: 5, spells: ['flame-strike', 'hallow'] },
+  ],
+}
+
+/**
+ * Archfey patron subclass for Warlock
+ */
+export const ARCHFEY: Subclass = {
+  id: 'archfey',
+  name: 'The Archfey',
+  description: 'Your patron is a lord or lady of the fey, a creature of legend who holds secrets that were forgotten before mortal races were born.',
+  parentClassId: 'warlock',
+  features: [
+    {
+      id: 'fey-presence',
+      name: 'Fey Presence',
+      description: 'As an action, cause each creature in a 10-foot cube originating from you to make a WIS save or become charmed or frightened (your choice) until the end of your next turn.',
+      level: 1,
+      charges: { amount: 1, rechargeOn: 'shortRest' },
+    },
+    {
+      id: 'misty-escape',
+      name: 'Misty Escape',
+      description: 'When you take damage, you can use your reaction to turn invisible and teleport up to 60 feet. You remain invisible until the start of your next turn.',
+      level: 6,
+      charges: { amount: 1, rechargeOn: 'shortRest' },
+    },
+    {
+      id: 'beguiling-defenses',
+      name: 'Beguiling Defenses',
+      description: 'You are immune to being charmed. When another creature attempts to charm you, you can use your reaction to turn the charm back on them.',
+      level: 10,
+    },
+    {
+      id: 'dark-delirium',
+      name: 'Dark Delirium',
+      description: 'As an action, choose a creature within 60 feet. It must make a WIS save or be charmed or frightened for 1 minute, perceiving a dreamlike world.',
+      level: 14,
+      charges: { amount: 1, rechargeOn: 'shortRest' },
+    },
+  ],
+  expandedSpells: [
+    { level: 1, spells: ['faerie-fire', 'sleep'] },
+    { level: 2, spells: ['calm-emotions', 'phantasmal-force'] },
+    { level: 3, spells: ['blink', 'plant-growth'] },
+    { level: 4, spells: ['dominate-beast', 'greater-invisibility'] },
+    { level: 5, spells: ['dominate-person', 'seeming'] },
+  ],
+}
