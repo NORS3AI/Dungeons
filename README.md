@@ -1,90 +1,125 @@
-# Dungeons - D&D Character Creation Made Simple
+# Dungeons - D&D 5e Character Creator & DM Tool
 
-A streamlined, click-and-create character builder for Dungeons & Dragons 5th Edition. Build your perfect adventurer in minutes, not hours.
+A browser-based Dungeon Master tool and character creation system for D&D 5th Edition (2024). Create characters with a simple click-and-create flow, manage entire campaigns, and keep everything at your fingertips during gameplay.
 
 ## Vision
 
-Creating a D&D character should be **fun**, not frustrating. This project aims to make character creation:
+**For Players**: Build a complete character in minutes with an intuitive page-by-page flow. Full keyboard navigation, smart defaults, and no manual calculations.
 
-- **Simple** - Guided step-by-step process with smart defaults
-- **Fast** - Click-and-create interface, no manual calculations
-- **Educational** - Learn about races, classes, and abilities as you build
-- **Flexible** - From quick presets to full customization
+**For DMs**: Manage your entire party from one dashboard. Instant access to character sheets, clickable spell/skill references, and a powerful dice roller that knows your modifiers.
+
+## Core Features
+
+### Character Creation Flow
+A guided, page-by-page experience:
+
+| Page | Purpose |
+|------|---------|
+| 1. Details | Name, age, height, weight, background notes |
+| 2. Race/Species | Visual race cards with trait previews |
+| 3. Class | Class selection with subclass options |
+| 4. Stats | Standard Array, Point Buy, or Roll (4d6 drop lowest) |
+| 5. Spells | Cantrips and spell selection (class-dependent) |
+| 6. Equipment | Starting gear, weapons, armor, inventory |
+| 7. Review | Final character sheet with edit options |
+
+**Keyboard-first design**: Tab/Shift+Tab navigation throughout, Enter to confirm.
+
+### Dice Rolling System
+Full-featured dice roller built for real gameplay:
+
+```
+Syntax: NdX+M (e.g., 2d6+3, 1d20+5, 12d10)
+
+Supported: d4, d6, d8, d10, d12, d20, d100
+Features:
+  - Roll any combination (12d10, 4d6, 2d20)
+  - Auto-apply character modifiers
+  - Advantage/Disadvantage support
+  - Roll history tracking
+  - Visual dice animations
+```
+
+### Inventory & Currency Tracking
+Keep track of everything your character carries:
+
+- **Currency**: Copper, Silver, Gold, Electrum, Platinum (track per session)
+- **Equipment**: Weapons, armor, adventuring gear, tools
+- **Weight**: Optional encumbrance tracking
+- **Quick add/remove** for loot management
+
+### DM Campaign Management
+Tools for running your game:
+
+- **Party Dashboard**: All characters at a glance
+- **Quick Sheet Access**: One-click to any character's full sheet
+- **Initiative Tracker**: Manage combat order
+- **Session Notes**: Per-character notes and reminders
+- **Internal Links**: Click any spell, skill, or feature for instant reference
 
 ## Supported Content
 
-### Classes
+### Current Development (Phase 1)
 
-| Class | Subclass | Status |
-|-------|----------|--------|
-| Fighter | Champion | Planned |
-| Fighter | **Ranger** | In Progress |
-| Warlock | **The Great Old One** | Planned |
-| Warlock | The Fiend | Planned |
-| Warlock | The Archfey | Planned |
+| Classes | Subclass | Status |
+|---------|----------|--------|
+| Fighter | Ranger | In Progress |
+| Warlock | Great Old One | In Progress |
 
-### Races
+| Races | Status |
+|-------|--------|
+| Drow (Dark Elf) | In Progress |
+| Tiefling | In Progress |
 
-| Race | Subraces | Status |
-|------|----------|--------|
-| **Drow** (Dark Elf) | - | In Progress |
-| **Tiefling** | Asmodeus, Baalzebul, Dispater | Planned |
-| Elf | High, Wood, Eladrin | Planned |
-| Human | Standard, Variant | Planned |
+### Planned (Full PHB 2024)
+All classes and races from the **2024 Player's Handbook** will be supported.
 
-## Features
+## Class Features
 
-### Core Features
-- **One-Click Character Generation** - Select race + class combo and get a ready-to-play character
-- **Stat Rolling Options** - Standard array, point buy, or roll 4d6 drop lowest
-- **Equipment Packages** - Pre-built gear sets based on class and background
-- **Character Sheet Export** - PDF, JSON, and printer-friendly formats
+### Fighter
+- Hit Die: d10
+- Fighting Styles: Archery, Defense, Dueling, Great Weapon Fighting, Protection, Two-Weapon Fighting
+- Second Wind HP recovery
+- Action Surge tracking
+- Martial Archetype features
 
-### Fighter-Specific Features
-- **Fighting Style Selector** - Archery, Defense, Dueling, Great Weapon Fighting, Protection, Two-Weapon Fighting
-- **Second Wind Tracker** - Visual HP recovery calculator
-- **Action Surge Counter** - Track your extra actions per rest
-- **Ranger Subclass Tools**:
-  - Favored Enemy selector with stat bonuses
-  - Natural Explorer terrain picker
-  - Primeval Awareness range calculator
+### Warlock (Great Old One)
+- Hit Die: d8
+- Pact Boons: Blade, Chain, Tome, Talisman
+- Eldritch Invocations browser
+- Pact Magic slot tracker
+- Patron Features:
+  - Awakened Mind (telepathy 30ft)
+  - Entropic Ward (reaction defense)
+  - Thought Shield (psychic resistance)
+  - Create Thrall (charmed ally)
 
-### Warlock-Specific Features
-- **Pact Boon Selector** - Pact of the Blade, Chain, Tome, or Talisman
-- **Eldritch Invocations Browser** - Filterable list with prerequisites
-- **Spell Slot Tracker** - Visual Pact Magic slot management
-- **Great Old One Patron Tools**:
-  - Awakened Mind telepathy range calculator
-  - Entropic Ward usage tracker
-  - Thought Shield mental defense indicator
-  - Create Thrall management interface
+## Race Features
 
-### Drow Features
-- **Superior Darkvision** (120 ft) indicator
-- **Sunlight Sensitivity** reminder system
-- **Drow Magic Progression** - Dancing Lights, Faerie Fire, Darkness spell tracker
-- **Drow Weapon Training** - Rapier, shortsword, hand crossbow proficiencies
+### Drow
+- +2 DEX, +1 CHA
+- Superior Darkvision (120 ft)
+- Sunlight Sensitivity
+- Drow Magic: Dancing Lights → Faerie Fire → Darkness
+- Weapon Training: Rapiers, shortswords, hand crossbows
+- Fey Ancestry & Trance
 
-### Tiefling Features
-- **Infernal Legacy Spell Tracker** - Thaumaturgy, Hellish Rebuke, Darkness
-- **Bloodline Selector** - Different stat bonuses and spells per bloodline
-- **Resistance Indicator** - Fire resistance visual badge
-- **Darkvision** (60 ft) toggle
-
-### Quality of Life
-- **Auto-calculated Modifiers** - No math required
-- **Proficiency Bonus Scaling** - Updates automatically with level
-- **Skill Proficiency Picker** - Visual checkboxes with source tracking
-- **Save Progress** - Local storage and cloud sync options
-- **Undo/Redo** - Made a mistake? Go back anytime
+### Tiefling
+- +2 CHA, +1 INT (Asmodeus bloodline)
+- Darkvision (60 ft)
+- Hellish Resistance (fire)
+- Infernal Legacy: Thaumaturgy → Hellish Rebuke → Darkness
+- Multiple bloodline options
 
 ## Tech Stack
 
-- **Frontend**: React + TypeScript
+- **Framework**: React + TypeScript + Vite
 - **Styling**: Tailwind CSS
-- **State Management**: Zustand
+- **State**: Zustand
+- **Routing**: React Router
 - **Data**: JSON-based rule definitions
-- **Export**: jsPDF for character sheets
+- **Testing**: Vitest
+- **Export**: PDF character sheets
 
 ## Getting Started
 
@@ -98,6 +133,12 @@ npm install
 
 # Start development server
 npm run dev
+
+# Run tests
+npm run test
+
+# Build for production
+npm run build
 ```
 
 ## Project Structure
@@ -105,25 +146,40 @@ npm run dev
 ```
 Dungeons/
 ├── src/
-│   ├── components/       # UI components
+│   ├── components/
+│   │   ├── character/     # Character creation pages
+│   │   ├── dice/          # Dice roller components
+│   │   ├── inventory/     # Inventory management
+│   │   ├── sheet/         # Character sheet display
+│   │   └── dm/            # DM campaign tools
 │   ├── data/
-│   │   ├── classes/      # Class definitions (fighter.json, warlock.json)
-│   │   ├── races/        # Race definitions (drow.json, tiefling.json)
-│   │   ├── spells/       # Spell data
-│   │   └── equipment/    # Gear and weapons
-│   ├── hooks/            # Custom React hooks
-│   ├── stores/           # Zustand state stores
-│   ├── utils/            # Calculation helpers
-│   └── types/            # TypeScript definitions
+│   │   ├── classes/       # Class JSON (fighter.json, warlock.json)
+│   │   ├── races/         # Race JSON (drow.json, tiefling.json)
+│   │   ├── spells/        # Spell data
+│   │   └── equipment/     # Weapons, armor, gear
+│   ├── hooks/             # Custom React hooks
+│   ├── stores/            # Zustand state stores
+│   ├── utils/             # Dice rolling, stat calculations
+│   ├── types/             # TypeScript interfaces
+│   └── pages/             # Route pages
 ├── public/
-│   └── assets/           # Images, icons
-├── tests/                # Test suites
-└── docs/                 # Additional documentation
+│   └── assets/            # Images, icons
+└── tests/                 # Test suites
 ```
+
+## Keyboard Shortcuts
+
+| Key | Action |
+|-----|--------|
+| Tab | Next field/option |
+| Shift+Tab | Previous field/option |
+| Enter | Confirm selection / Next page |
+| Escape | Cancel / Close modal |
+| R | Quick roll (when dice roller focused) |
 
 ## Contributing
 
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Contributions welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## License
 
