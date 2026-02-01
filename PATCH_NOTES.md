@@ -138,14 +138,63 @@ Version format: `v0.0.pX-alpha` where X = phase number
 
 ---
 
-## Upcoming Phases
+## [v0.0.p2-alpha] - 2026-02-01 @ 9:46 AM MST-AZ
 
-### Phase 2: Character Details Page (Planned)
-- Character name, age, height, weight inputs
-- Background story/notes field
-- Player name for DM tracking
-- Tab/Shift+Tab keyboard navigation
-- Form validation
+### Phase 2: Character Details Page
+
+**Character Creation Wizard - Step 1 Complete**
+
+#### New Components
+- **`src/components/CharacterDetailsForm.tsx`** - Full character details form with:
+  - Character Name input (required, 2-50 characters)
+  - Age input with numeric validation
+  - Height input (free text, e.g., "5'10\"")
+  - Weight input (free text, e.g., "150 lbs")
+  - Player Name input (for DM tracking)
+  - Backstory/Notes textarea (up to 5000 characters with counter)
+  - Full ARIA accessibility attributes
+  - Real-time validation with error messages
+
+- **`src/components/WizardSteps.tsx`** - Progress indicator with:
+  - Desktop view: Horizontal step indicators with checkmarks
+  - Mobile view: Compact progress bar with step counter
+  - Clickable navigation to completed steps
+  - 7-step character creation flow defined
+  - Visual states: pending, current, completed
+
+#### Keyboard Navigation
+- **Tab** to move forward through fields
+- **Shift+Tab** to move backward
+- **Enter** to advance to next field (on text inputs)
+- Auto-focus on first input when page loads
+- Keyboard shortcuts hint displayed at bottom
+
+#### Form Validation
+- Required field indication with red asterisk
+- Real-time validation on blur
+- Error messages with ARIA alerts for screen readers
+- Next button disabled until required fields valid
+- Character limits with visual feedback
+
+#### Updated Pages
+- **`src/pages/CharacterCreatePage.tsx`** - Complete wizard implementation:
+  - WizardSteps progress indicator at top
+  - Step-by-step flow with Back/Next navigation
+  - Details form integrated with characterStore
+  - Placeholder pages for steps 2-6 (Race, Class, Stats, Spells, Equipment)
+  - Review page shows character summary
+  - Save Character button on final step
+  - Navigate to character sheet after save
+
+#### Store Integration
+- Form data syncs with `useCharacterStore`
+- Character details persisted on navigation
+- Undo/redo history maintained
+- Auto-create new character on page load if none exists
+
+---
+
+## Upcoming Phases
 
 ### Phase 3: Race Selection Page (Planned)
 - Visual race cards
@@ -196,6 +245,7 @@ Version format: `v0.0.pX-alpha` where X = phase number
 
 | Version | Date | Phase | Description |
 |---------|------|-------|-------------|
+| v0.0.p2-alpha | 2026-02-01 | 2 | Character Details Page |
 | v0.0.p1-alpha | 2026-02-01 | 1 | Project Setup & Infrastructure |
 
 ---
