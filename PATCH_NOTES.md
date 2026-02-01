@@ -248,22 +248,140 @@ Version format: `v0.0.pX-alpha` where X = phase number
 
 ---
 
+## [v0.0.p4-alpha] - 2026-02-01 @ 10:12 AM MST-AZ
+
+### Phase 4: Class Selection Page
+
+**Character Creation Wizard - Step 3 Complete**
+
+#### New Components
+- **`src/components/ClassCard.tsx`** - Visual class card with:
+  - Class name, hit die, primary ability display
+  - Description preview
+  - Spellcasting type badge (Martial, Pact Magic, etc.)
+  - Armor/weapon proficiency previews
+  - Saving throw indicators
+  - Subclass level display
+
+- **`src/components/ClassSelector.tsx`** - Class selection page with:
+  - Grid layout for class cards
+  - Detailed class features panel on selection
+  - Primary stats overview (Hit Die, Primary Ability, Saves)
+  - Proficiencies display (Armor, Weapons)
+  - Skill choices list
+  - Level 1 features with charge information
+  - Fighting Styles (for Fighter)
+  - **Subclass selection** (required for Warlock at level 1)
+
+#### Available Classes
+- **Fighter** - d10, STR/DEX primary, Martial
+  - Features: Fighting Style, Second Wind (1/short rest)
+  - 6 Fighting Style options
+  - Subclass at level 3 (Martial Archetype)
+
+- **Warlock** - d8, CHA primary, Pact Magic
+  - Features: Pact Magic (short rest spell slots)
+  - 2 cantrips, 2 spells known at level 1
+  - Subclass at level 1 (Otherworldly Patron)
+  - **Great Old One** subclass implemented:
+    - Awakened Mind (telepathy 30ft)
+    - Expanded spells: Dissonant Whispers, Tasha's Hideous Laughter
+
+---
+
+## [v0.0.p5-alpha] - 2026-02-01 @ 10:12 AM MST-AZ
+
+### Phase 5: Stat Allocation Page
+
+**Character Creation Wizard - Step 4 Complete**
+
+#### New Component
+- **`src/components/StatAllocator.tsx`** - Full ability score allocation with:
+  - **Three allocation methods** via toggle buttons
+  - Racial bonus integration and display
+  - Real-time modifier calculations
+  - Final score summary with modifiers
+
+#### Standard Array Method
+- Fixed values: 15, 14, 13, 12, 10, 8
+- Dropdown selectors for each ability
+- Track available values
+- Prevent duplicate assignments
+
+#### Point Buy Method
+- 27 points total to distribute
+- Score range: 8-15
+- Point cost reference table (8=0, 9=1, 10=2, 11=3, 12=4, 13=5, 14=7, 15=9)
+- +/- buttons with validation
+- Points remaining counter
+- Real-time cost display per ability
+
+#### Roll Method (4d6 Drop Lowest)
+- "Roll All" button generates 6 scores
+- Each score: roll 4d6, drop lowest die
+- Assign rolled values to abilities
+- Scores sorted high to low
+- Handle duplicate values correctly
+
+#### Integration
+- Racial bonuses auto-applied from selected race
+- Final scores = Base + Racial Bonus
+- Modifiers shown: floor((score - 10) / 2)
+- Results saved to characterStore via `setAbilityScores()`
+
+---
+
+## [v0.0.p6-alpha] - 2026-02-01 @ 10:12 AM MST-AZ
+
+### Phase 6: Spell Selection Page
+
+**Character Creation Wizard - Step 5 Complete**
+
+#### New Components
+- **`src/components/SpellCard.tsx`** - Visual spell card with:
+  - Spell name and school badge (color-coded)
+  - Level indicator (Cantrip, 1st Level, etc.)
+  - Description preview (2-line clamp)
+  - Casting time, range, components display
+  - Concentration/Ritual badges
+  - Damage dice and type (if applicable)
+  - Selected state with checkmark
+
+- **`src/components/SpellSelector.tsx`** - Spell selection page with:
+  - Separate sections for Cantrips and 1st Level spells
+  - Selection counter (X / Y selected)
+  - Class-based spell filtering
+  - Subclass expanded spells support
+  - Pact Magic information display
+  - Selected spells summary panel
+  - Non-spellcaster skip option (for Fighter)
+
+#### Available Warlock Cantrips (5)
+- Eldritch Blast, Chill Touch, Minor Illusion, Prestidigitation, Mage Hand
+
+#### Available Warlock 1st Level Spells (5)
+- Hex, Armor of Agathys, Hellish Rebuke, Charm Person, Witch Bolt
+
+#### Great Old One Expanded Spells (2)
+- Dissonant Whispers, Tasha's Hideous Laughter
+- Marked with "Expanded" badge
+
+#### Spell Data Structure
+- Full spell properties: school, casting time, range, components, duration
+- Damage/healing dice with scaling
+- Saving throw effects
+- Attack roll indicator
+- Concentration and ritual flags
+
+#### Updated Review Page
+- Ability scores displayed with modifiers
+- Known spells listed
+- Subclass shown with class
+- Improved summary layout
+
+---
+
 ## Upcoming Phases
-
-### Phase 4: Class Selection Page (Planned)
-- Visual class cards
-- Class features display
-- Subclass selection
-
-### Phase 5: Stat Allocation Page (Planned)
-- Standard Array method
-- Point Buy method
-- Roll method (4d6 drop lowest)
-
-### Phase 6: Spell Selection Page (Planned)
-- Cantrip selection
-- Spell list by level
-- Spell slot display
 
 ### Phase 7: Equipment Page (Planned)
 - Starting equipment packs
@@ -294,6 +412,9 @@ Version format: `v0.0.pX-alpha` where X = phase number
 
 | Version | Date | Phase | Description |
 |---------|------|-------|-------------|
+| v0.0.p6-alpha | 2026-02-01 | 6 | Spell Selection Page |
+| v0.0.p5-alpha | 2026-02-01 | 5 | Stat Allocation Page |
+| v0.0.p4-alpha | 2026-02-01 | 4 | Class Selection Page |
 | v0.0.p3-alpha | 2026-02-01 | 3 | Race Selection Page |
 | v0.0.p2-alpha | 2026-02-01 | 2 | Character Details Page |
 | v0.0.p1-alpha | 2026-02-01 | 1 | Project Setup & Infrastructure |
