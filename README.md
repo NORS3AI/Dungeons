@@ -2,6 +2,19 @@
 
 A browser-based Dungeon Master tool and character creation system for D&D 5th Edition (2024). Create characters with a simple click-and-create flow, manage entire campaigns, and keep everything at your fingertips during gameplay.
 
+---
+
+## Get Started
+
+| | |
+|---|---|
+| **[Play Now](https://dungeons.app)** | Jump straight into character creation - no account required |
+| **[Create Account](https://dungeons.app/register)** | Save unlimited characters, sync across devices, join campaigns |
+
+> *Note: App URL will be updated once deployed*
+
+---
+
 ## Vision
 
 **For Players**: Build a complete character in minutes with an intuitive page-by-page flow. Full keyboard navigation, smart defaults, and no manual calculations.
