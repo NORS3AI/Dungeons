@@ -8,10 +8,8 @@ A browser-based Dungeon Master tool and character creation system for D&D 5th Ed
 
 | | |
 |---|---|
-| **[Play Now](https://dungeons.app)** | Jump straight into character creation - no account required |
-| **[Create Account](https://dungeons.app/register)** | Save unlimited characters, sync across devices, join campaigns |
-
-> *Note: App URL will be updated once deployed*
+| **[Play Now](https://nors3ai.github.io/Dungeons)** | Jump straight into character creation - no account required |
+| **[Create Account](https://nors3ai.github.io/Dungeons/register)** | Save unlimited characters, sync across devices, join campaigns |
 
 ---
 
