@@ -1,5 +1,6 @@
 import type { Race } from './race'
 import type { Class, Subclass } from './class'
+import type { Background } from './background'
 import type { Spell } from './spell'
 import type { Equipment, Currency } from './equipment'
 
@@ -148,10 +149,11 @@ export interface Character {
   level: number
   experiencePoints: number
 
-  // Race & Class
+  // Race, Class & Background
   race: Race | null
   class: Class | null
   subclass: Subclass | null
+  background: Background | null
 
   // Abilities
   abilityScores: AbilityScores

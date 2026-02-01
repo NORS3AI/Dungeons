@@ -86,6 +86,23 @@ export {
   LONGSWORD,
 } from './equipment'
 
+// Background types
+export type {
+  BackgroundFeature,
+  SuggestedCharacteristic,
+  Background,
+} from './background'
+
+export {
+  ACOLYTE,
+  CRIMINAL,
+  FOLK_HERO,
+  NOBLE,
+  SAGE,
+  SOLDIER,
+  AVAILABLE_BACKGROUNDS,
+} from './background'
+
 // Dice types
 export type {
   StandardDie,
