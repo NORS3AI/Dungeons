@@ -82,11 +82,13 @@ export function CharacterCreatePage() {
     nextStep()
   }
 
-  const handleClassSelect = (classData: Class, subclass?: Subclass) => {
+  const handleClassSelect = (classData: Class, subclass?: Subclass, _skills?: string[], _fightingStyle?: string) => {
     setClass(classData)
     if (subclass) {
       setSubclass(subclass)
     }
+    // Note: skills and fightingStyle would be stored in character - add to store if needed
+    // For now we'll just move forward
     nextStep()
   }
 

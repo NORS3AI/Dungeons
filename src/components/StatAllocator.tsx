@@ -57,7 +57,8 @@ function calculatePointsSpent(scores: AbilityScores): number {
  * Allows users to allocate ability scores using three methods
  */
 export function StatAllocator({ initialScores, race, onSubmit, onBack }: StatAllocatorProps) {
-  const [method, setMethod] = useState<AllocationMethod>('standard')
+  // Default to roll method, standard and point buy are disabled for now
+  const [method, setMethod] = useState<AllocationMethod>('roll')
   const [baseScores, setBaseScores] = useState<AbilityScores>(
     initialScores || { ...DEFAULT_ABILITY_SCORES }
   )
@@ -141,14 +142,18 @@ export function StatAllocator({ initialScores, race, onSubmit, onBack }: StatAll
 
   const getAvailableRollValues = (): number[] => {
     const assigned = Object.values(rollAssignments).filter((v) => v !== null) as number[]
-    return rolledScores.filter((v) => {
-      const assignedIndex = assigned.indexOf(v)
-      if (assignedIndex === -1) return true
-      // Handle duplicates
-      const countInRolled = rolledScores.filter((r) => r === v).length
-      const countAssigned = assigned.filter((a) => a === v).length
-      return countAssigned < countInRolled && !assigned.slice(0, assigned.indexOf(v) + 1).includes(v)
-    })
+    // Create a copy of rolled scores to track availability
+    const available: number[] = [...rolledScores]
+
+    // Remove assigned values one by one (handles duplicates correctly)
+    for (const val of assigned) {
+      const idx = available.indexOf(val)
+      if (idx !== -1) {
+        available.splice(idx, 1)
+      }
+    }
+
+    return available
   }
 
   const handleRollAssign = (ability: AbilityKey, value: number | null) => {
@@ -194,25 +199,33 @@ export function StatAllocator({ initialScores, race, onSubmit, onBack }: StatAll
       {/* Method Selection */}
       <div className="flex flex-wrap gap-4 mb-8">
         {[
-          { id: 'standard', name: 'Standard Array', desc: '15, 14, 13, 12, 10, 8' },
-          { id: 'pointBuy', name: 'Point Buy', desc: '27 points to spend' },
-          { id: 'roll', name: 'Roll', desc: '4d6 drop lowest' },
+          { id: 'standard', name: 'Standard Array', desc: '15, 14, 13, 12, 10, 8', disabled: true },
+          { id: 'pointBuy', name: 'Point Buy', desc: '27 points to spend', disabled: true },
+          { id: 'roll', name: 'Roll', desc: '4d6 drop lowest', disabled: false },
         ].map((m) => (
           <button
             key={m.id}
             type="button"
-            onClick={() => setMethod(m.id as AllocationMethod)}
-            className={`flex-1 min-w-[150px] p-4 rounded-lg border-2 transition-all duration-200
+            onClick={() => !m.disabled && setMethod(m.id as AllocationMethod)}
+            disabled={m.disabled}
+            className={`flex-1 min-w-[150px] p-4 rounded-lg border-2 transition-all duration-200 relative
                        ${
-                         method === m.id
-                           ? 'border-dnd-gold bg-gray-800'
-                           : 'border-gray-700 bg-gray-800/50 hover:border-gray-600'
+                         m.disabled
+                           ? 'border-gray-800 bg-gray-900/50 cursor-not-allowed opacity-50'
+                           : method === m.id
+                             ? 'border-dnd-gold bg-gray-800'
+                             : 'border-gray-700 bg-gray-800/50 hover:border-gray-600'
                        }`}
           >
-            <div className={`font-bold ${method === m.id ? 'text-dnd-gold' : 'text-white'}`}>
+            <div className={`font-bold ${m.disabled ? 'text-gray-600' : method === m.id ? 'text-dnd-gold' : 'text-white'}`}>
               {m.name}
             </div>
-            <div className="text-sm text-gray-400">{m.desc}</div>
+            <div className={`text-sm ${m.disabled ? 'text-gray-700' : 'text-gray-400'}`}>{m.desc}</div>
+            {m.disabled && (
+              <div className="absolute top-1 right-2 px-2 py-0.5 bg-gray-700 text-gray-500 text-xs rounded">
+                Coming Soon
+              </div>
+            )}
           </button>
         ))}
       </div>

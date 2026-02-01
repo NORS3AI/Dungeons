@@ -4,6 +4,7 @@ interface RaceCardProps {
   race: Race
   isSelected: boolean
   onSelect: (race: Race) => void
+  onReadMore: (race: Race) => void
 }
 
 /**
@@ -44,8 +45,13 @@ function getVisionDescription(vision: Race['vision'], range?: number): string {
  * Race Card Component
  * Displays a race option with visual styling and key information
  */
-export function RaceCard({ race, isSelected, onSelect }: RaceCardProps) {
+export function RaceCard({ race, isSelected, onSelect, onReadMore }: RaceCardProps) {
   const abilityBonuses = formatAbilityBonuses(race.abilityBonuses)
+
+  const handleReadMoreClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    onReadMore(race)
+  }
 
   return (
     <button
@@ -114,9 +120,20 @@ export function RaceCard({ race, isSelected, onSelect }: RaceCardProps) {
       </div>
 
       {/* Languages */}
-      <div className="mt-3 pt-3 border-t border-gray-700">
-        <span className="text-xs text-gray-500">Languages: </span>
-        <span className="text-xs text-gray-400">{race.languages.join(', ')}</span>
+      <div className="mt-3 pt-3 border-t border-gray-700 flex items-center justify-between">
+        <div>
+          <span className="text-xs text-gray-500">Languages: </span>
+          <span className="text-xs text-gray-400">{race.languages.join(', ')}</span>
+        </div>
+        <button
+          type="button"
+          onClick={handleReadMoreClick}
+          className="px-3 py-1 text-xs font-medium text-dnd-gold hover:text-yellow-400
+                     bg-dnd-gold/10 hover:bg-dnd-gold/20 rounded-full transition-all
+                     focus:outline-none focus:ring-2 focus:ring-dnd-gold focus:ring-offset-1 focus:ring-offset-gray-800"
+        >
+          Read More
+        </button>
       </div>
     </button>
   )

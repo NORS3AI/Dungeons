@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { Class, Subclass } from '../types'
 import { FIGHTER, WARLOCK, GREAT_OLD_ONE } from '../types'
 import { ClassCard } from './ClassCard'
+import { QuickRefTooltip } from './QuickRefTooltip'
 
 // Available classes
 const AVAILABLE_CLASSES: Class[] = [FIGHTER, WARLOCK]
@@ -15,8 +16,31 @@ const SUBCLASSES: Record<string, Subclass[]> = {
 interface ClassSelectorProps {
   initialClass?: Class | null
   initialSubclass?: Subclass | null
-  onSelect: (classData: Class, subclass?: Subclass) => void
+  initialSkills?: string[]
+  initialFightingStyle?: string | null
+  onSelect: (classData: Class, subclass?: Subclass, skills?: string[], fightingStyle?: string) => void
   onBack: () => void
+}
+
+/**
+ * Convert skill ID to display name
+ */
+function formatSkillName(skill: string): string {
+  // Convert camelCase to Title Case with spaces
+  return skill
+    .replace(/([A-Z])/g, ' $1')
+    .trim()
+    .replace(/^./, (str) => str.toUpperCase())
+}
+
+/**
+ * Convert skill name to ID for quick reference lookup
+ */
+function skillToId(skill: string): string {
+  return skill
+    .replace(/([A-Z])/g, '-$1')
+    .toLowerCase()
+    .replace(/^-/, '')
 }
 
 /**
@@ -41,17 +65,23 @@ function formatAbilityName(key: string): string {
 export function ClassSelector({
   initialClass,
   initialSubclass,
+  initialSkills = [],
+  initialFightingStyle = null,
   onSelect,
   onBack,
 }: ClassSelectorProps) {
   const [selectedClass, setSelectedClass] = useState<Class | null>(initialClass || null)
   const [selectedSubclass, setSelectedSubclass] = useState<Subclass | null>(initialSubclass || null)
+  const [selectedSkills, setSelectedSkills] = useState<string[]>(initialSkills)
+  const [selectedFightingStyle, setSelectedFightingStyle] = useState<string | null>(initialFightingStyle)
 
   const handleClassSelect = (classData: Class) => {
     setSelectedClass(classData)
-    // Reset subclass when class changes
+    // Reset subclass, skills, and fighting style when class changes
     if (selectedClass?.id !== classData.id) {
       setSelectedSubclass(null)
+      setSelectedSkills([])
+      setSelectedFightingStyle(null)
     }
   }
 
@@ -59,14 +89,36 @@ export function ClassSelector({
     setSelectedSubclass(subclass)
   }
 
+  const handleSkillToggle = (skill: string) => {
+    if (selectedSkills.includes(skill)) {
+      // Deselect the skill
+      setSelectedSkills(selectedSkills.filter((s) => s !== skill))
+    } else if (selectedClass && selectedSkills.length < selectedClass.skillChoices.choose) {
+      // Select the skill (if we haven't reached the limit)
+      setSelectedSkills([...selectedSkills, skill])
+    }
+  }
+
+  const handleFightingStyleSelect = (styleId: string) => {
+    setSelectedFightingStyle(styleId === selectedFightingStyle ? null : styleId)
+  }
+
   const handleSubmit = () => {
     if (selectedClass) {
-      onSelect(selectedClass, selectedSubclass || undefined)
+      onSelect(
+        selectedClass,
+        selectedSubclass || undefined,
+        selectedSkills.length > 0 ? selectedSkills : undefined,
+        selectedFightingStyle || undefined
+      )
     }
   }
 
   const availableSubclasses = selectedClass ? SUBCLASSES[selectedClass.id] || [] : []
   const needsSubclass = selectedClass && selectedClass.subclassLevel === 1 && availableSubclasses.length > 0
+  const skillsRemaining = selectedClass ? selectedClass.skillChoices.choose - selectedSkills.length : 0
+  const hasFightingStyles = selectedClass?.fightingStyles && selectedClass.fightingStyles.length > 0
+  const needsFightingStyle = hasFightingStyles && !selectedFightingStyle
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -147,21 +199,66 @@ export function ClassSelector({
             </div>
           </div>
 
-          {/* Skills */}
+          {/* Skills Selection */}
           <div className="mb-6">
-            <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
-              Skill Choices (Choose {selectedClass.skillChoices.choose})
-            </h4>
-            <div className="flex flex-wrap gap-2">
-              {selectedClass.skillChoices.from.map((skill) => (
-                <span
-                  key={skill}
-                  className="px-3 py-1 bg-gray-700 text-gray-300 text-sm rounded-full capitalize"
-                >
-                  {skill.replace(/([A-Z])/g, ' $1').trim()}
-                </span>
-              ))}
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
+                Select Your Skills
+              </h4>
+              <span className={`text-sm font-medium ${skillsRemaining > 0 ? 'text-dnd-gold' : 'text-green-400'}`}>
+                {skillsRemaining > 0 ? `${skillsRemaining} remaining` : 'All selected!'}
+              </span>
             </div>
+            <p className="text-xs text-gray-500 mb-3">
+              Choose {selectedClass.skillChoices.choose} skills. Click to select, click again to deselect.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {selectedClass.skillChoices.from.map((skill) => {
+                const isSelected = selectedSkills.includes(skill)
+                const canSelect = selectedSkills.length < selectedClass.skillChoices.choose
+                return (
+                  <button
+                    key={skill}
+                    type="button"
+                    onClick={() => handleSkillToggle(skill)}
+                    disabled={!isSelected && !canSelect}
+                    className={`px-4 py-2 text-sm rounded-lg font-medium transition-all duration-200
+                               flex items-center gap-2 border-2
+                               ${
+                                 isSelected
+                                   ? 'bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-500/20'
+                                   : canSelect
+                                     ? 'bg-gray-700 text-gray-300 border-gray-600 hover:border-blue-500 hover:text-white'
+                                     : 'bg-gray-800 text-gray-500 border-gray-700 cursor-not-allowed'
+                               }`}
+                  >
+                    {isSelected && (
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
+                    {formatSkillName(skill)}
+                  </button>
+                )
+              })}
+            </div>
+            {/* Quick reference for selected skills */}
+            {selectedSkills.length > 0 && (
+              <div className="mt-4 p-3 bg-blue-900/20 border border-blue-500/30 rounded-lg">
+                <p className="text-xs text-blue-300 mb-2">Selected skills (click for details):</p>
+                <div className="flex flex-wrap gap-2">
+                  {selectedSkills.map((skill) => (
+                    <QuickRefTooltip key={skill} type="skill" id={skillToId(skill)}>
+                      {formatSkillName(skill)}
+                    </QuickRefTooltip>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Level 1 Features */}
@@ -188,19 +285,66 @@ export function ClassSelector({
             </div>
           </div>
 
-          {/* Fighting Styles (for Fighter) */}
+          {/* Fighting Styles Selection (for Fighter) */}
           {selectedClass.fightingStyles && selectedClass.fightingStyles.length > 0 && (
             <div className="mb-6">
-              <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                Fighting Style Options
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {selectedClass.fightingStyles.map((style) => (
-                  <div key={style.id} className="p-3 bg-gray-700/30 rounded-lg">
-                    <span className="text-white font-medium">{style.name}: </span>
-                    <span className="text-gray-400 text-sm">{style.description}</span>
-                  </div>
-                ))}
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
+                  Choose Your Fighting Style
+                </h4>
+                {selectedFightingStyle ? (
+                  <span className="text-sm font-medium text-green-400">Selected!</span>
+                ) : (
+                  <span className="text-sm font-medium text-dnd-gold">Required</span>
+                )}
+              </div>
+              <p className="text-xs text-gray-500 mb-3">
+                Select one fighting style that defines your combat specialization.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {selectedClass.fightingStyles.map((style) => {
+                  const isSelected = selectedFightingStyle === style.id
+                  const isDualTwoHanded = style.id === 'dual-two-handed'
+                  return (
+                    <button
+                      key={style.id}
+                      type="button"
+                      onClick={() => handleFightingStyleSelect(style.id)}
+                      className={`text-left p-4 rounded-lg border-2 transition-all duration-200
+                                 ${
+                                   isSelected
+                                     ? 'bg-red-900/20 border-red-500 shadow-lg shadow-red-500/10'
+                                     : 'bg-gray-700/30 border-gray-600 hover:border-red-500/50'
+                                 }`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className={`font-semibold ${isSelected ? 'text-red-400' : 'text-white'}`}>
+                          {style.name}
+                        </span>
+                        {isSelected && (
+                          <svg className="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        )}
+                      </div>
+                      <p className="text-gray-400 text-sm">{style.description}</p>
+                      {isDualTwoHanded && (
+                        <div className="mt-2 flex items-center gap-2">
+                          <span className="px-2 py-0.5 bg-yellow-900/30 text-yellow-400 text-xs rounded font-medium">
+                            Homebrew
+                          </span>
+                          <span className="px-2 py-0.5 bg-red-900/30 text-red-400 text-xs rounded">
+                            -4 AC
+                          </span>
+                        </div>
+                      )}
+                    </button>
+                  )
+                })}
               </div>
             </div>
           )}
@@ -301,12 +445,12 @@ export function ClassSelector({
         <button
           type="button"
           onClick={handleSubmit}
-          disabled={!selectedClass || (!!needsSubclass && !selectedSubclass)}
+          disabled={!selectedClass || (!!needsSubclass && !selectedSubclass) || skillsRemaining > 0 || !!needsFightingStyle}
           className={`px-8 py-3 rounded-lg font-semibold transition-all duration-200
                      focus:outline-none focus:ring-2 focus:ring-dnd-gold focus:ring-offset-2
                      focus:ring-offset-gray-900
                      ${
-                       selectedClass && (!needsSubclass || selectedSubclass)
+                       selectedClass && (!needsSubclass || selectedSubclass) && skillsRemaining === 0 && !needsFightingStyle
                          ? 'bg-dnd-gold text-gray-900 hover:bg-yellow-500'
                          : 'bg-gray-700 text-gray-500 cursor-not-allowed'
                      }`}
@@ -321,6 +465,7 @@ export function ClassSelector({
           <span className="text-dnd-gold font-medium">Tip:</span>{' '}
           Your class determines your hit points, proficiencies, and special abilities.
           {needsSubclass && ' Warlocks must choose their Otherworldly Patron at level 1.'}
+          {' '}Select your {selectedClass?.skillChoices.choose || 2} skill proficiencies to continue.
         </p>
       </div>
     </div>
