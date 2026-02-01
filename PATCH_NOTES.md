@@ -138,19 +138,117 @@ Version format: `v0.0.pX-alpha` where X = phase number
 
 ---
 
+## [v0.0.p2-alpha] - 2026-02-01 @ 9:46 AM MST-AZ
+
+### Phase 2: Character Details Page
+
+**Character Creation Wizard - Step 1 Complete**
+
+#### New Components
+- **`src/components/CharacterDetailsForm.tsx`** - Full character details form with:
+  - Character Name input (required, 2-50 characters)
+  - Age input with numeric validation
+  - Height input (free text, e.g., "5'10\"")
+  - Weight input (free text, e.g., "150 lbs")
+  - Player Name input (for DM tracking)
+  - Backstory/Notes textarea (up to 5000 characters with counter)
+  - Full ARIA accessibility attributes
+  - Real-time validation with error messages
+
+- **`src/components/WizardSteps.tsx`** - Progress indicator with:
+  - Desktop view: Horizontal step indicators with checkmarks
+  - Mobile view: Compact progress bar with step counter
+  - Clickable navigation to completed steps
+  - 7-step character creation flow defined
+  - Visual states: pending, current, completed
+
+#### Keyboard Navigation
+- **Tab** to move forward through fields
+- **Shift+Tab** to move backward
+- **Enter** to advance to next field (on text inputs)
+- Auto-focus on first input when page loads
+- Keyboard shortcuts hint displayed at bottom
+
+#### Form Validation
+- Required field indication with red asterisk
+- Real-time validation on blur
+- Error messages with ARIA alerts for screen readers
+- Next button disabled until required fields valid
+- Character limits with visual feedback
+
+#### Updated Pages
+- **`src/pages/CharacterCreatePage.tsx`** - Complete wizard implementation:
+  - WizardSteps progress indicator at top
+  - Step-by-step flow with Back/Next navigation
+  - Details form integrated with characterStore
+  - Placeholder pages for steps 2-6 (Race, Class, Stats, Spells, Equipment)
+  - Review page shows character summary
+  - Save Character button on final step
+  - Navigate to character sheet after save
+
+#### Store Integration
+- Form data syncs with `useCharacterStore`
+- Character details persisted on navigation
+- Undo/redo history maintained
+- Auto-create new character on page load if none exists
+
+---
+
+## [v0.0.p3-alpha] - 2026-02-01 @ 10:04 AM MST-AZ
+
+### Phase 3: Race Selection Page
+
+**Character Creation Wizard - Step 2 Complete**
+
+#### New Components
+- **`src/components/RaceCard.tsx`** - Visual race card with:
+  - Race name and size display
+  - Description preview (2-line clamp)
+  - Ability bonus badges (+2 DEX, +1 CHA format)
+  - Speed and vision quick stats
+  - Languages list
+  - Selected state with gold border and checkmark
+  - Full keyboard accessibility (Tab navigation, aria-pressed)
+
+- **`src/components/RaceSelector.tsx`** - Race selection page with:
+  - Grid layout for race cards (responsive 1-2 columns)
+  - Available races: Drow, Tiefling
+  - "Coming soon" placeholder for future races
+  - Detailed trait panel on selection
+
+#### Race Details Panel (on selection)
+- **Ability Score Increases** - Visual display with ability name and bonus
+- **Racial Traits** - Full description for each trait
+- **Innate Spellcasting** - Spell list with level requirements and uses/day
+- **Weapon Proficiencies** - List of racial weapon proficiencies
+- **Damage Resistances** - Highlighted resistance badges
+- **Quick Stats Grid** - Size, Speed, Vision Range, Languages count
+
+#### Available Races
+- **Drow** - +2 DEX, +1 CHA, Superior Darkvision 120ft
+  - Traits: Fey Ancestry, Trance, Sunlight Sensitivity
+  - Spells: Dancing Lights (1), Faerie Fire (3), Darkness (5)
+  - Proficiencies: Rapier, Shortsword, Hand Crossbow
+
+- **Tiefling** - +2 CHA, +1 INT, Darkvision 60ft
+  - Traits: Hellish Resistance (fire)
+  - Spells: Thaumaturgy (1), Hellish Rebuke (3), Darkness (5)
+
+#### Updated Pages
+- **`src/pages/CharacterCreatePage.tsx`** - Race step integration:
+  - RaceSelector component replaces placeholder
+  - Race selection saved to characterStore via setRace()
+  - Preserves selected race when navigating back
+  - Review page now displays selected race name
+
+#### Store Integration
+- Race selection persisted via `setRace()` action
+- Undo/redo history tracks race changes
+- Race displayed in Review step summary
+
+---
+
 ## Upcoming Phases
-
-### Phase 2: Character Details Page (Planned)
-- Character name, age, height, weight inputs
-- Background story/notes field
-- Player name for DM tracking
-- Tab/Shift+Tab keyboard navigation
-- Form validation
-
-### Phase 3: Race Selection Page (Planned)
-- Visual race cards
-- Racial traits display
-- Ability score modifier preview
 
 ### Phase 4: Class Selection Page (Planned)
 - Visual class cards
@@ -196,6 +294,8 @@ Version format: `v0.0.pX-alpha` where X = phase number
 
 | Version | Date | Phase | Description |
 |---------|------|-------|-------------|
+| v0.0.p3-alpha | 2026-02-01 | 3 | Race Selection Page |
+| v0.0.p2-alpha | 2026-02-01 | 2 | Character Details Page |
 | v0.0.p1-alpha | 2026-02-01 | 1 | Project Setup & Infrastructure |
 
 ---
