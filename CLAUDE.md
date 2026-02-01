@@ -460,7 +460,15 @@ Eldritch-themed warlock with psychic abilities:
 - [ ] Create settings page/modal
 - [ ] User preferences persistence
 - [ ] Keyboard shortcut customization
-- [ ] Accessibility options (font size, contrast)
+
+#### Font & Accessibility
+- [ ] Font size controls with +/- icons
+- [ ] Font size range (e.g., 12px to 24px)
+- [ ] Responsive text scaling in constrained areas (character sheets, cards)
+- [ ] Text overflow handling (truncate, wrap, or shrink-to-fit)
+- [ ] High contrast mode toggle
+- [ ] Dyslexia-friendly font option (OpenDyslexic)
+- [ ] Remember font preferences per user
 
 #### Theme System
 - [ ] Implement theme switching infrastructure
