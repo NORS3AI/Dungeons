@@ -10,7 +10,6 @@ import type {
   Currency,
   Spell,
   Condition,
-  FeatureCharge,
 } from '../types'
 import { DEFAULT_ABILITY_SCORES, EMPTY_CURRENCY } from '../types'
 
