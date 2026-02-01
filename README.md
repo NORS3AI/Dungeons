@@ -82,6 +82,10 @@ All classes and races from the **2024 Player's Handbook** will be supported.
 - Second Wind HP recovery
 - Action Surge tracking
 - Martial Archetype features
+- **Weapon Mastery Options** (Homebrew):
+  - Two-Handed: Standard 2d6/1d12 damage
+  - Dual Two-Handed: 4d6 damage, -4 AC penalty (dual greatswords!)
+  - Sword & Board: Simple weapon + shield
 
 ### Warlock (Great Old One)
 - Hit Die: d8

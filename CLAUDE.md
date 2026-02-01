@@ -155,6 +155,22 @@ Base Fighter features:
 - Martial Archetype (level 3)
 - Extra Attack (level 5)
 
+### Weapon Mastery Options (Homebrew)
+
+DM-approved weapon configurations for Fighters:
+
+| Style | Description | Damage | AC Modifier |
+|-------|-------------|--------|-------------|
+| **Two-Handed** | Standard two-handed weapon (greatsword, greataxe, etc.) | 2d6 / 1d12 | None |
+| **Dual Two-Handed** | Wield two greatswords or similar | 4d6 | **-4 AC** |
+| **Sword & Board** | Simple weapon + shield | 1d6/1d8 | +2 AC (shield) |
+
+**Dual Two-Handed Details:**
+- Fighter wields two two-handed weapons simultaneously (e.g., two greatswords)
+- Damage dice doubled (2d6 → 4d6)
+- Permanent -4 penalty to AC while using this style
+- Requires both hands occupied (no shield, no free hand for grappling)
+
 ### Warlock - Great Old One Patron
 Eldritch-themed warlock with psychic abilities:
 - **Expanded Spells**: Dissonant Whispers, Tasha's Hideous Laughter, Detect Thoughts, Phantasmal Force, Clairvoyance, Sending, Dominate Beast, Evard's Black Tentacles, Dominate Person, Telekinesis
