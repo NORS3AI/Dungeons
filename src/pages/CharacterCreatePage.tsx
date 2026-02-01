@@ -4,7 +4,11 @@ import { useCharacterStore } from '../stores/characterStore'
 import { WizardSteps, CHARACTER_CREATION_STEPS } from '../components/WizardSteps'
 import { CharacterDetailsForm } from '../components/CharacterDetailsForm'
 import { RaceSelector } from '../components/RaceSelector'
-import type { Race } from '../types'
+import { ClassSelector } from '../components/ClassSelector'
+import { StatAllocator } from '../components/StatAllocator'
+import { SpellSelector } from '../components/SpellSelector'
+import type { Race, Class, Subclass, AbilityScores, Spell } from '../types'
+import { calculateModifier } from '../types'
 
 /**
  * Map creation step to step number for WizardSteps component
@@ -27,6 +31,10 @@ export function CharacterCreatePage() {
     createNewCharacter,
     updateCharacterDetails,
     setRace,
+    setClass,
+    setSubclass,
+    setAbilityScores,
+    addSpell,
     nextStep,
     prevStep,
     setCreationStep,
@@ -74,6 +82,26 @@ export function CharacterCreatePage() {
     nextStep()
   }
 
+  const handleClassSelect = (classData: Class, subclass?: Subclass) => {
+    setClass(classData)
+    if (subclass) {
+      setSubclass(subclass)
+    }
+    nextStep()
+  }
+
+  const handleStatsSubmit = (scores: AbilityScores) => {
+    setAbilityScores(scores)
+    nextStep()
+  }
+
+  const handleSpellsSubmit = (cantrips: Spell[], spells: Spell[]) => {
+    // Add all selected spells to character
+    cantrips.forEach((spell) => addSpell(spell))
+    spells.forEach((spell) => addSpell(spell))
+    nextStep()
+  }
+
   const handleFinalize = () => {
     saveCharacter()
     if (currentCharacter) {
@@ -111,98 +139,33 @@ export function CharacterCreatePage() {
 
       case 'class':
         return (
-          <div className="max-w-2xl mx-auto">
-            <div className="mb-8">
-              <h2 className="text-3xl font-bold text-dnd-gold mb-2">Choose Your Class</h2>
-              <p className="text-gray-400">
-                Select a class that defines your character's abilities and role.
-              </p>
-            </div>
-            <div className="card bg-gray-800 border border-gray-700 p-8 text-center">
-              <p className="text-gray-400 mb-4">Class selection coming in Phase 4</p>
-              <p className="text-gray-500 text-sm">Available classes: Fighter, Warlock (more coming soon)</p>
-            </div>
-            <div className="flex justify-between pt-6 mt-6 border-t border-gray-700">
-              <button
-                onClick={handleBack}
-                className="px-6 py-3 text-gray-300 hover:text-white border border-gray-600
-                         hover:border-gray-500 rounded-lg transition-colors duration-200"
-              >
-                Back
-              </button>
-              <button
-                onClick={nextStep}
-                className="px-8 py-3 bg-dnd-gold text-gray-900 rounded-lg font-semibold
-                         hover:bg-yellow-500 transition-colors duration-200"
-              >
-                Next: Allocate Stats
-              </button>
-            </div>
-          </div>
+          <ClassSelector
+            initialClass={currentCharacter?.class}
+            initialSubclass={currentCharacter?.subclass}
+            onSelect={handleClassSelect}
+            onBack={handleBack}
+          />
         )
 
       case 'stats':
         return (
-          <div className="max-w-2xl mx-auto">
-            <div className="mb-8">
-              <h2 className="text-3xl font-bold text-dnd-gold mb-2">Allocate Ability Scores</h2>
-              <p className="text-gray-400">
-                Determine your character's core abilities using one of three methods.
-              </p>
-            </div>
-            <div className="card bg-gray-800 border border-gray-700 p-8 text-center">
-              <p className="text-gray-400 mb-4">Stat allocation coming in Phase 5</p>
-              <p className="text-gray-500 text-sm">Methods: Standard Array, Point Buy, Roll (4d6 drop lowest)</p>
-            </div>
-            <div className="flex justify-between pt-6 mt-6 border-t border-gray-700">
-              <button
-                onClick={handleBack}
-                className="px-6 py-3 text-gray-300 hover:text-white border border-gray-600
-                         hover:border-gray-500 rounded-lg transition-colors duration-200"
-              >
-                Back
-              </button>
-              <button
-                onClick={nextStep}
-                className="px-8 py-3 bg-dnd-gold text-gray-900 rounded-lg font-semibold
-                         hover:bg-yellow-500 transition-colors duration-200"
-              >
-                Next: Choose Spells
-              </button>
-            </div>
-          </div>
+          <StatAllocator
+            initialScores={currentCharacter?.abilityScores}
+            race={currentCharacter?.race}
+            onSubmit={handleStatsSubmit}
+            onBack={handleBack}
+          />
         )
 
       case 'spells':
         return (
-          <div className="max-w-2xl mx-auto">
-            <div className="mb-8">
-              <h2 className="text-3xl font-bold text-dnd-gold mb-2">Select Spells</h2>
-              <p className="text-gray-400">
-                Choose cantrips and spells for your character (if applicable).
-              </p>
-            </div>
-            <div className="card bg-gray-800 border border-gray-700 p-8 text-center">
-              <p className="text-gray-400 mb-4">Spell selection coming in Phase 6</p>
-              <p className="text-gray-500 text-sm">Includes: Cantrips, Leveled Spells, Expanded Spell Lists</p>
-            </div>
-            <div className="flex justify-between pt-6 mt-6 border-t border-gray-700">
-              <button
-                onClick={handleBack}
-                className="px-6 py-3 text-gray-300 hover:text-white border border-gray-600
-                         hover:border-gray-500 rounded-lg transition-colors duration-200"
-              >
-                Back
-              </button>
-              <button
-                onClick={nextStep}
-                className="px-8 py-3 bg-dnd-gold text-gray-900 rounded-lg font-semibold
-                         hover:bg-yellow-500 transition-colors duration-200"
-              >
-                Next: Equipment
-              </button>
-            </div>
-          </div>
+          <SpellSelector
+            characterClass={currentCharacter?.class}
+            subclass={currentCharacter?.subclass}
+            level={currentCharacter?.level || 1}
+            onSubmit={handleSpellsSubmit}
+            onBack={handleBack}
+          />
         )
 
       case 'equipment':
@@ -249,53 +212,80 @@ export function CharacterCreatePage() {
 
             {/* Character Summary */}
             {currentCharacter && (
-              <div className="card bg-gray-800 border border-gray-700 p-6 mb-6">
-                <h3 className="text-xl font-bold text-white mb-4">
-                  {currentCharacter.name || 'Unnamed Character'}
-                </h3>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-gray-500">Player:</span>{' '}
-                    <span className="text-gray-300">
-                      {currentCharacter.playerName || 'Not specified'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-gray-500">Age:</span>{' '}
-                    <span className="text-gray-300">
-                      {currentCharacter.age || 'Not specified'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-gray-500">Height:</span>{' '}
-                    <span className="text-gray-300">
-                      {currentCharacter.height || 'Not specified'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-gray-500">Weight:</span>{' '}
-                    <span className="text-gray-300">
-                      {currentCharacter.weight || 'Not specified'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-gray-500">Race:</span>{' '}
-                    <span className="text-gray-300">
-                      {currentCharacter.race?.name || 'Not selected'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-gray-500">Class:</span>{' '}
-                    <span className="text-gray-300">
-                      {currentCharacter.class?.name || 'Not selected'}
-                    </span>
+              <div className="space-y-6">
+                {/* Basic Info */}
+                <div className="card bg-gray-800 border border-gray-700 p-6">
+                  <h3 className="text-xl font-bold text-dnd-gold mb-4">
+                    {currentCharacter.name || 'Unnamed Character'}
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-gray-500">Player:</span>{' '}
+                      <span className="text-gray-300">
+                        {currentCharacter.playerName || 'Not specified'}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Level:</span>{' '}
+                      <span className="text-gray-300">{currentCharacter.level}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Race:</span>{' '}
+                      <span className="text-gray-300">
+                        {currentCharacter.race?.name || 'Not selected'}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Class:</span>{' '}
+                      <span className="text-gray-300">
+                        {currentCharacter.class?.name || 'Not selected'}
+                        {currentCharacter.subclass && ` (${currentCharacter.subclass.name})`}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
+                {/* Ability Scores */}
+                <div className="card bg-gray-800 border border-gray-700 p-6">
+                  <h4 className="font-semibold text-white mb-4">Ability Scores</h4>
+                  <div className="grid grid-cols-6 gap-4 text-center">
+                    {(['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'] as const).map((ability) => (
+                      <div key={ability}>
+                        <div className="text-xs text-gray-500 uppercase">{ability.slice(0, 3)}</div>
+                        <div className="text-xl font-bold text-white">
+                          {currentCharacter.abilityScores[ability]}
+                        </div>
+                        <div className="text-sm text-dnd-gold">
+                          {calculateModifier(currentCharacter.abilityScores[ability]) >= 0 ? '+' : ''}
+                          {calculateModifier(currentCharacter.abilityScores[ability])}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Spells (if any) */}
+                {currentCharacter.knownSpells.length > 0 && (
+                  <div className="card bg-gray-800 border border-gray-700 p-6">
+                    <h4 className="font-semibold text-white mb-4">Known Spells</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {currentCharacter.knownSpells.map((spell) => (
+                        <span
+                          key={spell.id}
+                          className="px-3 py-1 bg-purple-900/30 text-purple-300 text-sm rounded-full"
+                        >
+                          {spell.name}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Backstory */}
                 {currentCharacter.backstory && (
-                  <div className="mt-4 pt-4 border-t border-gray-700">
-                    <span className="text-gray-500 text-sm">Backstory:</span>
-                    <p className="text-gray-300 mt-1 text-sm whitespace-pre-wrap">
+                  <div className="card bg-gray-800 border border-gray-700 p-6">
+                    <h4 className="font-semibold text-white mb-2">Backstory</h4>
+                    <p className="text-gray-300 text-sm whitespace-pre-wrap">
                       {currentCharacter.backstory}
                     </p>
                   </div>
@@ -303,11 +293,7 @@ export function CharacterCreatePage() {
               </div>
             )}
 
-            <div className="card bg-gray-800 border border-gray-700 p-8 text-center mb-6">
-              <p className="text-gray-400 mb-4">Full character sheet preview coming in Phase 8</p>
-            </div>
-
-            <div className="flex justify-between pt-6 border-t border-gray-700">
+            <div className="flex justify-between pt-6 mt-6 border-t border-gray-700">
               <button
                 onClick={handleBack}
                 className="px-6 py-3 text-gray-300 hover:text-white border border-gray-600
