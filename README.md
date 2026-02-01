@@ -141,6 +141,28 @@ All classes and races from the **2024 Player's Handbook** will be supported.
 - Infernal Legacy: Thaumaturgy → Hellish Rebuke → Darkness
 - Multiple bloodline options
 
+## User Accounts & Cloud Save
+
+- **Create Account**: Register to save your characters
+- **Unlimited Characters**: Store as many characters as you want
+- **Cloud Sync**: Access your characters from any device
+- **Campaign Sharing**: DMs can invite players and view all party sheets
+
+## Themes
+
+Customize your experience with multiple visual themes:
+
+| Theme | Style |
+|-------|-------|
+| Light Mode | Clean, bright interface |
+| Lighter Mode | High contrast, maximum brightness |
+| Dark Mode | Easy on the eyes for long sessions |
+| Darker Mode | OLED-friendly, true blacks |
+| **D&D Theme** | Parchment textures, classic fantasy |
+| **WoW Theme** | Azeroth-inspired, gold accents |
+| **Final Fantasy Theme** | Crystal aesthetics, blue tones |
+| **Diablo 3 Theme** | Gothic, dark red, demonic styling |
+
 ## Tech Stack
 
 - **Framework**: React + TypeScript + Vite

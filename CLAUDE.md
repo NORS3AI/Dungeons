@@ -422,15 +422,56 @@ Eldritch-themed warlock with psychic abilities:
 - [ ] Add feats selection
 - [ ] Implement multiclassing rules
 
-### Phase 4: Polish & Advanced
+### Phase 4: Polish & Export
 
 - [ ] PDF character sheet export
 - [ ] JSON import/export
 - [ ] Character leveling system
-- [ ] Dark mode toggle
 - [ ] Print-friendly character sheets
 - [ ] Homebrew content import system
-- [ ] Party/campaign sharing features
+
+### Phase 5: User Accounts & Cloud
+
+#### Login System
+- [ ] Create account registration page
+- [ ] Create login page
+- [ ] Implement authentication (JWT or session-based)
+- [ ] Password reset functionality
+- [ ] Email verification (optional)
+- [ ] OAuth options (Google, Discord) - future
+
+#### Character Storage
+- [ ] Cloud save for unlimited characters
+- [ ] Character list per player account
+- [ ] Quick-load character sheets
+- [ ] Sync between devices
+- [ ] Offline mode with sync on reconnect
+- [ ] Character sharing between accounts
+
+#### Campaign Sharing
+- [ ] Invite players to campaign
+- [ ] DM access to all party character sheets
+- [ ] Real-time updates during sessions
+- [ ] Campaign export/backup
+
+### Phase 6: Settings & Themes
+
+#### Settings Page
+- [ ] Create settings page/modal
+- [ ] User preferences persistence
+- [ ] Keyboard shortcut customization
+- [ ] Accessibility options (font size, contrast)
+
+#### Theme System
+- [ ] Implement theme switching infrastructure
+- [ ] **Light Mode** - Clean, bright interface
+- [ ] **Lighter Mode** - High contrast, maximum brightness
+- [ ] **Dark Mode** - Easy on the eyes for long sessions
+- [ ] **Darker Mode** - OLED-friendly, true blacks
+- [ ] **Dungeons & Dragons Theme** - Parchment textures, classic fantasy styling
+- [ ] **World of Warcraft Theme** - Azeroth-inspired UI, gold accents
+- [ ] **Final Fantasy Theme** - Crystal/menu aesthetics, blue tones
+- [ ] **Diablo 3 Theme** - Gothic, dark red accents, demonic styling
 
 ---
 
