@@ -3,6 +3,7 @@ import type { Race } from '../types'
 import { DROW, TIEFLING } from '../types'
 import { RaceCard } from './RaceCard'
 import { RaceDetailModal } from './RaceDetailModal'
+import { QuickRefTooltip } from './QuickRefTooltip'
 
 // Available races for selection
 const AVAILABLE_RACES: Race[] = [DROW, TIEFLING]
@@ -98,6 +99,7 @@ export function RaceSelector({ initialRace, onSelect, onBack }: RaceSelectorProp
           <div className="mb-6">
             <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
               Ability Score Increases
+              <span className="text-xs font-normal text-gray-500 ml-2">(click ability names to learn more)</span>
             </h4>
             <div className="flex flex-wrap gap-3">
               {Object.entries(selectedRace.abilityBonuses)
@@ -107,7 +109,9 @@ export function RaceSelector({ initialRace, onSelect, onBack }: RaceSelectorProp
                     key={ability}
                     className="flex items-center gap-2 px-4 py-2 bg-gray-700/50 rounded-lg"
                   >
-                    <span className="text-white font-medium">{formatAbilityName(ability)}</span>
+                    <QuickRefTooltip type="ability" id={ability}>
+                      <span className="font-medium">{formatAbilityName(ability)}</span>
+                    </QuickRefTooltip>
                     <span className="text-dnd-gold font-bold">+{bonus}</span>
                   </div>
                 ))}
@@ -118,11 +122,16 @@ export function RaceSelector({ initialRace, onSelect, onBack }: RaceSelectorProp
           <div className="mb-6">
             <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
               Racial Traits
+              <span className="text-xs font-normal text-gray-500 ml-2">(click trait names for details)</span>
             </h4>
             <div className="space-y-3">
               {selectedRace.traits.map((trait) => (
                 <div key={trait.id} className="p-4 bg-gray-700/30 rounded-lg">
-                  <h5 className="text-white font-semibold mb-1">{trait.name}</h5>
+                  <h5 className="mb-1">
+                    <QuickRefTooltip type="trait" id={trait.id}>
+                      <span className="font-semibold">{trait.name}</span>
+                    </QuickRefTooltip>
+                  </h5>
                   <p className="text-gray-300 text-sm">{trait.description}</p>
                 </div>
               ))}
@@ -134,6 +143,7 @@ export function RaceSelector({ initialRace, onSelect, onBack }: RaceSelectorProp
             <div className="mb-6">
               <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
                 Innate Spellcasting
+                <span className="text-xs font-normal text-gray-500 ml-2">(click spell names for details)</span>
               </h4>
               <div className="space-y-2">
                 {selectedRace.spells.map((spell) => (
@@ -141,9 +151,11 @@ export function RaceSelector({ initialRace, onSelect, onBack }: RaceSelectorProp
                     key={spell.spellId}
                     className="flex items-center justify-between p-3 bg-gray-700/30 rounded-lg"
                   >
-                    <div>
-                      <span className="text-white font-medium">{spell.spellName}</span>
-                      <span className="text-gray-400 text-sm ml-2">
+                    <div className="flex items-center gap-2">
+                      <QuickRefTooltip type="spell" id={spell.spellId}>
+                        <span className="font-medium">{spell.spellName}</span>
+                      </QuickRefTooltip>
+                      <span className="text-gray-400 text-sm">
                         (Level {spell.levelGained}+)
                       </span>
                     </div>
@@ -161,15 +173,15 @@ export function RaceSelector({ initialRace, onSelect, onBack }: RaceSelectorProp
             <div className="mb-6">
               <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
                 Weapon Proficiencies
+                <span className="text-xs font-normal text-gray-500 ml-2">(click for weapon stats)</span>
               </h4>
               <div className="flex flex-wrap gap-2">
                 {selectedRace.weaponProficiencies.map((weapon) => (
-                  <span
-                    key={weapon}
-                    className="px-3 py-1 bg-gray-700 text-gray-300 text-sm rounded-full capitalize"
-                  >
-                    {weapon.replace('-', ' ')}
-                  </span>
+                  <QuickRefTooltip key={weapon} type="weapon" id={weapon}>
+                    <span className="px-3 py-1 bg-gray-700 text-sm rounded-full capitalize">
+                      {weapon.replace('-', ' ')}
+                    </span>
+                  </QuickRefTooltip>
                 ))}
               </div>
             </div>
@@ -249,10 +261,10 @@ export function RaceSelector({ initialRace, onSelect, onBack }: RaceSelectorProp
       {/* Keyboard Navigation Hint */}
       <div className="mt-8 p-4 bg-gray-800/50 rounded-lg border border-gray-700">
         <p className="text-sm text-gray-400">
-          <span className="text-dnd-gold font-medium">Tip:</span>{' '}
-          Click on a race card to select it and view detailed traits below.
-          Use <kbd className="px-2 py-1 bg-gray-700 rounded text-xs">Tab</kbd> to navigate between cards.
-          Click <span className="text-dnd-gold">Read More</span> for full race details.
+          <span className="text-dnd-gold font-medium">New to D&D?</span>{' '}
+          Click on any <span className="text-purple-400">highlighted text</span> to learn what it means!
+          Abilities, traits, spells, and weapons all have detailed explanations.
+          Click <span className="text-dnd-gold">Read More</span> on any race card for full lore and details.
         </p>
       </div>
 
