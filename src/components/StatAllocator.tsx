@@ -142,14 +142,18 @@ export function StatAllocator({ initialScores, race, onSubmit, onBack }: StatAll
 
   const getAvailableRollValues = (): number[] => {
     const assigned = Object.values(rollAssignments).filter((v) => v !== null) as number[]
-    return rolledScores.filter((v) => {
-      const assignedIndex = assigned.indexOf(v)
-      if (assignedIndex === -1) return true
-      // Handle duplicates
-      const countInRolled = rolledScores.filter((r) => r === v).length
-      const countAssigned = assigned.filter((a) => a === v).length
-      return countAssigned < countInRolled && !assigned.slice(0, assigned.indexOf(v) + 1).includes(v)
-    })
+    // Create a copy of rolled scores to track availability
+    const available: number[] = [...rolledScores]
+
+    // Remove assigned values one by one (handles duplicates correctly)
+    for (const val of assigned) {
+      const idx = available.indexOf(val)
+      if (idx !== -1) {
+        available.splice(idx, 1)
+      }
+    }
+
+    return available
   }
 
   const handleRollAssign = (ability: AbilityKey, value: number | null) => {
