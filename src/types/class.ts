@@ -162,6 +162,7 @@ export const FIGHTER: Class = {
     { id: 'great-weapon', name: 'Great Weapon Fighting', description: 'Reroll 1s and 2s on damage dice for two-handed weapons.' },
     { id: 'protection', name: 'Protection', description: 'Use reaction to impose disadvantage on attack against adjacent ally.' },
     { id: 'two-weapon', name: 'Two-Weapon Fighting', description: 'Add ability modifier to off-hand attack damage.' },
+    { id: 'dual-two-handed', name: 'Dual Two-Handed', description: 'Wield two two-handed weapons simultaneously (e.g., two greatswords). -4 AC penalty but roll damage for both weapons.' },
   ],
   subclassLevel: 3,
   subclassName: 'Martial Archetype',

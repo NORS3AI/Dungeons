@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import type { Race } from '../types'
 import { DROW, TIEFLING } from '../types'
 import { RaceCard } from './RaceCard'
+import { RaceDetailModal } from './RaceDetailModal'
 
 // Available races for selection
 const AVAILABLE_RACES: Race[] = [DROW, TIEFLING]
@@ -33,11 +34,20 @@ function formatAbilityName(key: string): string {
  */
 export function RaceSelector({ initialRace, onSelect, onBack }: RaceSelectorProps) {
   const [selectedRace, setSelectedRace] = useState<Race | null>(initialRace || null)
+  const [modalRace, setModalRace] = useState<Race | null>(null)
 
   // Focus management for accessibility
   useEffect(() => {
     // Could focus on first card here if needed
   }, [])
+
+  const handleReadMore = (race: Race) => {
+    setModalRace(race)
+  }
+
+  const handleCloseModal = () => {
+    setModalRace(null)
+  }
 
   const handleRaceSelect = (race: Race) => {
     setSelectedRace(race)
@@ -67,6 +77,7 @@ export function RaceSelector({ initialRace, onSelect, onBack }: RaceSelectorProp
             race={race}
             isSelected={selectedRace?.id === race.id}
             onSelect={handleRaceSelect}
+            onReadMore={handleReadMore}
           />
         ))}
       </div>
@@ -241,8 +252,18 @@ export function RaceSelector({ initialRace, onSelect, onBack }: RaceSelectorProp
           <span className="text-dnd-gold font-medium">Tip:</span>{' '}
           Click on a race card to select it and view detailed traits below.
           Use <kbd className="px-2 py-1 bg-gray-700 rounded text-xs">Tab</kbd> to navigate between cards.
+          Click <span className="text-dnd-gold">Read More</span> for full race details.
         </p>
       </div>
+
+      {/* Race Detail Modal */}
+      {modalRace && (
+        <RaceDetailModal
+          race={modalRace}
+          isOpen={!!modalRace}
+          onClose={handleCloseModal}
+        />
+      )}
     </div>
   )
 }
