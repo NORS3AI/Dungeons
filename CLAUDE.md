@@ -269,21 +269,41 @@ Eldritch-themed warlock with psychic abilities:
 
 ## TODO List
 
-### Phase 1: Foundation (Current)
+---
 
-#### Project Setup
+### Phase 1: Project Setup & Infrastructure
+
 - [ ] Initialize React + TypeScript project with Vite
 - [ ] Configure Tailwind CSS
 - [ ] Set up React Router for page navigation
 - [ ] Configure Zustand for state management
 - [ ] Set up testing framework (Vitest)
+- [ ] Define `Character` interface in `src/types/character.ts`
+- [ ] Define `Race` interface in `src/types/race.ts`
+- [ ] Define `Class` and `Subclass` interfaces in `src/types/class.ts`
+- [ ] Define `Spell` interface in `src/types/spell.ts`
+- [ ] Define `Equipment` and `Item` interfaces in `src/types/equipment.ts`
+- [ ] Define `DiceRoll` interface in `src/types/dice.ts`
+- [ ] Create `useCharacterStore` with Zustand
+- [ ] Create `useCampaignStore` for DM features
+- [ ] Implement character persistence (localStorage)
+- [ ] Add undo/redo functionality
 
-#### Character Details Page
+---
+
+### Phase 2: Character Details Page
+
 - [ ] Create `CharacterDetailsForm` component
 - [ ] Implement text inputs: name, age, height, weight, notes, player name
 - [ ] Add Tab/Shift+Tab keyboard navigation
 - [ ] Add form validation (required fields)
 - [ ] Create "Next" button with disabled state
+- [ ] Style form with Tailwind
+- [ ] Add autosave to localStorage
+
+---
+
+### Phase 3: Race & Class Selection
 
 #### Race/Species Selection Page
 - [ ] Create `RaceSelector` page component
@@ -298,16 +318,24 @@ Eldritch-themed warlock with psychic abilities:
 - [ ] Build `ClassCard` component
 - [ ] Create `src/data/classes/fighter.json` with features
 - [ ] Create `src/data/classes/warlock.json` with features
-- [ ] Create subclass data files
+- [ ] Create subclass data files (fighter-ranger.json, warlock-great-old-one.json)
 - [ ] Display class features on selection
+- [ ] Show subclass options
+
+---
+
+### Phase 4: Stats & Spells
 
 #### Stat Allocation Page
 - [ ] Create `StatAllocator` page component
-- [ ] Implement Standard Array method
-- [ ] Implement Point Buy method with validation
+- [ ] Implement Standard Array method (15, 14, 13, 12, 10, 8)
+- [ ] Implement Point Buy method with validation (27 points)
 - [ ] Implement Roll method (4d6 drop lowest)
 - [ ] Auto-apply racial bonuses
 - [ ] Display final stats with modifiers
+- [ ] Create `calculateModifier(stat: number)` function
+- [ ] Create `calculateProficiencyBonus(level: number)` function
+- [ ] Create `applyRacialBonuses(stats, race)` function
 
 #### Spell Selection Page
 - [ ] Create `SpellSelector` page component
@@ -316,9 +344,16 @@ Eldritch-themed warlock with psychic abilities:
 - [ ] Build spell card/list components
 - [ ] Track cantrips vs leveled spells
 - [ ] Show spell slots
+- [ ] Auto-add patron expanded spells
+
+---
+
+### Phase 5: Dice, Inventory & Character Sheet
 
 #### Dice Rolling System
 - [ ] Create `DiceRoller` component
+- [ ] Create `rollDice(notation: string)` function
+- [ ] Create `parseDiceNotation(input: string)` function
 - [ ] Parse dice notation (NdX+M)
 - [ ] Support multiple dice types (d4, d6, d8, d10, d12, d20, d100)
 - [ ] Apply character modifiers automatically
@@ -341,28 +376,9 @@ Eldritch-themed warlock with psychic abilities:
 - [ ] Create spell/skill popup/modal system
 - [ ] Add edit mode toggle
 
-#### Type Definitions
-- [ ] Define `Character` interface in `src/types/character.ts`
-- [ ] Define `Race` interface in `src/types/race.ts`
-- [ ] Define `Class` and `Subclass` interfaces in `src/types/class.ts`
-- [ ] Define `Spell` interface in `src/types/spell.ts`
-- [ ] Define `Equipment` and `Item` interfaces in `src/types/equipment.ts`
-- [ ] Define `DiceRoll` interface in `src/types/dice.ts`
+---
 
-#### State Management
-- [ ] Create `useCharacterStore` with Zustand
-- [ ] Create `useCampaignStore` for DM features
-- [ ] Implement character persistence (localStorage)
-- [ ] Add undo/redo functionality
-
-#### Utilities
-- [ ] Create `calculateModifier(stat: number)` function
-- [ ] Create `calculateProficiencyBonus(level: number)` function
-- [ ] Create `applyRacialBonuses(stats, race)` function
-- [ ] Create `rollDice(notation: string)` function
-- [ ] Create `parseDiceNotation(input: string)` function
-
-### Phase 2: DM Tools
+### Phase 6: DM Tools
 
 #### Campaign Dashboard
 - [ ] Create campaign management dashboard
@@ -412,7 +428,9 @@ Eldritch-themed warlock with psychic abilities:
 - [ ] Track NPC health during combat
 - [ ] Quick-roll NPC attacks and saves
 
-### Phase 3: Content Expansion
+---
+
+### Phase 7: Content Expansion
 
 - [ ] Add all Fighter subclasses (Champion, Battle Master, Eldritch Knight, etc.)
 - [ ] Add all Warlock subclasses (Fiend, Archfey, Hexblade, etc.)
@@ -422,7 +440,9 @@ Eldritch-themed warlock with psychic abilities:
 - [ ] Add feats selection
 - [ ] Implement multiclassing rules
 
-### Phase 4: Polish & Export
+---
+
+### Phase 8: Polish & Export
 
 - [ ] PDF character sheet export
 - [ ] JSON import/export
@@ -430,7 +450,9 @@ Eldritch-themed warlock with psychic abilities:
 - [ ] Print-friendly character sheets
 - [ ] Homebrew content import system
 
-### Phase 5: User Accounts & Cloud
+---
+
+### Phase 9: User Accounts & Cloud
 
 #### Login System
 - [ ] Create account registration page
@@ -454,7 +476,9 @@ Eldritch-themed warlock with psychic abilities:
 - [ ] Real-time updates during sessions
 - [ ] Campaign export/backup
 
-### Phase 6: Settings & Themes
+---
+
+### Phase 10: Settings & Themes
 
 #### Settings Page
 - [ ] Create settings page/modal
