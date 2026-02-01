@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { useCharacterStore } from '../stores/characterStore'
 import { WizardSteps, CHARACTER_CREATION_STEPS } from '../components/WizardSteps'
 import { CharacterDetailsForm } from '../components/CharacterDetailsForm'
+import { RaceSelector } from '../components/RaceSelector'
+import type { Race } from '../types'
 
 /**
  * Map creation step to step number for WizardSteps component
@@ -24,6 +26,7 @@ export function CharacterCreatePage() {
     creationStep,
     createNewCharacter,
     updateCharacterDetails,
+    setRace,
     nextStep,
     prevStep,
     setCreationStep,
@@ -66,6 +69,11 @@ export function CharacterCreatePage() {
     }
   }
 
+  const handleRaceSelect = (race: Race) => {
+    setRace(race)
+    nextStep()
+  }
+
   const handleFinalize = () => {
     saveCharacter()
     if (currentCharacter) {
@@ -94,34 +102,11 @@ export function CharacterCreatePage() {
 
       case 'race':
         return (
-          <div className="max-w-2xl mx-auto">
-            <div className="mb-8">
-              <h2 className="text-3xl font-bold text-dnd-gold mb-2">Choose Your Race</h2>
-              <p className="text-gray-400">
-                Select a race for your character. Each race provides unique traits and abilities.
-              </p>
-            </div>
-            <div className="card bg-gray-800 border border-gray-700 p-8 text-center">
-              <p className="text-gray-400 mb-4">Race selection coming in Phase 3</p>
-              <p className="text-gray-500 text-sm">Available races: Drow, Tiefling (more coming soon)</p>
-            </div>
-            <div className="flex justify-between pt-6 mt-6 border-t border-gray-700">
-              <button
-                onClick={handleBack}
-                className="px-6 py-3 text-gray-300 hover:text-white border border-gray-600
-                         hover:border-gray-500 rounded-lg transition-colors duration-200"
-              >
-                Back
-              </button>
-              <button
-                onClick={nextStep}
-                className="px-8 py-3 bg-dnd-gold text-gray-900 rounded-lg font-semibold
-                         hover:bg-yellow-500 transition-colors duration-200"
-              >
-                Next: Choose Class
-              </button>
-            </div>
-          </div>
+          <RaceSelector
+            initialRace={currentCharacter?.race}
+            onSelect={handleRaceSelect}
+            onBack={handleBack}
+          />
         )
 
       case 'class':
