@@ -8,6 +8,10 @@ export default {
   theme: {
     extend: {
       colors: {
+        // D&D Theme shorthand colors
+        'dnd-gold': '#d4af37',
+        'dnd-red': '#8b0000',
+        'dnd-dark': '#1a1a2e',
         // D&D Theme colors
         parchment: {
           50: '#fdfcfa',
