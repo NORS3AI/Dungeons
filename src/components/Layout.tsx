@@ -16,18 +16,6 @@ export function Layout() {
             </Link>
 
             <div className="flex items-center space-x-4">
-              <Link
-                to="/create"
-                className="btn-primary"
-              >
-                Create Character
-              </Link>
-              <Link
-                to="/campaign"
-                className="btn-secondary"
-              >
-                DM Tools
-              </Link>
               <button
                 onClick={() => setShowSettings(true)}
                 className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-gray-700
