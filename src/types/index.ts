@@ -41,7 +41,61 @@ export type {
   Subclass,
 } from './class'
 
-export { FIGHTER, WARLOCK, GREAT_OLD_ONE, FIEND, ARCHFEY, CHAMPION, BATTLE_MASTER } from './class'
+export {
+  // Classes
+  FIGHTER,
+  WARLOCK,
+  ROGUE,
+  WIZARD,
+  CLERIC,
+  BARBARIAN,
+  BARD,
+  DRUID,
+  MONK,
+  PALADIN,
+  RANGER,
+  SORCERER,
+  // Fighter subclasses
+  CHAMPION,
+  BATTLE_MASTER,
+  ELDRITCH_KNIGHT,
+  // Warlock subclasses
+  GREAT_OLD_ONE,
+  FIEND,
+  ARCHFEY,
+  HEXBLADE,
+  CELESTIAL,
+  // Rogue subclasses
+  THIEF,
+  ASSASSIN,
+  // Wizard subclasses
+  SCHOOL_OF_EVOCATION,
+  SCHOOL_OF_ABJURATION,
+  // Cleric subclasses
+  LIFE_DOMAIN,
+  LIGHT_DOMAIN,
+  // Barbarian subclasses
+  PATH_OF_THE_BERSERKER,
+  PATH_OF_THE_TOTEM_WARRIOR,
+  // Bard subclasses
+  COLLEGE_OF_LORE,
+  COLLEGE_OF_VALOR,
+  // Druid subclasses
+  CIRCLE_OF_THE_LAND,
+  CIRCLE_OF_THE_MOON,
+  // Monk subclasses
+  WAY_OF_THE_OPEN_HAND,
+  WAY_OF_SHADOW,
+  // Paladin subclasses
+  OATH_OF_DEVOTION,
+  OATH_OF_VENGEANCE,
+  // Ranger subclasses
+  HUNTER,
+  BEAST_MASTER,
+  // Sorcerer subclasses
+  DRACONIC_BLOODLINE,
+  WILD_MAGIC,
+} from './class'
 
 // Spell types
 export type {
@@ -102,6 +156,33 @@ export {
   SOLDIER,
   AVAILABLE_BACKGROUNDS,
 } from './background'
+
+// Feat types
+export type { FeatPrerequisite, Feat } from './feat'
+
+export {
+  ALERT,
+  SKILLED,
+  TOUGH,
+  LUCKY,
+  GREAT_WEAPON_MASTER,
+  SHARPSHOOTER,
+  SENTINEL,
+  POLEARM_MASTER,
+  WAR_CASTER,
+  RESILIENT,
+  MOBILE,
+  CROSSBOW_EXPERT,
+  DUAL_WIELDER,
+  SHIELD_MASTER,
+  MAGE_SLAYER,
+  ACTOR,
+  OBSERVANT,
+  ORIGIN_FEATS,
+  COMBAT_FEATS,
+  UTILITY_FEATS,
+  ALL_FEATS,
+} from './feat'
 
 // Dice types
 export type {
