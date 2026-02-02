@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCharacterStore } from '../stores/characterStore'
 import { WizardSteps, CHARACTER_CREATION_STEPS } from '../components/WizardSteps'
@@ -11,6 +11,7 @@ import { SpellSelector } from '../components/SpellSelector'
 import { EquipmentSelector } from '../components/EquipmentSelector'
 import type { Race, Class, Subclass, AbilityScores, Spell, Background, Equipment } from '../types'
 import { calculateModifier } from '../types'
+import { rollDice } from '../types/dice'
 
 /**
  * Map creation step to step number for WizardSteps component
@@ -44,7 +45,11 @@ export function CharacterCreatePage() {
     prevStep,
     setCreationStep,
     saveCharacter,
+    initializeHP,
   } = useCharacterStore()
+
+  // HP rolling state
+  const [hpRoll, setHpRoll] = useState<{ result: number; isRolling: boolean } | null>(null)
 
   // Initialize new character if none exists
   useEffect(() => {
@@ -279,6 +284,100 @@ export function CharacterCreatePage() {
                   </div>
                 </div>
 
+                {/* Starting HP Roll */}
+                <div className="card bg-gray-800 border border-red-900/50 p-6">
+                  <h4 className="font-semibold text-white mb-4 flex items-center gap-2">
+                    <span className="text-red-400">❤️</span>
+                    Starting Hit Points
+                  </h4>
+
+                  {currentCharacter.hitPoints.maximum > 0 ? (
+                    // HP already rolled
+                    <div className="text-center">
+                      <div className="text-4xl font-bold text-red-400 mb-2">
+                        {currentCharacter.hitPoints.maximum} HP
+                      </div>
+                      <p className="text-gray-400 text-sm">
+                        {currentCharacter.class?.hitDie || '1d8'} roll + {calculateModifier(currentCharacter.abilityScores.constitution) >= 0 ? '+' : ''}{calculateModifier(currentCharacter.abilityScores.constitution)} CON
+                      </p>
+                      <button
+                        onClick={() => {
+                          setHpRoll(null)
+                          initializeHP(0) // Reset to allow re-roll
+                        }}
+                        className="mt-3 text-sm text-gray-500 hover:text-gray-300 underline"
+                      >
+                        Re-roll HP
+                      </button>
+                    </div>
+                  ) : (
+                    // Need to roll HP
+                    <div className="text-center">
+                      <p className="text-gray-400 mb-4">
+                        Roll your hit die to determine starting health!
+                      </p>
+                      <div className="flex flex-col items-center gap-4">
+                        <div className="text-lg text-gray-300">
+                          Hit Die: <span className="text-dnd-gold font-bold">{currentCharacter.class?.hitDie || '1d8'}</span>
+                          {' + '}
+                          <span className="text-blue-400">
+                            {calculateModifier(currentCharacter.abilityScores.constitution) >= 0 ? '+' : ''}
+                            {calculateModifier(currentCharacter.abilityScores.constitution)} CON
+                          </span>
+                        </div>
+
+                        {hpRoll?.isRolling ? (
+                          <div className="text-2xl text-dnd-gold animate-bounce">🎲</div>
+                        ) : hpRoll?.result ? (
+                          <div className="space-y-3">
+                            <div className="text-3xl font-bold text-white">
+                              Rolled: <span className="text-dnd-gold">{hpRoll.result}</span>
+                            </div>
+                            <div className="text-xl text-gray-400">
+                              Total HP: <span className="text-red-400 font-bold">
+                                {Math.max(1, hpRoll.result + calculateModifier(currentCharacter.abilityScores.constitution))}
+                              </span>
+                            </div>
+                            <div className="flex gap-3 justify-center">
+                              <button
+                                onClick={() => {
+                                  initializeHP(hpRoll.result)
+                                }}
+                                className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg font-medium transition-colors"
+                              >
+                                Accept
+                              </button>
+                              <button
+                                onClick={() => setHpRoll(null)}
+                                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors"
+                              >
+                                Roll Again
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => {
+                              setHpRoll({ result: 0, isRolling: true })
+                              setTimeout(() => {
+                                const hitDie = currentCharacter.class?.hitDie || '1d8'
+                                const roll = rollDice(hitDie)
+                                if (roll) {
+                                  setHpRoll({ result: roll.grandTotal, isRolling: false })
+                                }
+                              }, 500)
+                            }}
+                            className="px-6 py-3 bg-red-600 hover:bg-red-500 text-white rounded-lg font-bold text-lg transition-colors flex items-center gap-2"
+                          >
+                            <span>🎲</span>
+                            Roll for HP
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 {/* Spells (if any) */}
                 {currentCharacter.knownSpells.length > 0 && (
                   <div className="card bg-gray-800 border border-gray-700 p-6">
@@ -318,10 +417,14 @@ export function CharacterCreatePage() {
               </button>
               <button
                 onClick={handleFinalize}
-                className="px-8 py-3 bg-green-600 text-white rounded-lg font-semibold
-                         hover:bg-green-500 transition-colors duration-200"
+                disabled={!currentCharacter || currentCharacter.hitPoints.maximum === 0}
+                className={`px-8 py-3 rounded-lg font-semibold transition-colors duration-200 ${
+                  !currentCharacter || currentCharacter.hitPoints.maximum === 0
+                    ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                    : 'bg-green-600 text-white hover:bg-green-500'
+                }`}
               >
-                Save Character
+                {!currentCharacter || currentCharacter.hitPoints.maximum === 0 ? 'Roll HP First' : 'Save Character'}
               </button>
             </div>
           </div>

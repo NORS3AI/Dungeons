@@ -131,6 +131,37 @@ function PartyCharacterCard({
   onSelect,
 }: PartyCharacterCardProps) {
   const [showNotes, setShowNotes] = useState(false)
+  const [showDMControls, setShowDMControls] = useState(false)
+  const [editingLevel, setEditingLevel] = useState(character.level)
+  const [editingHP, setEditingHP] = useState(character.hitPoints.current)
+  const [editingMaxHP, setEditingMaxHP] = useState(character.hitPoints.maximum)
+
+  const { updateHitPoints, setLevelWithHP } = useCharacterStore()
+
+  // Keep editing values in sync when character changes
+  const syncValues = () => {
+    setEditingLevel(character.level)
+    setEditingHP(character.hitPoints.current)
+    setEditingMaxHP(character.hitPoints.maximum)
+  }
+
+  const handleSaveDMChanges = () => {
+    // Load the character into the store temporarily to make edits
+    const { loadCharacter, saveCharacter } = useCharacterStore.getState()
+    loadCharacter(character.id)
+
+    // Apply changes
+    if (editingLevel !== character.level || editingMaxHP !== character.hitPoints.maximum) {
+      setLevelWithHP(editingLevel, editingMaxHP)
+    }
+    if (editingHP !== character.hitPoints.current) {
+      updateHitPoints({ current: editingHP })
+    }
+
+    // Save the character
+    saveCharacter()
+    setShowDMControls(false)
+  }
 
   const hpPercent = character.hitPoints.maximum > 0
     ? (character.hitPoints.current / character.hitPoints.maximum) * 100
@@ -220,6 +251,122 @@ function PartyCharacterCard({
                 {condition}
               </span>
             ))}
+          </div>
+        )}
+
+        {/* DM Controls Toggle */}
+        <button
+          onClick={() => {
+            if (!showDMControls) syncValues()
+            setShowDMControls(!showDMControls)
+          }}
+          className="w-full px-3 py-1.5 bg-purple-900/50 hover:bg-purple-800/50 text-purple-300 text-sm rounded-lg transition-colors flex items-center justify-center gap-2"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+          DM Edit
+        </button>
+
+        {/* DM Controls Panel */}
+        {showDMControls && (
+          <div className="p-3 bg-purple-900/20 border border-purple-700/50 rounded-lg space-y-3">
+            <h4 className="text-sm font-semibold text-purple-300">DM Controls</h4>
+
+            {/* Level Control */}
+            <div>
+              <label className="text-xs text-gray-400 block mb-1">Level</label>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setEditingLevel((l) => Math.max(1, l - 1))}
+                  className="px-2 py-1 bg-gray-700 hover:bg-gray-600 text-white rounded"
+                >
+                  -
+                </button>
+                <input
+                  type="number"
+                  value={editingLevel}
+                  onChange={(e) => setEditingLevel(Math.max(1, Math.min(20, parseInt(e.target.value) || 1)))}
+                  className="w-16 px-2 py-1 bg-gray-800 border border-gray-600 rounded text-center text-white"
+                  min="1"
+                  max="20"
+                />
+                <button
+                  onClick={() => setEditingLevel((l) => Math.min(20, l + 1))}
+                  className="px-2 py-1 bg-gray-700 hover:bg-gray-600 text-white rounded"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            {/* Current HP Control */}
+            <div>
+              <label className="text-xs text-gray-400 block mb-1">Current HP</label>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setEditingHP((h) => Math.max(0, h - 1))}
+                  className="px-2 py-1 bg-red-900 hover:bg-red-800 text-white rounded"
+                >
+                  -
+                </button>
+                <input
+                  type="number"
+                  value={editingHP}
+                  onChange={(e) => setEditingHP(Math.max(0, parseInt(e.target.value) || 0))}
+                  className="w-16 px-2 py-1 bg-gray-800 border border-gray-600 rounded text-center text-white"
+                  min="0"
+                />
+                <button
+                  onClick={() => setEditingHP((h) => Math.min(editingMaxHP, h + 1))}
+                  className="px-2 py-1 bg-green-900 hover:bg-green-800 text-white rounded"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            {/* Max HP Control */}
+            <div>
+              <label className="text-xs text-gray-400 block mb-1">Max HP</label>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setEditingMaxHP((h) => Math.max(1, h - 1))}
+                  className="px-2 py-1 bg-gray-700 hover:bg-gray-600 text-white rounded"
+                >
+                  -
+                </button>
+                <input
+                  type="number"
+                  value={editingMaxHP}
+                  onChange={(e) => setEditingMaxHP(Math.max(1, parseInt(e.target.value) || 1))}
+                  className="w-16 px-2 py-1 bg-gray-800 border border-gray-600 rounded text-center text-white"
+                  min="1"
+                />
+                <button
+                  onClick={() => setEditingMaxHP((h) => h + 1)}
+                  className="px-2 py-1 bg-gray-700 hover:bg-gray-600 text-white rounded"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            {/* Save/Cancel */}
+            <div className="flex gap-2 pt-2">
+              <button
+                onClick={handleSaveDMChanges}
+                className="flex-1 px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-sm rounded font-medium transition-colors"
+              >
+                Save Changes
+              </button>
+              <button
+                onClick={() => setShowDMControls(false)}
+                className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm rounded transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         )}
 

@@ -164,6 +164,8 @@ interface CharacterState {
   // Leveling
   levelUp: () => void
   setLevel: (level: number) => void
+  initializeHP: (rollResult: number) => void
+  setLevelWithHP: (level: number, maxHP: number) => void
 
   // Undo/Redo
   undo: () => void
@@ -651,6 +653,51 @@ export const useCharacterStore = create<CharacterState>()(
             currentCharacter: {
               ...currentCharacter,
               level,
+            },
+            history: {
+              past: [...history.past, currentCharacter],
+              future: [],
+            },
+          })
+        },
+
+        initializeHP: (rollResult: number) => {
+          const { currentCharacter, history } = get()
+          if (!currentCharacter) return
+
+          // For level 1: HP = hit die roll + CON modifier
+          const conModifier = Math.floor((currentCharacter.abilityScores.constitution - 10) / 2)
+          const maxHP = Math.max(1, rollResult + conModifier)
+
+          set({
+            currentCharacter: {
+              ...currentCharacter,
+              hitPoints: {
+                current: maxHP,
+                maximum: maxHP,
+                temporary: 0,
+              },
+            },
+            history: {
+              past: [...history.past, currentCharacter],
+              future: [],
+            },
+          })
+        },
+
+        setLevelWithHP: (level: number, maxHP: number) => {
+          const { currentCharacter, history } = get()
+          if (!currentCharacter || level < 1 || level > 20) return
+
+          set({
+            currentCharacter: {
+              ...currentCharacter,
+              level,
+              hitPoints: {
+                current: maxHP,
+                maximum: maxHP,
+                temporary: currentCharacter.hitPoints.temporary,
+              },
             },
             history: {
               past: [...history.past, currentCharacter],
