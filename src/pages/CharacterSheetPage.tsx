@@ -4,7 +4,7 @@ import { useCharacterStore } from '../stores/characterStore'
 import { DiceRoller, DiceRollerButton, DiceRollerModal } from '../components/DiceRoller'
 import { calculateModifier, calculateProficiencyBonus } from '../types/dice'
 import { isWeapon, isArmor, isShield } from '../types/equipment'
-import type { Character, Ability, Equipment, Weapon, Currency } from '../types'
+import type { Character, Ability, Equipment, Weapon, Armor, Shield, Currency } from '../types'
 import { ALL_PROFESSIONS, CATEGORY_INFO, formatIncome, getProfessionByRoll, type Profession } from '../data/professions'
 
 const ABILITY_NAMES: Record<Ability, string> = {
@@ -44,7 +44,7 @@ const SKILLS: { name: string; ability: Ability; key: SkillKey }[] = [
 export function CharacterSheetPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { characters, loadCharacter, currentCharacter, levelUp, updateCurrency, removeEquipment, saveCharacter } = useCharacterStore()
+  const { characters, loadCharacter, currentCharacter, levelUp, updateCurrency, removeEquipment, toggleEquipment, saveCharacter } = useCharacterStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
   const [activeTab, setActiveTab] = useState<'main' | 'spells' | 'inventory' | 'features'>('main')
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
@@ -421,6 +421,17 @@ export function CharacterSheetPage() {
 
       {activeTab === 'inventory' && (
         <div className="space-y-6">
+          {/* Equipped Gear Section */}
+          <EquippedGearSection
+            equipment={character.equipment}
+            character={character}
+            onToggleEquip={(itemId) => {
+              toggleEquipment(itemId)
+              saveCharacter()
+            }}
+            calculateAC={calculateAC}
+          />
+
           {/* Currency */}
           <div className="card bg-gray-800 border-gray-700 p-4">
             <div className="flex items-center justify-between mb-4">
@@ -458,9 +469,9 @@ export function CharacterSheetPage() {
             </div>
           </div>
 
-          {/* Equipment */}
+          {/* All Equipment (Inventory) */}
           <div className="card bg-gray-800 border-gray-700 p-4">
-            <h3 className="text-lg font-bold text-white mb-4">Equipment</h3>
+            <h3 className="text-lg font-bold text-white mb-4">Inventory</h3>
             {character.equipment.length === 0 ? (
               <p className="text-gray-400 text-center py-4">No equipment.</p>
             ) : (
@@ -472,6 +483,10 @@ export function CharacterSheetPage() {
                     character={character}
                     onRemove={() => {
                       removeEquipment(item.id)
+                      saveCharacter()
+                    }}
+                    onToggleEquip={() => {
+                      toggleEquipment(item.id)
                       saveCharacter()
                     }}
                   />
@@ -589,12 +604,158 @@ function TrashIcon({ onClick }: { onClick: () => void }) {
   )
 }
 
-// Equipment item component
-function EquipmentItem({ item, character, onRemove }: { item: Equipment; character: Character; onRemove: () => void }) {
+// Equip toggle button component
+function EquipToggle({ equipped, onToggle, canEquip = true }: { equipped: boolean; onToggle: () => void; canEquip?: boolean }) {
+  if (!canEquip) return null
+  return (
+    <button
+      onClick={onToggle}
+      className={`p-1.5 rounded transition-colors ${
+        equipped
+          ? 'text-green-400 bg-green-900/30 hover:bg-green-900/50'
+          : 'text-gray-500 hover:text-green-400 hover:bg-green-900/30'
+      }`}
+      title={equipped ? 'Unequip' : 'Equip'}
+    >
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        {equipped ? (
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+        ) : (
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+        )}
+      </svg>
+    </button>
+  )
+}
+
+// Equipped Gear Section
+function EquippedGearSection({
+  equipment,
+  character,
+  onToggleEquip,
+  calculateAC,
+}: {
+  equipment: Equipment[]
+  character: Character
+  onToggleEquip: (itemId: string) => void
+  calculateAC: () => number
+}) {
+  const equippedWeapons = equipment.filter((e) => isWeapon(e) && e.equipped) as Weapon[]
+  const equippedArmor = equipment.find((e) => isArmor(e) && e.equipped) as Armor | undefined
+  const equippedShield = equipment.find((e) => isShield(e) && e.equipped) as Shield | undefined
+
   const getAbilityMod = (ability: Ability): number => {
     return calculateModifier(character.abilityScores[ability])
   }
   const profBonus = calculateProficiencyBonus(character.level)
+
+  const hasEquippedGear = equippedWeapons.length > 0 || equippedArmor || equippedShield
+
+  return (
+    <div className="card bg-gray-800 border-gray-700 p-4 border-l-4 border-l-dnd-gold">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-bold text-dnd-gold">Equipped Gear</h3>
+        <div className="flex items-center gap-2">
+          <span className="text-gray-400 text-sm">Total AC:</span>
+          <span className="text-xl font-bold text-white bg-gray-900 px-3 py-1 rounded-lg">{calculateAC()}</span>
+        </div>
+      </div>
+
+      {!hasEquippedGear ? (
+        <p className="text-gray-400 text-center py-4">No gear equipped. Equip items from your inventory below.</p>
+      ) : (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Equipped Weapons */}
+          {equippedWeapons.map((weapon) => {
+            const isFinesse = weapon.properties.includes('finesse')
+            const attackMod = isFinesse
+              ? Math.max(getAbilityMod('strength'), getAbilityMod('dexterity'))
+              : weapon.weaponCategory === 'ranged'
+              ? getAbilityMod('dexterity')
+              : getAbilityMod('strength')
+            const attackBonus = attackMod + profBonus
+            const damageMod = attackMod
+
+            return (
+              <div key={weapon.id} className="p-3 bg-green-900/20 rounded-lg border border-green-600/50">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs text-green-400 uppercase font-medium">Weapon</span>
+                  <button
+                    onClick={() => onToggleEquip(weapon.id)}
+                    className="text-xs text-gray-400 hover:text-red-400"
+                  >
+                    Unequip
+                  </button>
+                </div>
+                <div className="font-semibold text-white">{weapon.name}</div>
+                <div className="text-sm text-gray-300">
+                  <span className="text-dnd-gold">+{attackBonus}</span> to hit |{' '}
+                  <span className="text-red-400">{weapon.damage.dice}{damageMod >= 0 ? '+' : ''}{damageMod}</span> {weapon.damage.type}
+                </div>
+                {weapon.properties.length > 0 && (
+                  <div className="text-xs text-gray-500 mt-1">
+                    {weapon.properties.join(', ')}
+                  </div>
+                )}
+              </div>
+            )
+          })}
+
+          {/* Equipped Armor */}
+          {equippedArmor && (
+            <div className="p-3 bg-blue-900/20 rounded-lg border border-blue-600/50">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs text-blue-400 uppercase font-medium">Armor</span>
+                <button
+                  onClick={() => onToggleEquip(equippedArmor.id)}
+                  className="text-xs text-gray-400 hover:text-red-400"
+                >
+                  Unequip
+                </button>
+              </div>
+              <div className="font-semibold text-white">{equippedArmor.name}</div>
+              <div className="text-sm text-gray-300">
+                Base AC: <span className="text-blue-400">{equippedArmor.baseAC}</span>
+                {equippedArmor.maxDexBonus !== undefined && (
+                  <span className="text-gray-500"> (+DEX max {equippedArmor.maxDexBonus})</span>
+                )}
+              </div>
+              <div className="text-xs text-gray-500 mt-1 capitalize">{equippedArmor.armorType} armor</div>
+            </div>
+          )}
+
+          {/* Equipped Shield */}
+          {equippedShield && (
+            <div className="p-3 bg-purple-900/20 rounded-lg border border-purple-600/50">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs text-purple-400 uppercase font-medium">Shield</span>
+                <button
+                  onClick={() => onToggleEquip(equippedShield.id)}
+                  className="text-xs text-gray-400 hover:text-red-400"
+                >
+                  Unequip
+                </button>
+              </div>
+              <div className="font-semibold text-white">{equippedShield.name}</div>
+              <div className="text-sm text-gray-300">
+                AC Bonus: <span className="text-purple-400">+{equippedShield.acBonus}</span>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// Equipment item component
+function EquipmentItem({ item, character, onRemove, onToggleEquip }: { item: Equipment; character: Character; onRemove: () => void; onToggleEquip: () => void }) {
+  const getAbilityMod = (ability: Ability): number => {
+    return calculateModifier(character.abilityScores[ability])
+  }
+  const profBonus = calculateProficiencyBonus(character.level)
+  const canEquip = isWeapon(item) || isArmor(item) || isShield(item)
+  const isEquipped = item.equipped
 
   if (isWeapon(item)) {
     const weapon = item as Weapon
@@ -607,16 +768,24 @@ function EquipmentItem({ item, character, onRemove }: { item: Equipment; charact
     const attackBonus = attackMod + profBonus
 
     return (
-      <div className="p-3 bg-gray-900 rounded-lg flex items-center justify-between group">
-        <div>
-          <span className="font-medium text-white hover:text-dnd-gold">
-            {weapon.name}
-          </span>
-          {weapon.quantity > 1 && (
-            <span className="text-gray-500 ml-1">x{weapon.quantity}</span>
-          )}
-          <div className="text-sm text-gray-400">
-            {weapon.damage.dice} {weapon.damage.type}
+      <div className={`p-3 rounded-lg flex items-center justify-between group ${
+        isEquipped ? 'bg-green-900/30 border border-green-600/50' : 'bg-gray-900'
+      }`}>
+        <div className="flex items-center gap-3">
+          <EquipToggle equipped={!!isEquipped} onToggle={onToggleEquip} canEquip={canEquip} />
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-medium text-white hover:text-dnd-gold">
+                {weapon.name}
+              </span>
+              {isEquipped && <span className="text-xs text-green-400 bg-green-900/50 px-1.5 py-0.5 rounded">Equipped</span>}
+            </div>
+            {weapon.quantity > 1 && (
+              <span className="text-gray-500 ml-1">x{weapon.quantity}</span>
+            )}
+            <div className="text-sm text-gray-400">
+              {weapon.damage.dice} {weapon.damage.type}
+            </div>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -634,11 +803,46 @@ function EquipmentItem({ item, character, onRemove }: { item: Equipment; charact
 
   if (isArmor(item)) {
     return (
-      <div className="p-3 bg-gray-900 rounded-lg flex items-center justify-between group">
-        <div>
-          <span className="font-medium text-white">{item.name}</span>
-          <div className="text-sm text-gray-400">
-            AC {item.baseAC} | {item.armorType}
+      <div className={`p-3 rounded-lg flex items-center justify-between group ${
+        isEquipped ? 'bg-blue-900/30 border border-blue-600/50' : 'bg-gray-900'
+      }`}>
+        <div className="flex items-center gap-3">
+          <EquipToggle equipped={!!isEquipped} onToggle={onToggleEquip} canEquip={canEquip} />
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-medium text-white">{item.name}</span>
+              {isEquipped && <span className="text-xs text-blue-400 bg-blue-900/50 px-1.5 py-0.5 rounded">Equipped</span>}
+            </div>
+            <div className="text-sm text-gray-400">
+              AC {item.baseAC} | {item.armorType}
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="text-right">
+            <div className="text-xs text-gray-500">{item.weight} lb</div>
+          </div>
+          <TrashIcon onClick={onRemove} />
+        </div>
+      </div>
+    )
+  }
+
+  if (isShield(item)) {
+    return (
+      <div className={`p-3 rounded-lg flex items-center justify-between group ${
+        isEquipped ? 'bg-purple-900/30 border border-purple-600/50' : 'bg-gray-900'
+      }`}>
+        <div className="flex items-center gap-3">
+          <EquipToggle equipped={!!isEquipped} onToggle={onToggleEquip} canEquip={canEquip} />
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-medium text-white">{item.name}</span>
+              {isEquipped && <span className="text-xs text-purple-400 bg-purple-900/50 px-1.5 py-0.5 rounded">Equipped</span>}
+            </div>
+            <div className="text-sm text-gray-400">
+              +{item.acBonus} AC
+            </div>
           </div>
         </div>
         <div className="flex items-center gap-3">
