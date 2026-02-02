@@ -1,7 +1,8 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useMemo } from 'react'
 import { rollDice, rollWithAdvantage, rollWithDisadvantage } from '../types/dice'
 import type { DiceRoll, DieResult } from '../types/dice'
-import type { Character } from '../types'
+import type { Character, Weapon } from '../types'
+import { isWeapon } from '../types/equipment'
 
 interface DiceRollerProps {
   onRoll?: (roll: DiceRoll) => void
@@ -32,6 +33,20 @@ const ROLL_PURPOSES: { value: RollPurpose; label: string; description: string }[
   { value: 'check', label: 'Check', description: 'd20 + ability modifier' },
 ]
 
+// Get the best ability for a weapon
+function getWeaponAbility(weapon: Weapon, character: Character): Ability {
+  const isFinesse = weapon.properties.includes('finesse')
+  const isRanged = weapon.weaponCategory === 'ranged'
+
+  if (isFinesse) {
+    const strMod = Math.floor((character.abilityScores.strength - 10) / 2)
+    const dexMod = Math.floor((character.abilityScores.dexterity - 10) / 2)
+    return dexMod >= strMod ? 'dexterity' : 'strength'
+  }
+
+  return isRanged ? 'dexterity' : 'strength'
+}
+
 export function DiceRoller({ onRoll, compact = false, character }: DiceRollerProps) {
   const [notation, setNotation] = useState('1d20')
   const [manualModifier, setManualModifier] = useState(0)
@@ -43,6 +58,36 @@ export function DiceRoller({ onRoll, compact = false, character }: DiceRollerPro
   // Smart roll settings
   const [rollPurpose, setRollPurpose] = useState<RollPurpose>('raw')
   const [selectedAbility, setSelectedAbility] = useState<Ability>('strength')
+  const [selectedWeaponId, setSelectedWeaponId] = useState<string | null>(null)
+
+  // Get equipped weapons from character
+  const equippedWeapons = useMemo(() => {
+    if (!character) return []
+    return character.equipment.filter((e) => isWeapon(e) && e.equipped) as Weapon[]
+  }, [character])
+
+  // Get the selected weapon object
+  const selectedWeapon = useMemo(() => {
+    if (!selectedWeaponId) return null
+    return equippedWeapons.find((w) => w.id === selectedWeaponId) || null
+  }, [selectedWeaponId, equippedWeapons])
+
+  // Auto-select first equipped weapon when switching to damage mode
+  useEffect(() => {
+    if (rollPurpose === 'damage' && equippedWeapons.length > 0 && !selectedWeaponId) {
+      setSelectedWeaponId(equippedWeapons[0].id)
+    }
+  }, [rollPurpose, equippedWeapons, selectedWeaponId])
+
+  // Update ability and notation when weapon changes
+  useEffect(() => {
+    if (rollPurpose === 'damage' && selectedWeapon && character) {
+      const weaponAbility = getWeaponAbility(selectedWeapon, character)
+      setSelectedAbility(weaponAbility)
+      setNotation(selectedWeapon.damage.dice)
+      setDiceCount(1)
+    }
+  }, [selectedWeapon, rollPurpose, character])
 
   // Calculate modifier based on character stats and roll purpose
   const calculateSmartModifier = useCallback((): number => {
@@ -188,10 +233,70 @@ export function DiceRoller({ onRoll, compact = false, character }: DiceRollerPro
         </div>
       </div>
 
+      {/* Equipped Weapon Selector - only show for damage rolls with equipped weapons */}
+      {rollPurpose === 'damage' && character && equippedWeapons.length > 0 && (
+        <div className="mb-4">
+          <span className="text-gray-400 text-sm block mb-2">Equipped Weapon:</span>
+          <div className="flex flex-wrap gap-2">
+            {equippedWeapons.map((weapon) => {
+              const isSelected = selectedWeaponId === weapon.id
+              const weaponAbility = getWeaponAbility(weapon, character)
+              const abilityMod = Math.floor((character.abilityScores[weaponAbility] - 10) / 2)
+              return (
+                <button
+                  key={weapon.id}
+                  onClick={() => setSelectedWeaponId(weapon.id)}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    isSelected
+                      ? 'bg-green-600 text-white ring-2 ring-green-400'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  }`}
+                >
+                  <div className="flex flex-col items-start">
+                    <span className="font-semibold">{weapon.name}</span>
+                    <span className="text-xs opacity-80">
+                      {weapon.damage.dice}{abilityMod >= 0 ? '+' : ''}{abilityMod} {weapon.damage.type}
+                    </span>
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+          {selectedWeapon && (
+            <div className="mt-2 p-2 bg-gray-900 rounded-lg text-sm">
+              <span className="text-gray-400">Using </span>
+              <span className="text-green-400 font-medium">{selectedWeapon.name}</span>
+              <span className="text-gray-400"> ({selectedWeapon.damage.dice} {selectedWeapon.damage.type})</span>
+              {selectedWeapon.properties.length > 0 && (
+                <span className="text-gray-500 ml-2">
+                  [{selectedWeapon.properties.join(', ')}]
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* No equipped weapons warning for damage rolls */}
+      {rollPurpose === 'damage' && character && equippedWeapons.length === 0 && (
+        <div className="mb-4 p-3 bg-yellow-900/30 border border-yellow-600/50 rounded-lg">
+          <p className="text-yellow-400 text-sm">
+            No weapons equipped. Equip a weapon from your inventory to auto-calculate damage.
+          </p>
+        </div>
+      )}
+
       {/* Ability Selector - only show when not raw and character exists */}
       {rollPurpose !== 'raw' && character && (
         <div className="mb-4">
-          <span className="text-gray-400 text-sm block mb-2">Ability:</span>
+          <span className="text-gray-400 text-sm block mb-2">
+            Ability:
+            {rollPurpose === 'damage' && selectedWeapon && (
+              <span className="text-green-400 ml-2 text-xs">
+                (auto-selected for {selectedWeapon.name})
+              </span>
+            )}
+          </span>
           <div className="flex flex-wrap gap-2">
             {ABILITIES.map((ability) => {
               const score = character.abilityScores[ability]

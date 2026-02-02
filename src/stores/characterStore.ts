@@ -148,6 +148,7 @@ interface CharacterState {
   removeSpell: (spellId: string) => void
   addEquipment: (item: Equipment) => void
   removeEquipment: (itemId: string) => void
+  toggleEquipment: (itemId: string) => void
   updateCurrency: (currency: Partial<Currency>) => void
 
   // Combat/Session updates
@@ -407,6 +408,42 @@ export const useCharacterStore = create<CharacterState>()(
             currentCharacter: {
               ...currentCharacter,
               equipment: currentCharacter.equipment.filter((e) => e.id !== itemId),
+            },
+            history: {
+              past: [...history.past, currentCharacter],
+              future: [],
+            },
+          })
+        },
+
+        toggleEquipment: (itemId: string) => {
+          const { currentCharacter, history } = get()
+          if (!currentCharacter) return
+
+          const item = currentCharacter.equipment.find((e) => e.id === itemId)
+          if (!item) return
+
+          // For armor, unequip other armor when equipping this one
+          // For shields, unequip other shields when equipping this one
+          const equipment = currentCharacter.equipment.map((e) => {
+            if (e.id === itemId) {
+              return { ...e, equipped: !e.equipped }
+            }
+            // If equipping armor, unequip other armor
+            if (item.category === 'armor' && e.category === 'armor' && !item.equipped) {
+              return { ...e, equipped: false }
+            }
+            // If equipping shield, unequip other shields
+            if (item.category === 'shield' && e.category === 'shield' && !item.equipped) {
+              return { ...e, equipped: false }
+            }
+            return e
+          })
+
+          set({
+            currentCharacter: {
+              ...currentCharacter,
+              equipment,
             },
             history: {
               past: [...history.past, currentCharacter],
