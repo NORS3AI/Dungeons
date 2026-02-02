@@ -1784,6 +1784,27 @@ export const TRAITS: Record<string, TraitRef> = {
     description: 'Starting at 1st level, your alien knowledge gives you the ability to touch the minds of other creatures. You can communicate telepathically with any creature you can see within 30 feet of you. You don\'t need to share a language with the creature for it to understand your telepathic utterances, but the creature must be able to understand at least one language.',
     mechanics: 'Telepathic communication with creatures within 30 feet.',
   },
+  'entropic-ward': {
+    id: 'entropic-ward',
+    name: 'Entropic Ward',
+    source: 'Warlock (Great Old One)',
+    description: 'At 6th level, you learn to magically ward yourself against attack and to turn an enemy\'s failed strike into good luck for yourself. When a creature makes an attack roll against you, you can use your reaction to impose disadvantage on that roll. If the attack misses you, your next attack roll against the creature has advantage if you make it before the end of your next turn. Once you use this feature, you can\'t use it again until you finish a short or long rest.',
+    mechanics: 'Reaction: Impose disadvantage on attack against you. If it misses, gain advantage on your next attack against them. Recharges on short/long rest.',
+  },
+  'thought-shield': {
+    id: 'thought-shield',
+    name: 'Thought Shield',
+    source: 'Warlock (Great Old One)',
+    description: 'Starting at 10th level, your thoughts can\'t be read by telepathy or other means unless you allow it. You also have resistance to psychic damage, and whenever a creature deals psychic damage to you, that creature takes the same amount of damage that you do.',
+    mechanics: 'Immune to thought reading. Resistance to psychic damage. Reflect psychic damage back to attacker.',
+  },
+  'create-thrall': {
+    id: 'create-thrall',
+    name: 'Create Thrall',
+    source: 'Warlock (Great Old One)',
+    description: 'At 14th level, you gain the ability to infect a humanoid\'s mind with the alien magic of your patron. You can use your action to touch an incapacitated humanoid. That creature is then charmed by you until a remove curse spell is cast on it, the charmed condition is removed from it, or you use this feature again. You can communicate telepathically with the charmed creature as long as the two of you are on the same plane of existence.',
+    mechanics: 'Action: Touch incapacitated humanoid to permanently charm them. Telepathic link across any distance on same plane.',
+  },
   'pact-magic': {
     id: 'pact-magic',
     name: 'Pact Magic',
@@ -2328,6 +2349,79 @@ export const TRAITS: Record<string, TraitRef> = {
     source: 'Fighter (Champion, Level 18)',
     description: 'At 18th level, you attain the pinnacle of resilience in battle. At the start of each of your turns, you regain hit points equal to 5 + your Constitution modifier if you have no more than half of your hit points left. You don\'t gain this benefit if you have 0 hit points.',
     mechanics: 'Regenerate 5 + CON HP per turn when below half health.',
+  },
+  // === BATTLE MASTER FEATURES ===
+  'student-of-war': {
+    id: 'student-of-war',
+    name: 'Student of War',
+    source: 'Fighter (Battle Master, Level 3)',
+    description: 'At 3rd level, you gain proficiency with one type of artisan\'s tools of your choice.',
+    mechanics: 'Gain proficiency with one artisan\'s tools.',
+  },
+  'know-your-enemy': {
+    id: 'know-your-enemy',
+    name: 'Know Your Enemy',
+    source: 'Fighter (Battle Master, Level 7)',
+    description: 'Starting at 7th level, if you spend at least 1 minute observing or interacting with another creature outside combat, you can learn certain information about its capabilities compared to your own.',
+    mechanics: 'Spend 1 minute to learn relative stats of a creature (higher/lower/equal in 2 characteristics).',
+  },
+  'improved-combat-superiority': {
+    id: 'improved-combat-superiority',
+    name: 'Improved Combat Superiority',
+    source: 'Fighter (Battle Master, Level 10)',
+    description: 'At 10th level, your superiority dice turn into d10s. At 18th level, they turn into d12s.',
+    mechanics: 'Superiority dice become d10s (level 10) then d12s (level 18).',
+  },
+  'relentless': {
+    id: 'relentless',
+    name: 'Relentless',
+    source: 'Fighter (Battle Master, Level 15)',
+    description: 'Starting at 15th level, when you roll initiative and have no superiority dice remaining, you regain 1 superiority die.',
+    mechanics: 'Regain 1 superiority die when rolling initiative if you have none.',
+  },
+  // === FIEND WARLOCK FEATURES ===
+  'dark-ones-own-luck': {
+    id: 'dark-ones-own-luck',
+    name: "Dark One's Own Luck",
+    source: 'Warlock (The Fiend, Level 6)',
+    description: 'Starting at 6th level, you can call on your patron to alter fate in your favor. When you make an ability check or a saving throw, you can use this feature to add a d10 to your roll. You can do so after seeing the initial roll but before any of the roll\'s effects occur. Once you use this feature, you can\'t use it again until you finish a short or long rest.',
+    mechanics: 'Add d10 to ability check or saving throw. Recharges on short/long rest.',
+  },
+  'fiendish-resilience': {
+    id: 'fiendish-resilience',
+    name: 'Fiendish Resilience',
+    source: 'Warlock (The Fiend, Level 10)',
+    description: 'Starting at 10th level, you can choose one damage type when you finish a short or long rest. You gain resistance to that damage type until you choose a different one with this feature. Damage from magical weapons or silver weapons ignores this resistance.',
+    mechanics: 'Choose resistance to one damage type after each rest.',
+  },
+  'hurl-through-hell': {
+    id: 'hurl-through-hell',
+    name: 'Hurl Through Hell',
+    source: 'Warlock (The Fiend, Level 14)',
+    description: 'Starting at 14th level, when you hit a creature with an attack, you can use this feature to instantly transport the target through the lower planes. The creature disappears and hurtles through a nightmare landscape. At the end of your next turn, the target returns to the space it previously occupied, or the nearest unoccupied space. If the target is not a fiend, it takes 10d10 psychic damage as it reels from its horrific experience. Once you use this feature, you can\'t use it again until you finish a long rest.',
+    mechanics: 'Banish target through Hell. Non-fiends take 10d10 psychic damage. Recharges on long rest.',
+  },
+  // === ARCHFEY WARLOCK FEATURES ===
+  'misty-escape': {
+    id: 'misty-escape',
+    name: 'Misty Escape',
+    source: 'Warlock (The Archfey, Level 6)',
+    description: 'Starting at 6th level, you can vanish in a puff of mist in response to harm. When you take damage, you can use your reaction to turn invisible and teleport up to 60 feet to an unoccupied space you can see. You remain invisible until the start of your next turn or until you attack or cast a spell. Once you use this feature, you can\'t use it again until you finish a short or long rest.',
+    mechanics: 'Reaction when damaged: Turn invisible and teleport 60 ft. Recharges on short/long rest.',
+  },
+  'beguiling-defenses': {
+    id: 'beguiling-defenses',
+    name: 'Beguiling Defenses',
+    source: 'Warlock (The Archfey, Level 10)',
+    description: 'Beginning at 10th level, your patron teaches you how to turn the mind-affecting magic of your enemies against them. You are immune to being charmed, and when another creature attempts to charm you, you can use your reaction to attempt to turn the charm back on that creature.',
+    mechanics: 'Immune to charm. Reaction: Reflect charm attempts back at caster.',
+  },
+  'dark-delirium': {
+    id: 'dark-delirium',
+    name: 'Dark Delirium',
+    source: 'Warlock (The Archfey, Level 14)',
+    description: 'Starting at 14th level, you can plunge a creature into an illusory realm. As an action, choose a creature that you can see within 60 feet of you. It must make a Wisdom saving throw against your warlock spell save DC. On a failed save, it is charmed or frightened by you (your choice) for 1 minute or until your concentration is broken. This effect ends early if the creature takes any damage. Until this illusion ends, the creature thinks it is lost in a misty realm. Once you use this feature, you can\'t use it again until you finish a short or long rest.',
+    mechanics: 'Action: Target WIS save or charmed/frightened for 1 minute. Recharges on short/long rest.',
   },
 }
 
