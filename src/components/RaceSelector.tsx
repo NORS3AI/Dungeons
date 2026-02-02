@@ -178,27 +178,40 @@ export function RaceSelector({ initialRace, onSelect, onBack }: RaceSelectorProp
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {selectedRace.subraces.map((subrace) => (
-              <button
+              <div
                 key={subrace.id}
-                onClick={() => handleSubraceSelect(subrace)}
-                className={`p-4 rounded-lg border-2 text-left transition-all ${
+                className={`p-4 rounded-lg border-2 transition-all ${
                   selectedSubrace?.id === subrace.id
                     ? 'border-dnd-gold bg-gray-700'
                     : 'border-gray-700 bg-gray-800 hover:border-gray-600'
                 }`}
               >
-                <div className="flex items-center gap-3">
-                  {subrace.icon && (
-                    <span className="text-2xl">{subrace.icon}</span>
-                  )}
-                  <div>
-                    <div className="font-semibold text-white">{subrace.name}</div>
-                    <div className="text-sm text-gray-400 line-clamp-2">
-                      {subrace.description}
+                <button
+                  onClick={() => handleSubraceSelect(subrace)}
+                  className="w-full text-left"
+                >
+                  <div className="flex items-center gap-3">
+                    {subrace.icon && (
+                      <span className="text-2xl">{subrace.icon}</span>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-white">{subrace.name}</div>
+                      <div className="text-sm text-gray-400 line-clamp-2">
+                        {subrace.description}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </button>
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleReadMore(subrace)
+                  }}
+                  className="mt-2 text-xs text-dnd-gold hover:text-yellow-400 transition-colors"
+                >
+                  Read More
+                </button>
+              </div>
             ))}
           </div>
         </div>

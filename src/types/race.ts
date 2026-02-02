@@ -32,6 +32,36 @@ export interface RacialSpell {
 export type VisionType = 'normal' | 'darkvision' | 'superiorDarkvision' | 'blindsight' | 'truesight'
 
 /**
+ * Source book reference
+ */
+export interface SourceBook {
+  name: string
+  abbreviation: string
+  page?: number
+}
+
+/**
+ * Common D&D source books
+ */
+export const SOURCE_BOOKS = {
+  PHB: { name: "Player's Handbook", abbreviation: 'PHB' },
+  PHB2024: { name: "Player's Handbook (2024)", abbreviation: 'PHB24' },
+  MM: { name: "Monster Manual", abbreviation: 'MM' },
+  DMG: { name: "Dungeon Master's Guide", abbreviation: 'DMG' },
+  MPMM: { name: "Mordenkainen Presents: Monsters of the Multiverse", abbreviation: 'MPMM' },
+  VGM: { name: "Volo's Guide to Monsters", abbreviation: 'VGM' },
+  XGTE: { name: "Xanathar's Guide to Everything", abbreviation: 'XGtE' },
+  TCOE: { name: "Tasha's Cauldron of Everything", abbreviation: 'TCoE' },
+  SCAG: { name: "Sword Coast Adventurer's Guide", abbreviation: 'SCAG' },
+  ERLW: { name: "Eberron: Rising from the Last War", abbreviation: 'ERLW' },
+  GGR: { name: "Guildmaster's Guide to Ravnica", abbreviation: 'GGR' },
+  SAIS: { name: "Spelljammer: Adventures in Space", abbreviation: 'SJ:AiS' },
+  SAC: { name: "Strixhaven: A Curriculum of Chaos", abbreviation: 'SCC' },
+  WBTW: { name: "The Wild Beyond the Witchlight", abbreviation: 'WBtW' },
+  EGW: { name: "Explorer's Guide to Wildemount", abbreviation: 'EGW' },
+} as const
+
+/**
  * D&D Race/Species
  */
 export interface Race {
@@ -44,6 +74,9 @@ export interface Race {
 
   // Category for organization
   category?: 'common' | 'exotic' | 'monstrous' | 'planar' | 'aquatic' | 'aerial'
+
+  // Source book reference
+  sourceBook?: SourceBook
 
   // Ability bonuses
   abilityBonuses: AbilityBonus
