@@ -77,13 +77,6 @@ export function BackgroundSelector({ initialBackground, onSelect, onBack }: Back
         ))}
       </div>
 
-      {/* Coming Soon Note */}
-      <div className="mb-8 p-4 bg-gray-800/50 rounded-lg border border-gray-700">
-        <p className="text-sm text-gray-400 text-center">
-          More backgrounds coming soon: Charlatan, Entertainer, Guild Artisan, Hermit, Outlander, Urchin
-        </p>
-      </div>
-
       {/* Selected Background Details */}
       {selectedBackground && (
         <div className="mb-8 p-6 bg-gray-800 rounded-xl border border-dnd-gold/30">

@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import type { Background } from '../types/background'
+import { QuickRefTooltip } from './QuickRefTooltip'
 
 interface BackgroundCardProps {
   background: Background
@@ -35,21 +37,41 @@ function formatSkillName(skill: string): string {
 
 /**
  * Background Card Component
- * Displays a background option with visual styling and key information
+ * Displays a background option with visual styling, expandable lore, and clickable skills
  */
 export function BackgroundCard({ background, isSelected, onSelect }: BackgroundCardProps) {
+  const [showLore, setShowLore] = useState(false)
+  const [showFeature, setShowFeature] = useState(false)
+
+  const handleReadMore = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setShowLore(!showLore)
+  }
+
+  const handleFeatureClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setShowFeature(!showFeature)
+  }
+
   return (
-    <button
-      type="button"
+    <div
       onClick={() => onSelect(background)}
-      className={`w-full text-left p-6 rounded-xl border-2 transition-all duration-200
+      className={`w-full text-left p-6 rounded-xl border-2 transition-all duration-200 cursor-pointer
                  focus:outline-none focus:ring-2 focus:ring-dnd-gold focus:ring-offset-2 focus:ring-offset-gray-900
                  ${
                    isSelected
                      ? 'border-dnd-gold bg-gray-800 shadow-lg shadow-dnd-gold/20'
                      : 'border-gray-700 bg-gray-800/50 hover:border-gray-500 hover:bg-gray-800'
                  }`}
+      role="button"
+      tabIndex={0}
       aria-pressed={isSelected}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          onSelect(background)
+        }
+      }}
     >
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
@@ -72,25 +94,64 @@ export function BackgroundCard({ background, isSelected, onSelect }: BackgroundC
       </div>
 
       {/* Description */}
-      <p className="text-gray-300 text-sm mb-4 line-clamp-2">{background.description}</p>
+      <p className="text-gray-300 text-sm mb-3">{background.description}</p>
 
-      {/* Skill Proficiencies */}
+      {/* Read More Button */}
+      <button
+        onClick={handleReadMore}
+        className="text-dnd-gold hover:text-yellow-400 text-sm font-medium mb-4 flex items-center gap-1 transition-colors"
+      >
+        {showLore ? 'Show Less' : 'Read More'}
+        <svg
+          className={`w-4 h-4 transition-transform duration-200 ${showLore ? 'rotate-180' : ''}`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {/* Expanded Lore */}
+      {showLore && (
+        <div className="mb-4 p-4 bg-gray-900/50 rounded-lg border border-gray-700">
+          <h4 className="text-sm font-semibold text-dnd-gold mb-2 flex items-center gap-2">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+            Story Lore
+          </h4>
+          <div className="text-gray-300 text-sm leading-relaxed whitespace-pre-line max-h-60 overflow-y-auto pr-2">
+            {background.lore}
+          </div>
+        </div>
+      )}
+
+      {/* Skill Proficiencies - Clickable */}
       <div className="mb-3">
-        <span className="text-xs text-gray-500 uppercase tracking-wider">Skills:</span>
+        <span className="text-xs text-gray-500 uppercase tracking-wider">Skills (click to learn more):</span>
         <div className="flex flex-wrap gap-2 mt-1">
           {background.skillProficiencies.map((skill) => (
-            <span
+            <div
               key={skill}
-              className="px-2 py-1 bg-purple-900/30 text-purple-300 text-xs font-medium rounded"
+              onClick={(e) => e.stopPropagation()}
+              className="px-3 py-1.5 bg-purple-900/30 text-purple-300 text-sm font-medium rounded-lg border border-purple-800/50 hover:border-purple-500 transition-colors"
             >
-              {formatSkillName(skill)}
-            </span>
+              <QuickRefTooltip type="skill" id={skill}>
+                <span className="flex items-center gap-1">
+                  {formatSkillName(skill)}
+                  <svg className="w-3 h-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </span>
+              </QuickRefTooltip>
+            </div>
           ))}
         </div>
       </div>
 
       {/* Tool Proficiencies or Languages */}
-      <div className="flex flex-wrap gap-4 text-xs text-gray-400">
+      <div className="flex flex-wrap gap-4 text-xs text-gray-400 mb-3">
         {background.toolProficiencies && background.toolProficiencies.length > 0 && (
           <div>
             <span className="text-gray-500">Tools: </span>
@@ -105,11 +166,37 @@ export function BackgroundCard({ background, isSelected, onSelect }: BackgroundC
         )}
       </div>
 
-      {/* Feature Preview */}
-      <div className="mt-3 pt-3 border-t border-gray-700">
-        <span className="text-xs text-gray-500">Feature: </span>
-        <span className="text-xs text-dnd-gold">{background.feature.name}</span>
+      {/* Feature - Clickable for details */}
+      <div className="pt-3 border-t border-gray-700">
+        <button
+          onClick={handleFeatureClick}
+          className="w-full text-left hover:bg-gray-700/50 rounded-lg p-2 -m-2 transition-colors"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="text-xs text-gray-500">Feature: </span>
+              <span className="text-sm text-dnd-gold font-medium">{background.feature.name}</span>
+            </div>
+            <svg
+              className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${showFeature ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </button>
+
+        {/* Feature Description Expanded */}
+        {showFeature && (
+          <div className="mt-3 p-3 bg-dnd-gold/10 rounded-lg border border-dnd-gold/30">
+            <p className="text-sm text-gray-300 leading-relaxed">
+              {background.feature.description}
+            </p>
+          </div>
+        )}
       </div>
-    </button>
+    </div>
   )
 }
