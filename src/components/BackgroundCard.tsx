@@ -96,6 +96,21 @@ export function BackgroundCard({ background, isSelected, onSelect }: BackgroundC
       {/* Description */}
       <p className="text-gray-300 text-sm mb-3">{background.description}</p>
 
+      {/* Ability Score Bonuses */}
+      <div className="mb-3">
+        <span className="text-xs text-gray-500 uppercase tracking-wider">Ability Bonuses:</span>
+        <div className="flex flex-wrap gap-2 mt-1">
+          {background.abilityBonuses.map((bonus) => (
+            <span
+              key={bonus.ability}
+              className="px-2 py-1 bg-green-900/30 text-green-300 text-sm font-medium rounded-lg border border-green-800/50"
+            >
+              +{bonus.bonus} {bonus.ability.charAt(0).toUpperCase() + bonus.ability.slice(1, 3).toUpperCase()}
+            </span>
+          ))}
+        </div>
+      </div>
+
       {/* Read More Button */}
       <button
         onClick={handleReadMore}
@@ -138,12 +153,7 @@ export function BackgroundCard({ background, isSelected, onSelect }: BackgroundC
               className="px-3 py-1.5 bg-purple-900/30 text-purple-300 text-sm font-medium rounded-lg border border-purple-800/50 hover:border-purple-500 transition-colors"
             >
               <QuickRefTooltip type="skill" id={skill}>
-                <span className="flex items-center gap-1">
-                  {formatSkillName(skill)}
-                  <svg className="w-3 h-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </span>
+                {formatSkillName(skill)}
               </QuickRefTooltip>
             </div>
           ))}
