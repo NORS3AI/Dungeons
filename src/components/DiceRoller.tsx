@@ -395,9 +395,9 @@ export function DiceRoller({ onRoll, compact = false, character }: DiceRollerPro
           type="text"
           value={notation}
           onChange={(e) => setNotation(e.target.value)}
-          placeholder="e.g., 2d6, 1d20+5, 4d6"
-          className="flex-1 px-4 py-2 bg-gray-900 border border-gray-600 rounded-lg
-                   text-white placeholder-gray-500 focus:border-dnd-gold focus:outline-none"
+          placeholder="e.g., 2d6+5"
+          className="w-32 px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg
+                   text-white placeholder-gray-500 focus:border-dnd-gold focus:outline-none text-center"
         />
         <div className="flex items-center gap-1">
           <button
