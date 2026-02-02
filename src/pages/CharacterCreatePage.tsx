@@ -53,6 +53,11 @@ export function CharacterCreatePage() {
     }
   }, [currentCharacter, createNewCharacter])
 
+  // Scroll to top when step changes
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [creationStep])
+
   const currentStepNumber = STEP_TO_NUMBER[creationStep] ?? 1
 
   const handleStepClick = (stepId: number) => {
