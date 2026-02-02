@@ -3,6 +3,21 @@
  * Centralized data for tooltips and popups throughout the app
  */
 
+// Source Book Reference
+export interface SourceBook {
+  name: string
+  abbreviation: string
+  page?: number
+}
+
+// Common D&D Source Books
+export const SOURCE_BOOKS = {
+  PHB: { name: "Player's Handbook", abbreviation: 'PHB' },
+  PHB2024: { name: "Player's Handbook (2024)", abbreviation: 'PHB24' },
+  XGTE: { name: "Xanathar's Guide to Everything", abbreviation: 'XGtE' },
+  TCOE: { name: "Tasha's Cauldron of Everything", abbreviation: 'TCoE' },
+} as const
+
 // Spell Reference
 export interface SpellRef {
   id: string
@@ -16,6 +31,7 @@ export interface SpellRef {
   description: string
   higherLevels?: string
   classes: string[]
+  sourceBook?: SourceBook
 }
 
 // Skill Reference
