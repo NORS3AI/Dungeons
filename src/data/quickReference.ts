@@ -16,6 +16,8 @@ export const SOURCE_BOOKS = {
   PHB2024: { name: "Player's Handbook (2024)", abbreviation: 'PHB24' },
   XGTE: { name: "Xanathar's Guide to Everything", abbreviation: 'XGtE' },
   TCOE: { name: "Tasha's Cauldron of Everything", abbreviation: 'TCoE' },
+  GGR: { name: "Guildmaster's Guide to Ravnica", abbreviation: 'GGR' },
+  EGW: { name: "Explorer's Guide to Wildemount", abbreviation: 'EGW' },
 } as const
 
 // Spell Reference
