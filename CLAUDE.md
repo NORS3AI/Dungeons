@@ -1,5 +1,53 @@
 # Claude.md - Project Context for AI Assistance
 
+## Current Project Status (Updated Feb 2026)
+
+### What's Already Built
+
+**Tech Stack**: React 18 + TypeScript + Vite + Tailwind CSS + Zustand
+
+**Completed Data References** (in `src/data/quickReference.ts`):
+- ✅ **401 Spells** - Complete PHB 2024 spell list (cantrips through 9th level)
+- ✅ **6 Abilities** - STR, DEX, CON, INT, WIS, CHA with descriptions
+- ✅ **18 Skills** - All skills with ability associations
+- ✅ **37 Weapons** - Simple and martial weapons with stats
+- ✅ **13 Armor** - Light, medium, heavy armor and shields
+- ✅ **14 Conditions** - Blinded, charmed, frightened, etc.
+- ✅ **100+ Class Traits** - Features for all classes/subclasses
+- ✅ **30+ Game Rules** - Clickable references for new players (spellcasting, combat, rests)
+
+**Completed Classes** (12 classes, 28 subclasses):
+- Barbarian (4 subclasses), Bard (4), Cleric (7 domains), Druid (3)
+- Fighter (5), Monk (4), Paladin (4), Ranger (4)
+- Rogue (4), Sorcerer (4), Warlock (4 patrons), Wizard (8 schools)
+
+**Completed Races**: Human, Elf, Dwarf, Halfling, Gnome, Half-Elf, Half-Orc, Tiefling, Dragonborn, Drow, Aasimar, Goliath, Tabaxi, Kenku, Firbolg, Lizardfolk, Triton, Tortle
+
+**Completed Feats**: 18 feats including Alert, GWM, Sentinel, Lucky, etc.
+
+**UI Components Built**:
+- QuickRefTooltip - Clickable references that show popups
+- Character creation flow (partial)
+- Dice roller
+- Inventory system with currency
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `src/data/quickReference.ts` | Main data file - spells, skills, weapons, armor, conditions, traits, rules |
+| `src/components/QuickRefTooltip.tsx` | Clickable reference popup component |
+| `src/stores/characterStore.ts` | Zustand store for character state |
+
+### Important Notes
+
+- **Spell levels go 0-9** (cantrips to 9th), NOT 1-20. Character levels go 1-20.
+- **PHB 2024** is the target ruleset, not older 5e versions
+- **New player focused** - all references should be beginner-friendly with examples
+- Build with `npm run build` - must pass TypeScript checks
+
+---
+
 ## Project Overview
 
 **Dungeons** is a browser-based D&D 5th Edition (2024) DM tool and character creation system. The goal is "click and create" - users should be able to build complete, playable characters with minimal effort while DMs can manage entire campaigns from a single interface.
