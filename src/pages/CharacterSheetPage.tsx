@@ -4,7 +4,8 @@ import { useCharacterStore } from '../stores/characterStore'
 import { DiceRoller, DiceRollerButton, DiceRollerModal } from '../components/DiceRoller'
 import { calculateModifier, calculateProficiencyBonus } from '../types/dice'
 import { isWeapon, isArmor, isShield } from '../types/equipment'
-import type { Character, Ability, Equipment, Weapon } from '../types'
+import type { Character, Ability, Equipment, Weapon, Currency } from '../types'
+import { ALL_PROFESSIONS, CATEGORY_INFO, formatIncome, getProfessionByRoll, type Profession } from '../data/professions'
 
 const ABILITY_NAMES: Record<Ability, string> = {
   strength: 'STR',
@@ -43,9 +44,11 @@ const SKILLS: { name: string; ability: Ability; key: SkillKey }[] = [
 export function CharacterSheetPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { characters, loadCharacter, currentCharacter, levelUp } = useCharacterStore()
+  const { characters, loadCharacter, currentCharacter, levelUp, updateCurrency, removeEquipment, saveCharacter } = useCharacterStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
   const [activeTab, setActiveTab] = useState<'main' | 'spells' | 'inventory' | 'features'>('main')
+  const [showCurrencyModal, setShowCurrencyModal] = useState(false)
+  const [showIncomeRoller, setShowIncomeRoller] = useState(false)
 
   useEffect(() => {
     if (id) {
@@ -420,16 +423,32 @@ export function CharacterSheetPage() {
         <div className="space-y-6">
           {/* Currency */}
           <div className="card bg-gray-800 border-gray-700 p-4">
-            <h3 className="text-lg font-bold text-white mb-4">Currency</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-white">Currency</h3>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowIncomeRoller(true)}
+                  className="px-3 py-1 text-sm bg-dnd-gold text-gray-900 rounded-lg hover:bg-yellow-500 transition-colors"
+                >
+                  Daily Income
+                </button>
+                <button
+                  onClick={() => setShowCurrencyModal(true)}
+                  className="px-3 py-1 text-sm bg-green-700 text-white rounded-lg hover:bg-green-600 transition-colors"
+                >
+                  Add Currency
+                </button>
+              </div>
+            </div>
             <div className="flex flex-wrap gap-4">
               {[
-                { key: 'platinum', label: 'PP', color: 'text-gray-300' },
-                { key: 'gold', label: 'GP', color: 'text-yellow-400' },
-                { key: 'electrum', label: 'EP', color: 'text-blue-300' },
-                { key: 'silver', label: 'SP', color: 'text-gray-400' },
-                { key: 'copper', label: 'CP', color: 'text-orange-400' },
-              ].map(({ key, label, color }) => (
-                <div key={key} className="bg-gray-900 rounded-lg px-4 py-2 text-center">
+                { key: 'platinum', label: 'PP', color: 'text-gray-300', bgColor: 'bg-gray-600/20' },
+                { key: 'gold', label: 'GP', color: 'text-yellow-400', bgColor: 'bg-yellow-600/20' },
+                { key: 'electrum', label: 'EP', color: 'text-blue-300', bgColor: 'bg-blue-600/20' },
+                { key: 'silver', label: 'SP', color: 'text-gray-400', bgColor: 'bg-gray-500/20' },
+                { key: 'copper', label: 'CP', color: 'text-orange-400', bgColor: 'bg-orange-600/20' },
+              ].map(({ key, label, color, bgColor }) => (
+                <div key={key} className={`${bgColor} bg-gray-900 rounded-lg px-4 py-2 text-center min-w-[80px]`}>
                   <div className={`text-xl font-bold ${color}`}>
                     {character.currency[key as keyof typeof character.currency]}
                   </div>
@@ -447,11 +466,46 @@ export function CharacterSheetPage() {
             ) : (
               <div className="space-y-2">
                 {character.equipment.map((item) => (
-                  <EquipmentItem key={item.id} item={item} character={character} />
+                  <EquipmentItem
+                    key={item.id}
+                    item={item}
+                    character={character}
+                    onRemove={() => {
+                      removeEquipment(item.id)
+                      saveCharacter()
+                    }}
+                  />
                 ))}
               </div>
             )}
           </div>
+
+          {/* Currency Modal */}
+          {showCurrencyModal && (
+            <CurrencyModal
+              currency={character.currency}
+              onUpdate={(currency) => {
+                updateCurrency(currency)
+                saveCharacter()
+              }}
+              onClose={() => setShowCurrencyModal(false)}
+            />
+          )}
+
+          {/* Daily Income Roller */}
+          {showIncomeRoller && (
+            <DailyIncomeRoller
+              onEarn={(currency) => {
+                const newCurrency = { ...character.currency }
+                for (const [key, value] of Object.entries(currency)) {
+                  newCurrency[key as keyof Currency] += value
+                }
+                updateCurrency(newCurrency)
+                saveCharacter()
+              }}
+              onClose={() => setShowIncomeRoller(false)}
+            />
+          )}
         </div>
       )}
 
@@ -520,8 +574,23 @@ export function CharacterSheetPage() {
   )
 }
 
+// Trash icon component
+function TrashIcon({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className="p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-900/30 rounded transition-colors"
+      title="Remove item"
+    >
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+      </svg>
+    </button>
+  )
+}
+
 // Equipment item component
-function EquipmentItem({ item, character }: { item: Equipment; character: Character }) {
+function EquipmentItem({ item, character, onRemove }: { item: Equipment; character: Character; onRemove: () => void }) {
   const getAbilityMod = (ability: Ability): number => {
     return calculateModifier(character.abilityScores[ability])
   }
@@ -538,7 +607,7 @@ function EquipmentItem({ item, character }: { item: Equipment; character: Charac
     const attackBonus = attackMod + profBonus
 
     return (
-      <div className="p-3 bg-gray-900 rounded-lg flex items-center justify-between">
+      <div className="p-3 bg-gray-900 rounded-lg flex items-center justify-between group">
         <div>
           <span className="font-medium text-white hover:text-dnd-gold">
             {weapon.name}
@@ -550,11 +619,14 @@ function EquipmentItem({ item, character }: { item: Equipment; character: Charac
             {weapon.damage.dice} {weapon.damage.type}
           </div>
         </div>
-        <div className="text-right">
-          <div className="text-dnd-gold font-medium">
-            +{attackBonus} to hit
+        <div className="flex items-center gap-3">
+          <div className="text-right">
+            <div className="text-dnd-gold font-medium">
+              +{attackBonus} to hit
+            </div>
+            <div className="text-xs text-gray-500">{weapon.weight} lb</div>
           </div>
-          <div className="text-xs text-gray-500">{weapon.weight} lb</div>
+          <TrashIcon onClick={onRemove} />
         </div>
       </div>
     )
@@ -562,22 +634,25 @@ function EquipmentItem({ item, character }: { item: Equipment; character: Charac
 
   if (isArmor(item)) {
     return (
-      <div className="p-3 bg-gray-900 rounded-lg flex items-center justify-between">
+      <div className="p-3 bg-gray-900 rounded-lg flex items-center justify-between group">
         <div>
           <span className="font-medium text-white">{item.name}</span>
           <div className="text-sm text-gray-400">
             AC {item.baseAC} | {item.armorType}
           </div>
         </div>
-        <div className="text-right">
-          <div className="text-xs text-gray-500">{item.weight} lb</div>
+        <div className="flex items-center gap-3">
+          <div className="text-right">
+            <div className="text-xs text-gray-500">{item.weight} lb</div>
+          </div>
+          <TrashIcon onClick={onRemove} />
         </div>
       </div>
     )
   }
 
   return (
-    <div className="p-3 bg-gray-900 rounded-lg flex items-center justify-between">
+    <div className="p-3 bg-gray-900 rounded-lg flex items-center justify-between group">
       <div>
         <span className="font-medium text-white">{item.name}</span>
         {item.quantity > 1 && (
@@ -585,7 +660,291 @@ function EquipmentItem({ item, character }: { item: Equipment; character: Charac
         )}
         <div className="text-sm text-gray-400">{item.description}</div>
       </div>
-      <div className="text-xs text-gray-500">{item.weight} lb</div>
+      <div className="flex items-center gap-3">
+        <div className="text-xs text-gray-500">{item.weight} lb</div>
+        <TrashIcon onClick={onRemove} />
+      </div>
+    </div>
+  )
+}
+
+// Currency Modal
+function CurrencyModal({
+  currency,
+  onUpdate,
+  onClose,
+}: {
+  currency: Currency
+  onUpdate: (currency: Partial<Currency>) => void
+  onClose: () => void
+}) {
+  const [values, setValues] = useState({
+    platinum: 0,
+    gold: 0,
+    electrum: 0,
+    silver: 0,
+    copper: 0,
+  })
+  const [mode, setMode] = useState<'add' | 'subtract'>('add')
+
+  const handleSubmit = () => {
+    const updates: Partial<Currency> = {}
+    for (const [key, value] of Object.entries(values)) {
+      if (value !== 0) {
+        const currencyKey = key as keyof Currency
+        if (mode === 'add') {
+          updates[currencyKey] = currency[currencyKey] + value
+        } else {
+          updates[currencyKey] = Math.max(0, currency[currencyKey] - value)
+        }
+      }
+    }
+    if (Object.keys(updates).length > 0) {
+      onUpdate(updates)
+    }
+    onClose()
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div className="bg-gray-800 rounded-xl p-6 w-full max-w-md border border-gray-700">
+        <h3 className="text-xl font-bold text-white mb-4">Manage Currency</h3>
+
+        {/* Mode Toggle */}
+        <div className="flex gap-2 mb-4">
+          <button
+            onClick={() => setMode('add')}
+            className={`flex-1 py-2 rounded-lg font-medium transition-colors ${
+              mode === 'add'
+                ? 'bg-green-700 text-white'
+                : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+            }`}
+          >
+            Add
+          </button>
+          <button
+            onClick={() => setMode('subtract')}
+            className={`flex-1 py-2 rounded-lg font-medium transition-colors ${
+              mode === 'subtract'
+                ? 'bg-red-700 text-white'
+                : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+            }`}
+          >
+            Subtract
+          </button>
+        </div>
+
+        {/* Currency Inputs */}
+        <div className="space-y-3">
+          {[
+            { key: 'platinum', label: 'Platinum (PP)', color: 'text-gray-300' },
+            { key: 'gold', label: 'Gold (GP)', color: 'text-yellow-400' },
+            { key: 'electrum', label: 'Electrum (EP)', color: 'text-blue-300' },
+            { key: 'silver', label: 'Silver (SP)', color: 'text-gray-400' },
+            { key: 'copper', label: 'Copper (CP)', color: 'text-orange-400' },
+          ].map(({ key, label, color }) => (
+            <div key={key} className="flex items-center gap-3">
+              <label className={`w-32 ${color} font-medium`}>{label}</label>
+              <span className="text-gray-500 w-16 text-right">
+                ({currency[key as keyof Currency]})
+              </span>
+              <input
+                type="number"
+                min="0"
+                value={values[key as keyof typeof values]}
+                onChange={(e) => setValues({ ...values, [key]: parseInt(e.target.value) || 0 })}
+                className="flex-1 px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white
+                         focus:outline-none focus:ring-2 focus:ring-dnd-gold"
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-3 mt-6">
+          <button
+            onClick={onClose}
+            className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSubmit}
+            className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
+              mode === 'add'
+                ? 'bg-green-700 text-white hover:bg-green-600'
+                : 'bg-red-700 text-white hover:bg-red-600'
+            }`}
+          >
+            {mode === 'add' ? 'Add' : 'Subtract'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Daily Income Roller
+function DailyIncomeRoller({
+  onEarn,
+  onClose,
+}: {
+  onEarn: (currency: Partial<Currency>) => void
+  onClose: () => void
+}) {
+  const [selectedProfession, setSelectedProfession] = useState<Profession | null>(null)
+  const [rollResult, setRollResult] = useState<number | null>(null)
+  const [earnedAmount, setEarnedAmount] = useState<{ amount: number; currency: string } | null>(null)
+  const [isRolling, setIsRolling] = useState(false)
+
+  const handleRandomProfession = () => {
+    setIsRolling(true)
+    setEarnedAmount(null)
+
+    // Animate the roll
+    let count = 0
+    const interval = setInterval(() => {
+      const roll = Math.floor(Math.random() * 100) + 1
+      setRollResult(roll)
+      count++
+      if (count >= 15) {
+        clearInterval(interval)
+        const finalRoll = Math.floor(Math.random() * 100) + 1
+        setRollResult(finalRoll)
+        const profession = getProfessionByRoll(finalRoll)
+        setSelectedProfession(profession)
+        setIsRolling(false)
+      }
+    }, 50)
+  }
+
+  const handleCollectIncome = () => {
+    if (!selectedProfession) return
+
+    const { amount, currency } = selectedProfession.dailyIncome
+    setEarnedAmount({ amount, currency })
+
+    // Convert to currency object
+    const earned: Partial<Currency> = {}
+    if (currency === 'gold') earned.gold = amount
+    else if (currency === 'silver') earned.silver = amount
+    else if (currency === 'copper') earned.copper = amount
+
+    onEarn(earned)
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div className="bg-gray-800 rounded-xl p-6 w-full max-w-lg border border-gray-700 max-h-[90vh] overflow-y-auto">
+        <h3 className="text-xl font-bold text-dnd-gold mb-4">Daily Income Roller</h3>
+        <p className="text-gray-400 text-sm mb-4">
+          Roll d100 to determine your daily profession and earnings, or select a profession manually.
+        </p>
+
+        {/* Random Roll Section */}
+        <div className="bg-gray-900 rounded-lg p-4 mb-4">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-white font-medium">Random Profession</span>
+            <button
+              onClick={handleRandomProfession}
+              disabled={isRolling}
+              className="px-4 py-2 bg-dnd-gold text-gray-900 rounded-lg font-medium hover:bg-yellow-500 transition-colors disabled:opacity-50"
+            >
+              {isRolling ? 'Rolling...' : 'Roll d100'}
+            </button>
+          </div>
+          {rollResult !== null && (
+            <div className="text-center">
+              <div className="text-4xl font-bold text-dnd-gold mb-2">{rollResult}</div>
+              {selectedProfession && !isRolling && (
+                <div className="text-white">
+                  <span className={CATEGORY_INFO[selectedProfession.category].color}>
+                    {selectedProfession.name}
+                  </span>
+                  <span className="text-gray-400 ml-2">
+                    ({formatIncome(selectedProfession.dailyIncome)}/day)
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Manual Selection */}
+        <div className="mb-4">
+          <label className="text-white font-medium block mb-2">Or Select Profession</label>
+          <select
+            value={selectedProfession?.id || ''}
+            onChange={(e) => {
+              const profession = ALL_PROFESSIONS.find((p) => p.id === e.target.value)
+              setSelectedProfession(profession || null)
+              setRollResult(null)
+              setEarnedAmount(null)
+            }}
+            className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white
+                     focus:outline-none focus:ring-2 focus:ring-dnd-gold"
+          >
+            <option value="">Choose a profession...</option>
+            {Object.entries(CATEGORY_INFO).map(([category, info]) => (
+              <optgroup key={category} label={info.name}>
+                {ALL_PROFESSIONS.filter((p) => p.category === category).map((profession) => (
+                  <option key={profession.id} value={profession.id}>
+                    {profession.name} - {formatIncome(profession.dailyIncome)}/day
+                  </option>
+                ))}
+              </optgroup>
+            ))}
+          </select>
+        </div>
+
+        {/* Selected Profession Details */}
+        {selectedProfession && (
+          <div className="bg-gray-900 rounded-lg p-4 mb-4">
+            <div className="flex items-center justify-between mb-2">
+              <h4 className={`text-lg font-bold ${CATEGORY_INFO[selectedProfession.category].color}`}>
+                {selectedProfession.name}
+              </h4>
+              <span className="text-dnd-gold font-bold">
+                {formatIncome(selectedProfession.dailyIncome)}/day
+              </span>
+            </div>
+            <p className="text-gray-400 text-sm mb-3">{selectedProfession.description}</p>
+            <div className="text-sm">
+              <span className="text-gray-500">Lifestyle: </span>
+              <span className={CATEGORY_INFO[selectedProfession.category].color}>
+                {CATEGORY_INFO[selectedProfession.category].name}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Earned Amount Display */}
+        {earnedAmount && (
+          <div className="bg-green-900/30 border border-green-600 rounded-lg p-4 mb-4 text-center">
+            <p className="text-green-400 font-medium">
+              Collected {earnedAmount.amount} {earnedAmount.currency === 'gold' ? 'GP' : earnedAmount.currency === 'silver' ? 'SP' : 'CP'}!
+            </p>
+          </div>
+        )}
+
+        {/* Actions */}
+        <div className="flex gap-3">
+          <button
+            onClick={onClose}
+            className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+          >
+            Close
+          </button>
+          {selectedProfession && !earnedAmount && (
+            <button
+              onClick={handleCollectIncome}
+              className="flex-1 px-4 py-2 bg-green-700 text-white rounded-lg font-medium hover:bg-green-600 transition-colors"
+            >
+              Collect {formatIncome(selectedProfession.dailyIncome)}
+            </button>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
