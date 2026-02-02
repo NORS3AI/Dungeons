@@ -278,7 +278,7 @@ export function CharacterSheetPage() {
                 <div className="bg-gray-900 rounded-lg p-3 text-center border border-gray-700">
                   <div className="text-xs text-gray-500 uppercase mb-1">Hit Die</div>
                   <div className="text-xl font-bold text-white">
-                    {character.level}d{character.class?.hitDie || 8}
+                    {character.level}{character.class?.hitDie || 'd8'}
                   </div>
                 </div>
               </div>
