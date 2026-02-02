@@ -21,6 +21,14 @@ export interface SuggestedCharacteristic {
 }
 
 /**
+ * Ability score bonus from background
+ */
+export interface AbilityBonus {
+  ability: 'strength' | 'dexterity' | 'constitution' | 'intelligence' | 'wisdom' | 'charisma'
+  bonus: number // +1 or +2
+}
+
+/**
  * Background definition
  */
 export interface Background {
@@ -30,6 +38,9 @@ export interface Background {
 
   // Extended lore for "Read More" section
   lore: string
+
+  // Ability Score Bonuses (2024 PHB style)
+  abilityBonuses: AbilityBonus[] // e.g., +2 to one, +1 to another
 
   // Proficiencies
   skillProficiencies: string[] // Two skills
@@ -65,6 +76,10 @@ Your days were filled with ritual: the morning prayers at dawn, the careful main
 The faithful came to you seeking guidance, blessings for their newborns, last rites for their dying, and absolution for their sins. You learned that faith is both a comfort and a burden, that the gods speak in whispers that require years of devotion to understand.
 
 Now, whether called by divine vision, sent on holy mission, or driven from your temple by darkness, you carry your faith into a world that desperately needs the light—or the shadow—that only the devoted can provide.`,
+  abilityBonuses: [
+    { ability: 'wisdom', bonus: 2 },
+    { ability: 'intelligence', bonus: 1 },
+  ],
   skillProficiencies: ['insight', 'religion'],
   languages: 2,
   startingEquipment: [
@@ -132,6 +147,10 @@ You've run with thieves' guilds in sprawling cities, served as muscle for crime 
 The city watch knows your type, but they've never quite caught you—or if they have, you've always found a way to slip free. You've made enemies, certainly, but also allies who would rather die than betray you, bound by the blood oaths and shared secrets of the underworld.
 
 Now you venture beyond the familiar streets, but you carry with you the skills honed in darkness: the ability to move unseen, to speak honeyed lies, and to always, always have a plan for when things go wrong.`,
+  abilityBonuses: [
+    { ability: 'dexterity', bonus: 2 },
+    { ability: 'intelligence', bonus: 1 },
+  ],
   skillProficiencies: ['deception', 'stealth'],
   toolProficiencies: ['thieves-tools', 'gaming-set'],
   startingEquipment: [
@@ -198,6 +217,10 @@ And you won.
 The tale spread like wildfire through the surrounding countryside. Travelers carried stories of the peasant hero to distant taverns. Bards began composing ballads. Children play-acted your victory in the streets. Your name became a symbol of hope for the downtrodden, proof that one person—even the humblest among us—can make a difference.
 
 Now destiny calls you to greater challenges. The people believe in you, and you carry their hopes upon your shoulders as you venture into a wider world filled with dangers that dwarf anything you've faced before.`,
+  abilityBonuses: [
+    { ability: 'constitution', bonus: 2 },
+    { ability: 'strength', bonus: 1 },
+  ],
   skillProficiencies: ['animal-handling', 'survival'],
   toolProficiencies: ['artisans-tools', 'vehicles-land'],
   startingEquipment: [
@@ -264,6 +287,10 @@ Your family's name opens doors throughout the realm. Merchants bow when you pass
 But noble life is not without its shadows. Rivals plot against your house, seeking to usurp your lands or destroy your reputation. Family secrets lurk in locked towers and forbidden libraries. The weight of expectation presses heavily—you are expected to marry advantageously, to produce heirs, to uphold the honor of ancestors whose portraits line your halls.
 
 Now you've left the comfort of your estates behind, whether driven by duty, adventure, disgrace, or a desire to prove that you are more than your bloodline. In the wider world, your title means less—but the skills learned in court and the confidence bred into your bones remain your greatest weapons.`,
+  abilityBonuses: [
+    { ability: 'charisma', bonus: 2 },
+    { ability: 'intelligence', bonus: 1 },
+  ],
   skillProficiencies: ['history', 'persuasion'],
   toolProficiencies: ['gaming-set'],
   languages: 1,
@@ -330,6 +357,10 @@ Your specialty might be arcane theory, historical records, astronomical observat
 The pursuit of knowledge is rarely without cost. You've sacrificed relationships, wealth, and years of your life in dark rooms lit only by candlelight. Perhaps you've grown socially awkward, more comfortable with texts than with people. Maybe your discoveries have earned you enemies among those who prefer certain truths remain buried.
 
 But your mind is a weapon as sharp as any blade. You know things others cannot imagine, and in a world where knowledge is power, you are mightier than most realize. Now a mystery has drawn you from your studies—a question that cannot be answered from books alone, a secret that demands you seek the truth in the dangerous world beyond library walls.`,
+  abilityBonuses: [
+    { ability: 'intelligence', bonus: 2 },
+    { ability: 'wisdom', bonus: 1 },
+  ],
   skillProficiencies: ['arcana', 'history'],
   languages: 2,
   startingEquipment: [
@@ -397,6 +428,10 @@ You've stood in shield walls while arrows darkened the sky. You've charged acros
 War leaves its marks. Perhaps you bear physical scars from blade or fire. Perhaps the deeper wounds are the ones that don't show—the faces of the fallen that visit you in dreams, the sound of a scream that makes you reach for your weapon even in peaceful times. You've seen the worst of what mortals can do to each other, and somehow, you kept going.
 
 Now the war is over—or perhaps you've simply left it behind. But the soldier's discipline, the warrior's instincts, and the veteran's hard-won wisdom remain. In a world still filled with monsters and conflicts, your skills are far from useless.`,
+  abilityBonuses: [
+    { ability: 'strength', bonus: 2 },
+    { ability: 'constitution', bonus: 1 },
+  ],
   skillProficiencies: ['athletics', 'intimidation'],
   toolProficiencies: ['gaming-set', 'vehicles-land'],
   startingEquipment: [
@@ -463,6 +498,10 @@ Your schemes have ranged from petty street cons to elaborate long games spanning
 Perhaps you started from necessity—a street urchin who learned that a convincing lie was worth more than honest begging. Or maybe you discovered your talent in more comfortable circumstances, finding that people simply believed whatever you told them. Either way, you've honed deception into a razor-sharp skill.
 
 Now you seek bigger games. The adventuring life offers access to wealthy patrons, ancient treasures, and situations where a silver tongue might be worth more than a steel blade.`,
+  abilityBonuses: [
+    { ability: 'charisma', bonus: 2 },
+    { ability: 'dexterity', bonus: 1 },
+  ],
   skillProficiencies: ['deception', 'sleight-of-hand'],
   toolProficiencies: ['disguise-kit', 'forgery-kit'],
   startingEquipment: [
@@ -494,6 +533,10 @@ You've performed in tavern corners for copper pieces and in grand theaters for n
 The entertainer's life taught you to read a room instantly—to sense when a crowd is ready to riot or ready to throw coins. You've learned to think on your feet, to improvise when things go wrong, and to always leave them wanting more.
 
 Now adventure calls with its promise of new stories to tell, new songs to compose, and the greatest stage of all: the epic tales of heroes and villains.`,
+  abilityBonuses: [
+    { ability: 'charisma', bonus: 2 },
+    { ability: 'dexterity', bonus: 1 },
+  ],
   skillProficiencies: ['acrobatics', 'performance'],
   toolProficiencies: ['disguise-kit', 'musical-instrument'],
   startingEquipment: [
@@ -525,6 +568,10 @@ You've created works of beauty and utility—weapons that sing when swung, furni
 But the workshop's walls grew too confining. You've heard tales of lost techniques, legendary materials, and master artisans who achieved the impossible. Perhaps you seek the adamantine heart of a fallen star to forge the ultimate blade, or the feathers of a phoenix to craft garments of immortal flame.
 
 Adventure offers resources and discoveries no guild can provide.`,
+  abilityBonuses: [
+    { ability: 'intelligence', bonus: 2 },
+    { ability: 'constitution', bonus: 1 },
+  ],
   skillProficiencies: ['insight', 'persuasion'],
   toolProficiencies: ['artisans-tools'],
   languages: 1,
@@ -557,6 +604,10 @@ The world outside rushed past, but within your sanctuary, you explored the inner
 Solitude taught you patience and self-reliance. You learned to read the subtle signs of weather and season, to survive on little, and to find company in your own thoughts. The silence spoke to you, and in that silence, you discovered a truth that changed everything.
 
 Now you've emerged, carrying knowledge that the crowded world has forgotten or never knew.`,
+  abilityBonuses: [
+    { ability: 'wisdom', bonus: 2 },
+    { ability: 'constitution', bonus: 1 },
+  ],
   skillProficiencies: ['medicine', 'religion'],
   toolProficiencies: ['herbalism-kit'],
   languages: 1,
@@ -590,6 +641,10 @@ You've tracked prey through terrain that would kill the unprepared. You've read 
 Perhaps you lived among a nomadic tribe, following the herds across continents. Maybe you were raised by wolves, bears, or stranger creatures. Or perhaps you simply wandered, a lone predator in an ecosystem of predators, surviving by wit and will.
 
 Now you've come to the lands of "civilization," and these people with their walls and laws seem as foreign to you as you seem to them.`,
+  abilityBonuses: [
+    { ability: 'constitution', bonus: 2 },
+    { ability: 'wisdom', bonus: 1 },
+  ],
   skillProficiencies: ['athletics', 'survival'],
   toolProficiencies: ['musical-instrument'],
   languages: 1,
@@ -623,6 +678,10 @@ You've weathered storms that would terrify landsmen, navigated by stars through 
 The sea is a cruel master, but a fair one. It doesn't care about your birth or your wealth—only whether you can tie a knot, climb a mast, and keep your head when the waves are breaking. You've lost friends to the depths and made brothers of strangers.
 
 Now the sea calls you to new horizons, new adventures, and perhaps the discovery of what lies beyond the maps' edges.`,
+  abilityBonuses: [
+    { ability: 'strength', bonus: 2 },
+    { ability: 'constitution', bonus: 1 },
+  ],
   skillProficiencies: ['athletics', 'perception'],
   toolProficiencies: ['navigators-tools', 'vehicles-water'],
   startingEquipment: [
@@ -655,6 +714,10 @@ You learned to move unseen through crowds, to spot an easy mark, to know which m
 Every coin was precious, every meal a victory. You developed a network of fellow urchins, beggars, and street folk—the invisible people that the wealthy pretend don't exist. You know the city's true face, the one hidden behind its prosperity and law.
 
 Now you're no longer a helpless child. The skills you learned to survive have become valuable tools, and the world owes you a better life.`,
+  abilityBonuses: [
+    { ability: 'dexterity', bonus: 2 },
+    { ability: 'constitution', bonus: 1 },
+  ],
   skillProficiencies: ['sleight-of-hand', 'stealth'],
   toolProficiencies: ['disguise-kit', 'thieves-tools'],
   startingEquipment: [
@@ -688,6 +751,10 @@ The experience shattered your previous life. Friends and family either died in t
 But your trauma has also hardened you. You've stared into the abyss and survived. You know that monsters are real, that evil exists beyond mortal comprehension, and that the world's apparent normalcy is a thin veneer over howling chaos. This knowledge is both your curse and your shield.
 
 You hunt the darkness now, or perhaps it hunts you.`,
+  abilityBonuses: [
+    { ability: 'wisdom', bonus: 2 },
+    { ability: 'constitution', bonus: 1 },
+  ],
   skillProficiencies: ['investigation', 'survival'],
   languages: 2,
   startingEquipment: [
@@ -719,6 +786,10 @@ For months or years, you descended deeper into the darkness. You learned forbidd
 Then came the moment of clarity. Perhaps you witnessed an atrocity too terrible even for you. Maybe you realized that you weren't a valued servant but a disposable pawn. Or perhaps you simply saw, in a moment of horrible lucidity, what you had become—and what you were becoming.
 
 Escape was terrifying. Your former brothers and sisters hunt you still, and the powers you served do not forget. But you've seen the alternative, and death is preferable to that fate.`,
+  abilityBonuses: [
+    { ability: 'intelligence', bonus: 2 },
+    { ability: 'wisdom', bonus: 1 },
+  ],
   skillProficiencies: ['arcana', 'religion'],
   languages: 2,
   startingEquipment: [
@@ -755,6 +826,10 @@ The knowledge changed you. Your dreams became strange, filled with non-Euclidean
 You've developed an instinctive understanding of aberrant psychology—if such beings can be said to have psychology. You recognize the signs of Far Realm corruption: the subtle warping of space, the whispers at the edge of hearing, the wrongness that makes animals flee and plants wither. This knowledge makes you invaluable when facing such threats, though it also marks you as someone who has gazed too long into the abyss.
 
 Fellow scholars either revere you as a pioneer or shun you as a madman. The truth, as always, lies somewhere in between. You've touched something vast and incomprehensible, and it has touched you back. Whether this is a gift or a curse remains to be seen.`,
+  abilityBonuses: [
+    { ability: 'intelligence', bonus: 2 },
+    { ability: 'wisdom', bonus: 1 },
+  ],
   skillProficiencies: ['arcana', 'investigation'],
   toolProficiencies: ['calligraphers-supplies'],
   languages: 2,
@@ -822,6 +897,10 @@ Your days were spent digging graves, preparing bodies, performing last rites, an
 You've seen things that would turn most people's hair white: bodies that refused to stay buried, ghosts bound by unfinished business, and the terrible price paid by those who disturb the dead. You've learned the prayers that put spirits to rest, the signs that indicate undead activity, and the techniques for fighting things that are already dead.
 
 The work is grim but necessary. Someone must stand between the living and the dead.`,
+  abilityBonuses: [
+    { ability: 'wisdom', bonus: 2 },
+    { ability: 'constitution', bonus: 1 },
+  ],
   skillProficiencies: ['medicine', 'religion'],
   toolProficiencies: ['herbalism-kit'],
   languages: 1,
@@ -855,6 +934,10 @@ Your methods combine detective work with occult knowledge. You interview witness
 You've seen the supernatural's fingerprints everywhere: the politician controlled by a devil's whispers, the merchant whose success comes from a pact with something hungry, the orphanage built over a site of ancient sacrifice. You've become skilled at recognizing the signs and following the threads of otherworldly corruption.
 
 The work is dangerous and often thankless. The powerful prefer their secrets stay hidden, and the entities you investigate don't appreciate the attention.`,
+  abilityBonuses: [
+    { ability: 'intelligence', bonus: 2 },
+    { ability: 'wisdom', bonus: 1 },
+  ],
   skillProficiencies: ['investigation', 'arcana'],
   toolProficiencies: ['thieves-tools'],
   languages: 1,
@@ -888,6 +971,10 @@ The entity—if "entity" is even the right word for something so alien—left it
 Some touched ones go mad, their fragile minds shattered by contact with the infinite. Others become prophets, cult leaders, or hermits babbling warnings that no one heeds. You've managed to maintain your sanity—mostly—but you're forever changed. The world seems thinner now, its reality more fragile. Sometimes you see through the cracks.
 
 The entity watches you still. What it wants, you cannot imagine.`,
+  abilityBonuses: [
+    { ability: 'charisma', bonus: 2 },
+    { ability: 'constitution', bonus: 1 },
+  ],
   skillProficiencies: ['insight', 'arcana'],
   languages: 2,
   startingEquipment: [
@@ -920,6 +1007,10 @@ Somehow, you survived. The fever burned through you for days that felt like year
 But you lived. While others succumbed, you endured. You developed an almost supernatural resistance to disease, and death no longer frightens you the way it once did—you've seen too much of it. You've walked through mass graves, helped burn the bodies of children, and learned that life is fragile and precious beyond measure.
 
 Now you carry the memory of the dead with you, and perhaps a mission to ensure such devastation never happens again.`,
+  abilityBonuses: [
+    { ability: 'constitution', bonus: 2 },
+    { ability: 'wisdom', bonus: 1 },
+  ],
   skillProficiencies: ['medicine', 'survival'],
   toolProficiencies: ['herbalism-kit'],
   languages: 1,
@@ -953,6 +1044,10 @@ At first, you feared your dreams. You did everything to avoid sleep: potions, pr
 Now you walk freely in the realm of nightmares. You've met others there—fellow travelers, imprisoned souls, and entities that have slept since before the world was young. You've learned secrets whispered only in dreams and developed abilities that work in both the waking and sleeping worlds.
 
 But the nightmare realm never truly lets go. Sometimes its shadows bleed into your waking hours.`,
+  abilityBonuses: [
+    { ability: 'wisdom', bonus: 2 },
+    { ability: 'charisma', bonus: 1 },
+  ],
   skillProficiencies: ['arcana', 'insight'],
   languages: 2,
   startingEquipment: [
@@ -985,6 +1080,10 @@ You grew up knowing you were special—and knowing that specialness came with a 
 But the bloodline also attracts attention. Enemies who destroyed your ancestors still hunt their descendants. Entities who made deals with your forebears expect you to honor ancient contracts. The power in your veins calls to things that would consume you to steal it for themselves.
 
 You carry both your family's gift and its burden.`,
+  abilityBonuses: [
+    { ability: 'charisma', bonus: 2 },
+    { ability: 'constitution', bonus: 1 },
+  ],
   skillProficiencies: ['history', 'arcana'],
   languages: 2,
   startingEquipment: [
@@ -1017,6 +1116,10 @@ Perhaps you deserved it. Perhaps you committed a crime so terrible that banishme
 The early days of exile were the hardest. You had to learn new customs, new languages, new ways of survival. Every stranger was a potential enemy, every town a place you might be recognized and turned away. Slowly, you adapted. You learned to live as a perpetual outsider, to find comfort in anonymity and freedom in having nothing to lose.
 
 Now the world is your home, or perhaps nowhere is.`,
+  abilityBonuses: [
+    { ability: 'dexterity', bonus: 2 },
+    { ability: 'wisdom', bonus: 1 },
+  ],
   skillProficiencies: ['deception', 'survival'],
   languages: 2,
   startingEquipment: [
@@ -1049,6 +1152,10 @@ Then something went wrong. Perhaps you couldn't master a crucial skill. Perhaps 
 The experience left you with fragmentary knowledge—enough to be dangerous, not enough to be powerful. You know how to cast the first gestures of spells you can't complete, remember the beginning of rituals you never mastered, and recall lessons that your former masters probably wish you'd forget.
 
 But failure is not the end. Many who now walk the paths of adventure found their true calling only after their first path collapsed.`,
+  abilityBonuses: [
+    { ability: 'intelligence', bonus: 2 },
+    { ability: 'dexterity', bonus: 1 },
+  ],
   skillProficiencies: ['arcana', 'history'],
   languages: 2,
   startingEquipment: [
@@ -1081,6 +1188,10 @@ Your methods are pragmatic rather than heroic. You study your quarry's habits, i
 The work isn't always clean. Sometimes you bring back corpses instead of prisoners. Sometimes the "criminals" you hunt turn out to be innocents framed by corrupt authorities. You've developed your own code for navigating these moral ambiguities—it might not satisfy philosophers, but it lets you sleep at night.
 
 Now you hunt bigger game.`,
+  abilityBonuses: [
+    { ability: 'dexterity', bonus: 2 },
+    { ability: 'wisdom', bonus: 1 },
+  ],
   skillProficiencies: ['investigation', 'survival'],
   toolProficiencies: ['thieves-tools'],
   languages: 1,
@@ -1114,6 +1225,10 @@ Perhaps you were a slave, forced to fight for others' profit. Perhaps you were a
 You've fought against other gladiators, against wild beasts, against monsters dragged from dungeons for public spectacle. You've learned to read opponents instantly, to sense the crowd's mood, and to turn impending defeat into dramatic victory. Your scars are your medals, your fighting style your signature.
 
 But the arena's walls grew too confining. You've proven yourself the best within those walls—now it's time to test yourself in the wider world.`,
+  abilityBonuses: [
+    { ability: 'strength', bonus: 2 },
+    { ability: 'charisma', bonus: 1 },
+  ],
   skillProficiencies: ['athletics', 'performance'],
   toolProficiencies: ['gaming-set'],
   languages: 1,
@@ -1147,6 +1262,10 @@ You've crawled through collapsing tombs, deciphered scripts dead for millennia, 
 The work is dangerous. Ancient sites are often protected by traps that still function perfectly after thousands of years. Curses laid by long-dead priests can still strike down the unwary. And there are always rivals—other archaeologists, treasure hunters, and those who believe certain knowledge should stay buried.
 
 But the discoveries make it worthwhile. You've held crown jewels of fallen empires, you've read the private thoughts of legendary rulers, and you've stood in chambers that changed the world.`,
+  abilityBonuses: [
+    { ability: 'intelligence', bonus: 2 },
+    { ability: 'dexterity', bonus: 1 },
+  ],
   skillProficiencies: ['history', 'survival'],
   toolProficiencies: ['cartographers-tools'],
   languages: 1,
@@ -1180,6 +1299,10 @@ With the inheritance came expectations. Distant relatives emerged from nowhere, 
 But you also inherited power. Whatever your legacy might be, it grants you resources and capabilities beyond those of ordinary people. You're learning to use it, to understand its history, and to decide what you want to do with this unexpected gift.
 
 Some inheritances are curses. Some are blessings. Most are both.`,
+  abilityBonuses: [
+    { ability: 'charisma', bonus: 2 },
+    { ability: 'constitution', bonus: 1 },
+  ],
   skillProficiencies: ['history', 'persuasion'],
   toolProficiencies: ['gaming-set'],
   languages: 1,
@@ -1212,6 +1335,10 @@ Perhaps monsters destroyed everything you loved, and vengeance drove you onto th
 You know the weaknesses of vampires and werewolves, the vulnerabilities of demons and undead, and the signs that reveal a monster's presence before the bodies start appearing. You carry specialized weapons—silver, cold iron, blessed blades—and you know how to use them. You've faced things that would drive ordinary people mad with terror, and you've won.
 
 The work never ends. For every monster you destroy, more lurk in the shadows.`,
+  abilityBonuses: [
+    { ability: 'wisdom', bonus: 2 },
+    { ability: 'strength', bonus: 1 },
+  ],
   skillProficiencies: ['arcana', 'survival'],
   toolProficiencies: ['herbalism-kit'],
   languages: 1,
@@ -1245,6 +1372,10 @@ The mercenary life stripped away any illusions about honor and glory. You've see
 You've worked for the righteous and the wicked, protected the innocent and threatened them, because money spends the same regardless of its source. Perhaps you've developed your own code, drawing lines you won't cross. Or perhaps you've learned to swallow any reservation when the price is right.
 
 Now you fight for your own purposes, whatever those might be.`,
+  abilityBonuses: [
+    { ability: 'strength', bonus: 2 },
+    { ability: 'constitution', bonus: 1 },
+  ],
   skillProficiencies: ['athletics', 'persuasion'],
   toolProficiencies: ['gaming-set', 'vehicles-land'],
   startingEquipment: [
@@ -1277,6 +1408,10 @@ Your training covered every aspect of the spy's craft: surveillance and counter-
 The work has left its marks. You find it difficult to form genuine connections, to let down your guard, to be simply yourself. Every conversation is analyzed for hidden meanings, every stranger evaluated as a potential threat or asset. You've done terrible things for what your masters called the greater good—or perhaps simply for gold.
 
 Now you operate independently, but the skills remain. The mask is part of your face.`,
+  abilityBonuses: [
+    { ability: 'charisma', bonus: 2 },
+    { ability: 'dexterity', bonus: 1 },
+  ],
   skillProficiencies: ['deception', 'stealth'],
   toolProficiencies: ['thieves-tools', 'disguise-kit'],
   startingEquipment: [
@@ -1309,6 +1444,10 @@ You know every neighborhood's character, from wealthy estates to slum warrens. Y
 Your methods are adapted to urban realities. You cultivate relationships with innkeepers, beggars, and street children who see everything. You've learned to pick locks, forge documents, and fight in the confined spaces of buildings. When a fugitive thinks they're safe in the city's anonymous embrace, they find you waiting.
 
 The city never sleeps, and neither do you.`,
+  abilityBonuses: [
+    { ability: 'dexterity', bonus: 2 },
+    { ability: 'intelligence', bonus: 1 },
+  ],
   skillProficiencies: ['investigation', 'stealth'],
   toolProficiencies: ['thieves-tools'],
   languages: 1,
@@ -1342,6 +1481,10 @@ Every stroke of the hammer is a prayer, every finished piece an offering to the 
 But the outside world called to you. Perhaps you seek rare materials that can only be found beyond the mountain halls. Perhaps clan politics drove you away. Or perhaps you simply yearned to see the sky, to learn what other races create, and to test your skills against the world's challenges.
 
 You carry your clan's traditions with you, and one day you'll return with treasures and knowledge to enrich your people.`,
+  abilityBonuses: [
+    { ability: 'constitution', bonus: 2 },
+    { ability: 'intelligence', bonus: 1 },
+  ],
   skillProficiencies: ['history', 'insight'],
   toolProficiencies: ['artisans-tools'],
   languages: 1,
@@ -1375,6 +1518,10 @@ Your days followed scholarly rhythms: morning lectures, afternoon research, even
 But pure scholarship reached its limits. Some questions can't be answered from books. Some knowledge exists only in ruins that must be explored, in witnesses who must be interviewed, in phenomena that must be observed firsthand. The library gave you the framework; now you must fill it with experience.
 
 Besides, there might be books out there that even your great library doesn't possess.`,
+  abilityBonuses: [
+    { ability: 'intelligence', bonus: 2 },
+    { ability: 'wisdom', bonus: 1 },
+  ],
   skillProficiencies: ['history', 'arcana'],
   languages: 2,
   startingEquipment: [
@@ -1407,6 +1554,10 @@ You learned to read faces like books, to hear what's not being said, and to say 
 Perhaps you served a specific monarch or noble house. Perhaps you were a freelance agent, offering your services to whoever paid best. Either way, you've seen behind the mask of civilization that courts present to the world, and you know how power really works.
 
 Now you take your skills beyond the palace walls.`,
+  abilityBonuses: [
+    { ability: 'charisma', bonus: 2 },
+    { ability: 'intelligence', bonus: 1 },
+  ],
   skillProficiencies: ['insight', 'persuasion'],
   languages: 2,
   startingEquipment: [
@@ -1438,6 +1589,10 @@ Your journey here was long and arduous. You crossed seas that had never seen you
 Now you must learn to navigate a world where everything you knew is strange or wrong. Your customs confuse the locals; their customs confuse you. But you also bring something valuable: a perspective no native could possess, knowledge of things this land has never seen, and the fresh eyes that notice what familiarity hides.
 
 You are a bridge between worlds.`,
+  abilityBonuses: [
+    { ability: 'wisdom', bonus: 2 },
+    { ability: 'charisma', bonus: 1 },
+  ],
   skillProficiencies: ['insight', 'perception'],
   toolProficiencies: ['musical-instrument'],
   languages: 1,
@@ -1471,6 +1626,10 @@ Your order might serve a god, a kingdom, a philosophical ideal, or an ancient tr
 You've ridden on quests assigned by your superiors, fought to protect those your order defends, and upheld its principles even when doing so was difficult or dangerous. The order became your family, its knights your brothers and sisters, its traditions your identity.
 
 But now you ride alone, whether by choice or circumstance, carrying your order's ideals into a world that may have forgotten them.`,
+  abilityBonuses: [
+    { ability: 'strength', bonus: 2 },
+    { ability: 'charisma', bonus: 1 },
+  ],
   skillProficiencies: ['persuasion', 'religion'],
   toolProficiencies: ['gaming-set'],
   languages: 1,
