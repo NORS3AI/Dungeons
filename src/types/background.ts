@@ -743,29 +743,68 @@ export const ABERRANT_SCHOLAR: Background = {
   id: 'aberrant-scholar',
   name: 'Aberrant Scholar',
   description:
-    'Your academic pursuits led you to study the things that exist beyond reality—the Far Realm and its alien inhabitants.',
+    'Your academic pursuits led you to study the things that exist beyond reality—the Far Realm and its alien inhabitants. The knowledge you gained has left its mark upon your mind.',
   lore: `It began as innocent curiosity. Ancient texts mentioned things from "outside"—entities older than the gods, realms that existed before space and time. Most scholars dismissed these as metaphor or madness. You knew better. You had to know.
 
-Your research took you to forbidden libraries, to crumbling temples of forgotten gods, to the dreams of those driven mad by cosmic truth. Gradually, the pieces came together: there are places beyond the reality we know, and things live there that operate by laws utterly alien to mortal minds.
+Your research took you to forbidden libraries where books whispered when touched, to crumbling temples of forgotten gods whose names hurt to speak, to the dreams of those driven mad by cosmic truth. You interviewed survivors of aberrant attacks, studied the corpses of mind flayers, and deciphered texts written in languages that predated mortal speech.
 
-The knowledge changed you. Your dreams became strange, filled with geometries that shouldn't exist and colors without names. Sometimes you see things that others cannot—or perhaps you see them more clearly than others. Your mind has been expanded, but at what cost?
+Gradually, the pieces came together: there are places beyond the reality we know, dimensions folded into impossible angles, and things live there that operate by laws utterly alien to mortal minds. The Far Realm. The Outside. The place where geometry screams and thoughts have teeth.
 
-You've glimpsed the Far Realm's impossible vistas and the beings that dwell there. The experience left you forever changed. Most would call you mad; you call yourself enlightened.`,
+The knowledge changed you. Your dreams became strange, filled with non-Euclidean geometries and colors without names. Sometimes you see things that others cannot—or perhaps you see reality more clearly than others, perceiving the cracks where the Outside bleeds through. Your mind has been expanded, stretched to accommodate concepts it was never meant to hold.
+
+You've developed an instinctive understanding of aberrant psychology—if such beings can be said to have psychology. You recognize the signs of Far Realm corruption: the subtle warping of space, the whispers at the edge of hearing, the wrongness that makes animals flee and plants wither. This knowledge makes you invaluable when facing such threats, though it also marks you as someone who has gazed too long into the abyss.
+
+Fellow scholars either revere you as a pioneer or shun you as a madman. The truth, as always, lies somewhere in between. You've touched something vast and incomprehensible, and it has touched you back. Whether this is a gift or a curse remains to be seen.`,
   skillProficiencies: ['arcana', 'investigation'],
+  toolProficiencies: ['calligraphers-supplies'],
   languages: 2,
   startingEquipment: [
-    'Scholarly robes',
-    'Book of aberrant lore',
-    'Strange crystal that glows faintly',
-    'Writing supplies',
+    'Scholarly robes with strange geometric patterns',
+    'Book of aberrant lore (partially translated)',
+    'Strange crystal that pulses with inner light',
+    'Silver mirror (for detecting dimensional anomalies)',
+    'Writing supplies with unusual inks',
+    'Letter from a concerned colleague warning you to stop',
   ],
-  startingGold: 10,
+  startingGold: 15,
   feature: {
     id: 'alien-insight',
     name: 'Alien Insight',
     description:
-      'Your exposure to aberrant knowledge allows you to recognize signs of Far Realm influence. You can identify aberrations on sight and know their basic weaknesses. Your dreams sometimes contain prophetic visions.',
+      'Your study of the Far Realm grants you unique abilities: You can automatically identify aberrations and know their damage resistances and vulnerabilities. You have advantage on Intelligence checks to recall lore about aberrations, the Far Realm, or elder entities. Once per long rest, when you sleep, you may ask the DM one question about a current threat or mystery—your dreams provide a cryptic but truthful clue. Additionally, aberrations find your mind strangely familiar; you have advantage on saving throws against being charmed or frightened by aberrations.',
   },
+  personalityTraits: [
+    { roll: 1, text: 'I speak in riddles and metaphors that reference cosmic truths others cannot comprehend.' },
+    { roll: 2, text: 'I sketch strange symbols and diagrams constantly, trying to capture what I see in my dreams.' },
+    { roll: 3, text: 'I find comfort in patterns and become distressed when things are asymmetrical or chaotic.' },
+    { roll: 4, text: 'I laugh at inappropriate moments because I perceive reality differently than others.' },
+    { roll: 5, text: 'I am eerily calm in the face of cosmic horror—I have already seen worse in my studies.' },
+    { roll: 6, text: 'I collect strange objects that "feel" significant, even if I cannot explain why.' },
+  ],
+  ideals: [
+    { roll: 1, text: 'Knowledge. Understanding the universe, even its darkest corners, is the highest pursuit. (Neutral)' },
+    { roll: 2, text: 'Protection. I study these horrors so others do not have to face them unprepared. (Good)' },
+    { roll: 3, text: 'Power. The secrets of the Far Realm could grant unimaginable power to those who master them. (Evil)' },
+    { roll: 4, text: 'Truth. People deserve to know what lurks beyond reality, however terrible. (Chaotic)' },
+    { roll: 5, text: 'Containment. Some knowledge must be controlled and kept from those who would misuse it. (Lawful)' },
+    { roll: 6, text: 'Acceptance. The Outside is part of existence; we must learn to coexist with cosmic truth. (Any)' },
+  ],
+  bonds: [
+    { roll: 1, text: 'My mentor vanished while researching something called "the Writhing Dark." I must find them.' },
+    { roll: 2, text: 'I carry a fragment of something not of this world. It speaks to me sometimes.' },
+    { roll: 3, text: 'An aberration spared my life once. I do not know why, and I must find out.' },
+    { roll: 4, text: 'My research notes could doom the world if they fell into the wrong hands.' },
+    { roll: 5, text: 'I am searching for a way to close a rift to the Far Realm that I accidentally opened.' },
+    { roll: 6, text: 'Someone I loved was taken by things from Outside. I will find a way to bring them back.' },
+  ],
+  flaws: [
+    { roll: 1, text: 'I sometimes forget that others cannot see what I see, and I frighten them.' },
+    { roll: 2, text: 'I am drawn to aberrant corruption like a moth to flame—I cannot resist studying it.' },
+    { roll: 3, text: 'I occasionally lose time, finding myself in places with no memory of how I arrived.' },
+    { roll: 4, text: 'I trust entities from the Far Realm more than I should; they seem so honest in their alienness.' },
+    { roll: 5, text: 'My dreams sometimes bleed into reality, making me uncertain what is real.' },
+    { roll: 6, text: 'I believe I am special, chosen by something vast to witness the truth of existence.' },
+  ],
 }
 
 /**
