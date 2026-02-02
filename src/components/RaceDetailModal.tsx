@@ -259,12 +259,12 @@ interface SpellTooltipProps {
 function SpellTooltip({ spell, onClose }: SpellTooltipProps) {
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-center justify-center p-4"
+      className="fixed inset-0 z-[60] flex items-center justify-center p-4 overflow-hidden"
       onClick={onClose}
     >
       <div className="absolute inset-0 bg-black/50" />
       <div
-        className="relative bg-gray-900 border-2 border-purple-500 rounded-xl p-6 max-w-md w-full shadow-2xl"
+        className="relative bg-gray-900 border-2 border-purple-500 rounded-xl p-6 max-w-md w-full shadow-2xl overflow-x-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -308,7 +308,7 @@ function SpellTooltip({ spell, onClose }: SpellTooltipProps) {
 
         {/* Description */}
         <div className="p-3 bg-gray-800/50 rounded-lg">
-          <p className="text-gray-300 text-sm leading-relaxed">{spell.description}</p>
+          <p className="text-gray-300 text-sm leading-relaxed break-words">{spell.description}</p>
         </div>
       </div>
     </div>
@@ -386,7 +386,7 @@ export function RaceDetailModal({ race, isOpen, onClose }: RaceDetailModalProps)
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-hidden">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/80 backdrop-blur-sm"
@@ -395,7 +395,7 @@ export function RaceDetailModal({ race, isOpen, onClose }: RaceDetailModalProps)
 
       {/* Modal Content */}
       <div
-        className="relative bg-gray-900 rounded-2xl border border-dnd-gold/30 w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl"
+        className="relative bg-gray-900 rounded-2xl border border-dnd-gold/30 w-full max-w-4xl max-h-[90vh] overflow-y-auto overflow-x-hidden shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header with Image */}
@@ -451,7 +451,7 @@ export function RaceDetailModal({ race, isOpen, onClose }: RaceDetailModalProps)
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-8">
+        <div className="p-6 space-y-8 overflow-x-hidden">
           {/* Quick Stats Bar */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-gray-800/50 rounded-xl">
             <div className="text-center">
@@ -508,7 +508,7 @@ export function RaceDetailModal({ race, isOpen, onClose }: RaceDetailModalProps)
               </h3>
               <div className="space-y-4 p-4 bg-gray-800/30 rounded-xl border border-gray-700">
                 {loreData.lore.map((paragraph, i) => (
-                  <p key={i} className="text-gray-300 leading-relaxed">{paragraph}</p>
+                  <p key={i} className="text-gray-300 leading-relaxed break-words">{paragraph}</p>
                 ))}
               </div>
             </section>
@@ -526,8 +526,8 @@ export function RaceDetailModal({ race, isOpen, onClose }: RaceDetailModalProps)
               <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {loreData.physicalTraits.map((trait, i) => (
                   <li key={i} className="flex items-start gap-2 p-2 bg-gray-800/30 rounded-lg">
-                    <span className="text-dnd-gold mt-1">&#8226;</span>
-                    <span className="text-gray-300">{trait}</span>
+                    <span className="text-dnd-gold mt-1 flex-shrink-0">&#8226;</span>
+                    <span className="text-gray-300 break-words">{trait}</span>
                   </li>
                 ))}
               </ul>
@@ -545,8 +545,8 @@ export function RaceDetailModal({ race, isOpen, onClose }: RaceDetailModalProps)
             <div className="space-y-3">
               {race.traits.map((trait) => (
                 <div key={trait.id} className="p-4 bg-gray-800 rounded-xl border border-gray-700 hover:border-dnd-gold/30 transition-colors">
-                  <h4 className="text-lg font-semibold text-dnd-gold mb-2">{trait.name}</h4>
-                  <p className="text-gray-300">{trait.description}</p>
+                  <h4 className="text-lg font-semibold text-dnd-gold mb-2 break-words">{trait.name}</h4>
+                  <p className="text-gray-300 break-words">{trait.description}</p>
                 </div>
               ))}
             </div>
@@ -569,7 +569,7 @@ export function RaceDetailModal({ race, isOpen, onClose }: RaceDetailModalProps)
                     <button
                       key={spell.spellId}
                       onClick={() => handleSpellClick(spell.spellId)}
-                      className="w-full flex items-center justify-between p-4 bg-gray-800 rounded-xl border border-gray-700 hover:border-purple-500/50 hover:bg-gray-800/80 transition-all text-left group"
+                      className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-gray-800 rounded-xl border border-gray-700 hover:border-purple-500/50 hover:bg-gray-800/80 transition-all text-left group gap-3"
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 flex items-center justify-center bg-purple-900/30 rounded-lg group-hover:bg-purple-900/50 transition-colors">
@@ -684,8 +684,8 @@ export function RaceDetailModal({ race, isOpen, onClose }: RaceDetailModalProps)
               <ul className="space-y-2">
                 {loreData.culture.map((item, i) => (
                   <li key={i} className="flex items-start gap-2 p-3 bg-gray-800/30 rounded-lg">
-                    <span className="text-dnd-gold mt-0.5">&#8226;</span>
-                    <span className="text-gray-300">{item}</span>
+                    <span className="text-dnd-gold mt-0.5 flex-shrink-0">&#8226;</span>
+                    <span className="text-gray-300 break-words">{item}</span>
                   </li>
                 ))}
               </ul>
@@ -703,7 +703,7 @@ export function RaceDetailModal({ race, isOpen, onClose }: RaceDetailModalProps)
                 As Adventurers
               </h3>
               <div className="p-4 bg-gray-800/30 rounded-xl border border-gray-700">
-                <p className="text-gray-300 leading-relaxed italic">{loreData.adventurers}</p>
+                <p className="text-gray-300 leading-relaxed italic break-words">{loreData.adventurers}</p>
               </div>
             </section>
           )}
@@ -718,18 +718,18 @@ export function RaceDetailModal({ race, isOpen, onClose }: RaceDetailModalProps)
                 Example Names
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 bg-gray-800/30 rounded-xl">
+                <div className="p-4 bg-gray-800/30 rounded-xl overflow-hidden">
                   <h4 className="text-sm font-semibold text-gray-400 uppercase mb-2">Male Names</h4>
-                  <p className="text-gray-300">{loreData.nameExamples.male.join(', ')}</p>
+                  <p className="text-gray-300 break-words">{loreData.nameExamples.male.join(', ')}</p>
                 </div>
-                <div className="p-4 bg-gray-800/30 rounded-xl">
+                <div className="p-4 bg-gray-800/30 rounded-xl overflow-hidden">
                   <h4 className="text-sm font-semibold text-gray-400 uppercase mb-2">Female Names</h4>
-                  <p className="text-gray-300">{loreData.nameExamples.female.join(', ')}</p>
+                  <p className="text-gray-300 break-words">{loreData.nameExamples.female.join(', ')}</p>
                 </div>
                 {loreData.nameExamples.surnames && (
-                  <div className="p-4 bg-gray-800/30 rounded-xl md:col-span-2">
+                  <div className="p-4 bg-gray-800/30 rounded-xl md:col-span-2 overflow-hidden">
                     <h4 className="text-sm font-semibold text-gray-400 uppercase mb-2">Surnames / Family Names</h4>
-                    <p className="text-gray-300">{loreData.nameExamples.surnames.join(', ')}</p>
+                    <p className="text-gray-300 break-words">{loreData.nameExamples.surnames.join(', ')}</p>
                   </div>
                 )}
               </div>
