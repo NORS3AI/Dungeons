@@ -7,6 +7,7 @@ import {
   type ArmorRef,
   type ConditionRef,
   type TraitRef,
+  type RuleRef,
   type RefType,
   getReference,
 } from '../data/quickReference'
@@ -18,7 +19,7 @@ interface QuickRefTooltipProps {
   className?: string
 }
 
-type AnyRef = SpellRef | SkillRef | AbilityRef | WeaponRef | ArmorRef | ConditionRef | TraitRef
+type AnyRef = SpellRef | SkillRef | AbilityRef | WeaponRef | ArmorRef | ConditionRef | TraitRef | RuleRef
 
 /**
  * Get color scheme for different reference types
@@ -39,6 +40,8 @@ function getTypeColors(type: RefType): { border: string; bg: string; accent: str
       return { border: 'border-yellow-500', bg: 'bg-yellow-900/20', accent: 'text-yellow-400' }
     case 'trait':
       return { border: 'border-dnd-gold', bg: 'bg-dnd-gold/10', accent: 'text-dnd-gold' }
+    case 'rule':
+      return { border: 'border-emerald-500', bg: 'bg-emerald-900/20', accent: 'text-emerald-400' }
   }
 }
 
@@ -229,6 +232,75 @@ function TraitContent({ trait }: { trait: TraitRef }) {
 }
 
 /**
+ * Render rule/game mechanics reference content
+ */
+function RuleContent({ rule }: { rule: RuleRef }) {
+  const categoryColors: Record<string, string> = {
+    spellcasting: 'text-purple-400',
+    combat: 'text-red-400',
+    rest: 'text-blue-400',
+    movement: 'text-cyan-400',
+    general: 'text-gray-400',
+  }
+
+  return (
+    <>
+      <div className="flex items-center gap-2 mb-3">
+        <span className={`text-xs uppercase tracking-wide ${categoryColors[rule.category]}`}>
+          {rule.category}
+        </span>
+      </div>
+      <p className="text-emerald-300 text-sm font-medium mb-2">{rule.summary}</p>
+      <p className="text-gray-300 text-sm mb-3">{rule.description}</p>
+
+      {rule.table && (
+        <div className="mb-3 overflow-x-auto">
+          <table className="w-full text-sm border-collapse">
+            <thead>
+              <tr className="bg-emerald-900/30">
+                {rule.table.headers.map((header, i) => (
+                  <th key={i} className="px-2 py-1 text-left text-emerald-400 border border-emerald-800">
+                    {header}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {rule.table.rows.map((row, i) => (
+                <tr key={i} className="hover:bg-emerald-900/20">
+                  {row.map((cell, j) => (
+                    <td key={j} className="px-2 py-1 text-gray-300 border border-emerald-800/50">
+                      {cell}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {rule.examples && rule.examples.length > 0 && (
+        <div className="mb-3">
+          <div className="text-emerald-400 text-sm font-medium mb-1">Examples:</div>
+          <ul className="list-disc list-inside text-gray-400 text-sm space-y-1">
+            {rule.examples.map((example, i) => (
+              <li key={i}>{example}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {rule.relatedRules && rule.relatedRules.length > 0 && (
+        <div className="text-xs text-gray-500 mt-3 pt-2 border-t border-gray-700">
+          Related: {rule.relatedRules.join(', ')}
+        </div>
+      )}
+    </>
+  )
+}
+
+/**
  * Render content based on reference type
  */
 function ReferenceContent({ type, data }: { type: RefType; data: AnyRef }) {
@@ -247,6 +319,8 @@ function ReferenceContent({ type, data }: { type: RefType; data: AnyRef }) {
       return <ConditionContent condition={data as ConditionRef} />
     case 'trait':
       return <TraitContent trait={data as TraitRef} />
+    case 'rule':
+      return <RuleContent rule={data as RuleRef} />
   }
 }
 
