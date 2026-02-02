@@ -2,6 +2,10 @@ import type { NPC } from '../../stores/campaignStore'
 
 type NPCTemplate = Omit<NPC, 'id' | 'createdAt'>
 
+// =============================================================================
+// TOWNSFOLK & CIVILIANS
+// =============================================================================
+
 export const NPC_TEMPLATES: Record<string, NPCTemplate> = {
   commoner: {
     name: 'Commoner',
@@ -32,6 +36,233 @@ export const NPC_TEMPLATES: Record<string, NPCTemplate> = {
     isTemplate: true,
   },
 
+  tavernkeeper: {
+    name: 'Tavernkeeper',
+    type: 'Humanoid',
+    alignment: 'True Neutral',
+    challengeRating: '0',
+    armorClass: 10,
+    hitPoints: { current: 9, maximum: 9, formula: '2d8' },
+    speed: { walk: 30 },
+    abilityScores: {
+      strength: 12,
+      dexterity: 10,
+      constitution: 11,
+      intelligence: 11,
+      wisdom: 12,
+      charisma: 14,
+    },
+    skills: ['Insight +3', 'Persuasion +4'],
+    actions: [
+      {
+        name: 'Club',
+        description: 'Melee Weapon Attack: +3 to hit, reach 5 ft., one target.',
+        attackBonus: 3,
+        damage: '1d4+1',
+        damageType: 'Bludgeoning',
+      },
+    ],
+    languages: ['Common'],
+    description: 'A friendly tavernkeeper who knows all the local gossip.',
+    isTemplate: true,
+  },
+
+  barmaid: {
+    name: 'Barmaid',
+    type: 'Humanoid',
+    alignment: 'Neutral Good',
+    challengeRating: '0',
+    armorClass: 10,
+    hitPoints: { current: 4, maximum: 4, formula: '1d8' },
+    speed: { walk: 30 },
+    abilityScores: {
+      strength: 8,
+      dexterity: 12,
+      constitution: 10,
+      intelligence: 10,
+      wisdom: 11,
+      charisma: 14,
+    },
+    skills: ['Perception +2', 'Persuasion +4'],
+    actions: [
+      {
+        name: 'Improvised Weapon',
+        description: 'Melee Weapon Attack: +1 to hit, reach 5 ft., one target.',
+        attackBonus: 1,
+        damage: '1d4',
+        damageType: 'Bludgeoning',
+      },
+    ],
+    languages: ['Common'],
+    description: 'A quick-witted server who hears everything.',
+    isTemplate: true,
+  },
+
+  merchant: {
+    name: 'Merchant',
+    type: 'Humanoid',
+    alignment: 'True Neutral',
+    challengeRating: '0',
+    armorClass: 10,
+    hitPoints: { current: 9, maximum: 9, formula: '2d8' },
+    speed: { walk: 30 },
+    abilityScores: {
+      strength: 10,
+      dexterity: 10,
+      constitution: 10,
+      intelligence: 13,
+      wisdom: 12,
+      charisma: 14,
+    },
+    skills: ['Insight +3', 'Persuasion +4', 'Deception +4'],
+    actions: [
+      {
+        name: 'Dagger',
+        description: 'Melee Weapon Attack: +2 to hit, reach 5 ft., one target.',
+        attackBonus: 2,
+        damage: '1d4',
+        damageType: 'Piercing',
+      },
+    ],
+    languages: ['Common'],
+    description: 'A shrewd businessperson always looking for a deal.',
+    isTemplate: true,
+  },
+
+  blacksmith: {
+    name: 'Blacksmith',
+    type: 'Humanoid',
+    alignment: 'Lawful Neutral',
+    challengeRating: '1/4',
+    armorClass: 12,
+    hitPoints: { current: 15, maximum: 15, formula: '2d8+6' },
+    speed: { walk: 30 },
+    abilityScores: {
+      strength: 16,
+      dexterity: 10,
+      constitution: 16,
+      intelligence: 11,
+      wisdom: 11,
+      charisma: 10,
+    },
+    skills: ['Athletics +5'],
+    actions: [
+      {
+        name: 'Hammer',
+        description: 'Melee Weapon Attack: +5 to hit, reach 5 ft., one target.',
+        attackBonus: 5,
+        damage: '1d8+3',
+        damageType: 'Bludgeoning',
+      },
+    ],
+    languages: ['Common'],
+    description: 'A muscular smith who works the forge.',
+    isTemplate: true,
+  },
+
+  entertainer: {
+    name: 'Entertainer',
+    type: 'Humanoid',
+    alignment: 'Chaotic Good',
+    challengeRating: '0',
+    armorClass: 11,
+    hitPoints: { current: 7, maximum: 7, formula: '2d8-2' },
+    speed: { walk: 30 },
+    abilityScores: {
+      strength: 8,
+      dexterity: 13,
+      constitution: 9,
+      intelligence: 12,
+      wisdom: 10,
+      charisma: 16,
+    },
+    skills: ['Acrobatics +3', 'Performance +5', 'Persuasion +5'],
+    actions: [
+      {
+        name: 'Dagger',
+        description: 'Melee or Ranged Weapon Attack: +3 to hit, reach 5 ft. or range 20/60 ft., one target.',
+        attackBonus: 3,
+        damage: '1d4+1',
+        damageType: 'Piercing',
+      },
+    ],
+    languages: ['Common'],
+    description: 'A charismatic performer who captivates audiences.',
+    isTemplate: true,
+  },
+
+  stablehand: {
+    name: 'Stablehand',
+    type: 'Humanoid',
+    alignment: 'Neutral Good',
+    challengeRating: '0',
+    armorClass: 10,
+    hitPoints: { current: 5, maximum: 5, formula: '1d8+1' },
+    speed: { walk: 30 },
+    abilityScores: {
+      strength: 13,
+      dexterity: 10,
+      constitution: 12,
+      intelligence: 8,
+      wisdom: 12,
+      charisma: 9,
+    },
+    skills: ['Animal Handling +3', 'Nature +1'],
+    actions: [
+      {
+        name: 'Pitchfork',
+        description: 'Melee Weapon Attack: +3 to hit, reach 5 ft., one target.',
+        attackBonus: 3,
+        damage: '1d6+1',
+        damageType: 'Piercing',
+      },
+    ],
+    languages: ['Common'],
+    description: 'A hardworking youth who tends the horses.',
+    isTemplate: true,
+  },
+
+  noble: {
+    name: 'Noble',
+    type: 'Humanoid',
+    alignment: 'Lawful Neutral',
+    challengeRating: '1/8',
+    armorClass: 15,
+    hitPoints: { current: 9, maximum: 9, formula: '2d8' },
+    speed: { walk: 30 },
+    abilityScores: {
+      strength: 11,
+      dexterity: 12,
+      constitution: 11,
+      intelligence: 12,
+      wisdom: 14,
+      charisma: 16,
+    },
+    skills: ['Deception +5', 'Insight +4', 'Persuasion +5'],
+    actions: [
+      {
+        name: 'Rapier',
+        description: 'Melee Weapon Attack: +3 to hit, reach 5 ft., one target.',
+        attackBonus: 3,
+        damage: '1d8+1',
+        damageType: 'Piercing',
+      },
+    ],
+    reactions: [
+      {
+        name: 'Parry',
+        description: 'The noble adds 2 to its AC against one melee attack that would hit it.',
+      },
+    ],
+    languages: ['Common', 'Elvish'],
+    description: 'A person of high social standing and political influence.',
+    isTemplate: true,
+  },
+
+  // =============================================================================
+  // GUARDS & SOLDIERS
+  // =============================================================================
+
   guard: {
     name: 'Guard',
     type: 'Humanoid',
@@ -61,6 +292,52 @@ export const NPC_TEMPLATES: Record<string, NPCTemplate> = {
     languages: ['Common'],
     isTemplate: true,
   },
+
+  veteran: {
+    name: 'Veteran',
+    type: 'Humanoid',
+    alignment: 'Lawful Neutral',
+    challengeRating: '3',
+    armorClass: 17,
+    hitPoints: { current: 58, maximum: 58, formula: '9d8+18' },
+    speed: { walk: 30 },
+    abilityScores: {
+      strength: 16,
+      dexterity: 13,
+      constitution: 14,
+      intelligence: 10,
+      wisdom: 11,
+      charisma: 10,
+    },
+    skills: ['Athletics +5', 'Perception +2'],
+    actions: [
+      {
+        name: 'Multiattack',
+        description: 'The veteran makes two longsword attacks.',
+      },
+      {
+        name: 'Longsword',
+        description: 'Melee Weapon Attack: +5 to hit, reach 5 ft., one target.',
+        attackBonus: 5,
+        damage: '1d8+3',
+        damageType: 'Slashing',
+      },
+      {
+        name: 'Heavy Crossbow',
+        description: 'Ranged Weapon Attack: +3 to hit, range 100/400 ft., one target.',
+        attackBonus: 3,
+        damage: '1d10+1',
+        damageType: 'Piercing',
+      },
+    ],
+    languages: ['Common'],
+    description: 'A battle-hardened soldier with years of experience.',
+    isTemplate: true,
+  },
+
+  // =============================================================================
+  // CRIMINALS & ENEMIES
+  // =============================================================================
 
   bandit: {
     name: 'Bandit',
@@ -98,6 +375,48 @@ export const NPC_TEMPLATES: Record<string, NPCTemplate> = {
     isTemplate: true,
   },
 
+  thug: {
+    name: 'Thug',
+    type: 'Humanoid',
+    alignment: 'Neutral Evil',
+    challengeRating: '1/2',
+    armorClass: 11,
+    hitPoints: { current: 32, maximum: 32, formula: '5d8+10' },
+    speed: { walk: 30 },
+    abilityScores: {
+      strength: 15,
+      dexterity: 11,
+      constitution: 14,
+      intelligence: 10,
+      wisdom: 10,
+      charisma: 11,
+    },
+    skills: ['Intimidation +2'],
+    actions: [
+      {
+        name: 'Multiattack',
+        description: 'The thug makes two melee attacks.',
+      },
+      {
+        name: 'Mace',
+        description: 'Melee Weapon Attack: +4 to hit, reach 5 ft., one target.',
+        attackBonus: 4,
+        damage: '1d6+2',
+        damageType: 'Bludgeoning',
+      },
+      {
+        name: 'Heavy Crossbow',
+        description: 'Ranged Weapon Attack: +2 to hit, range 100/400 ft., one target.',
+        attackBonus: 2,
+        damage: '1d10',
+        damageType: 'Piercing',
+      },
+    ],
+    languages: ['Common'],
+    description: 'Pack Tactics. The thug has advantage on attack rolls against a creature if at least one ally is within 5 feet.',
+    isTemplate: true,
+  },
+
   cultist: {
     name: 'Cultist',
     type: 'Humanoid',
@@ -129,45 +448,177 @@ export const NPC_TEMPLATES: Record<string, NPCTemplate> = {
     isTemplate: true,
   },
 
-  goblin: {
-    name: 'Goblin',
-    type: 'Humanoid',
-    race: 'Goblinoid',
-    alignment: 'Neutral Evil',
-    challengeRating: '1/4',
-    armorClass: 15,
-    hitPoints: { current: 7, maximum: 7, formula: '2d6' },
-    speed: { walk: 30 },
+  // =============================================================================
+  // BEASTS & ANIMALS
+  // =============================================================================
+
+  rat: {
+    name: 'Rat',
+    type: 'Beast',
+    alignment: 'Unaligned',
+    challengeRating: '0',
+    armorClass: 10,
+    hitPoints: { current: 1, maximum: 1, formula: '1d4-1' },
+    speed: { walk: 20 },
     abilityScores: {
-      strength: 8,
-      dexterity: 14,
-      constitution: 10,
-      intelligence: 10,
-      wisdom: 8,
-      charisma: 8,
+      strength: 2,
+      dexterity: 11,
+      constitution: 9,
+      intelligence: 2,
+      wisdom: 10,
+      charisma: 4,
     },
-    skills: ['Stealth +6'],
-    senses: ['Darkvision 60 ft.'],
+    senses: ['Darkvision 30 ft.'],
     actions: [
       {
-        name: 'Scimitar',
-        description: 'Melee Weapon Attack: +4 to hit, reach 5 ft., one target.',
-        attackBonus: 4,
-        damage: '1d6+2',
-        damageType: 'Slashing',
-      },
-      {
-        name: 'Shortbow',
-        description: 'Ranged Weapon Attack: +4 to hit, range 80/320 ft., one target.',
-        attackBonus: 4,
-        damage: '1d6+2',
+        name: 'Bite',
+        description: 'Melee Weapon Attack: +0 to hit, reach 5 ft., one target.',
+        attackBonus: 0,
+        damage: '1',
         damageType: 'Piercing',
       },
     ],
-    languages: ['Common', 'Goblin'],
-    description: 'Nimble Escape. The goblin can take the Disengage or Hide action as a bonus action on each of its turns.',
+    languages: [],
+    description: 'Keen Smell. The rat has advantage on Wisdom (Perception) checks that rely on smell.',
     isTemplate: true,
   },
+
+  giantRat: {
+    name: 'Giant Rat',
+    type: 'Beast',
+    alignment: 'Unaligned',
+    challengeRating: '1/8',
+    armorClass: 12,
+    hitPoints: { current: 7, maximum: 7, formula: '2d6' },
+    speed: { walk: 30 },
+    abilityScores: {
+      strength: 7,
+      dexterity: 15,
+      constitution: 11,
+      intelligence: 2,
+      wisdom: 10,
+      charisma: 4,
+    },
+    senses: ['Darkvision 60 ft.'],
+    actions: [
+      {
+        name: 'Bite',
+        description: 'Melee Weapon Attack: +4 to hit, reach 5 ft., one target.',
+        attackBonus: 4,
+        damage: '1d4+2',
+        damageType: 'Piercing',
+      },
+    ],
+    languages: [],
+    description: 'Keen Smell. Pack Tactics.',
+    isTemplate: true,
+  },
+
+  diseaseRat: {
+    name: 'Diseased Rat',
+    type: 'Beast',
+    alignment: 'Unaligned',
+    challengeRating: '1/8',
+    armorClass: 12,
+    hitPoints: { current: 7, maximum: 7, formula: '2d6' },
+    speed: { walk: 30 },
+    abilityScores: {
+      strength: 7,
+      dexterity: 15,
+      constitution: 11,
+      intelligence: 2,
+      wisdom: 10,
+      charisma: 4,
+    },
+    senses: ['Darkvision 60 ft.'],
+    actions: [
+      {
+        name: 'Bite',
+        description: 'Melee Weapon Attack: +4 to hit, reach 5 ft., one target. Target must succeed DC 10 CON save or be poisoned until cured.',
+        attackBonus: 4,
+        damage: '1d4+2',
+        damageType: 'Piercing',
+      },
+    ],
+    languages: [],
+    description: 'Diseased. A creature bitten by this rat must succeed on a DC 10 Constitution saving throw or contract a disease.',
+    isTemplate: true,
+  },
+
+  wolf: {
+    name: 'Wolf',
+    type: 'Beast',
+    alignment: 'Unaligned',
+    challengeRating: '1/4',
+    armorClass: 13,
+    hitPoints: { current: 11, maximum: 11, formula: '2d8+2' },
+    speed: { walk: 40 },
+    abilityScores: {
+      strength: 12,
+      dexterity: 15,
+      constitution: 12,
+      intelligence: 3,
+      wisdom: 12,
+      charisma: 6,
+    },
+    skills: ['Perception +3', 'Stealth +4'],
+    senses: [],
+    actions: [
+      {
+        name: 'Bite',
+        description: 'Melee Weapon Attack: +4 to hit, reach 5 ft., one target. If hit, target must succeed DC 11 STR save or be knocked prone.',
+        attackBonus: 4,
+        damage: '2d4+2',
+        damageType: 'Piercing',
+      },
+    ],
+    languages: [],
+    description: 'Keen Hearing and Smell. Pack Tactics.',
+    isTemplate: true,
+  },
+
+  giantSpider: {
+    name: 'Giant Spider',
+    type: 'Beast',
+    alignment: 'Unaligned',
+    challengeRating: '1',
+    armorClass: 14,
+    hitPoints: { current: 26, maximum: 26, formula: '4d10+4' },
+    speed: { walk: 30, climb: 30 },
+    abilityScores: {
+      strength: 14,
+      dexterity: 16,
+      constitution: 12,
+      intelligence: 2,
+      wisdom: 11,
+      charisma: 4,
+    },
+    skills: ['Stealth +7'],
+    senses: ['Blindsight 10 ft.', 'Darkvision 60 ft.'],
+    actions: [
+      {
+        name: 'Bite',
+        description: 'Melee Weapon Attack: +5 to hit, reach 5 ft., one creature. Target must make DC 11 CON save, taking 2d8 poison damage on fail, or half on success.',
+        attackBonus: 5,
+        damage: '1d8+3',
+        damageType: 'Piercing',
+      },
+      {
+        name: 'Web (Recharge 5-6)',
+        description: 'Ranged Weapon Attack: +5 to hit, range 30/60 ft., one creature. Target is restrained by webbing. DC 12 STR to break free.',
+        attackBonus: 5,
+        damage: '',
+        damageType: '',
+      },
+    ],
+    languages: [],
+    description: 'Spider Climb. Web Sense. Web Walker.',
+    isTemplate: true,
+  },
+
+  // =============================================================================
+  // UNDEAD
+  // =============================================================================
 
   skeleton: {
     name: 'Skeleton',
@@ -241,6 +692,91 @@ export const NPC_TEMPLATES: Record<string, NPCTemplate> = {
     description: 'Undead Fortitude. If damage reduces the zombie to 0 hit points, it must make a Constitution saving throw with a DC of 5 + the damage taken, unless the damage is radiant or from a critical hit. On a success, the zombie drops to 1 hit point instead.',
     isTemplate: true,
   },
+
+  // =============================================================================
+  // MONSTERS
+  // =============================================================================
+
+  goblin: {
+    name: 'Goblin',
+    type: 'Humanoid',
+    race: 'Goblinoid',
+    alignment: 'Neutral Evil',
+    challengeRating: '1/4',
+    armorClass: 15,
+    hitPoints: { current: 7, maximum: 7, formula: '2d6' },
+    speed: { walk: 30 },
+    abilityScores: {
+      strength: 8,
+      dexterity: 14,
+      constitution: 10,
+      intelligence: 10,
+      wisdom: 8,
+      charisma: 8,
+    },
+    skills: ['Stealth +6'],
+    senses: ['Darkvision 60 ft.'],
+    actions: [
+      {
+        name: 'Scimitar',
+        description: 'Melee Weapon Attack: +4 to hit, reach 5 ft., one target.',
+        attackBonus: 4,
+        damage: '1d6+2',
+        damageType: 'Slashing',
+      },
+      {
+        name: 'Shortbow',
+        description: 'Ranged Weapon Attack: +4 to hit, range 80/320 ft., one target.',
+        attackBonus: 4,
+        damage: '1d6+2',
+        damageType: 'Piercing',
+      },
+    ],
+    languages: ['Common', 'Goblin'],
+    description: 'Nimble Escape. The goblin can take the Disengage or Hide action as a bonus action on each of its turns.',
+    isTemplate: true,
+  },
+
+  ogre: {
+    name: 'Ogre',
+    type: 'Giant',
+    alignment: 'Chaotic Evil',
+    challengeRating: '2',
+    armorClass: 11,
+    hitPoints: { current: 59, maximum: 59, formula: '7d10+21' },
+    speed: { walk: 40 },
+    abilityScores: {
+      strength: 19,
+      dexterity: 8,
+      constitution: 16,
+      intelligence: 5,
+      wisdom: 7,
+      charisma: 7,
+    },
+    senses: ['Darkvision 60 ft.'],
+    actions: [
+      {
+        name: 'Greatclub',
+        description: 'Melee Weapon Attack: +6 to hit, reach 5 ft., one target.',
+        attackBonus: 6,
+        damage: '2d8+4',
+        damageType: 'Bludgeoning',
+      },
+      {
+        name: 'Javelin',
+        description: 'Melee or Ranged Weapon Attack: +6 to hit, reach 5 ft. or range 30/120 ft., one target.',
+        attackBonus: 6,
+        damage: '2d6+4',
+        damageType: 'Piercing',
+      },
+    ],
+    languages: ['Common', 'Giant'],
+    isTemplate: true,
+  },
+
+  // =============================================================================
+  // POWERFUL
+  // =============================================================================
 
   mage: {
     name: 'Mage',
@@ -344,47 +880,14 @@ export const NPC_TEMPLATES: Record<string, NPCTemplate> = {
     description: 'Brave. The knight has advantage on saving throws against being frightened.',
     isTemplate: true,
   },
-
-  ogre: {
-    name: 'Ogre',
-    type: 'Giant',
-    alignment: 'Chaotic Evil',
-    challengeRating: '2',
-    armorClass: 11,
-    hitPoints: { current: 59, maximum: 59, formula: '7d10+21' },
-    speed: { walk: 40 },
-    abilityScores: {
-      strength: 19,
-      dexterity: 8,
-      constitution: 16,
-      intelligence: 5,
-      wisdom: 7,
-      charisma: 7,
-    },
-    senses: ['Darkvision 60 ft.'],
-    actions: [
-      {
-        name: 'Greatclub',
-        description: 'Melee Weapon Attack: +6 to hit, reach 5 ft., one target.',
-        attackBonus: 6,
-        damage: '2d8+4',
-        damageType: 'Bludgeoning',
-      },
-      {
-        name: 'Javelin',
-        description: 'Melee or Ranged Weapon Attack: +6 to hit, reach 5 ft. or range 30/120 ft., one target.',
-        attackBonus: 6,
-        damage: '2d6+4',
-        damageType: 'Piercing',
-      },
-    ],
-    languages: ['Common', 'Giant'],
-    isTemplate: true,
-  },
 }
 
 export const NPC_TEMPLATE_CATEGORIES = {
-  'Common NPCs': ['commoner', 'guard', 'bandit', 'cultist'],
-  'Monsters': ['goblin', 'skeleton', 'zombie', 'ogre'],
+  'Townsfolk': ['commoner', 'tavernkeeper', 'barmaid', 'merchant', 'blacksmith', 'entertainer', 'stablehand', 'noble'],
+  'Guards & Soldiers': ['guard', 'veteran'],
+  'Criminals': ['bandit', 'thug', 'cultist'],
+  'Beasts': ['rat', 'giantRat', 'diseaseRat', 'wolf', 'giantSpider'],
+  'Undead': ['skeleton', 'zombie'],
+  'Monsters': ['goblin', 'ogre'],
   'Powerful': ['mage', 'knight'],
 }
