@@ -68,11 +68,19 @@ export function RaceCard({ race, isSelected, onSelect, onReadMore }: RaceCardPro
     >
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
-        <div>
-          <h3 className={`text-xl font-bold ${isSelected ? 'text-dnd-gold' : 'text-white'}`}>
-            {race.name}
-          </h3>
-          <p className="text-sm text-gray-400 capitalize">{race.size} creature</p>
+        <div className="flex items-center gap-3">
+          {/* Race Icon */}
+          {race.icon && (
+            <div className={`text-4xl ${isSelected ? 'scale-110' : ''} transition-transform`}>
+              {race.icon}
+            </div>
+          )}
+          <div>
+            <h3 className={`text-xl font-bold ${isSelected ? 'text-dnd-gold' : 'text-white'}`}>
+              {race.name}
+            </h3>
+            <p className="text-sm text-gray-400 capitalize">{race.size} creature</p>
+          </div>
         </div>
         {isSelected && (
           <div className="flex items-center justify-center w-6 h-6 bg-dnd-gold rounded-full">

@@ -39,6 +39,12 @@ export interface Race {
   name: string
   description: string
 
+  // Visual icon (emoji or SVG identifier)
+  icon?: string
+
+  // Category for organization
+  category?: 'common' | 'exotic' | 'monstrous' | 'planar' | 'aquatic' | 'aerial'
+
   // Ability bonuses
   abilityBonuses: AbilityBonus
 
