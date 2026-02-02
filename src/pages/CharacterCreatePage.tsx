@@ -8,7 +8,8 @@ import { ClassSelector } from '../components/ClassSelector'
 import { BackgroundSelector } from '../components/BackgroundSelector'
 import { StatAllocator } from '../components/StatAllocator'
 import { SpellSelector } from '../components/SpellSelector'
-import type { Race, Class, Subclass, AbilityScores, Spell, Background } from '../types'
+import { EquipmentSelector } from '../components/EquipmentSelector'
+import type { Race, Class, Subclass, AbilityScores, Spell, Background, Equipment } from '../types'
 import { calculateModifier } from '../types'
 
 /**
@@ -38,6 +39,7 @@ export function CharacterCreatePage() {
     setBackground,
     setAbilityScores,
     addSpell,
+    addEquipment,
     nextStep,
     prevStep,
     setCreationStep,
@@ -109,6 +111,12 @@ export function CharacterCreatePage() {
     // Add all selected spells to character
     cantrips.forEach((spell) => addSpell(spell))
     spells.forEach((spell) => addSpell(spell))
+    nextStep()
+  }
+
+  const handleEquipmentSubmit = (equipment: Equipment[]) => {
+    // Add all selected equipment to character
+    equipment.forEach((item) => addEquipment(item))
     nextStep()
   }
 
@@ -189,34 +197,11 @@ export function CharacterCreatePage() {
 
       case 'equipment':
         return (
-          <div className="max-w-2xl mx-auto">
-            <div className="mb-8">
-              <h2 className="text-3xl font-bold text-dnd-gold mb-2">Choose Equipment</h2>
-              <p className="text-gray-400">
-                Select your starting equipment, weapons, and armor.
-              </p>
-            </div>
-            <div className="card bg-gray-800 border border-gray-700 p-8 text-center">
-              <p className="text-gray-400 mb-4">Equipment selection coming in Phase 7</p>
-              <p className="text-gray-500 text-sm">Includes: Starting Packs, Weapons, Armor, Gear</p>
-            </div>
-            <div className="flex justify-between pt-6 mt-6 border-t border-gray-700">
-              <button
-                onClick={handleBack}
-                className="px-6 py-3 text-gray-300 hover:text-white border border-gray-600
-                         hover:border-gray-500 rounded-lg transition-colors duration-200"
-              >
-                Back
-              </button>
-              <button
-                onClick={nextStep}
-                className="px-8 py-3 bg-dnd-gold text-gray-900 rounded-lg font-semibold
-                         hover:bg-yellow-500 transition-colors duration-200"
-              >
-                Next: Review
-              </button>
-            </div>
-          </div>
+          <EquipmentSelector
+            characterClass={currentCharacter?.class || undefined}
+            onSubmit={handleEquipmentSubmit}
+            onBack={handleBack}
+          />
         )
 
       case 'review':
