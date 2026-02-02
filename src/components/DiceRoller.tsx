@@ -14,6 +14,7 @@ const QUICK_DICE: QuickDie[] = ['d4', 'd6', 'd8', 'd10', 'd12', 'd20', 'd100']
 export function DiceRoller({ onRoll, compact = false }: DiceRollerProps) {
   const [notation, setNotation] = useState('1d20')
   const [modifier, setModifier] = useState(0)
+  const [diceCount, setDiceCount] = useState(1)
   const [rollHistory, setRollHistory] = useState<DiceRoll[]>([])
   const [currentRoll, setCurrentRoll] = useState<DiceRoll | null>(null)
   const [isRolling, setIsRolling] = useState(false)
@@ -54,8 +55,8 @@ export function DiceRoller({ onRoll, compact = false }: DiceRollerProps) {
   }, [modifier, onRoll])
 
   const handleQuickRoll = (die: QuickDie) => {
-    setNotation(`1${die}`)
-    performRoll(`1${die}`)
+    setNotation(`${diceCount}${die}`)
+    performRoll(`${diceCount}${die}`)
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -103,6 +104,43 @@ export function DiceRoller({ onRoll, compact = false }: DiceRollerProps) {
     <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
       <h3 className="text-xl font-bold text-dnd-gold mb-4">Dice Roller</h3>
 
+      {/* Dice Count Selector */}
+      <div className="flex items-center gap-3 mb-4">
+        <span className="text-gray-400 text-sm">Number of dice:</span>
+        <div className="flex items-center">
+          <button
+            type="button"
+            onClick={() => setDiceCount((c) => Math.max(1, c - 1))}
+            disabled={diceCount <= 1}
+            className="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-l-lg
+                     font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            -
+          </button>
+          <span className="px-4 py-2 bg-gray-900 text-dnd-gold font-bold min-w-[3rem] text-center text-lg">
+            {diceCount}
+          </span>
+          <button
+            type="button"
+            onClick={() => setDiceCount((c) => Math.min(20, c + 1))}
+            disabled={diceCount >= 20}
+            className="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-r-lg
+                     font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            +
+          </button>
+        </div>
+        {diceCount > 1 && (
+          <button
+            type="button"
+            onClick={() => setDiceCount(1)}
+            className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+          >
+            Reset
+          </button>
+        )}
+      </div>
+
       {/* Quick Dice */}
       <div className="flex flex-wrap gap-2 mb-4">
         {QUICK_DICE.map((die) => (
@@ -113,7 +151,7 @@ export function DiceRoller({ onRoll, compact = false }: DiceRollerProps) {
             className="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg
                      font-medium transition-colors disabled:opacity-50"
           >
-            {die}
+            {diceCount}{die}
           </button>
         ))}
       </div>
