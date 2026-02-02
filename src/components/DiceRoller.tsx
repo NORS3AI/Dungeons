@@ -151,7 +151,7 @@ export function DiceRoller({ onRoll, compact = false }: DiceRollerProps) {
             className="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg
                      font-medium transition-colors disabled:opacity-50"
           >
-            {diceCount}{die}
+            {die}
           </button>
         ))}
       </div>
