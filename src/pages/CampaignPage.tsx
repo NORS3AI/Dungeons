@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { PartyOverview, InitiativeTracker, NPCCreator, EncounterBuilder } from '../components/dm'
+import { PartyOverview, InitiativeTracker, NPCCreator, EncounterBuilder, QuickNPCSelector } from '../components/dm'
 import { useCampaignStore, type NPC } from '../stores/campaignStore'
 import { DiceRoller } from '../components/DiceRoller'
 
@@ -71,30 +71,30 @@ export function CampaignPage() {
 
   return (
     <div className="min-h-screen bg-gray-900">
-      {/* Header */}
+      {/* Header - mobile optimized */}
       <div className="bg-gray-800 border-b border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <h1 className="text-2xl font-bold text-dnd-gold">DM Campaign Tools</h1>
-          <p className="text-gray-400 text-sm mt-1">Manage your party, NPCs, and encounters</p>
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
+          <h1 className="text-xl sm:text-2xl font-bold text-dnd-gold">DM Campaign Tools</h1>
+          <p className="text-gray-400 text-xs sm:text-sm mt-1">Manage your party, NPCs, and encounters</p>
         </div>
       </div>
 
-      {/* Tab Navigation */}
+      {/* Tab Navigation - horizontally scrollable on mobile */}
       <div className="bg-gray-800 border-b border-gray-700 sticky top-0 z-20">
-        <div className="max-w-7xl mx-auto px-4">
-          <nav className="flex gap-1">
+        <div className="max-w-7xl mx-auto">
+          <nav className="flex overflow-x-auto scrollbar-hide -mx-1 px-2 sm:px-4">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-3 font-medium transition-colors border-b-2 ${
+                className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-3 font-medium transition-colors border-b-2 whitespace-nowrap min-w-max ${
                   activeTab === tab.id
                     ? 'text-dnd-gold border-dnd-gold bg-gray-900/50'
-                    : 'text-gray-400 border-transparent hover:text-white hover:bg-gray-700/50'
+                    : 'text-gray-400 border-transparent hover:text-white active:bg-gray-700/50'
                 }`}
               >
                 {tab.icon}
-                {tab.label}
+                <span className="text-sm sm:text-base">{tab.label}</span>
               </button>
             ))}
           </nav>
@@ -102,7 +102,7 @@ export function CampaignPage() {
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
         {/* Party Overview */}
         {activeTab === 'party' && <PartyOverview />}
 
@@ -111,29 +111,41 @@ export function CampaignPage() {
 
         {/* NPCs */}
         {activeTab === 'npcs' && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-dnd-gold">NPC Library</h2>
-              <button
-                onClick={() => setShowNPCCreator(true)}
-                className="px-4 py-2 bg-dnd-gold text-gray-900 rounded-lg font-medium hover:bg-yellow-500 transition-colors"
-              >
-                Create NPC
-              </button>
+          <div className="space-y-4 sm:space-y-6">
+            {/* Header with actions - stacks on mobile */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
+              <h2 className="text-xl sm:text-2xl font-bold text-dnd-gold">NPC Library</h2>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <QuickNPCSelector />
+                <button
+                  onClick={() => setShowNPCCreator(true)}
+                  className="flex items-center justify-center gap-2 px-4 py-3 bg-dnd-gold text-gray-900 rounded-lg font-medium hover:bg-yellow-500 transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  <span>Custom NPC</span>
+                </button>
+              </div>
             </div>
 
             {npcs.length === 0 ? (
-              <div className="text-center py-12 bg-gray-800 rounded-lg border border-gray-700">
+              <div className="text-center py-8 sm:py-12 bg-gray-800 rounded-lg border border-gray-700">
+                <div className="text-4xl mb-3">👤</div>
                 <p className="text-gray-400 mb-4">No NPCs created yet.</p>
-                <button
-                  onClick={() => setShowNPCCreator(true)}
-                  className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
-                >
-                  Create Your First NPC
-                </button>
+                <p className="text-gray-500 text-sm mb-4">Use Quick NPC for common characters or create a custom one.</p>
+                <div className="flex flex-col sm:flex-row gap-2 justify-center px-4">
+                  <QuickNPCSelector />
+                  <button
+                    onClick={() => setShowNPCCreator(true)}
+                    className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
+                  >
+                    Create Custom NPC
+                  </button>
+                </div>
               </div>
             ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 {npcs.map((npc) => (
                   <NPCCard
                     key={npc.id}
@@ -146,11 +158,11 @@ export function CampaignPage() {
               </div>
             )}
 
-            {/* NPC Creator Modal */}
+            {/* NPC Creator Modal - fullscreen on mobile */}
             {showNPCCreator && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4">
                 <div className="absolute inset-0 bg-black/70" onClick={handleCloseNPCCreator} />
-                <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                <div className="relative w-full sm:max-w-2xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto bg-gray-800 sm:rounded-xl rounded-t-xl">
                   <NPCCreator onSave={handleCloseNPCCreator} editingNPC={editingNPC} />
                 </div>
               </div>
