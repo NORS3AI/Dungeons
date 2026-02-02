@@ -515,7 +515,7 @@ export function CharacterSheetPage() {
 
       {/* Floating Dice Button */}
       <DiceRollerButton onClick={() => setShowDiceRoller(true)} />
-      <DiceRollerModal isOpen={showDiceRoller} onClose={() => setShowDiceRoller(false)} />
+      <DiceRollerModal isOpen={showDiceRoller} onClose={() => setShowDiceRoller(false)} character={character} />
     </div>
   )
 }

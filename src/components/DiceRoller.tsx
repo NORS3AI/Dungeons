@@ -1,22 +1,77 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { rollDice, rollWithAdvantage, rollWithDisadvantage } from '../types/dice'
 import type { DiceRoll, DieResult } from '../types/dice'
+import type { Character } from '../types'
 
 interface DiceRollerProps {
   onRoll?: (roll: DiceRoll) => void
   compact?: boolean
+  character?: Character | null
 }
 
 type QuickDie = 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20' | 'd100'
+type RollPurpose = 'raw' | 'attack' | 'damage' | 'save' | 'check'
+type Ability = 'strength' | 'dexterity' | 'constitution' | 'intelligence' | 'wisdom' | 'charisma'
 
 const QUICK_DICE: QuickDie[] = ['d4', 'd6', 'd8', 'd10', 'd12', 'd20', 'd100']
+const ABILITIES: Ability[] = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma']
+const ABILITY_ABBREV: Record<Ability, string> = {
+  strength: 'STR',
+  dexterity: 'DEX',
+  constitution: 'CON',
+  intelligence: 'INT',
+  wisdom: 'WIS',
+  charisma: 'CHA',
+}
 
-export function DiceRoller({ onRoll, compact = false }: DiceRollerProps) {
+const ROLL_PURPOSES: { value: RollPurpose; label: string; description: string }[] = [
+  { value: 'raw', label: 'Raw', description: 'No automatic modifiers' },
+  { value: 'attack', label: 'Attack', description: 'd20 + ability + proficiency' },
+  { value: 'damage', label: 'Damage', description: 'Weapon dice + ability' },
+  { value: 'save', label: 'Save', description: 'd20 + ability (+ prof if proficient)' },
+  { value: 'check', label: 'Check', description: 'd20 + ability modifier' },
+]
+
+export function DiceRoller({ onRoll, compact = false, character }: DiceRollerProps) {
   const [notation, setNotation] = useState('1d20')
-  const [modifier, setModifier] = useState(0)
+  const [manualModifier, setManualModifier] = useState(0)
+  const [diceCount, setDiceCount] = useState(1)
   const [rollHistory, setRollHistory] = useState<DiceRoll[]>([])
   const [currentRoll, setCurrentRoll] = useState<DiceRoll | null>(null)
   const [isRolling, setIsRolling] = useState(false)
+
+  // Smart roll settings
+  const [rollPurpose, setRollPurpose] = useState<RollPurpose>('raw')
+  const [selectedAbility, setSelectedAbility] = useState<Ability>('strength')
+
+  // Calculate modifier based on character stats and roll purpose
+  const calculateSmartModifier = useCallback((): number => {
+    if (!character || rollPurpose === 'raw') return manualModifier
+
+    const abilityScore = character.abilityScores[selectedAbility]
+    const abilityMod = Math.floor((abilityScore - 10) / 2)
+    const profBonus = Math.floor((character.level - 1) / 4) + 2
+
+    switch (rollPurpose) {
+      case 'attack':
+        // Attack: ability modifier + proficiency bonus
+        return abilityMod + profBonus + manualModifier
+      case 'damage':
+        // Damage: just ability modifier (no proficiency)
+        return abilityMod + manualModifier
+      case 'save':
+        // Save: ability modifier + proficiency if proficient
+        const isProficient = character.savingThrows[selectedAbility]
+        return abilityMod + (isProficient ? profBonus : 0) + manualModifier
+      case 'check':
+        // Ability check: just ability modifier
+        return abilityMod + manualModifier
+      default:
+        return manualModifier
+    }
+  }, [character, rollPurpose, selectedAbility, manualModifier])
+
+  const totalModifier = calculateSmartModifier()
 
   const performRoll = useCallback((
     rollNotation: string,
@@ -26,8 +81,8 @@ export function DiceRoller({ onRoll, compact = false }: DiceRollerProps) {
 
     // Brief animation delay
     setTimeout(() => {
-      const fullNotation = modifier !== 0
-        ? `${rollNotation}${modifier >= 0 ? '+' : ''}${modifier}`
+      const fullNotation = totalModifier !== 0
+        ? `${rollNotation}${totalModifier >= 0 ? '+' : ''}${totalModifier}`
         : rollNotation
 
       let result: DiceRoll | null = null
@@ -51,11 +106,12 @@ export function DiceRoller({ onRoll, compact = false }: DiceRollerProps) {
 
       setIsRolling(false)
     }, 300)
-  }, [modifier, onRoll])
+  }, [totalModifier, onRoll])
 
   const handleQuickRoll = (die: QuickDie) => {
-    setNotation(`1${die}`)
-    performRoll(`1${die}`)
+    const fullNotation = `${diceCount}${die}`
+    setNotation(fullNotation)
+    performRoll(fullNotation)
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -73,6 +129,14 @@ export function DiceRoller({ onRoll, compact = false }: DiceRollerProps) {
     if (result.isMin) return 'text-red-400 bg-red-900/30'
     return 'text-white bg-gray-700'
   }
+
+  // Auto-set d20 for attack/save/check rolls
+  useEffect(() => {
+    if (rollPurpose === 'attack' || rollPurpose === 'save' || rollPurpose === 'check') {
+      setDiceCount(1)
+      setNotation('1d20')
+    }
+  }, [rollPurpose])
 
   if (compact) {
     return (
@@ -103,6 +167,108 @@ export function DiceRoller({ onRoll, compact = false }: DiceRollerProps) {
     <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
       <h3 className="text-xl font-bold text-dnd-gold mb-4">Dice Roller</h3>
 
+      {/* Roll Purpose Selector */}
+      <div className="mb-4">
+        <span className="text-gray-400 text-sm block mb-2">Roll Type:</span>
+        <div className="flex flex-wrap gap-2">
+          {ROLL_PURPOSES.map((purpose) => (
+            <button
+              key={purpose.value}
+              onClick={() => setRollPurpose(purpose.value)}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                rollPurpose === purpose.value
+                  ? 'bg-dnd-gold text-gray-900'
+                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              }`}
+              title={purpose.description}
+            >
+              {purpose.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Ability Selector - only show when not raw and character exists */}
+      {rollPurpose !== 'raw' && character && (
+        <div className="mb-4">
+          <span className="text-gray-400 text-sm block mb-2">Ability:</span>
+          <div className="flex flex-wrap gap-2">
+            {ABILITIES.map((ability) => {
+              const score = character.abilityScores[ability]
+              const mod = Math.floor((score - 10) / 2)
+              return (
+                <button
+                  key={ability}
+                  onClick={() => setSelectedAbility(ability)}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                    selectedAbility === ability
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  }`}
+                >
+                  {ABILITY_ABBREV[ability]} ({mod >= 0 ? '+' : ''}{mod})
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Smart Modifier Display */}
+      {rollPurpose !== 'raw' && character && (
+        <div className="mb-4 p-3 bg-gray-900 rounded-lg border border-gray-700">
+          <div className="text-sm text-gray-400 mb-1">Calculated Modifier:</div>
+          <div className="flex items-center gap-2 text-lg">
+            <span className="text-dnd-gold font-bold">
+              {totalModifier >= 0 ? '+' : ''}{totalModifier}
+            </span>
+            <span className="text-xs text-gray-500">
+              {rollPurpose === 'attack' && `(${ABILITY_ABBREV[selectedAbility]} + Prof + Manual)`}
+              {rollPurpose === 'damage' && `(${ABILITY_ABBREV[selectedAbility]} + Manual)`}
+              {rollPurpose === 'save' && `(${ABILITY_ABBREV[selectedAbility]}${character.savingThrows[selectedAbility] ? ' + Prof' : ''} + Manual)`}
+              {rollPurpose === 'check' && `(${ABILITY_ABBREV[selectedAbility]} + Manual)`}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Dice Count Selector */}
+      <div className="flex items-center gap-3 mb-4">
+        <span className="text-gray-400 text-sm">Number of dice:</span>
+        <div className="flex items-center">
+          <button
+            type="button"
+            onClick={() => setDiceCount((c) => Math.max(1, c - 1))}
+            disabled={diceCount <= 1}
+            className="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-l-lg
+                     font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            -
+          </button>
+          <span className="px-4 py-2 bg-gray-900 text-dnd-gold font-bold min-w-[3rem] text-center text-lg">
+            {diceCount}
+          </span>
+          <button
+            type="button"
+            onClick={() => setDiceCount((c) => Math.min(20, c + 1))}
+            disabled={diceCount >= 20}
+            className="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-r-lg
+                     font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            +
+          </button>
+        </div>
+        {diceCount > 1 && (
+          <button
+            type="button"
+            onClick={() => setDiceCount(1)}
+            className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+          >
+            Reset
+          </button>
+        )}
+      </div>
+
       {/* Quick Dice */}
       <div className="flex flex-wrap gap-2 mb-4">
         {QUICK_DICE.map((die) => (
@@ -113,7 +279,7 @@ export function DiceRoller({ onRoll, compact = false }: DiceRollerProps) {
             className="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg
                      font-medium transition-colors disabled:opacity-50"
           >
-            {die}
+            {diceCount}{die}
           </button>
         ))}
       </div>
@@ -131,17 +297,17 @@ export function DiceRoller({ onRoll, compact = false }: DiceRollerProps) {
         <div className="flex items-center gap-1">
           <button
             type="button"
-            onClick={() => setModifier((m) => m - 1)}
+            onClick={() => setManualModifier((m) => m - 1)}
             className="px-2 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-l-lg"
           >
             -
           </button>
           <span className="px-3 py-2 bg-gray-900 text-white min-w-[3rem] text-center">
-            {modifier >= 0 ? `+${modifier}` : modifier}
+            {manualModifier >= 0 ? `+${manualModifier}` : manualModifier}
           </span>
           <button
             type="button"
-            onClick={() => setModifier((m) => m + 1)}
+            onClick={() => setManualModifier((m) => m + 1)}
             className="px-2 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-r-lg"
           >
             +
@@ -273,13 +439,21 @@ export function DiceRollerButton({ onClick }: { onClick: () => void }) {
 }
 
 // Modal wrapper for the dice roller
-export function DiceRollerModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+export function DiceRollerModal({
+  isOpen,
+  onClose,
+  character
+}: {
+  isOpen: boolean
+  onClose: () => void
+  character?: Character | null
+}) {
   if (!isOpen) return null
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70" onClick={onClose} />
-      <div className="relative w-full max-w-md">
+      <div className="relative w-full max-w-md max-h-[90vh] overflow-y-auto">
         <button
           onClick={onClose}
           className="absolute -top-2 -right-2 w-8 h-8 bg-gray-700 hover:bg-gray-600
@@ -287,7 +461,7 @@ export function DiceRollerModal({ isOpen, onClose }: { isOpen: boolean; onClose:
         >
           x
         </button>
-        <DiceRoller />
+        <DiceRoller character={character} />
       </div>
     </div>
   )
