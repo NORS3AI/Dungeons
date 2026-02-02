@@ -68,28 +68,6 @@ export function HomePage() {
         </p>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-        <Link to="/create" className="card hover:border-gold-500 transition-colors group">
-          <div className="text-4xl mb-4">⚔️</div>
-          <h2 className="text-2xl font-bold text-gold-500 mb-2 group-hover:text-gold-400">
-            Create Character
-          </h2>
-          <p className="text-gray-400">
-            Build your hero step by step. Choose race, class, stats, spells, and equipment.
-          </p>
-        </Link>
-
-        <Link to="/campaign" className="card hover:border-gold-500 transition-colors group">
-          <div className="text-4xl mb-4">📜</div>
-          <h2 className="text-2xl font-bold text-gold-500 mb-2 group-hover:text-gold-400">
-            DM Tools
-          </h2>
-          <p className="text-gray-400">
-            Manage your campaign. Track characters, NPCs, and run encounters.
-          </p>
-        </Link>
-      </div>
-
       {/* My Characters Section */}
       <div className="mt-16 max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-6">
