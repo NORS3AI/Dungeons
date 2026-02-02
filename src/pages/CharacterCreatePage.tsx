@@ -5,9 +5,10 @@ import { WizardSteps, CHARACTER_CREATION_STEPS } from '../components/WizardSteps
 import { CharacterDetailsForm } from '../components/CharacterDetailsForm'
 import { RaceSelector } from '../components/RaceSelector'
 import { ClassSelector } from '../components/ClassSelector'
+import { BackgroundSelector } from '../components/BackgroundSelector'
 import { StatAllocator } from '../components/StatAllocator'
 import { SpellSelector } from '../components/SpellSelector'
-import type { Race, Class, Subclass, AbilityScores, Spell } from '../types'
+import type { Race, Class, Subclass, AbilityScores, Spell, Background } from '../types'
 import { calculateModifier } from '../types'
 
 /**
@@ -17,10 +18,11 @@ const STEP_TO_NUMBER: Record<string, number> = {
   details: 1,
   race: 2,
   class: 3,
-  stats: 4,
-  spells: 5,
-  equipment: 6,
-  review: 7,
+  background: 4,
+  stats: 5,
+  spells: 6,
+  equipment: 7,
+  review: 8,
 }
 
 export function CharacterCreatePage() {
@@ -33,6 +35,7 @@ export function CharacterCreatePage() {
     setRace,
     setClass,
     setSubclass,
+    setBackground,
     setAbilityScores,
     addSpell,
     nextStep,
@@ -92,6 +95,11 @@ export function CharacterCreatePage() {
     nextStep()
   }
 
+  const handleBackgroundSelect = (background: Background) => {
+    setBackground(background)
+    nextStep()
+  }
+
   const handleStatsSubmit = (scores: AbilityScores) => {
     setAbilityScores(scores)
     nextStep()
@@ -145,6 +153,15 @@ export function CharacterCreatePage() {
             initialClass={currentCharacter?.class}
             initialSubclass={currentCharacter?.subclass}
             onSelect={handleClassSelect}
+            onBack={handleBack}
+          />
+        )
+
+      case 'background':
+        return (
+          <BackgroundSelector
+            initialBackground={currentCharacter?.background}
+            onSelect={handleBackgroundSelect}
             onBack={handleBack}
           />
         )
@@ -242,6 +259,12 @@ export function CharacterCreatePage() {
                       <span className="text-gray-300">
                         {currentCharacter.class?.name || 'Not selected'}
                         {currentCharacter.subclass && ` (${currentCharacter.subclass.name})`}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Background:</span>{' '}
+                      <span className="text-gray-300">
+                        {currentCharacter.background?.name || 'Not selected'}
                       </span>
                     </div>
                   </div>

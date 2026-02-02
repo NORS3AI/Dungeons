@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
 import type { Race } from '../types'
-import { DROW, TIEFLING } from '../types'
+import { DROW, TIEFLING, HUMAN, HALF_ELF, DWARF } from '../types'
 import { RaceCard } from './RaceCard'
 import { RaceDetailModal } from './RaceDetailModal'
 import { QuickRefTooltip } from './QuickRefTooltip'
 
 // Available races for selection
-const AVAILABLE_RACES: Race[] = [DROW, TIEFLING]
+const AVAILABLE_RACES: Race[] = [HUMAN, DWARF, HALF_ELF, DROW, TIEFLING]
 
 interface RaceSelectorProps {
   initialRace?: Race | null
@@ -86,7 +86,7 @@ export function RaceSelector({ initialRace, onSelect, onBack }: RaceSelectorProp
       {/* Coming Soon Note */}
       <div className="mb-8 p-4 bg-gray-800/50 rounded-lg border border-gray-700">
         <p className="text-sm text-gray-400 text-center">
-          More races coming soon: Human, Elf, Dwarf, Halfling, Half-Orc, Dragonborn, Gnome, Half-Elf
+          More races coming soon: Elf, Halfling, Half-Orc, Dragonborn, Gnome
         </p>
       </div>
 

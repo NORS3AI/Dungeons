@@ -28,7 +28,7 @@ export type {
   Race,
 } from './race'
 
-export { DROW, TIEFLING } from './race'
+export { DROW, TIEFLING, HUMAN, HALF_ELF, DWARF } from './race'
 
 // Class types
 export type {
@@ -41,7 +41,7 @@ export type {
   Subclass,
 } from './class'
 
-export { FIGHTER, WARLOCK, GREAT_OLD_ONE } from './class'
+export { FIGHTER, WARLOCK, GREAT_OLD_ONE, FIEND, ARCHFEY, CHAMPION, BATTLE_MASTER } from './class'
 
 // Spell types
 export type {
@@ -85,6 +85,23 @@ export {
   GREATSWORD,
   LONGSWORD,
 } from './equipment'
+
+// Background types
+export type {
+  BackgroundFeature,
+  SuggestedCharacteristic,
+  Background,
+} from './background'
+
+export {
+  ACOLYTE,
+  CRIMINAL,
+  FOLK_HERO,
+  NOBLE,
+  SAGE,
+  SOLDIER,
+  AVAILABLE_BACKGROUNDS,
+} from './background'
 
 // Dice types
 export type {

@@ -6,6 +6,7 @@ import type {
   Race,
   Class,
   Subclass,
+  Background,
   Equipment,
   Currency,
   Spell,
@@ -20,6 +21,7 @@ export type CreationStep =
   | 'details'
   | 'race'
   | 'class'
+  | 'background'
   | 'stats'
   | 'spells'
   | 'equipment'
@@ -42,6 +44,7 @@ function createEmptyCharacter(): Character {
     race: null,
     class: null,
     subclass: null,
+    background: null,
     abilityScores: { ...DEFAULT_ABILITY_SCORES },
     skills: {
       athletics: 'none',
@@ -127,6 +130,7 @@ interface CharacterState {
   loadCharacter: (id: string) => void
   saveCharacter: () => void
   deleteCharacter: (id: string) => void
+  importCharacter: (character: Character) => void
 
   // Creation wizard
   setCreationStep: (step: CreationStep) => void
@@ -138,6 +142,7 @@ interface CharacterState {
   setRace: (race: Race) => void
   setClass: (characterClass: Class) => void
   setSubclass: (subclass: Subclass) => void
+  setBackground: (background: Background) => void
   setAbilityScores: (scores: AbilityScores) => void
   addSpell: (spell: Spell) => void
   removeSpell: (spellId: string) => void
@@ -155,6 +160,10 @@ interface CharacterState {
   shortRest: () => void
   longRest: () => void
 
+  // Leveling
+  levelUp: () => void
+  setLevel: (level: number) => void
+
   // Undo/Redo
   undo: () => void
   redo: () => void
@@ -165,7 +174,7 @@ interface CharacterState {
 /**
  * Creation step order
  */
-const STEP_ORDER: CreationStep[] = ['details', 'race', 'class', 'stats', 'spells', 'equipment', 'review']
+const STEP_ORDER: CreationStep[] = ['details', 'race', 'class', 'background', 'stats', 'spells', 'equipment', 'review']
 
 /**
  * Character store with persistence
@@ -225,6 +234,13 @@ export const useCharacterStore = create<CharacterState>()(
           set((state) => ({
             characters: state.characters.filter((c) => c.id !== id),
             currentCharacter: state.currentCharacter?.id === id ? null : state.currentCharacter,
+          }))
+        },
+
+        importCharacter: (character: Character) => {
+          set((state) => ({
+            characters: [...state.characters, character],
+            currentCharacter: character,
           }))
         },
 
@@ -301,6 +317,19 @@ export const useCharacterStore = create<CharacterState>()(
 
           set({
             currentCharacter: { ...currentCharacter, subclass },
+            history: {
+              past: [...history.past, currentCharacter],
+              future: [],
+            },
+          })
+        },
+
+        setBackground: (background: Background) => {
+          const { currentCharacter, history } = get()
+          if (!currentCharacter) return
+
+          set({
+            currentCharacter: { ...currentCharacter, background },
             history: {
               past: [...history.past, currentCharacter],
               future: [],
@@ -537,6 +566,58 @@ export const useCharacterStore = create<CharacterState>()(
               spellSlots,
               hitPoints,
               deathSaves: { successes: 0, failures: 0 },
+            },
+          })
+        },
+
+        levelUp: () => {
+          const { currentCharacter, history } = get()
+          if (!currentCharacter || currentCharacter.level >= 20) return
+
+          const newLevel = currentCharacter.level + 1
+
+          // Calculate HP increase (average + CON modifier)
+          // For d10 (Fighter): average is 6
+          // For d8 (Warlock): average is 5
+          const hitDieAverage = currentCharacter.class?.hitDie === 'd10' ? 6 :
+                                currentCharacter.class?.hitDie === 'd8' ? 5 :
+                                currentCharacter.class?.hitDie === 'd12' ? 7 :
+                                currentCharacter.class?.hitDie === 'd6' ? 4 : 5
+          const conModifier = Math.floor((currentCharacter.abilityScores.constitution - 10) / 2)
+          const hpIncrease = Math.max(1, hitDieAverage + conModifier)
+
+          const newMaxHP = currentCharacter.hitPoints.maximum + hpIncrease
+          const newCurrentHP = currentCharacter.hitPoints.current + hpIncrease
+
+          set({
+            currentCharacter: {
+              ...currentCharacter,
+              level: newLevel,
+              hitPoints: {
+                ...currentCharacter.hitPoints,
+                maximum: newMaxHP,
+                current: newCurrentHP,
+              },
+            },
+            history: {
+              past: [...history.past, currentCharacter],
+              future: [],
+            },
+          })
+        },
+
+        setLevel: (level: number) => {
+          const { currentCharacter, history } = get()
+          if (!currentCharacter || level < 1 || level > 20) return
+
+          set({
+            currentCharacter: {
+              ...currentCharacter,
+              level,
+            },
+            history: {
+              past: [...history.past, currentCharacter],
+              future: [],
             },
           })
         },

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { Class, Subclass } from '../types'
-import { FIGHTER, WARLOCK, GREAT_OLD_ONE } from '../types'
+import { FIGHTER, WARLOCK, GREAT_OLD_ONE, FIEND, ARCHFEY, CHAMPION, BATTLE_MASTER } from '../types'
 import { ClassCard } from './ClassCard'
 import { QuickRefTooltip } from './QuickRefTooltip'
 
@@ -9,8 +9,8 @@ const AVAILABLE_CLASSES: Class[] = [FIGHTER, WARLOCK]
 
 // Available subclasses mapped by parent class ID
 const SUBCLASSES: Record<string, Subclass[]> = {
-  fighter: [], // No subclasses defined yet for Fighter
-  warlock: [GREAT_OLD_ONE],
+  fighter: [CHAMPION, BATTLE_MASTER],
+  warlock: [GREAT_OLD_ONE, FIEND, ARCHFEY],
 }
 
 interface ClassSelectorProps {
@@ -395,29 +395,36 @@ export function ClassSelector({
                 {/* Subclass Features */}
                 {selectedSubclass?.id === subclass.id && (
                   <div className="mt-4 pt-4 border-t border-gray-600">
-                    <p className="text-xs text-gray-500 uppercase mb-2">Level 1 Feature</p>
+                    <p className="text-xs text-gray-500 uppercase mb-2">
+                      Level 1 Feature
+                      <span className="text-gray-600 ml-2">(click feature name for details)</span>
+                    </p>
                     {subclass.features
                       .filter((f) => f.level === 1)
                       .map((feature) => (
                         <div key={feature.id} className="p-3 bg-gray-800/50 rounded">
-                          <span className="text-purple-300 font-medium">{feature.name}: </span>
-                          <span className="text-gray-400 text-sm">{feature.description}</span>
+                          <QuickRefTooltip type="trait" id={feature.id}>
+                            <span className="font-medium">{feature.name}</span>
+                          </QuickRefTooltip>
+                          <span className="text-gray-400 text-sm">: {feature.description}</span>
                         </div>
                       ))}
 
                     {/* Expanded Spells */}
                     {subclass.expandedSpells && subclass.expandedSpells.length > 0 && (
                       <div className="mt-3">
-                        <p className="text-xs text-gray-500 uppercase mb-2">Expanded Spell List</p>
-                        <div className="flex flex-wrap gap-1">
+                        <p className="text-xs text-gray-500 uppercase mb-2">
+                          Expanded Spell List
+                          <span className="text-gray-600 ml-2">(click spells for details)</span>
+                        </p>
+                        <div className="flex flex-wrap gap-2">
                           {subclass.expandedSpells.flatMap((es) =>
                             es.spells.map((spell) => (
-                              <span
-                                key={spell}
-                                className="px-2 py-0.5 bg-purple-900/30 text-purple-300 text-xs rounded capitalize"
-                              >
-                                {spell.replace(/-/g, ' ')}
-                              </span>
+                              <QuickRefTooltip key={spell} type="spell" id={spell}>
+                                <span className="px-2 py-1 bg-purple-900/30 text-sm rounded capitalize">
+                                  {spell.replace(/-/g, ' ')}
+                                </span>
+                              </QuickRefTooltip>
                             ))
                           )}
                         </div>
