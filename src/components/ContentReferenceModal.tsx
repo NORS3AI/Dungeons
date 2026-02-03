@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { QuickRefTooltip } from './QuickRefTooltip'
 
 interface ContentReferenceModalProps {
@@ -13,6 +13,13 @@ interface ClassFeature {
   id?: string // Optional ID for clickable features
 }
 
+interface SubclassInfo {
+  name: string
+  description: string
+  features: ClassFeature[]
+  expandedSpells?: string[] // Spell IDs
+}
+
 interface ClassInfo {
   description: string
   hitDie: string
@@ -21,6 +28,7 @@ interface ClassInfo {
   features: ClassFeature[]
   spellcaster?: boolean
   sampleSpells?: string[] // Sample spell IDs to showcase
+  subclasses?: SubclassInfo[] // Available subclasses
 }
 
 // Class information database
@@ -187,6 +195,63 @@ const CLASS_INFO: Record<string, ClassInfo> = {
     ],
     spellcaster: true,
     sampleSpells: ['eldritch-blast', 'hex', 'armor-of-agathys', 'darkness', 'hunger-of-hadar', 'dimension-door', 'hold-monster'],
+    subclasses: [
+      {
+        name: 'The Great Old One',
+        description: 'Your patron is a mysterious entity from the Far Realm or beyond the stars.',
+        features: [
+          { name: 'Awakened Mind - Telepathically speak to creatures within 30 feet', id: 'awakened-mind' },
+          { name: 'Entropic Ward - Impose disadvantage on attacks, gain advantage when they miss', id: 'entropic-ward' },
+          { name: 'Thought Shield - Resist psychic damage and reflect telepathic probes', id: 'thought-shield' },
+          { name: 'Create Thrall - Charm an incapacitated humanoid indefinitely', id: 'create-thrall' },
+        ],
+        expandedSpells: ['dissonant-whispers', 'tashas-hideous-laughter', 'detect-thoughts', 'phantasmal-force', 'dominate-person'],
+      },
+      {
+        name: 'The Fiend',
+        description: 'You have made a pact with a fiend from the lower planes of existence.',
+        features: [
+          { name: "Dark One's Blessing - Gain temp HP when reducing a hostile creature to 0", id: 'dark-ones-blessing' },
+          { name: "Dark One's Own Luck - Add d10 to ability check or saving throw" },
+          { name: 'Fiendish Resilience - Gain resistance to one damage type per rest' },
+          { name: 'Hurl Through Hell - Send creature through lower planes dealing 10d10 psychic' },
+        ],
+        expandedSpells: ['burning-hands', 'command', 'scorching-ray', 'fireball', 'fire-storm'],
+      },
+      {
+        name: 'The Archfey',
+        description: 'Your patron is a lord or lady of the fey, a creature of legend.',
+        features: [
+          { name: 'Fey Presence - Charm or frighten creatures in 10-ft cube', id: 'fey-presence' },
+          { name: 'Misty Escape - Turn invisible and teleport when taking damage' },
+          { name: 'Beguiling Defenses - Immune to charm, reflect charm attempts' },
+          { name: 'Dark Delirium - Charm a creature and trap in illusory realm' },
+        ],
+        expandedSpells: ['faerie-fire', 'sleep', 'phantasmal-force', 'dominate-monster'],
+      },
+      {
+        name: 'The Hexblade',
+        description: 'You have made your pact with a mysterious entity from the Shadowfell.',
+        features: [
+          { name: "Hexblade's Curse - Curse a target for bonus damage and crit on 19-20" },
+          { name: 'Hex Warrior - Use CHA for weapon attacks with one weapon' },
+          { name: 'Accursed Specter - Raise a specter from a humanoid you kill' },
+          { name: 'Master of Hexes - Transfer your curse when target dies' },
+        ],
+        expandedSpells: ['shield', 'blur', 'blink', 'banishment'],
+      },
+      {
+        name: 'The Celestial',
+        description: 'Your patron is a powerful being of the Upper Planes.',
+        features: [
+          { name: 'Healing Light - Heal creatures using d6s as bonus action' },
+          { name: 'Radiant Soul - Add CHA to fire and radiant damage, resist radiant' },
+          { name: 'Celestial Resilience - Gain temp HP on short/long rest' },
+          { name: 'Searing Vengeance - Explode with radiant light when stabilizing' },
+        ],
+        expandedSpells: ['cure-wounds', 'guiding-bolt', 'revivify', 'flame-strike'],
+      },
+    ],
   },
   Wizard: {
     description: 'A scholarly magic-user capable of manipulating the structures of reality.',
@@ -232,6 +297,41 @@ const CLASS_INFO: Record<string, ClassInfo> = {
     ],
     spellcaster: true,
     sampleSpells: ['chill-touch', 'inflict-wounds', 'bone-spear', 'corpse-explosion', 'create-undead', 'finger-of-death', 'army-of-the-dead'],
+    subclasses: [
+      {
+        name: 'Bone Necromancer',
+        description: 'Master of skeletal magic and bone manipulation.',
+        features: [
+          { name: 'Bone Armor - Summon protective bone plating for damage reduction' },
+          { name: 'Bone Prison - Trap enemies in cages of bone' },
+          { name: 'Bone Spirit - Launch homing bone projectile that explodes' },
+          { name: 'Bone Wall - Create impassable wall of bones' },
+        ],
+        expandedSpells: ['bone-spear', 'bone-prison', 'bone-shield', 'bone-wall', 'bone-spirit'],
+      },
+      {
+        name: 'Blood Necromancer',
+        description: 'Harness the power of blood magic and life drain.',
+        features: [
+          { name: 'Blood Nova - Detonate corpses dealing massive damage' },
+          { name: 'Drain Life - Siphon life force from enemies to heal yourself' },
+          { name: 'Iron Maiden - Reflect damage back to attackers' },
+          { name: 'Blood Golem - Summon a powerful blood construct' },
+        ],
+        expandedSpells: ['drain-life', 'blood-nova', 'iron-maiden', 'inflict-wounds'],
+      },
+      {
+        name: 'Summoner Necromancer',
+        description: 'Command vast armies of undead servants.',
+        features: [
+          { name: 'Skeletal Mages - Summon ranged skeleton mages' },
+          { name: 'Revive - Bring back fallen undead minions' },
+          { name: 'Golem Mastery - Create clay, blood, iron, or fire golems' },
+          { name: 'Army of the Dead - Summon massive temporary undead horde' },
+        ],
+        expandedSpells: ['create-undead', 'army-of-the-dead', 'revive', 'land-of-the-dead'],
+      },
+    ],
   },
   'Demon Hunter': {
     description: 'A relentless slayer who sacrificed part of their humanity to gain demonic powers.',
@@ -378,6 +478,8 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
 }
 
 export function ContentReferenceModal({ isOpen, onClose, type, name }: ContentReferenceModalProps) {
+  const [expandedSubclass, setExpandedSubclass] = useState<string | null>(null)
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -536,6 +638,110 @@ export function ContentReferenceModal({ isOpen, onClose, type, name }: ContentRe
                   <p className="mt-3 text-xs text-gray-500 italic">
                     {classInfo.sampleSpells.length} sample spells shown • This class has access to many more
                   </p>
+                </div>
+              )}
+
+              {/* Subclasses Section */}
+              {classInfo.subclasses && classInfo.subclasses.length > 0 && (
+                <div>
+                  <h3 className="text-xl font-bold text-cyan-500 mb-3 flex items-center gap-2">
+                    <span>🎯</span>
+                    Available Subclasses ({classInfo.subclasses.length})
+                  </h3>
+                  <p className="text-xs text-gray-400 mb-3 italic">
+                    Click any subclass to see features and expanded spells
+                  </p>
+                  <div className="space-y-3">
+                    {classInfo.subclasses.map((subclass, index) => {
+                      const isExpanded = expandedSubclass === subclass.name
+                      return (
+                        <div
+                          key={index}
+                          className="border border-gray-700 rounded-lg overflow-hidden
+                                   hover:border-cyan-500/50 transition-colors"
+                        >
+                          <button
+                            onClick={() => setExpandedSubclass(isExpanded ? null : subclass.name)}
+                            className="w-full p-4 text-left bg-gray-900/30 hover:bg-gray-900/50
+                                     transition-colors flex items-center justify-between"
+                          >
+                            <div>
+                              <div className="font-bold text-cyan-400 text-lg mb-1">
+                                {subclass.name}
+                              </div>
+                              <div className="text-sm text-gray-400">
+                                {subclass.description}
+                              </div>
+                            </div>
+                            <svg
+                              className={`w-5 h-5 text-cyan-400 transform transition-transform ${
+                                isExpanded ? 'rotate-180' : ''
+                              }`}
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </button>
+
+                          {isExpanded && (
+                            <div className="p-4 bg-gray-900/20 space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
+                              {/* Subclass Features */}
+                              <div>
+                                <h4 className="text-sm font-semibold text-cyan-400 uppercase mb-2">
+                                  Subclass Features
+                                </h4>
+                                <div className="space-y-2">
+                                  {subclass.features.map((feature, fIndex) => (
+                                    <div
+                                      key={fIndex}
+                                      className="flex items-start gap-2 p-2 bg-gray-900/30 rounded-lg"
+                                    >
+                                      <span className="text-cyan-400 mt-1">→</span>
+                                      {feature.id ? (
+                                        <QuickRefTooltip type="trait" id={feature.id}>
+                                          <span className="text-gray-300 hover:text-cyan-400 cursor-pointer underline decoration-dotted">
+                                            {feature.name}
+                                          </span>
+                                        </QuickRefTooltip>
+                                      ) : (
+                                        <span className="text-gray-300">{feature.name}</span>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+
+                              {/* Expanded Spells */}
+                              {subclass.expandedSpells && subclass.expandedSpells.length > 0 && (
+                                <div>
+                                  <h4 className="text-sm font-semibold text-purple-400 uppercase mb-2">
+                                    Expanded Spell List
+                                  </h4>
+                                  <p className="text-xs text-gray-500 mb-2">
+                                    Click any spell for details
+                                  </p>
+                                  <div className="flex flex-wrap gap-2">
+                                    {subclass.expandedSpells.map((spellId) => (
+                                      <QuickRefTooltip key={spellId} type="spell" id={spellId}>
+                                        <div className="px-2 py-1 bg-purple-900/20 border border-purple-500/30 text-purple-300
+                                                      text-sm rounded hover:bg-purple-900/40 cursor-pointer transition-colors">
+                                          <span className="capitalize">
+                                            {spellId.replace(/-/g, ' ')}
+                                          </span>
+                                        </div>
+                                      </QuickRefTooltip>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
                 </div>
               )}
             </>
