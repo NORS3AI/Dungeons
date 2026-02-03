@@ -53,7 +53,7 @@ const CLASS_INFO: Record<string, ClassInfo> = {
       { name: 'Font of Inspiration - Regain Bardic Inspiration on short rest' },
     ],
     spellcaster: true,
-    sampleSpells: ['vicious-mockery', 'healing-word', 'faerie-fire', 'shatter', 'hypnotic-pattern', 'polymorph', 'greater-invisibility'],
+    sampleSpells: ['vicious-mockery', 'healing-word', 'faerie-fire', 'shatter', 'hypnotic-pattern', 'polymorph', 'mass-cure-wounds'],
   },
   Cleric: {
     description: 'A priestly champion who wields divine magic in service of a higher power.',
@@ -68,7 +68,7 @@ const CLASS_INFO: Record<string, ClassInfo> = {
       { name: 'Divine Intervention - Ask your deity to intervene on your behalf' },
     ],
     spellcaster: true,
-    sampleSpells: ['sacred-flame', 'cure-wounds', 'guiding-bolt', 'spiritual-weapon', 'revivify', 'guardian-of-faith', 'flame-strike'],
+    sampleSpells: ['sacred-flame', 'cure-wounds', 'guiding-bolt', 'spiritual-weapon', 'revivify', 'spirit-guardians', 'flame-strike'],
   },
   Druid: {
     description: 'A priest of the Old Faith, wielding the powers of nature and adopting animal forms.',
@@ -83,7 +83,7 @@ const CLASS_INFO: Record<string, ClassInfo> = {
       { name: 'Beast Spells - Cast spells while in Wild Shape form' },
     ],
     spellcaster: true,
-    sampleSpells: ['shillelagh', 'entangle', 'healing-word', 'moonbeam', 'call-lightning', 'conjure-animals', 'polymorph'],
+    sampleSpells: ['shillelagh', 'produce-flame', 'healing-word', 'spider-climb', 'conjure-elemental', 'polymorph', 'animal-shapes'],
   },
   Fighter: {
     description: 'A master of martial combat, skilled with a variety of weapons and armor.',
@@ -126,7 +126,7 @@ const CLASS_INFO: Record<string, ClassInfo> = {
       { name: 'Sacred Oath - Swear Oath of Devotion, Vengeance, or Ancients' },
     ],
     spellcaster: true,
-    sampleSpells: ['bless', 'cure-wounds', 'shield-of-faith', 'lesser-restoration', 'aid', 'revivify', 'aura-of-vitality'],
+    sampleSpells: ['bless', 'cure-wounds', 'sanctuary', 'revivify', 'banishment', 'destructive-wave', 'holy-aura'],
   },
   Ranger: {
     description: 'A warrior who uses martial prowess and nature magic to combat threats on the edges of civilization.',
@@ -142,7 +142,7 @@ const CLASS_INFO: Record<string, ClassInfo> = {
       { name: 'Extra Attack - Attack twice per action' },
     ],
     spellcaster: true,
-    sampleSpells: ['hunters-mark', 'cure-wounds', 'ensnaring-strike', 'pass-without-trace', 'spike-growth', 'conjure-animals'],
+    sampleSpells: ['guided-arrow', 'cure-wounds', 'freezing-arrow', 'conjure-elemental', 'swift-quiver', 'tree-stride'],
   },
   Rogue: {
     description: 'A scoundrel who uses stealth and trickery to overcome obstacles and enemies.',
@@ -171,7 +171,7 @@ const CLASS_INFO: Record<string, ClassInfo> = {
       { name: 'Sorcerous Restoration - Regain 4 sorcery points on short rest' },
     ],
     spellcaster: true,
-    sampleSpells: ['fire-bolt', 'mage-armor', 'magic-missile', 'scorching-ray', 'fireball', 'polymorph', 'chain-lightning'],
+    sampleSpells: ['fire-bolt', 'chromatic-orb', 'magic-missile', 'scorching-ray', 'fireball', 'polymorph', 'chain-lightning'],
   },
   Warlock: {
     description: 'A wielder of magic derived from a bargain with an extraplanar entity.',
@@ -216,7 +216,7 @@ const CLASS_INFO: Record<string, ClassInfo> = {
       { name: 'Raise Dead - Command undead minions to fight for you' },
     ],
     spellcaster: true,
-    sampleSpells: ['chill-touch', 'inflict-wounds', 'ray-of-enfeeblement', 'animate-dead', 'blight', 'cloudkill'],
+    sampleSpells: ['chill-touch', 'inflict-wounds', 'death-coil', 'raise-dead', 'death-strike', 'cloudkill', 'death-and-decay'],
   },
   Necromancer: {
     description: 'Master of the dark arts who commands undead minions and wields devastating curse magic.',
@@ -231,7 +231,7 @@ const CLASS_INFO: Record<string, ClassInfo> = {
       { name: 'Army of the Dead - Summon massive horde of undead temporarily' },
     ],
     spellcaster: true,
-    sampleSpells: ['chill-touch', 'ray-of-sickness', 'ray-of-enfeeblement', 'animate-dead', 'blight', 'create-undead', 'finger-of-death'],
+    sampleSpells: ['chill-touch', 'inflict-wounds', 'bone-spear', 'corpse-explosion', 'create-undead', 'finger-of-death', 'army-of-the-dead'],
   },
   'Demon Hunter': {
     description: 'A relentless slayer who sacrificed part of their humanity to gain demonic powers.',
@@ -246,7 +246,7 @@ const CLASS_INFO: Record<string, ClassInfo> = {
       { name: 'Demonic Wards - Gain resistance to fire and necrotic damage' },
     ],
     spellcaster: true,
-    sampleSpells: ['hellish-rebuke', 'burning-hands', 'scorching-ray', 'fireball', 'wall-of-fire'],
+    sampleSpells: ['hellish-rebuke', 'burning-hands', 'fel-bolt', 'fel-rush', 'fireball', 'metamorphosis', 'eye-beam'],
   },
   Amazon: {
     description: 'A warrior from the Skovos Isles, master of javelin, bow, and spear combat with elemental magic.',
@@ -261,7 +261,7 @@ const CLASS_INFO: Record<string, ClassInfo> = {
       { name: 'Valkyrie - Summon a celestial warrior ally to fight beside you' },
     ],
     spellcaster: true,
-    sampleSpells: ['magic-stone', 'thunderwave', 'lightning-arrow', 'call-lightning', 'chain-lightning'],
+    sampleSpells: ['magic-arrow', 'thunderwave', 'charged-strike', 'lightning-bolt', 'lightning-fury', 'chain-lightning', 'valkyrie'],
   },
 }
 
