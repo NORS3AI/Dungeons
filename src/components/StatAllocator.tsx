@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
 import type { AbilityScores, Race } from '../types'
+import type { Background } from '../types/background'
 import { STANDARD_ARRAY, POINT_BUY_COSTS, DEFAULT_ABILITY_SCORES, calculateModifier } from '../types'
 
 type AllocationMethod = 'standard' | 'pointBuy' | 'roll'
@@ -21,6 +22,7 @@ const POINT_BUY_MAX = 15
 interface StatAllocatorProps {
   initialScores?: AbilityScores
   race?: Race | null
+  background?: Background | null
   onSubmit: (scores: AbilityScores) => void
   onBack: () => void
 }
@@ -43,6 +45,15 @@ function getRacialBonus(race: Race | null | undefined, ability: AbilityKey): num
 }
 
 /**
+ * Get background bonus for an ability
+ */
+function getBackgroundBonus(background: Background | null | undefined, ability: AbilityKey): number {
+  if (!background?.abilityBonuses) return 0
+  const bonus = background.abilityBonuses.find(b => b.ability === ability)
+  return bonus?.bonus || 0
+}
+
+/**
  * Calculate point buy cost for current scores
  */
 function calculatePointsSpent(scores: AbilityScores): number {
@@ -56,7 +67,7 @@ function calculatePointsSpent(scores: AbilityScores): number {
  * Stat Allocator Component
  * Allows users to allocate ability scores using three methods
  */
-export function StatAllocator({ initialScores, race, onSubmit, onBack }: StatAllocatorProps) {
+export function StatAllocator({ initialScores, race, background, onSubmit, onBack }: StatAllocatorProps) {
   // Default to roll method, standard and point buy are disabled for now
   const [method, setMethod] = useState<AllocationMethod>('roll')
   const [baseScores, setBaseScores] = useState<AbilityScores>(
@@ -91,9 +102,9 @@ export function StatAllocator({ initialScores, race, onSubmit, onBack }: StatAll
       } else if (method === 'roll') {
         base = rollAssignments[ability] ?? 10
       }
-      return base + getRacialBonus(race, ability)
+      return base + getRacialBonus(race, ability) + getBackgroundBonus(background, ability)
     },
-    [method, standardAssignments, baseScores, rollAssignments, race]
+    [method, standardAssignments, baseScores, rollAssignments, race, background]
   )
 
   // Standard Array handlers
@@ -283,8 +294,15 @@ export function StatAllocator({ initialScores, race, onSubmit, onBack }: StatAll
                     </div>
                   </div>
                 </div>
-                {getRacialBonus(race, key) > 0 && (
-                  <div className="text-xs text-dnd-gold mt-1">+{getRacialBonus(race, key)} racial</div>
+                {(getRacialBonus(race, key) > 0 || getBackgroundBonus(background, key) > 0) && (
+                  <div className="text-xs mt-1 space-x-2">
+                    {getRacialBonus(race, key) > 0 && (
+                      <span className="text-dnd-gold">+{getRacialBonus(race, key)} racial</span>
+                    )}
+                    {getBackgroundBonus(background, key) > 0 && (
+                      <span className="text-blue-400">+{getBackgroundBonus(background, key)} background</span>
+                    )}
+                  </div>
                 )}
               </div>
             ))}
@@ -341,8 +359,15 @@ export function StatAllocator({ initialScores, race, onSubmit, onBack }: StatAll
                       +
                     </button>
                   </div>
-                  {getRacialBonus(race, key) > 0 && (
-                    <div className="text-xs text-dnd-gold mt-1 text-center">+{getRacialBonus(race, key)} racial</div>
+                  {(getRacialBonus(race, key) > 0 || getBackgroundBonus(background, key) > 0) && (
+                    <div className="text-xs mt-1 text-center space-x-1">
+                      {getRacialBonus(race, key) > 0 && (
+                        <span className="text-dnd-gold">+{getRacialBonus(race, key)} racial</span>
+                      )}
+                      {getBackgroundBonus(background, key) > 0 && (
+                        <span className="text-blue-400">+{getBackgroundBonus(background, key)} bg</span>
+                      )}
+                    </div>
                   )}
                 </div>
               )
@@ -423,8 +448,15 @@ export function StatAllocator({ initialScores, race, onSubmit, onBack }: StatAll
                         </div>
                       </div>
                     </div>
-                    {getRacialBonus(race, key) > 0 && (
-                      <div className="text-xs text-dnd-gold mt-1">+{getRacialBonus(race, key)} racial</div>
+                    {(getRacialBonus(race, key) > 0 || getBackgroundBonus(background, key) > 0) && (
+                      <div className="text-xs mt-1 space-x-2">
+                        {getRacialBonus(race, key) > 0 && (
+                          <span className="text-dnd-gold">+{getRacialBonus(race, key)} racial</span>
+                        )}
+                        {getBackgroundBonus(background, key) > 0 && (
+                          <span className="text-blue-400">+{getBackgroundBonus(background, key)} background</span>
+                        )}
+                      </div>
                     )}
                   </div>
                 ))}

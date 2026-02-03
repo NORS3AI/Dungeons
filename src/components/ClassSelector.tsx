@@ -41,14 +41,13 @@ import {
 } from '../types'
 import { ClassCard } from './ClassCard'
 import { QuickRefTooltip } from './QuickRefTooltip'
+import { ScrollNavigation } from './ScrollNavigation'
 
-// All 16 available classes (12 PHB + 4 Custom)
+// All 16 available classes (12 PHB + 4 Custom) - sorted alphabetically
 const AVAILABLE_CLASSES: Class[] = [
-  // Custom Classes featured first
-  AMAZON, DEATH_KNIGHT, DEMON_HUNTER, NECROMANCER,
-  // PHB Classes
-  BARBARIAN, BARD, CLERIC, DRUID, FIGHTER, MONK,
-  PALADIN, RANGER, ROGUE, SORCERER, WARLOCK, WIZARD,
+  AMAZON, BARBARIAN, BARD, CLERIC, DEATH_KNIGHT, DEMON_HUNTER,
+  DRUID, FIGHTER, MONK, NECROMANCER, PALADIN, RANGER,
+  ROGUE, SORCERER, WARLOCK, WIZARD,
 ]
 
 // All subclasses mapped by parent class ID
@@ -200,13 +199,6 @@ export function ClassSelector({
             onSelect={handleClassSelect}
           />
         ))}
-      </div>
-
-      {/* Custom Classes Note */}
-      <div className="mb-8 p-4 bg-gray-800/50 rounded-lg border border-dnd-gold/30">
-        <p className="text-sm text-gray-400 text-center">
-          <span className="text-dnd-gold font-medium">Featured:</span> Amazon, Death Knight, Demon Hunter, and Necromancer are custom classes inspired by World of Warcraft and Diablo.
-        </p>
       </div>
 
       {/* Selected Class Details */}
@@ -522,7 +514,7 @@ export function ClassSelector({
                          : 'bg-gray-700 text-gray-500 cursor-not-allowed'
                      }`}
         >
-          Next: Allocate Stats
+          Next: Choose Your Background
         </button>
       </div>
 
@@ -531,10 +523,13 @@ export function ClassSelector({
         <p className="text-sm text-gray-400">
           <span className="text-dnd-gold font-medium">Tip:</span>{' '}
           Your class determines your hit points, proficiencies, and special abilities.
-          {needsSubclass && ' Warlocks must choose their Otherworldly Patron at level 1.'}
+          {needsSubclass && ' Some classes must choose their subclass at level 1.'}
           {' '}Select your {selectedClass?.skillChoices.choose || 2} skill proficiencies to continue.
         </p>
       </div>
+
+      {/* Scroll Navigation */}
+      <ScrollNavigation />
     </div>
   )
 }

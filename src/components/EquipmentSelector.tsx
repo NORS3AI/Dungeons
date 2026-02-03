@@ -58,18 +58,60 @@ export function EquipmentSelector({ characterClass, onSubmit, onBack }: Equipmen
     return armor
   }
 
+  // Count selected weapons
+  const selectedWeaponCount = selectedEquipment.filter(
+    (e) => 'weaponType' in e && (e.weaponType === 'simple' || e.weaponType === 'martial')
+  ).length
+
+  // Count selected armor (not shields)
+  const selectedArmorCount = selectedEquipment.filter(
+    (e) => 'armorType' in e && e.armorType !== undefined
+  ).length
+
+  // Count selected shields
+  const selectedShieldCount = selectedEquipment.filter(
+    (e) => 'acBonus' in e && !('armorType' in e)
+  ).length
+
+  const MAX_WEAPONS = 3
+  const MAX_ARMOR = 1
+  const MAX_SHIELDS = 1
+
   const toggleEquipment = (item: Equipment) => {
     setSelectedEquipment((prev) => {
       const exists = prev.find((e) => e.id === item.id)
       if (exists) {
         return prev.filter((e) => e.id !== item.id)
       }
+
+      // Check limits
+      const isWeapon = 'weaponType' in item && (item.weaponType === 'simple' || item.weaponType === 'martial')
+      const isArmorItem = 'armorType' in item && item.armorType !== undefined
+      const isShieldItem = 'acBonus' in item && !('armorType' in item)
+
+      if (isWeapon && selectedWeaponCount >= MAX_WEAPONS) return prev
+      if (isArmorItem && selectedArmorCount >= MAX_ARMOR) return prev
+      if (isShieldItem && selectedShieldCount >= MAX_SHIELDS) return prev
+
       return [...prev, { ...item, quantity: 1 }]
     })
   }
 
   const isSelected = (itemId: string) => {
     return selectedEquipment.some((e) => e.id === itemId)
+  }
+
+  const canSelectWeapon = (weaponId: string) => {
+    return isSelected(weaponId) || selectedWeaponCount < MAX_WEAPONS
+  }
+
+  const canSelectArmor = (itemId: string, item: Equipment) => {
+    if (isSelected(itemId)) return true
+    const isArmorItem = 'armorType' in item && item.armorType !== undefined
+    const isShieldItem = 'acBonus' in item && !('armorType' in item)
+    if (isArmorItem) return selectedArmorCount < MAX_ARMOR
+    if (isShieldItem) return selectedShieldCount < MAX_SHIELDS
+    return true
   }
 
   const selectPack = (packId: string) => {
@@ -105,13 +147,6 @@ export function EquipmentSelector({ characterClass, onSubmit, onBack }: Equipmen
 
   const handleSubmit = () => {
     onSubmit(selectedEquipment)
-  }
-
-  const formatCost = (item: Equipment) => {
-    if (item.cost.gold > 0) return `${item.cost.gold} gp`
-    if (item.cost.silver > 0) return `${item.cost.silver} sp`
-    if (item.cost.copper > 0) return `${item.cost.copper} cp`
-    return 'Free'
   }
 
   const formatProperties = (weapon: Weapon) => {
@@ -178,10 +213,7 @@ export function EquipmentSelector({ characterClass, onSubmit, onBack }: Equipmen
                     : 'border-gray-700 bg-gray-800 hover:border-gray-600'
                 }`}
               >
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-bold text-white">{pack.name}</h3>
-                  <span className="text-sm text-dnd-gold">{pack.cost.gold} gp</span>
-                </div>
+                <h3 className="font-bold text-white mb-2">{pack.name}</h3>
                 <p className="text-gray-400 text-sm mb-3">{pack.description}</p>
                 <p className="text-xs text-gray-500">
                   Includes: Backpack, bedroll, rations, rope, torches, and more
@@ -192,92 +224,119 @@ export function EquipmentSelector({ characterClass, onSubmit, onBack }: Equipmen
         )}
 
         {activeTab === 'weapons' && (
-          <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2">
-            {getAvailableWeapons().map((weapon) => (
-              <button
-                key={weapon.id}
-                onClick={() => toggleEquipment(weapon)}
-                className={`w-full p-4 rounded-xl border text-left transition-all ${
-                  isSelected(weapon.id)
-                    ? 'border-dnd-gold bg-dnd-gold/10'
-                    : 'border-gray-700 bg-gray-800 hover:border-gray-600'
-                }`}
-              >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-bold text-white">{weapon.name}</h3>
-                    <p className="text-sm text-gray-400">
-                      {weapon.damage.dice} {weapon.damage.type}
-                      {weapon.versatileDamage && ` (${weapon.versatileDamage} two-handed)`}
-                    </p>
-                    {weapon.properties.length > 0 && (
-                      <p className="text-xs text-gray-500 mt-1">{formatProperties(weapon)}</p>
-                    )}
-                    {weapon.range && (
-                      <p className="text-xs text-gray-500">
-                        Range: {weapon.range.normal}/{weapon.range.long} ft
-                      </p>
-                    )}
-                  </div>
-                  <div className="text-right">
-                    <span className="text-sm text-dnd-gold">{formatCost(weapon)}</span>
-                    <p className="text-xs text-gray-500">{weapon.weight} lb</p>
-                  </div>
-                </div>
-              </button>
-            ))}
+          <div>
+            <div className="mb-4 flex justify-between items-center">
+              <span className="text-sm text-gray-400">Select up to {MAX_WEAPONS} weapons</span>
+              <span className={`text-sm font-medium ${selectedWeaponCount >= MAX_WEAPONS ? 'text-green-400' : 'text-dnd-gold'}`}>
+                {selectedWeaponCount} / {MAX_WEAPONS} selected
+              </span>
+            </div>
+            <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2">
+              {getAvailableWeapons().map((weapon) => {
+                const canSelect = canSelectWeapon(weapon.id)
+                return (
+                  <button
+                    key={weapon.id}
+                    onClick={() => toggleEquipment(weapon)}
+                    disabled={!canSelect}
+                    className={`w-full p-4 rounded-xl border text-left transition-all ${
+                      isSelected(weapon.id)
+                        ? 'border-dnd-gold bg-dnd-gold/10'
+                        : canSelect
+                          ? 'border-gray-700 bg-gray-800 hover:border-gray-600'
+                          : 'border-gray-800 bg-gray-900 opacity-50 cursor-not-allowed'
+                    }`}
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-bold text-white">{weapon.name}</h3>
+                        <p className="text-sm text-gray-400">
+                          {weapon.damage.dice} {weapon.damage.type}
+                          {weapon.versatileDamage && ` (${weapon.versatileDamage} two-handed)`}
+                        </p>
+                        {weapon.properties.length > 0 && (
+                          <p className="text-xs text-gray-500 mt-1">{formatProperties(weapon)}</p>
+                        )}
+                        {weapon.range && (
+                          <p className="text-xs text-gray-500">
+                            Range: {weapon.range.normal}/{weapon.range.long} ft
+                          </p>
+                        )}
+                      </div>
+                      <p className="text-xs text-gray-500">{weapon.weight} lb</p>
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
           </div>
         )}
 
         {activeTab === 'armor' && (
-          <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2">
+          <div>
+            <div className="mb-4 flex justify-between items-center">
+              <span className="text-sm text-gray-400">Select up to {MAX_ARMOR} armor and {MAX_SHIELDS} shield</span>
+              <div className="flex gap-4">
+                <span className={`text-sm font-medium ${selectedArmorCount >= MAX_ARMOR ? 'text-green-400' : 'text-dnd-gold'}`}>
+                  Armor: {selectedArmorCount} / {MAX_ARMOR}
+                </span>
+                <span className={`text-sm font-medium ${selectedShieldCount >= MAX_SHIELDS ? 'text-green-400' : 'text-dnd-gold'}`}>
+                  Shield: {selectedShieldCount} / {MAX_SHIELDS}
+                </span>
+              </div>
+            </div>
+            <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2">
             {getAvailableArmor().length === 0 ? (
               <div className="text-center py-8 text-gray-500">
                 Your class has no armor proficiencies.
               </div>
             ) : (
-              getAvailableArmor().map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => toggleEquipment(item)}
-                  className={`w-full p-4 rounded-xl border text-left transition-all ${
-                    isSelected(item.id)
-                      ? 'border-dnd-gold bg-dnd-gold/10'
-                      : 'border-gray-700 bg-gray-800 hover:border-gray-600'
-                  }`}
-                >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-bold text-white">{item.name}</h3>
-                      {isArmor(item) && (
-                        <>
-                          <p className="text-sm text-gray-400">
-                            AC {item.baseAC}
-                            {item.maxDexBonus !== undefined && item.maxDexBonus > 0
-                              ? ` + DEX (max ${item.maxDexBonus})`
-                              : item.maxDexBonus === undefined
-                              ? ' + DEX'
-                              : ''}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {item.armorType} armor
-                            {item.stealthDisadvantage && ' | Stealth Disadvantage'}
-                            {item.strengthRequirement && ` | STR ${item.strengthRequirement} required`}
-                          </p>
-                        </>
-                      )}
-                      {isShield(item) && (
-                        <p className="text-sm text-gray-400">+{item.acBonus} AC</p>
-                      )}
-                    </div>
-                    <div className="text-right">
-                      <span className="text-sm text-dnd-gold">{formatCost(item)}</span>
+              getAvailableArmor().map((item) => {
+                const canSelect = canSelectArmor(item.id, item)
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => toggleEquipment(item)}
+                    disabled={!canSelect}
+                    className={`w-full p-4 rounded-xl border text-left transition-all ${
+                      isSelected(item.id)
+                        ? 'border-dnd-gold bg-dnd-gold/10'
+                        : canSelect
+                          ? 'border-gray-700 bg-gray-800 hover:border-gray-600'
+                          : 'border-gray-800 bg-gray-900 opacity-50 cursor-not-allowed'
+                    }`}
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-bold text-white">{item.name}</h3>
+                        {isArmor(item) && (
+                          <>
+                            <p className="text-sm text-gray-400">
+                              AC {item.baseAC}
+                              {item.maxDexBonus !== undefined && item.maxDexBonus > 0
+                                ? ` + DEX (max ${item.maxDexBonus})`
+                                : item.maxDexBonus === undefined
+                                ? ' + DEX'
+                                : ''}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {item.armorType} armor
+                              {item.stealthDisadvantage && ' | Stealth Disadvantage'}
+                              {item.strengthRequirement && ` | STR ${item.strengthRequirement} required`}
+                            </p>
+                          </>
+                        )}
+                        {isShield(item) && (
+                          <p className="text-sm text-gray-400">+{item.acBonus} AC</p>
+                        )}
+                      </div>
                       <p className="text-xs text-gray-500">{item.weight} lb</p>
                     </div>
-                  </div>
-                </button>
-              ))
+                  </button>
+                )
+              })
             )}
+            </div>
           </div>
         )}
 
@@ -298,10 +357,7 @@ export function EquipmentSelector({ characterClass, onSubmit, onBack }: Equipmen
                     <h3 className="font-bold text-white">{item.name}</h3>
                     <p className="text-sm text-gray-400">{item.description}</p>
                   </div>
-                  <div className="text-right">
-                    <span className="text-sm text-dnd-gold">{formatCost(item)}</span>
-                    <p className="text-xs text-gray-500">{item.weight} lb</p>
-                  </div>
+                  <p className="text-xs text-gray-500">{item.weight} lb</p>
                 </div>
               </button>
             ))}

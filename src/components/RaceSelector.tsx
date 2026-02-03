@@ -4,6 +4,7 @@ import { ALL_RACES, RACE_CATEGORIES, getRacesByCategory } from '../data/races'
 import { RaceCard } from './RaceCard'
 import { RaceDetailModal } from './RaceDetailModal'
 import { QuickRefTooltip } from './QuickRefTooltip'
+import { ScrollNavigation } from './ScrollNavigation'
 
 type CategoryKey = keyof typeof RACE_CATEGORIES
 
@@ -429,6 +430,9 @@ export function RaceSelector({ initialRace, onSelect, onBack }: RaceSelectorProp
           onClose={handleCloseModal}
         />
       )}
+
+      {/* Scroll Navigation */}
+      <ScrollNavigation />
     </div>
   )
 }

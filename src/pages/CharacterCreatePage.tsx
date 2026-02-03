@@ -189,6 +189,7 @@ export function CharacterCreatePage() {
           <StatAllocator
             initialScores={currentCharacter?.abilityScores}
             race={currentCharacter?.race}
+            background={currentCharacter?.background}
             onSubmit={handleStatsSubmit}
             onBack={handleBack}
           />

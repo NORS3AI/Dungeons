@@ -428,6 +428,17 @@ export function SpellSelector({
         </div>
       )}
 
+      {/* No spells available message */}
+      {availableCantrips.length === 0 && availableSpells.length === 0 && (
+        <div className="mb-8 p-6 bg-yellow-900/20 rounded-lg border border-yellow-500/30">
+          <p className="text-yellow-400 font-medium mb-2">Spell Selection Unavailable</p>
+          <p className="text-gray-400 text-sm">
+            Spell data for {characterClass.name} is still being added. You can skip this step
+            and come back later, or continue without spells for now.
+          </p>
+        </div>
+      )}
+
       {/* Navigation Buttons */}
       <div className="flex justify-between pt-6 border-t border-gray-700">
         <button
@@ -439,21 +450,35 @@ export function SpellSelector({
         >
           Back
         </button>
-        <button
-          type="button"
-          onClick={handleSubmit}
-          disabled={!isComplete}
-          className={`px-8 py-3 rounded-lg font-semibold transition-all duration-200
-                     focus:outline-none focus:ring-2 focus:ring-dnd-gold focus:ring-offset-2
-                     focus:ring-offset-gray-900
-                     ${
-                       isComplete
-                         ? 'bg-dnd-gold text-gray-900 hover:bg-yellow-500'
-                         : 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                     }`}
-        >
-          Next: Equipment
-        </button>
+
+        <div className="flex gap-3">
+          {/* Skip button - always available */}
+          <button
+            type="button"
+            onClick={() => onSubmit([], [])}
+            className="px-6 py-3 text-gray-300 hover:text-white border border-gray-600
+                     hover:border-gray-500 rounded-lg transition-colors duration-200
+                     focus:outline-none focus:ring-2 focus:ring-gray-500"
+          >
+            Skip for Now
+          </button>
+
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={!isComplete}
+            className={`px-8 py-3 rounded-lg font-semibold transition-all duration-200
+                       focus:outline-none focus:ring-2 focus:ring-dnd-gold focus:ring-offset-2
+                       focus:ring-offset-gray-900
+                       ${
+                         isComplete
+                           ? 'bg-dnd-gold text-gray-900 hover:bg-yellow-500'
+                           : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                       }`}
+          >
+            Next: Equipment
+          </button>
+        </div>
       </div>
     </div>
   )
