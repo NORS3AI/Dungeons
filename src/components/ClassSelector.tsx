@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { Class, Subclass } from '../types'
 import {
-  // Classes
+  // PHB Classes
   FIGHTER,
   WARLOCK,
   ROGUE,
@@ -14,6 +14,11 @@ import {
   PALADIN,
   RANGER,
   SORCERER,
+  // Custom Classes (WoW/Diablo inspired)
+  DEATH_KNIGHT,
+  NECROMANCER,
+  DEMON_HUNTER,
+  AMAZON,
   // Fighter subclasses
   CHAMPION,
   BATTLE_MASTER,
@@ -54,12 +59,34 @@ import {
   // Sorcerer subclasses
   DRACONIC_BLOODLINE,
   WILD_MAGIC,
+  // Death Knight subclasses
+  BLOOD_DEATH_KNIGHT,
+  FROST_DEATH_KNIGHT,
+  UNHOLY_DEATH_KNIGHT,
+  // Necromancer subclasses
+  BONE_NECROMANCER,
+  BLOOD_NECROMANCER,
+  SUMMONER_NECROMANCER,
+  // Demon Hunter subclasses
+  VENGEANCE_DEMON_HUNTER,
+  HAVOC_DEMON_HUNTER,
+  SHADOW_DEMON_HUNTER,
+  // Amazon subclasses
+  JAVELIN_AMAZON,
+  BOW_AMAZON,
+  PASSIVE_MAGIC_AMAZON,
 } from '../types'
 import { ClassCard } from './ClassCard'
 import { QuickRefTooltip } from './QuickRefTooltip'
 
-// Available classes (all 12 PHB classes)
+// Available classes (12 PHB + 4 custom classes)
 const AVAILABLE_CLASSES: Class[] = [
+  // Custom classes (featured at top)
+  AMAZON,
+  DEATH_KNIGHT,
+  DEMON_HUNTER,
+  NECROMANCER,
+  // PHB classes
   BARBARIAN,
   BARD,
   CLERIC,
@@ -76,6 +103,12 @@ const AVAILABLE_CLASSES: Class[] = [
 
 // Available subclasses mapped by parent class ID
 const SUBCLASSES: Record<string, Subclass[]> = {
+  // Custom classes
+  amazon: [JAVELIN_AMAZON, BOW_AMAZON, PASSIVE_MAGIC_AMAZON],
+  'death-knight': [BLOOD_DEATH_KNIGHT, FROST_DEATH_KNIGHT, UNHOLY_DEATH_KNIGHT],
+  'demon-hunter': [VENGEANCE_DEMON_HUNTER, HAVOC_DEMON_HUNTER, SHADOW_DEMON_HUNTER],
+  necromancer: [BONE_NECROMANCER, BLOOD_NECROMANCER, SUMMONER_NECROMANCER],
+  // PHB classes
   barbarian: [PATH_OF_THE_BERSERKER, PATH_OF_THE_TOTEM_WARRIOR],
   bard: [COLLEGE_OF_LORE, COLLEGE_OF_VALOR],
   cleric: [LIFE_DOMAIN, LIGHT_DOMAIN],

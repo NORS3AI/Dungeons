@@ -35,6 +35,9 @@ export interface FightingStyle {
   id: string
   name: string
   description: string
+  weaponChoices?: string[] // For styles like Dual Two-Handed that require weapon selection
+  acPenalty?: number // AC penalty for using this style
+  damageBonuses?: Record<string, string> // Weapon-specific damage bonuses
 }
 
 /**
@@ -162,7 +165,13 @@ export const FIGHTER: Class = {
     { id: 'great-weapon', name: 'Great Weapon Fighting', description: 'Reroll 1s and 2s on damage dice for two-handed weapons.' },
     { id: 'protection', name: 'Protection', description: 'Use reaction to impose disadvantage on attack against adjacent ally.' },
     { id: 'two-weapon', name: 'Two-Weapon Fighting', description: 'Add ability modifier to off-hand attack damage.' },
-    { id: 'dual-two-handed', name: 'Dual Two-Handed', description: 'Wield two two-handed weapons simultaneously (e.g., two greatswords). -4 AC penalty but roll damage for both weapons.' },
+    {
+      id: 'dual-two-handed',
+      name: 'Dual Two-Handed',
+      description: 'Wield two two-handed weapons simultaneously. -4 AC penalty. When you take the Attack action, you attack with both weapons, rolling damage for each. Compatible weapons: Greatsword (2d6+2d6), Greataxe (1d12+1d12), Maul (2d6+2d6), Halberd (1d10+1d10), Glaive (1d10+1d10), Pike (1d10+1d10).',
+      weaponChoices: ['greatsword', 'greataxe', 'maul', 'halberd', 'glaive', 'pike'],
+      acPenalty: -4,
+    },
   ],
   subclassLevel: 3,
   subclassName: 'Martial Archetype',
@@ -2220,5 +2229,987 @@ export const WILD_MAGIC: Subclass = {
       description: 'When you roll damage for a spell and roll the highest number possible on any of the dice, you can roll that die again and add it to the damage.',
       level: 18,
     },
+  ],
+}
+
+// =============================================================================
+// DEATH KNIGHT CLASS (Inspired by World of Warcraft)
+// =============================================================================
+
+export const DEATH_KNIGHT: Class = {
+  id: 'death-knight',
+  name: 'Death Knight',
+  description: 'A fallen champion raised by dark powers, wielding runic magic and commanding the forces of death itself.',
+  hitDie: 'd10',
+  primaryAbility: ['strength', 'constitution'],
+  savingThrows: ['strength', 'charisma'],
+  armorProficiencies: ['light', 'medium', 'heavy', 'shields'],
+  weaponProficiencies: ['simple', 'martial'],
+  toolProficiencies: [],
+  skillChoices: {
+    choose: 2,
+    from: ['athletics', 'intimidation', 'arcana', 'religion', 'perception', 'survival'],
+  },
+  spellcasting: 'third',
+  spellcastingAbility: 'charisma',
+  features: [
+    {
+      id: 'runic-power',
+      name: 'Runic Power',
+      description: 'You have a pool of Runic Power equal to your Death Knight level + CON modifier. Runic Power fuels your death knight abilities and regenerates when you deal damage with weapon attacks.',
+      level: 1,
+    },
+    {
+      id: 'rune-weapon',
+      name: 'Rune Weapon',
+      description: 'You can inscribe a weapon with death runes as a bonus action. The weapon deals an extra 1d6 necrotic damage on hit and counts as magical.',
+      level: 1,
+    },
+    {
+      id: 'death-grip',
+      name: 'Death Grip',
+      description: 'As an action, you extend spectral chains to pull a Large or smaller creature within 30 feet to an unoccupied space within 5 feet of you. STR save or be pulled and have speed reduced to 0 until end of your next turn.',
+      level: 2,
+      charges: { amount: 2, rechargeOn: 'shortRest' },
+    },
+    {
+      id: 'anti-magic-shell',
+      name: 'Anti-Magic Shell',
+      description: 'As a reaction when targeted by a spell, gain resistance to all spell damage and advantage on saves against spells until the start of your next turn.',
+      level: 3,
+      charges: { amount: 1, rechargeOn: 'shortRest' },
+    },
+    {
+      id: 'extra-attack',
+      name: 'Extra Attack',
+      description: 'You can attack twice when you take the Attack action on your turn.',
+      level: 5,
+    },
+    {
+      id: 'dark-command',
+      name: 'Dark Command',
+      description: 'As a bonus action, you force a creature within 30 feet to make a WIS save or be compelled to attack only you for 1 minute.',
+      level: 6,
+      charges: { amount: 'proficiencyBonus', rechargeOn: 'longRest' },
+    },
+    {
+      id: 'lichborne',
+      name: 'Lichborne',
+      description: 'You become immune to charm and fear effects. Additionally, you can spend 10 Runic Power to heal yourself for 2d10 + CON modifier hit points.',
+      level: 7,
+    },
+    {
+      id: 'death-and-decay',
+      name: 'Death and Decay',
+      description: 'As an action, you corrupt a 20-foot radius area for 1 minute. Creatures starting their turn in the area take 3d6 necrotic damage and have their speed halved.',
+      level: 9,
+      charges: { amount: 1, rechargeOn: 'longRest' },
+    },
+    {
+      id: 'improved-runic-power',
+      name: 'Improved Runic Power',
+      description: 'Your Runic Power maximum increases by your proficiency bonus. You regain Runic Power equal to half the damage you deal with weapon attacks.',
+      level: 11,
+    },
+    {
+      id: 'army-of-the-dead',
+      name: 'Army of the Dead',
+      description: 'As an action, you raise 8 ghouls from corpses or shadows within 60 feet. They last for 1 minute and obey your commands.',
+      level: 14,
+      charges: { amount: 1, rechargeOn: 'longRest' },
+    },
+    {
+      id: 'purgatory',
+      name: 'Purgatory',
+      description: 'When you would be reduced to 0 HP, you instead drop to 1 HP and gain temporary HP equal to twice your Death Knight level. You must heal above 1 HP within 3 rounds or die.',
+      level: 18,
+      charges: { amount: 1, rechargeOn: 'longRest' },
+    },
+    {
+      id: 'apocalypse',
+      name: 'Apocalypse',
+      description: 'As an action, you unleash a wave of death energy. All creatures in a 60-foot cone take 10d10 necrotic damage (CON save for half). Creatures killed rise as undead under your control.',
+      level: 20,
+      charges: { amount: 1, rechargeOn: 'longRest' },
+    },
+  ],
+  subclassLevel: 3,
+  subclassName: 'Death Knight Specialization',
+}
+
+export const BLOOD_DEATH_KNIGHT: Subclass = {
+  id: 'blood',
+  name: 'Blood',
+  description: 'Blood Death Knights are vampiric tanks who sustain themselves by draining the life force of their enemies.',
+  parentClassId: 'death-knight',
+  features: [
+    {
+      id: 'blood-boil',
+      name: 'Blood Boil',
+      description: 'As an action, you cause blood to erupt from all creatures within 10 feet. They take 2d8 necrotic damage and you heal for half the total damage dealt.',
+      level: 3,
+      charges: { amount: 'proficiencyBonus', rechargeOn: 'shortRest' },
+    },
+    {
+      id: 'vampiric-blood',
+      name: 'Vampiric Blood',
+      description: 'As a bonus action, increase your maximum HP by 30% and healing received by 30% for 1 minute.',
+      level: 3,
+      charges: { amount: 1, rechargeOn: 'shortRest' },
+    },
+    {
+      id: 'heart-strike',
+      name: 'Heart Strike',
+      description: 'When you hit with a melee weapon attack, you can deal an extra 2d6 necrotic damage and heal for the extra damage dealt.',
+      level: 7,
+    },
+    {
+      id: 'blood-shield',
+      name: 'Blood Shield',
+      description: 'When you use Death Strike or Heart Strike, you gain a shield equal to 25% of the damage dealt that lasts until the start of your next turn.',
+      level: 10,
+    },
+    {
+      id: 'dancing-rune-weapon',
+      name: 'Dancing Rune Weapon',
+      description: 'As a bonus action, summon a spectral weapon that copies your attacks for 1 minute, effectively doubling your weapon damage.',
+      level: 14,
+      charges: { amount: 1, rechargeOn: 'longRest' },
+    },
+  ],
+  expandedSpells: [
+    { level: 1, spells: ['blood-boil', 'death-coil'] },
+    { level: 2, spells: ['vampiric-embrace', 'bone-shield'] },
+    { level: 3, spells: ['death-strike', 'marrowrend'] },
+    { level: 4, spells: ['consumption', 'blood-mirror'] },
+    { level: 5, spells: ['bonestorm', 'tombstone'] },
+  ],
+}
+
+export const FROST_DEATH_KNIGHT: Subclass = {
+  id: 'frost',
+  name: 'Frost',
+  description: 'Frost Death Knights wield the power of the frozen wastes, dealing devastating cold damage with dual weapons.',
+  parentClassId: 'death-knight',
+  features: [
+    {
+      id: 'frost-strike',
+      name: 'Frost Strike',
+      description: 'When you hit with a melee weapon attack, you can spend 5 Runic Power to deal an extra 2d8 cold damage and reduce the target\'s speed by 10 feet until the end of your next turn.',
+      level: 3,
+    },
+    {
+      id: 'killing-machine',
+      name: 'Killing Machine',
+      description: 'Your weapon attacks score a critical hit on a roll of 19 or 20. Critical hits with cold damage also freeze the target (restrained) until the end of your next turn.',
+      level: 3,
+    },
+    {
+      id: 'remorseless-winter',
+      name: 'Remorseless Winter',
+      description: 'As an action, you emit a freezing aura for 1 minute. Creatures within 10 feet take 2d6 cold damage at the start of your turn and have their speed reduced by 10 feet.',
+      level: 7,
+      charges: { amount: 1, rechargeOn: 'shortRest' },
+    },
+    {
+      id: 'obliterate',
+      name: 'Obliterate',
+      description: 'Once per turn when you hit with a two-handed weapon, you deal an extra 3d10 cold damage and the target must succeed on a CON save or be stunned until the end of your next turn.',
+      level: 10,
+    },
+    {
+      id: 'breath-of-sindragosa',
+      name: 'Breath of Sindragosa',
+      description: 'As an action, you breathe a 60-foot cone of frost. Creatures in the area take 8d8 cold damage (CON save for half) and are frozen solid (petrified) on a failed save for 1 minute.',
+      level: 14,
+      charges: { amount: 1, rechargeOn: 'longRest' },
+    },
+  ],
+  expandedSpells: [
+    { level: 1, spells: ['frost-strike', 'howling-blast'] },
+    { level: 2, spells: ['chains-of-ice', 'pillar-of-frost'] },
+    { level: 3, spells: ['glacial-advance', 'frostwyrms-fury'] },
+    { level: 4, spells: ['chill-streak', 'cold-heart'] },
+    { level: 5, spells: ['obliteration', 'absolute-zero'] },
+  ],
+}
+
+export const UNHOLY_DEATH_KNIGHT: Subclass = {
+  id: 'unholy',
+  name: 'Unholy',
+  description: 'Unholy Death Knights spread disease and pestilence while commanding an army of undead minions.',
+  parentClassId: 'death-knight',
+  features: [
+    {
+      id: 'raise-dead',
+      name: 'Raise Dead',
+      description: 'You permanently have an undead ghoul companion. If it dies, you can raise another from a corpse during a short rest. The ghoul gains HP equal to 4x your Death Knight level.',
+      level: 3,
+    },
+    {
+      id: 'festering-wound',
+      name: 'Festering Wound',
+      description: 'Your weapon attacks apply Festering Wounds (max 6). When you deal damage to a wounded target, you can burst all wounds dealing 1d6 necrotic damage per wound.',
+      level: 3,
+    },
+    {
+      id: 'outbreak',
+      name: 'Outbreak',
+      description: 'As an action, you infect all creatures in a 30-foot radius with Virulent Plague. Infected creatures take 1d8 necrotic damage at the start of each turn for 1 minute and spread the disease to adjacent creatures.',
+      level: 7,
+      charges: { amount: 2, rechargeOn: 'shortRest' },
+    },
+    {
+      id: 'dark-transformation',
+      name: 'Dark Transformation',
+      description: 'As a bonus action, empower your ghoul for 1 minute. It gains +4 to attack and damage rolls, its attacks deal extra 2d6 necrotic damage, and it can attack twice per turn.',
+      level: 10,
+      charges: { amount: 1, rechargeOn: 'shortRest' },
+    },
+    {
+      id: 'summon-gargoyle',
+      name: 'Summon Gargoyle',
+      description: 'As an action, summon a gargoyle for 1 minute. It has a flying speed of 60 feet and attacks with 3d8 necrotic blasts each turn.',
+      level: 14,
+      charges: { amount: 1, rechargeOn: 'longRest' },
+    },
+  ],
+  expandedSpells: [
+    { level: 1, spells: ['death-coil', 'plague-strike'] },
+    { level: 2, spells: ['outbreak', 'epidemic'] },
+    { level: 3, spells: ['scourge-strike', 'festering-strike'] },
+    { level: 4, spells: ['apocalypse', 'dark-transformation'] },
+    { level: 5, spells: ['army-of-the-dead', 'unholy-frenzy'] },
+  ],
+}
+
+// =============================================================================
+// NECROMANCER CLASS (Inspired by Diablo series)
+// =============================================================================
+
+export const NECROMANCER: Class = {
+  id: 'necromancer',
+  name: 'Necromancer',
+  description: 'A master of the dark arts who commands undead minions, manipulates bones and blood, and wields devastating curse magic.',
+  hitDie: 'd6',
+  primaryAbility: ['intelligence'],
+  savingThrows: ['intelligence', 'wisdom'],
+  armorProficiencies: ['light'],
+  weaponProficiencies: ['dagger', 'dart', 'sling', 'quarterstaff', 'scythe'],
+  toolProficiencies: [],
+  skillChoices: {
+    choose: 2,
+    from: ['arcana', 'history', 'insight', 'intimidation', 'medicine', 'religion'],
+  },
+  spellcasting: 'full',
+  spellcastingAbility: 'intelligence',
+  cantripsKnown: [3, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
+  spellsKnown: [4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 15, 16, 18, 19, 19, 20, 22, 22, 22],
+  features: [
+    {
+      id: 'essence',
+      name: 'Essence',
+      description: 'You have Essence equal to 10 + your Necromancer level. Essence is consumed by abilities and regenerates when your minions deal damage or when creatures die near you.',
+      level: 1,
+    },
+    {
+      id: 'raise-skeleton',
+      name: 'Raise Skeleton',
+      description: 'You can maintain a number of skeleton warriors equal to your INT modifier (minimum 1). Skeletons have HP equal to 3x your Necromancer level and attack with your spell attack bonus.',
+      level: 1,
+    },
+    {
+      id: 'corpse-explosion',
+      name: 'Corpse Explosion',
+      description: 'As an action, you detonate a corpse within 60 feet. All creatures within 10 feet take 3d8 + INT modifier necrotic damage (DEX save for half).',
+      level: 2,
+    },
+    {
+      id: 'bone-armor',
+      name: 'Bone Armor',
+      description: 'As a bonus action, surround yourself with bones that grant temporary HP equal to 2d8 + INT modifier and +2 AC for 1 hour.',
+      level: 3,
+      charges: { amount: 2, rechargeOn: 'shortRest' },
+    },
+    {
+      id: 'command-undead',
+      name: 'Command Undead',
+      description: 'You can take control of an undead creature (CHA save). If it fails, it obeys your commands for 24 hours or until you use this feature again.',
+      level: 5,
+    },
+    {
+      id: 'life-from-death',
+      name: 'Life From Death',
+      description: 'When a creature dies within 30 feet, you regain HP equal to your INT modifier + Necromancer level.',
+      level: 6,
+    },
+    {
+      id: 'skeleton-mage',
+      name: 'Skeleton Mage',
+      description: 'You can raise Skeleton Mages (max 2) that cast Bone Spear dealing 2d10 + INT modifier necrotic damage each turn.',
+      level: 7,
+    },
+    {
+      id: 'blood-nova',
+      name: 'Blood Nova',
+      description: 'As an action, sacrifice 20 HP to deal 6d6 necrotic damage to all creatures within 20 feet and heal for half the total damage dealt.',
+      level: 9,
+    },
+    {
+      id: 'golem',
+      name: 'Summon Golem',
+      description: 'You can summon a Bone, Blood, or Flesh Golem. The golem has HP equal to 5x your Necromancer level and attacks with powerful slam attacks.',
+      level: 11,
+      charges: { amount: 1, rechargeOn: 'longRest' },
+    },
+    {
+      id: 'death-nova',
+      name: 'Death Nova',
+      description: 'As an action, emit a 30-foot radius burst of death energy. All creatures take 8d8 necrotic damage (CON save for half) and must save or be poisoned for 1 minute.',
+      level: 14,
+      charges: { amount: 1, rechargeOn: 'longRest' },
+    },
+    {
+      id: 'land-of-the-dead',
+      name: 'Land of the Dead',
+      description: 'As an action, create a 60-foot radius zone for 1 minute. Corpses constantly generate, you can use Corpse Explosion unlimited times, and all your minions gain +4 to attack and damage.',
+      level: 18,
+      charges: { amount: 1, rechargeOn: 'longRest' },
+    },
+    {
+      id: 'avatar-of-death',
+      name: 'Avatar of Death',
+      description: 'As an action, transform into an Avatar of Death for 1 minute. Gain +50 temporary HP, your spells deal maximum damage, and creatures that die within 60 feet automatically rise as skeletons.',
+      level: 20,
+      charges: { amount: 1, rechargeOn: 'longRest' },
+    },
+  ],
+  subclassLevel: 2,
+  subclassName: 'Dark Path',
+}
+
+export const BONE_NECROMANCER: Subclass = {
+  id: 'bone',
+  name: 'Path of Bone',
+  description: 'Bone Necromancers focus on offensive bone magic, hurling spears of bone and creating walls of skeletal remains.',
+  parentClassId: 'necromancer',
+  features: [
+    {
+      id: 'bone-spear',
+      name: 'Bone Spear',
+      description: 'As an action, launch a piercing bone spear in a 60-foot line. All creatures in the line take 3d10 + INT modifier piercing damage (DEX save for half).',
+      level: 2,
+    },
+    {
+      id: 'bone-spirit',
+      name: 'Bone Spirit',
+      description: 'As an action, release a bone spirit that homes in on a target within 120 feet, dealing 6d10 necrotic damage on hit. The spirit has +10 to hit.',
+      level: 2,
+      charges: { amount: 'proficiencyBonus', rechargeOn: 'longRest' },
+    },
+    {
+      id: 'bone-prison',
+      name: 'Bone Prison',
+      description: 'As an action, trap a creature in a bone prison (STR save). The prison has AC 15 and HP equal to 5x your Necromancer level.',
+      level: 6,
+      charges: { amount: 2, rechargeOn: 'shortRest' },
+    },
+    {
+      id: 'bone-storm',
+      name: 'Bone Storm',
+      description: 'As an action, surround yourself with swirling bones for 1 minute. You gain +4 AC and creatures within 10 feet take 3d6 piercing damage at the start of your turn.',
+      level: 10,
+      charges: { amount: 1, rechargeOn: 'shortRest' },
+    },
+    {
+      id: 'ossuary',
+      name: 'Ossuary',
+      description: 'Your maximum Essence increases by 50. Your Bone Spear and Bone Spirit deal double damage to creatures below half HP.',
+      level: 14,
+    },
+  ],
+  expandedSpells: [
+    { level: 1, spells: ['bone-spike', 'teeth'] },
+    { level: 2, spells: ['bone-spear', 'bone-wall'] },
+    { level: 3, spells: ['bone-spirit', 'bone-prison'] },
+    { level: 4, spells: ['bone-storm', 'skeletal-hands'] },
+    { level: 5, spells: ['ossuary', 'iron-maiden'] },
+  ],
+}
+
+export const BLOOD_NECROMANCER: Subclass = {
+  id: 'blood-necro',
+  name: 'Path of Blood',
+  description: 'Blood Necromancers sacrifice their own vitality for power, healing through damage dealt and cursing their enemies.',
+  parentClassId: 'necromancer',
+  features: [
+    {
+      id: 'blood-surge',
+      name: 'Blood Surge',
+      description: 'You can sacrifice HP to cast spells without using spell slots. Sacrifice HP equal to 5x the spell level to cast a necromancer spell you know.',
+      level: 2,
+    },
+    {
+      id: 'siphon-blood',
+      name: 'Siphon Blood',
+      description: 'As an action, drain a creature within 60 feet. They take 3d8 necrotic damage and you heal for the damage dealt.',
+      level: 2,
+    },
+    {
+      id: 'blood-rush',
+      name: 'Blood Rush',
+      description: 'When you deal necrotic damage, gain temporary HP equal to half the damage dealt.',
+      level: 6,
+    },
+    {
+      id: 'transfusion',
+      name: 'Transfusion',
+      description: 'As a bonus action, sacrifice up to 30 HP to heal an ally within 60 feet for twice the HP sacrificed.',
+      level: 10,
+    },
+    {
+      id: 'hemorrhage',
+      name: 'Hemorrhage',
+      description: 'Your necrotic damage causes bleeding. Damaged creatures take 2d6 necrotic damage at the start of each of their turns for 1 minute (CON save ends).',
+      level: 14,
+    },
+  ],
+  expandedSpells: [
+    { level: 1, spells: ['blood-surge', 'blood-golem'] },
+    { level: 2, spells: ['siphon-blood', 'blood-wave'] },
+    { level: 3, spells: ['blood-lance', 'transfusion'] },
+    { level: 4, spells: ['hemorrhage', 'blood-bath'] },
+    { level: 5, spells: ['exsanguinate', 'blood-nova'] },
+  ],
+}
+
+export const SUMMONER_NECROMANCER: Subclass = {
+  id: 'summoner',
+  name: 'Path of the Summoner',
+  description: 'Summoner Necromancers focus on raising and empowering an army of undead servants.',
+  parentClassId: 'necromancer',
+  features: [
+    {
+      id: 'skeleton-mastery',
+      name: 'Skeleton Mastery',
+      description: 'You can raise additional skeletons equal to your proficiency bonus. Your skeletons gain +2 to attack and damage rolls.',
+      level: 2,
+    },
+    {
+      id: 'revive',
+      name: 'Revive',
+      description: 'As an action, revive a recently slain creature as an undead under your control for 1 hour. It retains its abilities but has the undead type.',
+      level: 2,
+      charges: { amount: 1, rechargeOn: 'longRest' },
+    },
+    {
+      id: 'commanders-presence',
+      name: 'Commander\'s Presence',
+      description: 'Your undead minions gain +10 HP and deal +1d6 necrotic damage on their attacks.',
+      level: 6,
+    },
+    {
+      id: 'army-master',
+      name: 'Army Master',
+      description: 'You can command all your minions to attack as a bonus action. Additionally, you can have up to 4 Skeleton Mages.',
+      level: 10,
+    },
+    {
+      id: 'death-lord',
+      name: 'Death Lord',
+      description: 'Your Golem gains +30 HP and an extra attack. When your minions kill a creature, you regain Essence equal to the creature\'s CR.',
+      level: 14,
+    },
+  ],
+  expandedSpells: [
+    { level: 1, spells: ['raise-skeleton', 'skeleton-warrior'] },
+    { level: 2, spells: ['skeleton-mage', 'command-skeleton'] },
+    { level: 3, spells: ['revive', 'bone-golem'] },
+    { level: 4, spells: ['flesh-golem', 'army-of-bones'] },
+    { level: 5, spells: ['death-lord', 'legion-of-the-dead'] },
+  ],
+}
+
+// =============================================================================
+// DEMON HUNTER CLASS (Inspired by WoW and Diablo)
+// =============================================================================
+
+export const DEMON_HUNTER: Class = {
+  id: 'demon-hunter',
+  name: 'Demon Hunter',
+  description: 'A relentless slayer who has sacrificed part of their humanity to gain demonic powers, hunting fiends with supernatural abilities.',
+  hitDie: 'd10',
+  primaryAbility: ['dexterity'],
+  savingThrows: ['dexterity', 'charisma'],
+  armorProficiencies: ['light', 'medium'],
+  weaponProficiencies: ['simple', 'martial', 'hand-crossbow'],
+  toolProficiencies: [],
+  skillChoices: {
+    choose: 3,
+    from: ['acrobatics', 'athletics', 'insight', 'intimidation', 'investigation', 'perception', 'stealth', 'survival'],
+  },
+  spellcasting: 'half',
+  spellcastingAbility: 'charisma',
+  features: [
+    {
+      id: 'hatred-discipline',
+      name: 'Hatred and Discipline',
+      description: 'You have two resources: Hatred (10 + DEX mod, regenerates 1/round) for offensive abilities and Discipline (10 + WIS mod, regenerates on short rest) for defensive abilities.',
+      level: 1,
+    },
+    {
+      id: 'spectral-sight',
+      name: 'Spectral Sight',
+      description: 'You can see invisible creatures and detect demons, undead, and magical auras within 60 feet. This vision penetrates most barriers.',
+      level: 1,
+    },
+    {
+      id: 'demon-mark',
+      name: 'Demon Mark',
+      description: 'As a bonus action, mark a creature. You deal +1d6 damage to marked targets, and they cannot hide from you. The mark lasts 1 hour or until the creature dies.',
+      level: 2,
+    },
+    {
+      id: 'fel-rush',
+      name: 'Fel Rush',
+      description: 'As a bonus action, dash up to 30 feet in a line, dealing 2d8 fire damage to creatures you pass through.',
+      level: 3,
+      charges: { amount: 2, rechargeOn: 'shortRest' },
+    },
+    {
+      id: 'extra-attack',
+      name: 'Extra Attack',
+      description: 'You can attack twice when you take the Attack action on your turn.',
+      level: 5,
+    },
+    {
+      id: 'blade-dance',
+      name: 'Blade Dance',
+      description: 'As an action, spin in a whirlwind of blades. All creatures within 10 feet take 4d6 slashing + 2d6 fire damage.',
+      level: 6,
+      charges: { amount: 2, rechargeOn: 'shortRest' },
+    },
+    {
+      id: 'immolation-aura',
+      name: 'Immolation Aura',
+      description: 'As a bonus action, wreathe yourself in fire for 1 minute. You deal 1d8 fire damage to creatures that start their turn within 5 feet.',
+      level: 7,
+    },
+    {
+      id: 'metamorphosis',
+      name: 'Metamorphosis',
+      description: 'As an action, transform into a demon for 1 minute. Gain +2 AC, your attacks deal extra 2d6 fire damage, and you gain a flying speed of 60 feet.',
+      level: 9,
+      charges: { amount: 1, rechargeOn: 'longRest' },
+    },
+    {
+      id: 'chaos-strike',
+      name: 'Chaos Strike',
+      description: 'Your critical hits deal an additional 3d8 chaos damage (half fire, half necrotic) and heal you for the extra damage dealt.',
+      level: 11,
+    },
+    {
+      id: 'soul-rend',
+      name: 'Soul Rend',
+      description: 'When you kill a creature with Demon Mark, absorb its soul to heal 2d10 + CHA modifier HP and gain +10 temporary HP.',
+      level: 14,
+    },
+    {
+      id: 'demonic-appetite',
+      name: 'Demonic Appetite',
+      description: 'Your Metamorphosis duration increases to 10 minutes. While transformed, you score critical hits on 18-20.',
+      level: 18,
+    },
+    {
+      id: 'the-hunt',
+      name: 'The Hunt',
+      description: 'As an action, you teleport up to 120 feet to a creature you can see, dealing 10d10 fire damage on arrival. The target is stunned until the end of your next turn.',
+      level: 20,
+      charges: { amount: 1, rechargeOn: 'longRest' },
+    },
+  ],
+  fightingStyles: [
+    { id: 'dual-wield', name: 'Dual Wield', description: 'You can dual wield any one-handed weapons, even if they aren\'t light. Add DEX to both attacks.' },
+    { id: 'thrown-glaives', name: 'Thrown Glaives', description: '+2 damage with thrown weapons. Your thrown weapons return to you.' },
+  ],
+  subclassLevel: 3,
+  subclassName: 'Demon Hunter Specialization',
+}
+
+export const VENGEANCE_DEMON_HUNTER: Subclass = {
+  id: 'vengeance',
+  name: 'Vengeance',
+  description: 'Vengeance Demon Hunters are tanks who turn their demonic power into shields and barriers.',
+  parentClassId: 'demon-hunter',
+  features: [
+    {
+      id: 'demon-spikes',
+      name: 'Demon Spikes',
+      description: 'As a bonus action, gain +4 AC and deal 1d8 fire damage to attackers who hit you in melee for 1 minute.',
+      level: 3,
+      charges: { amount: 2, rechargeOn: 'shortRest' },
+    },
+    {
+      id: 'infernal-strike',
+      name: 'Infernal Strike',
+      description: 'As an action, leap up to 40 feet and slam down, dealing 4d6 fire damage in a 10-foot radius.',
+      level: 3,
+      charges: { amount: 2, rechargeOn: 'shortRest' },
+    },
+    {
+      id: 'soul-cleave',
+      name: 'Soul Cleave',
+      description: 'As an action, cleave all enemies within 10 feet for 3d8 fire damage and heal for half the damage dealt.',
+      level: 7,
+    },
+    {
+      id: 'fiery-brand',
+      name: 'Fiery Brand',
+      description: 'As an action, brand a creature for 1 minute. Their damage against you is reduced by half, and they take 2d6 fire damage at the start of each turn.',
+      level: 11,
+      charges: { amount: 1, rechargeOn: 'shortRest' },
+    },
+    {
+      id: 'fel-devastation',
+      name: 'Fel Devastation',
+      description: 'As an action, channel fel energy in a 40-foot cone for 6d8 fire damage and heal for half the total damage dealt.',
+      level: 15,
+      charges: { amount: 1, rechargeOn: 'longRest' },
+    },
+  ],
+}
+
+export const HAVOC_DEMON_HUNTER: Subclass = {
+  id: 'havoc',
+  name: 'Havoc',
+  description: 'Havoc Demon Hunters are swift melee combatants who dance through battle dealing devastating damage.',
+  parentClassId: 'demon-hunter',
+  features: [
+    {
+      id: 'eye-beam',
+      name: 'Eye Beam',
+      description: 'As an action, fire a beam of fel energy in a 40-foot line, dealing 6d6 fire damage to all creatures (DEX save for half).',
+      level: 3,
+      charges: { amount: 2, rechargeOn: 'shortRest' },
+    },
+    {
+      id: 'momentum',
+      name: 'Momentum',
+      description: 'After using Fel Rush or Blade Dance, your next attack deals +2d6 damage.',
+      level: 3,
+    },
+    {
+      id: 'death-sweep',
+      name: 'Death Sweep',
+      description: 'While in Metamorphosis, your Blade Dance becomes Death Sweep, dealing 6d6 + 4d6 fire damage.',
+      level: 7,
+    },
+    {
+      id: 'furious-gaze',
+      name: 'Furious Gaze',
+      description: 'After using Eye Beam, gain an extra attack for 1 round.',
+      level: 11,
+    },
+    {
+      id: 'demonic',
+      name: 'Demonic',
+      description: 'Eye Beam triggers a 5-round Metamorphosis. Your Metamorphosis now grants +4 AC instead of +2.',
+      level: 15,
+    },
+  ],
+}
+
+export const SHADOW_DEMON_HUNTER: Subclass = {
+  id: 'shadow-dh',
+  name: 'Shadow',
+  description: 'Shadow Demon Hunters blend demonic power with stealth and ranged attacks, inspired by the Diablo Demon Hunter.',
+  parentClassId: 'demon-hunter',
+  features: [
+    {
+      id: 'shadow-power',
+      name: 'Shadow Power',
+      description: 'As a bonus action, enter a shadowy state for 1 minute. You gain advantage on Stealth checks and deal +1d6 necrotic damage on attacks.',
+      level: 3,
+      charges: { amount: 2, rechargeOn: 'shortRest' },
+    },
+    {
+      id: 'multishot',
+      name: 'Multishot',
+      description: 'As an action, fire arrows at all creatures in a 30-foot cone. Each creature takes 3d6 piercing damage (DEX save for half).',
+      level: 3,
+    },
+    {
+      id: 'caltrops',
+      name: 'Caltrops',
+      description: 'As a bonus action, scatter caltrops in a 20-foot area. Creatures entering the area take 2d4 piercing damage and must make a DEX save or have their speed reduced to 0.',
+      level: 7,
+      charges: { amount: 3, rechargeOn: 'shortRest' },
+    },
+    {
+      id: 'rain-of-vengeance',
+      name: 'Rain of Vengeance',
+      description: 'As an action, call down a storm of arrows in a 40-foot radius, dealing 8d6 piercing damage to all creatures (DEX save for half).',
+      level: 11,
+      charges: { amount: 1, rechargeOn: 'longRest' },
+    },
+    {
+      id: 'vengeance-incarnate',
+      name: 'Vengeance Incarnate',
+      description: 'While in Shadow Power, you can teleport 30 feet as a bonus action and your attacks ignore resistance to necrotic and piercing damage.',
+      level: 15,
+    },
+  ],
+}
+
+// =============================================================================
+// AMAZON CLASS (Inspired by Diablo 2)
+// =============================================================================
+
+export const AMAZON: Class = {
+  id: 'amazon',
+  name: 'Amazon',
+  description: 'A warrior from the Skovos Isles, master of javelin, bow, and spear combat enhanced by elemental and divine magic.',
+  hitDie: 'd10',
+  primaryAbility: ['dexterity', 'strength'],
+  savingThrows: ['dexterity', 'wisdom'],
+  armorProficiencies: ['light', 'medium', 'shields'],
+  weaponProficiencies: ['simple', 'martial', 'javelin', 'spear', 'bow', 'crossbow'],
+  toolProficiencies: [],
+  skillChoices: {
+    choose: 3,
+    from: ['acrobatics', 'athletics', 'insight', 'intimidation', 'nature', 'perception', 'stealth', 'survival'],
+  },
+  spellcasting: 'half',
+  spellcastingAbility: 'wisdom',
+  features: [
+    {
+      id: 'inner-sight',
+      name: 'Inner Sight',
+      description: 'As a bonus action, mark all creatures in a 30-foot radius. Marked creatures cannot benefit from invisibility, cover, or hiding for 1 minute.',
+      level: 1,
+      charges: { amount: 'proficiencyBonus', rechargeOn: 'shortRest' },
+    },
+    {
+      id: 'critical-strike',
+      name: 'Critical Strike',
+      description: 'Your weapon attacks score a critical hit on a roll of 19-20. Your critical hits deal an extra 1d6 damage.',
+      level: 1,
+    },
+    {
+      id: 'dodge',
+      name: 'Dodge',
+      description: 'When a creature attacks you, you can use your reaction to impose disadvantage on the attack roll. You can use this a number of times equal to your DEX modifier.',
+      level: 2,
+      charges: { amount: 'abilityModifier', abilityModifier: 'dexterity', rechargeOn: 'shortRest' },
+    },
+    {
+      id: 'penetrate',
+      name: 'Penetrate',
+      description: 'Your ranged attacks ignore half cover and three-quarters cover. Your ammunition passes through creatures, potentially hitting multiple targets in a line.',
+      level: 3,
+    },
+    {
+      id: 'extra-attack',
+      name: 'Extra Attack',
+      description: 'You can attack twice when you take the Attack action on your turn.',
+      level: 5,
+    },
+    {
+      id: 'slow-missiles',
+      name: 'Slow Missiles',
+      description: 'As a reaction, reduce incoming ranged attack damage by 2d10 + DEX modifier. If reduced to 0, you catch the projectile.',
+      level: 6,
+    },
+    {
+      id: 'avoid',
+      name: 'Avoid',
+      description: 'When you succeed on a DEX saving throw against an effect that deals damage, you take no damage. On a failure, you take half damage.',
+      level: 7,
+    },
+    {
+      id: 'evade',
+      name: 'Evade',
+      description: 'You can Disengage or Dash as a bonus action. Additionally, opportunity attacks against you have disadvantage.',
+      level: 9,
+    },
+    {
+      id: 'valkyrie',
+      name: 'Summon Valkyrie',
+      description: 'As an action, summon a Valkyrie spirit warrior for 1 hour. The Valkyrie has HP equal to 4x your Amazon level and fights alongside you.',
+      level: 11,
+      charges: { amount: 1, rechargeOn: 'longRest' },
+    },
+    {
+      id: 'pierce',
+      name: 'Pierce',
+      description: 'Your ranged attacks can hit up to 3 creatures in a line. Roll damage for each target hit.',
+      level: 14,
+    },
+    {
+      id: 'fend',
+      name: 'Fend',
+      description: 'When you hit a creature with a melee weapon, you can make additional attacks against other creatures within reach (up to your DEX modifier additional attacks).',
+      level: 18,
+    },
+    {
+      id: 'avatar-of-athena',
+      name: 'Avatar of Athena',
+      description: 'As an action, become an avatar of divine warfare for 1 minute. Gain +4 to attack rolls, +10 to damage, and immunity to fear and charm.',
+      level: 20,
+      charges: { amount: 1, rechargeOn: 'longRest' },
+    },
+  ],
+  fightingStyles: [
+    { id: 'archery', name: 'Archery', description: '+2 bonus to attack rolls with ranged weapons.' },
+    { id: 'thrown-weapon', name: 'Thrown Weapon Fighting', description: '+2 damage with thrown weapons. Draw thrown weapons as part of the attack.' },
+    { id: 'spear-fighting', name: 'Spear Fighting', description: '+1 to attack and damage with spears and javelins. You can use them one-handed with a shield.' },
+  ],
+  subclassLevel: 3,
+  subclassName: 'Amazon Path',
+}
+
+export const JAVELIN_AMAZON: Subclass = {
+  id: 'javelin',
+  name: 'Javelin and Spear',
+  description: 'Masters of thrown weapons and spear combat, channeling lightning through their javelins.',
+  parentClassId: 'amazon',
+  features: [
+    {
+      id: 'jab',
+      name: 'Jab',
+      description: 'When you hit with a spear or javelin, you can make a second attack against the same target as a bonus action.',
+      level: 3,
+    },
+    {
+      id: 'power-strike',
+      name: 'Power Strike',
+      description: 'Once per turn, add 2d6 lightning damage to a javelin or spear attack. The target must make a CON save or be stunned until the end of your next turn.',
+      level: 3,
+    },
+    {
+      id: 'lightning-bolt',
+      name: 'Lightning Bolt',
+      description: 'As an action, throw a javelin that transforms into a 100-foot line of lightning dealing 6d6 lightning damage (DEX save for half).',
+      level: 7,
+      charges: { amount: 2, rechargeOn: 'shortRest' },
+    },
+    {
+      id: 'charged-strike',
+      name: 'Charged Strike',
+      description: 'Your Power Strike damage increases to 4d6. Stunned targets take double damage from your next attack.',
+      level: 11,
+    },
+    {
+      id: 'lightning-fury',
+      name: 'Lightning Fury',
+      description: 'When your Lightning Bolt hits, it releases lightning bolts to all creatures within 20 feet of the line, dealing 3d6 lightning damage each.',
+      level: 15,
+    },
+  ],
+  expandedSpells: [
+    { level: 1, spells: ['power-strike', 'jab'] },
+    { level: 2, spells: ['charged-strike', 'fend'] },
+    { level: 3, spells: ['lightning-bolt', 'lightning-strike'] },
+    { level: 4, spells: ['lightning-fury', 'plague-javelin'] },
+    { level: 5, spells: ['titan-strike', 'thunderstorm'] },
+  ],
+}
+
+export const BOW_AMAZON: Subclass = {
+  id: 'bow',
+  name: 'Bow and Crossbow',
+  description: 'Expert archers who infuse their arrows with magical and elemental power.',
+  parentClassId: 'amazon',
+  features: [
+    {
+      id: 'magic-arrow',
+      name: 'Magic Arrow',
+      description: 'Your ranged attacks deal +1d6 force damage and count as magical. You never run out of ammunition.',
+      level: 3,
+    },
+    {
+      id: 'multiple-shot',
+      name: 'Multiple Shot',
+      description: 'As an action, fire arrows at up to 5 creatures within 30 feet of a point you can see. Make a ranged attack against each target.',
+      level: 3,
+      charges: { amount: 2, rechargeOn: 'shortRest' },
+    },
+    {
+      id: 'immolation-arrow',
+      name: 'Immolation Arrow',
+      description: 'As an action, fire an arrow that explodes on impact. The target and all creatures within 15 feet take 4d6 fire damage (DEX save for half). The area burns for 1 minute.',
+      level: 7,
+      charges: { amount: 2, rechargeOn: 'shortRest' },
+    },
+    {
+      id: 'guided-arrow',
+      name: 'Guided Arrow',
+      description: 'As an action, fire an arrow that automatically hits a target within 120 feet (no attack roll), dealing normal damage plus 3d6 force damage.',
+      level: 11,
+      charges: { amount: 2, rechargeOn: 'shortRest' },
+    },
+    {
+      id: 'strafe',
+      name: 'Strafe',
+      description: 'As an action, move up to your speed and fire an arrow at each creature you pass. You can fire up to 10 arrows this way.',
+      level: 15,
+      charges: { amount: 1, rechargeOn: 'shortRest' },
+    },
+  ],
+  expandedSpells: [
+    { level: 1, spells: ['magic-arrow', 'fire-arrow'] },
+    { level: 2, spells: ['cold-arrow', 'exploding-arrow'] },
+    { level: 3, spells: ['immolation-arrow', 'multiple-shot'] },
+    { level: 4, spells: ['guided-arrow', 'freezing-arrow'] },
+    { level: 5, spells: ['strafe', 'arrow-storm'] },
+  ],
+}
+
+export const PASSIVE_MAGIC_AMAZON: Subclass = {
+  id: 'passive-magic',
+  name: 'Passive and Magic',
+  description: 'Amazons who focus on defensive abilities, evasion, and summoning their Valkyrie companion.',
+  parentClassId: 'amazon',
+  features: [
+    {
+      id: 'decoy',
+      name: 'Decoy',
+      description: 'As an action, create an illusory duplicate of yourself within 30 feet. The decoy has 1 HP and lasts 1 minute or until destroyed. Enemies must make an INT save to recognize the real you.',
+      level: 3,
+      charges: { amount: 3, rechargeOn: 'shortRest' },
+    },
+    {
+      id: 'improved-dodge',
+      name: 'Improved Dodge',
+      description: 'Your Dodge feature now works against all attacks, not just one. You can impose disadvantage on up to 3 attacks per round.',
+      level: 3,
+    },
+    {
+      id: 'war-cry',
+      name: 'War Cry',
+      description: 'As an action, you and all allies within 30 feet gain +2 to attack rolls and advantage on saving throws against fear for 1 minute.',
+      level: 7,
+      charges: { amount: 2, rechargeOn: 'shortRest' },
+    },
+    {
+      id: 'improved-valkyrie',
+      name: 'Improved Valkyrie',
+      description: 'Your Valkyrie gains +20 HP, +2 to attack and damage rolls, and can be resummoned as a bonus action if destroyed.',
+      level: 11,
+    },
+    {
+      id: 'blade-guardian',
+      name: 'Blade Guardian',
+      description: 'You create a spinning blade barrier around yourself. Creatures that attack you in melee take 3d8 slashing damage. The barrier lasts 1 minute.',
+      level: 15,
+      charges: { amount: 1, rechargeOn: 'shortRest' },
+    },
+  ],
+  expandedSpells: [
+    { level: 1, spells: ['inner-sight', 'slow-missiles'] },
+    { level: 2, spells: ['decoy', 'avoid'] },
+    { level: 3, spells: ['valkyrie', 'evade'] },
+    { level: 4, spells: ['blade-guardian', 'penetrate'] },
+    { level: 5, spells: ['avatar-of-athena', 'war-cry'] },
   ],
 }

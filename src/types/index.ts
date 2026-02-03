@@ -42,7 +42,7 @@ export type {
 } from './class'
 
 export {
-  // Classes
+  // PHB Classes
   FIGHTER,
   WARLOCK,
   ROGUE,
@@ -55,6 +55,11 @@ export {
   PALADIN,
   RANGER,
   SORCERER,
+  // Custom Classes (WoW/Diablo inspired)
+  DEATH_KNIGHT,
+  NECROMANCER,
+  DEMON_HUNTER,
+  AMAZON,
   // Fighter subclasses
   CHAMPION,
   BATTLE_MASTER,
@@ -95,6 +100,22 @@ export {
   // Sorcerer subclasses
   DRACONIC_BLOODLINE,
   WILD_MAGIC,
+  // Death Knight subclasses
+  BLOOD_DEATH_KNIGHT,
+  FROST_DEATH_KNIGHT,
+  UNHOLY_DEATH_KNIGHT,
+  // Necromancer subclasses
+  BONE_NECROMANCER,
+  BLOOD_NECROMANCER,
+  SUMMONER_NECROMANCER,
+  // Demon Hunter subclasses
+  VENGEANCE_DEMON_HUNTER,
+  HAVOC_DEMON_HUNTER,
+  SHADOW_DEMON_HUNTER,
+  // Amazon subclasses
+  JAVELIN_AMAZON,
+  BOW_AMAZON,
+  PASSIVE_MAGIC_AMAZON,
 } from './class'
 
 // Spell types
