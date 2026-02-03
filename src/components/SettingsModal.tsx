@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSettingsStore, THEME_NAMES, FONT_SIZE_VALUES, type Theme, type FontSize } from '../stores/settingsStore'
 
 interface SettingsModalProps {
@@ -8,7 +8,8 @@ interface SettingsModalProps {
 
 export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const modalRef = useRef<HTMLDivElement>(null)
-  const { theme, fontSize, showQuickRefTooltips, setTheme, setFontSize, toggleQuickRefTooltips } = useSettingsStore()
+  const [showResetConfirm, setShowResetConfirm] = useState(false)
+  const { theme, fontSize, showQuickRefTooltips, setTheme, setFontSize, toggleQuickRefTooltips, resetAllCache } = useSettingsStore()
 
   // Close on escape key
   useEffect(() => {
@@ -168,6 +169,46 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             <p className="text-xs text-gray-500 mt-1">
               Show tooltips when hovering over spells, abilities, and other game terms.
             </p>
+          </div>
+
+          {/* Reset Cache */}
+          <div className="pt-4 border-t border-gray-700">
+            <label className="block text-sm font-semibold text-gray-300 mb-2">Reset All Cache</label>
+            <p className="text-xs text-gray-500 mb-3">
+              Clears all saved data including characters, settings, and cached files. Use this if you're experiencing display issues.
+            </p>
+            {!showResetConfirm ? (
+              <button
+                onClick={() => setShowResetConfirm(true)}
+                className="w-full px-4 py-2 bg-red-900/50 text-red-400 font-medium rounded-lg
+                         hover:bg-red-900/70 border border-red-800 transition-colors
+                         focus:outline-none focus:ring-2 focus:ring-red-500"
+              >
+                Reset All Cache
+              </button>
+            ) : (
+              <div className="space-y-2">
+                <p className="text-sm text-red-400 font-medium">
+                  Are you sure? This will delete all saved characters and settings!
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setShowResetConfirm(false)}
+                    className="flex-1 px-4 py-2 bg-gray-700 text-gray-300 font-medium rounded-lg
+                             hover:bg-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={resetAllCache}
+                    className="flex-1 px-4 py-2 bg-red-700 text-white font-medium rounded-lg
+                             hover:bg-red-600 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500"
+                  >
+                    Yes, Reset Everything
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

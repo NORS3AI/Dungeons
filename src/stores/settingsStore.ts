@@ -23,6 +23,7 @@ interface SettingsState {
   setTheme: (theme: Theme) => void
   setFontSize: (size: FontSize) => void
   toggleQuickRefTooltips: () => void
+  resetAllCache: () => void
 }
 
 /**
@@ -67,6 +68,23 @@ export const useSettingsStore = create<SettingsState>()(
 
       toggleQuickRefTooltips: () => {
         set((state) => ({ showQuickRefTooltips: !state.showQuickRefTooltips }))
+      },
+
+      resetAllCache: () => {
+        // Clear all localStorage
+        localStorage.clear()
+        // Clear all sessionStorage
+        sessionStorage.clear()
+        // Clear any service worker caches
+        if ('caches' in window) {
+          caches.keys().then((names) => {
+            names.forEach((name) => {
+              caches.delete(name)
+            })
+          })
+        }
+        // Force reload to apply changes
+        window.location.reload()
       },
     }),
     {
