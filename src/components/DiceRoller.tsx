@@ -104,10 +104,11 @@ export function DiceRoller({ onRoll, compact = false, character }: DiceRollerPro
       case 'damage':
         // Damage: just ability modifier (no proficiency)
         return abilityMod + manualModifier
-      case 'save':
+      case 'save': {
         // Save: ability modifier + proficiency if proficient
         const isProficient = character.savingThrows[selectedAbility]
         return abilityMod + (isProficient ? profBonus : 0) + manualModifier
+      }
       case 'check':
         // Ability check: just ability modifier
         return abilityMod + manualModifier

@@ -361,7 +361,11 @@ function InitiativeRow({
   const handleDamageHeal = (isDamage: boolean) => {
     const amount = parseInt(damageInput) || 0
     if (amount > 0) {
-      isDamage ? onDamage(amount) : onHeal(amount)
+      if (isDamage) {
+        onDamage(amount)
+      } else {
+        onHeal(amount)
+      }
       setDamageInput('')
     }
   }
