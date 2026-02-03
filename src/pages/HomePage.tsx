@@ -7,6 +7,7 @@ export function HomePage() {
   const navigate = useNavigate()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [importError, setImportError] = useState<string | null>(null)
+  const [showFullContent, setShowFullContent] = useState(false)
   const { characters, loadCharacter, deleteCharacter, importCharacter } = useCharacterStore()
 
   const handleExportCharacter = (characterId: string) => {
@@ -260,30 +261,152 @@ export function HomePage() {
         )}
       </div>
 
-      <div className="mt-16 text-center">
-        <h3 className="text-lg text-gray-500 mb-4">Currently Supporting</h3>
-        <div className="flex flex-wrap justify-center gap-4 md:gap-8 text-gray-400">
-          <div>
-            <span className="text-gold-500 font-semibold">Fighter</span> (Champion, Battle Master)
-          </div>
-          <div>
-            <span className="text-gold-500 font-semibold">Warlock</span> (Great Old One, Fiend, Archfey)
-          </div>
-          <div>
-            <span className="text-gold-500 font-semibold">Human</span>
-          </div>
-          <div>
-            <span className="text-gold-500 font-semibold">Dwarf</span>
-          </div>
-          <div>
-            <span className="text-gold-500 font-semibold">Half-Elf</span>
-          </div>
-          <div>
-            <span className="text-gold-500 font-semibold">Drow</span>
-          </div>
-          <div>
-            <span className="text-gold-500 font-semibold">Tiefling</span>
-          </div>
+      {/* Content Overview Section */}
+      <div className="mt-20 max-w-4xl mx-auto">
+        <div className="card text-center">
+          <button
+            onClick={() => setShowFullContent(!showFullContent)}
+            className="flex items-center justify-center gap-2 mx-auto text-gold-500 hover:text-gold-400
+                     font-semibold transition-colors group"
+          >
+            <span className="text-lg">
+              {showFullContent ? 'Hide Full Content List' : 'View All Available Content'}
+            </span>
+            <svg
+              className={`w-5 h-5 transform transition-transform duration-300 ${showFullContent ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          {showFullContent && (
+            <div className="mt-8 pt-8 border-t border-gray-700 animate-in fade-in slide-in-from-top-4 duration-300">
+              <div className="grid md:grid-cols-2 gap-8 text-left">
+                {/* Classes Column */}
+                <div>
+                  <h3 className="text-xl font-bold text-gold-500 mb-4 flex items-center gap-2">
+                    <span className="text-2xl">⚔️</span>
+                    Classes & Subclasses
+                  </h3>
+                  <div className="space-y-3 text-sm">
+                    <div>
+                      <span className="font-semibold text-white">Barbarian</span>
+                      <span className="text-gray-400"> - 4 subclasses</span>
+                    </div>
+                    <div>
+                      <span className="font-semibold text-white">Bard</span>
+                      <span className="text-gray-400"> - 4 subclasses</span>
+                    </div>
+                    <div>
+                      <span className="font-semibold text-white">Cleric</span>
+                      <span className="text-gray-400"> - 7 domains</span>
+                    </div>
+                    <div>
+                      <span className="font-semibold text-white">Druid</span>
+                      <span className="text-gray-400"> - 3 subclasses</span>
+                    </div>
+                    <div>
+                      <span className="font-semibold text-white">Fighter</span>
+                      <span className="text-gray-400"> - 5 subclasses</span>
+                    </div>
+                    <div>
+                      <span className="font-semibold text-white">Monk</span>
+                      <span className="text-gray-400"> - 4 subclasses</span>
+                    </div>
+                    <div>
+                      <span className="font-semibold text-white">Paladin</span>
+                      <span className="text-gray-400"> - 4 oaths</span>
+                    </div>
+                    <div>
+                      <span className="font-semibold text-white">Ranger</span>
+                      <span className="text-gray-400"> - 4 subclasses</span>
+                    </div>
+                    <div>
+                      <span className="font-semibold text-white">Rogue</span>
+                      <span className="text-gray-400"> - 4 subclasses</span>
+                    </div>
+                    <div>
+                      <span className="font-semibold text-white">Sorcerer</span>
+                      <span className="text-gray-400"> - 4 origins</span>
+                    </div>
+                    <div>
+                      <span className="font-semibold text-white">Warlock</span>
+                      <span className="text-gray-400"> - 4 patrons</span>
+                    </div>
+                    <div>
+                      <span className="font-semibold text-white">Wizard</span>
+                      <span className="text-gray-400"> - 8 schools</span>
+                    </div>
+                  </div>
+                  <p className="mt-4 text-gold-400 font-medium">
+                    Total: 12 Classes, 28 Subclasses
+                  </p>
+                </div>
+
+                {/* Races & Content Column */}
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-xl font-bold text-gold-500 mb-4 flex items-center gap-2">
+                      <span className="text-2xl">👥</span>
+                      Playable Races
+                    </h3>
+                    <div className="flex flex-wrap gap-2 text-sm">
+                      {['Human', 'Elf', 'Dwarf', 'Halfling', 'Gnome', 'Half-Elf', 'Half-Orc', 'Tiefling',
+                        'Dragonborn', 'Drow', 'Aasimar', 'Goliath', 'Tabaxi', 'Kenku', 'Firbolg',
+                        'Lizardfolk', 'Triton', 'Tortle'].map(race => (
+                        <span key={race} className="px-2 py-1 bg-gray-700/50 text-gray-300 rounded-md">
+                          {race}
+                        </span>
+                      ))}
+                    </div>
+                    <p className="mt-3 text-gold-400 font-medium">Total: 18 Races</p>
+                  </div>
+
+                  <div>
+                    <h3 className="text-xl font-bold text-gold-500 mb-4 flex items-center gap-2">
+                      <span className="text-2xl">✨</span>
+                      Spells & Features
+                    </h3>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Spells (Cantrips - 9th Level)</span>
+                        <span className="font-semibold text-white">401</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Class Features & Traits</span>
+                        <span className="font-semibold text-white">100+</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Feats</span>
+                        <span className="font-semibold text-white">18</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Weapons</span>
+                        <span className="font-semibold text-white">37</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Armor & Shields</span>
+                        <span className="font-semibold text-white">13</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Conditions</span>
+                        <span className="font-semibold text-white">14</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8 pt-6 border-t border-gray-700">
+                <p className="text-gray-500 text-sm">
+                  Based on D&D 5th Edition 2024 Player's Handbook
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
