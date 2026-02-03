@@ -3,6 +3,7 @@ import type { Background } from '../types/background'
 import { AVAILABLE_BACKGROUNDS } from '../types/background'
 import { BackgroundCard } from './BackgroundCard'
 import { QuickRefTooltip } from './QuickRefTooltip'
+import { ScrollNavigation } from './ScrollNavigation'
 
 interface BackgroundSelectorProps {
   initialBackground?: Background | null
@@ -231,6 +232,9 @@ export function BackgroundSelector({ initialBackground, onSelect, onBack }: Back
           Click on <span className="text-purple-400">skill names</span> to learn what each skill does!
         </p>
       </div>
+
+      {/* Scroll Navigation */}
+      <ScrollNavigation />
     </div>
   )
 }
