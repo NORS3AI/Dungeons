@@ -1,16 +1,93 @@
 import { useState } from 'react'
 import type { Class, Subclass } from '../types'
-import { FIGHTER, WARLOCK, GREAT_OLD_ONE, FIEND, ARCHFEY, CHAMPION, BATTLE_MASTER } from '../types'
+import {
+  // Classes
+  FIGHTER,
+  WARLOCK,
+  ROGUE,
+  WIZARD,
+  CLERIC,
+  BARBARIAN,
+  BARD,
+  DRUID,
+  MONK,
+  PALADIN,
+  RANGER,
+  SORCERER,
+  // Fighter subclasses
+  CHAMPION,
+  BATTLE_MASTER,
+  ELDRITCH_KNIGHT,
+  // Warlock subclasses
+  GREAT_OLD_ONE,
+  FIEND,
+  ARCHFEY,
+  HEXBLADE,
+  CELESTIAL,
+  // Rogue subclasses
+  THIEF,
+  ASSASSIN,
+  // Wizard subclasses
+  SCHOOL_OF_EVOCATION,
+  SCHOOL_OF_ABJURATION,
+  // Cleric subclasses
+  LIFE_DOMAIN,
+  LIGHT_DOMAIN,
+  // Barbarian subclasses
+  PATH_OF_THE_BERSERKER,
+  PATH_OF_THE_TOTEM_WARRIOR,
+  // Bard subclasses
+  COLLEGE_OF_LORE,
+  COLLEGE_OF_VALOR,
+  // Druid subclasses
+  CIRCLE_OF_THE_LAND,
+  CIRCLE_OF_THE_MOON,
+  // Monk subclasses
+  WAY_OF_THE_OPEN_HAND,
+  WAY_OF_SHADOW,
+  // Paladin subclasses
+  OATH_OF_DEVOTION,
+  OATH_OF_VENGEANCE,
+  // Ranger subclasses
+  HUNTER,
+  BEAST_MASTER,
+  // Sorcerer subclasses
+  DRACONIC_BLOODLINE,
+  WILD_MAGIC,
+} from '../types'
 import { ClassCard } from './ClassCard'
 import { QuickRefTooltip } from './QuickRefTooltip'
 
-// Available classes
-const AVAILABLE_CLASSES: Class[] = [FIGHTER, WARLOCK]
+// Available classes (all 12 PHB classes)
+const AVAILABLE_CLASSES: Class[] = [
+  BARBARIAN,
+  BARD,
+  CLERIC,
+  DRUID,
+  FIGHTER,
+  MONK,
+  PALADIN,
+  RANGER,
+  ROGUE,
+  SORCERER,
+  WARLOCK,
+  WIZARD,
+]
 
 // Available subclasses mapped by parent class ID
 const SUBCLASSES: Record<string, Subclass[]> = {
-  fighter: [CHAMPION, BATTLE_MASTER],
-  warlock: [GREAT_OLD_ONE, FIEND, ARCHFEY],
+  barbarian: [PATH_OF_THE_BERSERKER, PATH_OF_THE_TOTEM_WARRIOR],
+  bard: [COLLEGE_OF_LORE, COLLEGE_OF_VALOR],
+  cleric: [LIFE_DOMAIN, LIGHT_DOMAIN],
+  druid: [CIRCLE_OF_THE_LAND, CIRCLE_OF_THE_MOON],
+  fighter: [CHAMPION, BATTLE_MASTER, ELDRITCH_KNIGHT],
+  monk: [WAY_OF_THE_OPEN_HAND, WAY_OF_SHADOW],
+  paladin: [OATH_OF_DEVOTION, OATH_OF_VENGEANCE],
+  ranger: [HUNTER, BEAST_MASTER],
+  rogue: [THIEF, ASSASSIN],
+  sorcerer: [DRACONIC_BLOODLINE, WILD_MAGIC],
+  warlock: [GREAT_OLD_ONE, FIEND, ARCHFEY, HEXBLADE, CELESTIAL],
+  wizard: [SCHOOL_OF_EVOCATION, SCHOOL_OF_ABJURATION],
 }
 
 interface ClassSelectorProps {
@@ -142,12 +219,6 @@ export function ClassSelector({
         ))}
       </div>
 
-      {/* Coming Soon Note */}
-      <div className="mb-8 p-4 bg-gray-800/50 rounded-lg border border-gray-700">
-        <p className="text-sm text-gray-400 text-center">
-          More classes coming soon: Wizard, Cleric, Rogue, Ranger, Paladin, Barbarian, Bard, Druid, Monk, Sorcerer
-        </p>
-      </div>
 
       {/* Selected Class Details */}
       {selectedClass && (
