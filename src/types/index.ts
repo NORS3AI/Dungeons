@@ -55,7 +55,7 @@ export {
   PALADIN,
   RANGER,
   SORCERER,
-  // Custom Classes (WoW/Diablo inspired)
+  // Custom Classes (WoW/Diablo)
   DEATH_KNIGHT,
   NECROMANCER,
   DEMON_HUNTER,
