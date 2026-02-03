@@ -36,12 +36,13 @@ function meetsPrerequisites(feat: Feat, character?: Character | null): { met: bo
 
   for (const prereq of feat.prerequisites) {
     switch (prereq.type) {
-      case 'ability':
+      case 'ability': {
         const abilityScore = character.abilityScores[prereq.value as keyof typeof character.abilityScores]
         if (prereq.minimum && abilityScore < prereq.minimum) {
           return { met: false, reason: `Requires ${formatAbility(prereq.value as string)} ${prereq.minimum}+` }
         }
         break
+      }
       case 'level':
         if (character.level < (prereq.value as number)) {
           return { met: false, reason: `Requires level ${prereq.value}+` }
