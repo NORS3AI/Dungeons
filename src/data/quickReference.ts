@@ -3192,6 +3192,30 @@ export const SPELLS: Record<string, SpellRef> = {
   // =============================================================================
 
   // DEATH KNIGHT SPELLS
+  'grave-bolt': {
+    id: 'grave-bolt',
+    name: 'Grave Bolt',
+    school: 'Necromancy',
+    level: 'cantrip',
+    castingTime: '1 action',
+    range: '60 feet',
+    components: 'V, S',
+    duration: 'Instantaneous',
+    description: 'Hurl a bolt of necrotic energy at a creature. Make a ranged spell attack for 1d10 necrotic damage. Damage increases at 5th level (2d10), 11th level (3d10), and 17th level (4d10).',
+    classes: ['Death Knight'],
+  },
+  'runic-strike': {
+    id: 'runic-strike',
+    name: 'Runic Strike',
+    school: 'Evocation',
+    level: 'cantrip',
+    castingTime: '1 action',
+    range: 'Self (5-foot radius)',
+    components: 'V, M (a melee weapon)',
+    duration: 'Instantaneous',
+    description: 'Channel runic power through your weapon. As part of this action, make a melee weapon attack. On hit, deal an extra 1d6 cold damage. Damage increases at 5th level (2d6), 11th level (3d6), and 17th level (4d6).',
+    classes: ['Death Knight'],
+  },
   'death-coil': {
     id: 'death-coil',
     name: 'Death Coil',
@@ -3367,6 +3391,30 @@ export const SPELLS: Record<string, SpellRef> = {
   },
 
   // DEMON HUNTER SPELLS (WoW & Diablo)
+  'fel-bolt': {
+    id: 'fel-bolt',
+    name: 'Fel Bolt',
+    school: 'Evocation',
+    level: 'cantrip',
+    castingTime: '1 action',
+    range: '120 feet',
+    components: 'V, S',
+    duration: 'Instantaneous',
+    description: 'Hurl a bolt of fel fire at a creature. Make a ranged spell attack for 1d10 fire damage. If you have Spectral Sight active, gain advantage on this attack. Damage increases at 5th level (2d10), 11th level (3d10), and 17th level (4d10).',
+    classes: ['Demon Hunter'],
+  },
+  'throw-glaive': {
+    id: 'throw-glaive',
+    name: 'Throw Glaive',
+    school: 'Conjuration',
+    level: 'cantrip',
+    castingTime: '1 action',
+    range: '60 feet',
+    components: 'S, M (a bladed weapon)',
+    duration: 'Instantaneous',
+    description: 'Throw a spectral glaive that bounces between targets. Make a ranged spell attack. On hit, deal 1d6 slashing damage, then the glaive bounces to another creature within 10 feet (new attack roll). Can bounce up to 2 times. Damage increases at 5th level (2d6), 11th level (3d6), and 17th level (4d6).',
+    classes: ['Demon Hunter'],
+  },
   'eye-beam': {
     id: 'eye-beam',
     name: 'Eye Beam',
