@@ -1,5 +1,44 @@
 # Claude.md - Project Context for AI Assistance
 
+## 🚧 CURRENT WORK IN PROGRESS
+
+**Next Task**: Create `src/data/classSpells.ts` to connect spells to classes in SpellSelector
+
+**Problem**: SpellSelector.tsx only has hardcoded Warlock spells. Other classes show "Spell Selection Unavailable".
+
+**Solution needed**:
+1. Create `src/data/classSpells.ts` with properly typed `Spell` objects for each class
+2. Export arrays: `BARD_CANTRIPS`, `BARD_LEVEL_1_SPELLS`, `CLERIC_CANTRIPS`, etc.
+3. Export helper: `getClassSpells(classId: string, level: number)`
+4. Update `SpellSelector.tsx` to import from classSpells.ts instead of hardcoded arrays
+
+**Spell interface required** (from `src/types/spell.ts`):
+```typescript
+{
+  id: string,
+  name: string,
+  description: string,
+  level: number, // 0 for cantrips
+  school: 'abjuration' | 'conjuration' | 'divination' | 'enchantment' | 'evocation' | 'illusion' | 'necromancy' | 'transmutation',
+  castingTime: { amount: number, unit: 'action' | 'bonusAction' | 'reaction' | 'minute' | 'hour' },
+  range: { type: 'self' | 'touch' | 'ranged', distance?: number },
+  components: { verbal: boolean, somatic: boolean, material: boolean, materialDescription?: string },
+  duration: { type: 'instantaneous' | 'concentration' | 'timed', amount?: number, unit?: 'round' | 'minute' | 'hour' },
+  ritual: boolean,
+  concentration: boolean,
+  classes: string[]
+}
+```
+
+**Classes needing spells**:
+- Full casters (cantrips + spells): Bard, Cleric, Druid, Sorcerer, Warlock, Wizard
+- Half casters (spells only): Paladin, Ranger
+- Custom classes: Death Knight, Necromancer, Demon Hunter, Amazon
+
+**Reference**: 401 spells exist in `src/data/quickReference.ts` as `SpellRef` type (string-based), but SpellSelector needs structured `Spell` type objects.
+
+---
+
 ## Current Project Status (Updated Feb 2026)
 
 ### What's Already Built
