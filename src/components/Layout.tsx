@@ -1,9 +1,30 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Outlet, Link } from 'react-router-dom'
 import { SettingsModal } from './SettingsModal'
+import { KeyboardShortcutsModal } from './KeyboardShortcutsModal'
 
 export function Layout() {
   const [showSettings, setShowSettings] = useState(false)
+  const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false)
+
+  // Global keyboard shortcut listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Press '?' to show keyboard shortcuts (Shift + /)
+      if (e.key === '?' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        // Don't trigger if user is typing in an input field
+        const target = e.target as HTMLElement
+        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+          return
+        }
+        e.preventDefault()
+        setShowKeyboardShortcuts(true)
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -15,7 +36,23 @@ export function Layout() {
               <span className="text-xl font-bold text-gold-500">Dungeons</span>
             </Link>
 
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setShowKeyboardShortcuts(true)}
+                className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-gray-700
+                         transition-colors focus:outline-none focus:ring-2 focus:ring-dnd-gold"
+                aria-label="Keyboard shortcuts (Press ?)"
+                title="Keyboard shortcuts (Press ?)"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
+                  />
+                </svg>
+              </button>
               <button
                 onClick={() => setShowSettings(true)}
                 className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-gray-700
@@ -54,6 +91,9 @@ export function Layout() {
 
       {/* Settings Modal */}
       <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
+
+      {/* Keyboard Shortcuts Modal */}
+      <KeyboardShortcutsModal isOpen={showKeyboardShortcuts} onClose={() => setShowKeyboardShortcuts(false)} />
     </div>
   )
 }

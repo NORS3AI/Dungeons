@@ -10,11 +10,44 @@
     --color-surface: #25253d;
     --color-text: #e4e4e7;
     --color-text-muted: #a1a1aa;
+    --font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  /* OpenDyslexic font for accessibility */
+  @font-face {
+    font-family: 'OpenDyslexic';
+    src: url('https://cdn.jsdelivr.net/npm/opendyslexic@2.0.0/fonts/OpenDyslexic-Regular.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'OpenDyslexic';
+    src: url('https://cdn.jsdelivr.net/npm/opendyslexic@2.0.0/fonts/OpenDyslexic-Bold.woff2') format('woff2');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'OpenDyslexic';
+    src: url('https://cdn.jsdelivr.net/npm/opendyslexic@2.0.0/fonts/OpenDyslexic-Italic.woff2') format('woff2');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
   }
 
   body {
     @apply bg-gray-900 text-gray-100 antialiased;
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: var(--font-family);
+  }
+
+  /* Dyslexic font adjustments */
+  .font-dyslexic {
+    letter-spacing: 0.05em;
+    word-spacing: 0.1em;
+    line-height: 1.6;
   }
 
   /* Focus styles for keyboard navigation */
@@ -68,5 +101,104 @@
 
   .label {
     @apply block text-sm font-medium text-gray-300 mb-1;
+  }
+}
+
+/* Print Styles for Character Sheets */
+@media print {
+  /* Hide non-essential elements */
+  header,
+  footer,
+  nav,
+  button,
+  .no-print {
+    display: none !important;
+  }
+
+  /* Reset colors for printing */
+  * {
+    color: #000 !important;
+    background: #fff !important;
+    border-color: #333 !important;
+  }
+
+  body {
+    font-size: 12pt;
+    line-height: 1.4;
+  }
+
+  /* Page breaks */
+  .card {
+    page-break-inside: avoid;
+    break-inside: avoid;
+    border: 1px solid #333 !important;
+    padding: 12pt;
+    margin-bottom: 8pt;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+    break-after: avoid;
+    color: #000 !important;
+    font-weight: bold;
+  }
+
+  /* Remove shadows and rounded corners for cleaner print */
+  .card,
+  .btn,
+  .input {
+    box-shadow: none !important;
+    border-radius: 4pt;
+  }
+
+  /* Ensure text is readable */
+  .text-gray-400,
+  .text-gray-500,
+  .text-gray-300 {
+    color: #333 !important;
+  }
+
+  /* Make important numbers stand out */
+  .text-dnd-gold,
+  .text-gold-500,
+  .text-red-400 {
+    color: #000 !important;
+    font-weight: bold;
+  }
+
+  /* Grid layouts should flow for print */
+  .grid {
+    display: block !important;
+  }
+
+  .grid > * {
+    margin-bottom: 8pt;
+  }
+
+  /* Show character sheet tabs content all at once */
+  [role="tabpanel"] {
+    display: block !important;
+  }
+
+  /* Optimize spacing */
+  @page {
+    margin: 1cm;
+  }
+
+  /* Prevent orphans and widows */
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* Table formatting for skill lists */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  table, th, td {
+    border: 1px solid #333;
+    padding: 4pt;
   }
 }

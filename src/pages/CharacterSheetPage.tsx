@@ -6,6 +6,7 @@ import { calculateModifier, calculateProficiencyBonus } from '../types/dice'
 import { isWeapon, isArmor, isShield } from '../types/equipment'
 import type { Character, Ability, Equipment, Weapon, Armor, Shield, Currency } from '../types'
 import { ALL_PROFESSIONS, CATEGORY_INFO, formatIncome, getProfessionByRoll, type Profession } from '../data/professions'
+import { exportCharacterToJSON, exportCharacterToPDF } from '../utils/characterIO'
 
 const ABILITY_NAMES: Record<Ability, string> = {
   strength: 'STR',
@@ -49,6 +50,7 @@ export function CharacterSheetPage() {
   const [activeTab, setActiveTab] = useState<'main' | 'spells' | 'inventory' | 'features'>('main')
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
   const [showIncomeRoller, setShowIncomeRoller] = useState(false)
+  const [isExportingPDF, setIsExportingPDF] = useState(false)
 
   useEffect(() => {
     if (id) {
@@ -132,6 +134,18 @@ export function CharacterSheetPage() {
     return profLevel === 'proficient' || profLevel === 'expertise'
   }
 
+  const handleExportPDF = async () => {
+    try {
+      setIsExportingPDF(true)
+      await exportCharacterToPDF(character)
+    } catch (error) {
+      console.error('Failed to export PDF:', error)
+      alert('Failed to export PDF. Please try again.')
+    } finally {
+      setIsExportingPDF(false)
+    }
+  }
+
   const tabs = [
     { id: 'main', label: 'Overview' },
     { id: 'spells', label: 'Spells' },
@@ -156,18 +170,46 @@ export function CharacterSheetPage() {
             <p className="text-gray-500">{character.background.name} Background</p>
           )}
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <button
             onClick={() => levelUp()}
             className="px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-lg
-                     transition-colors"
+                     transition-colors focus:outline-none focus:ring-2 focus:ring-green-500"
+            title="Advance to next level"
           >
             Level Up
           </button>
           <button
+            onClick={() => window.print()}
+            className="px-4 py-2 bg-purple-700 hover:bg-purple-600 text-white rounded-lg
+                     transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500"
+            title="Print character sheet"
+          >
+            Print
+          </button>
+          <button
+            onClick={handleExportPDF}
+            disabled={isExportingPDF}
+            className="px-4 py-2 bg-red-700 hover:bg-red-600 text-white rounded-lg
+                     transition-colors focus:outline-none focus:ring-2 focus:ring-red-500
+                     disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Export character as PDF file"
+          >
+            {isExportingPDF ? 'Exporting...' : 'Export PDF'}
+          </button>
+          <button
+            onClick={() => exportCharacterToJSON(character)}
+            className="px-4 py-2 bg-blue-700 hover:bg-blue-600 text-white rounded-lg
+                     transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+            title="Export character as JSON file"
+          >
+            Export JSON
+          </button>
+          <button
             onClick={() => navigate('/create')}
             className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg
-                     transition-colors"
+                     transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500"
+            title="Edit character"
           >
             Edit
           </button>
