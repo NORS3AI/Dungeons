@@ -50,6 +50,223 @@
     line-height: 1.6;
   }
 
+  /* Theme overrides */
+  .theme-light {
+    --tw-bg-opacity: 1;
+  }
+
+  .theme-light body,
+  .theme-light .bg-gray-900 {
+    background-color: #f5f5f5 !important;
+  }
+
+  .theme-light .bg-gray-800 {
+    background-color: #ffffff !important;
+  }
+
+  .theme-light .bg-gray-700 {
+    background-color: #e5e5e5 !important;
+  }
+
+  .theme-light .text-gray-100,
+  .theme-light .text-white {
+    color: #1a1a1a !important;
+  }
+
+  .theme-light .text-gray-300,
+  .theme-light .text-gray-400 {
+    color: #4a4a4a !important;
+  }
+
+  .theme-light .text-gray-500 {
+    color: #6a6a6a !important;
+  }
+
+  .theme-light .border-gray-700 {
+    border-color: #d1d1d1 !important;
+  }
+
+  .theme-lighter body,
+  .theme-lighter .bg-gray-900 {
+    background-color: #ffffff !important;
+  }
+
+  .theme-lighter .bg-gray-800 {
+    background-color: #fafafa !important;
+  }
+
+  .theme-lighter .bg-gray-700 {
+    background-color: #f0f0f0 !important;
+  }
+
+  .theme-lighter .text-gray-100,
+  .theme-lighter .text-white {
+    color: #000000 !important;
+  }
+
+  .theme-lighter .text-gray-300,
+  .theme-lighter .text-gray-400 {
+    color: #1a1a1a !important;
+  }
+
+  .theme-lighter .text-gray-500 {
+    color: #4a4a4a !important;
+  }
+
+  .theme-lighter .border-gray-700 {
+    border-color: #e0e0e0 !important;
+  }
+
+  .theme-darker body,
+  .theme-darker .bg-gray-900 {
+    background-color: #000000 !important;
+  }
+
+  .theme-darker .bg-gray-800 {
+    background-color: #0a0a0a !important;
+  }
+
+  .theme-darker .bg-gray-700 {
+    background-color: #141414 !important;
+  }
+
+  .theme-darker .text-gray-100,
+  .theme-darker .text-white {
+    color: #ffffff !important;
+  }
+
+  .theme-darker .text-gray-400 {
+    color: #a0a0a0 !important;
+  }
+
+  .theme-darker .text-gray-500 {
+    color: #606060 !important;
+  }
+
+  .theme-darker .border-gray-700 {
+    border-color: #2a2a2a !important;
+  }
+
+  .theme-dnd body,
+  .theme-dnd .bg-gray-900 {
+    background-color: #1a1512 !important;
+  }
+
+  .theme-dnd .bg-gray-800 {
+    background-color: #2a2219 !important;
+  }
+
+  .theme-dnd .bg-gray-700 {
+    background-color: #3a3129 !important;
+  }
+
+  .theme-dnd .text-gray-100,
+  .theme-dnd .text-white {
+    color: #f4e4c1 !important;
+  }
+
+  .theme-dnd .text-gray-400 {
+    color: #c4b491 !important;
+  }
+
+  .theme-dnd .text-gray-500 {
+    color: #8a7a61 !important;
+  }
+
+  .theme-dnd .border-gray-700 {
+    border-color: #5a4a31 !important;
+  }
+
+  .theme-wow body,
+  .theme-wow .bg-gray-900 {
+    background-color: #0d0d0d !important;
+  }
+
+  .theme-wow .bg-gray-800 {
+    background-color: #1a1410 !important;
+  }
+
+  .theme-wow .bg-gray-700 {
+    background-color: #2a2420 !important;
+  }
+
+  .theme-wow .text-gray-100,
+  .theme-wow .text-white {
+    color: #f0d0a0 !important;
+  }
+
+  .theme-wow .text-gray-400 {
+    color: #d4af37 !important;
+  }
+
+  .theme-wow .text-gray-500 {
+    color: #8b7355 !important;
+  }
+
+  .theme-wow .border-gray-700 {
+    border-color: #4a3f2f !important;
+  }
+
+  .theme-final-fantasy body,
+  .theme-final-fantasy .bg-gray-900 {
+    background-color: #0a0e1a !important;
+  }
+
+  .theme-final-fantasy .bg-gray-800 {
+    background-color: #141a2e !important;
+  }
+
+  .theme-final-fantasy .bg-gray-700 {
+    background-color: #1e2a4a !important;
+  }
+
+  .theme-final-fantasy .text-gray-100,
+  .theme-final-fantasy .text-white {
+    color: #e0f0ff !important;
+  }
+
+  .theme-final-fantasy .text-gray-400 {
+    color: #a0c0ff !important;
+  }
+
+  .theme-final-fantasy .text-gray-500 {
+    color: #6080c0 !important;
+  }
+
+  .theme-final-fantasy .border-gray-700 {
+    border-color: #304a7a !important;
+  }
+
+  .theme-diablo body,
+  .theme-diablo .bg-gray-900 {
+    background-color: #0f0a0a !important;
+  }
+
+  .theme-diablo .bg-gray-800 {
+    background-color: #1a0f0f !important;
+  }
+
+  .theme-diablo .bg-gray-700 {
+    background-color: #2a1414 !important;
+  }
+
+  .theme-diablo .text-gray-100,
+  .theme-diablo .text-white {
+    color: #ffd0d0 !important;
+  }
+
+  .theme-diablo .text-gray-400 {
+    color: #d08080 !important;
+  }
+
+  .theme-diablo .text-gray-500 {
+    color: #8a5050 !important;
+  }
+
+  .theme-diablo .border-gray-700 {
+    border-color: #4a2020 !important;
+  }
+
   /* Focus styles for keyboard navigation */
   *:focus-visible {
     @apply outline-none ring-2 ring-gold-500 ring-offset-2 ring-offset-gray-900;
