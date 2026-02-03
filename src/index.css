@@ -41,6 +41,19 @@
   body {
     @apply bg-gray-900 text-gray-100 antialiased;
     font-family: var(--font-family);
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* Smooth transitions for theme changes */
+  * {
+    transition-property: background-color, border-color, color;
+    transition-duration: 200ms;
+    transition-timing-function: ease-in-out;
+  }
+
+  /* Preserve fast transitions for interactive elements */
+  button, a, input, select, textarea {
+    transition-duration: 150ms;
   }
 
   /* Dyslexic font adjustments */
@@ -293,12 +306,15 @@
 
 @layer components {
   .btn {
-    @apply px-4 py-2 rounded-lg font-medium transition-colors duration-200;
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200;
     @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900;
+    @apply shadow-md hover:shadow-lg active:shadow-sm;
+    @apply transform hover:scale-[1.02] active:scale-[0.98];
   }
 
   .btn-primary {
-    @apply btn bg-gold-600 text-white hover:bg-gold-700 focus:ring-gold-500;
+    @apply btn bg-gradient-to-r from-gold-600 to-yellow-600 text-white;
+    @apply hover:from-gold-700 hover:to-yellow-700 focus:ring-gold-500;
   }
 
   .btn-secondary {
@@ -306,18 +322,62 @@
   }
 
   .card {
-    @apply bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700;
+    @apply bg-gray-800 rounded-xl p-6 shadow-xl border border-gray-700;
+    @apply hover:shadow-2xl transition-shadow duration-300;
+    background-image: linear-gradient(to bottom right, rgba(255,255,255,0.02), transparent);
+  }
+
+  .card-interactive {
+    @apply card cursor-pointer;
+    @apply hover:border-gold-500/50 hover:-translate-y-1;
+    @apply transition-all duration-300;
   }
 
   .input {
     @apply w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg;
     @apply text-gray-100 placeholder-gray-500;
-    @apply focus:border-gold-500 focus:ring-1 focus:ring-gold-500;
-    @apply transition-colors duration-200;
+    @apply focus:border-gold-500 focus:ring-2 focus:ring-gold-500/50;
+    @apply transition-all duration-200;
+    @apply shadow-inner hover:border-gray-600;
   }
 
   .label {
-    @apply block text-sm font-medium text-gray-300 mb-1;
+    @apply block text-sm font-medium text-gray-300 mb-2;
+  }
+
+  /* Animated gradient background */
+  .gradient-bg {
+    background: linear-gradient(-45deg, #1a1a2e, #25253d, #1f1f2e, #2a2a3e);
+    background-size: 400% 400%;
+    animation: gradient-shift 15s ease infinite;
+  }
+
+  @keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* Shimmer effect for loading states */
+  .shimmer {
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  /* Pulse animation for attention */
+  .pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+    50% { box-shadow: 0 0 20px 5px rgba(212, 175, 55, 0.3); }
   }
 }
 
