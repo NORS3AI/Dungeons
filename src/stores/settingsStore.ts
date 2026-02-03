@@ -4,7 +4,7 @@ import { persist } from 'zustand/middleware'
 /**
  * Available themes
  */
-export type Theme = 'dark' | 'light' | 'darker' | 'dnd'
+export type Theme = 'dark' | 'light' | 'lighter' | 'darker' | 'dnd' | 'wow' | 'final-fantasy' | 'diablo'
 
 /**
  * Font size options
@@ -12,16 +12,23 @@ export type Theme = 'dark' | 'light' | 'darker' | 'dnd'
 export type FontSize = 'small' | 'medium' | 'large' | 'xlarge'
 
 /**
+ * Font family options
+ */
+export type FontFamily = 'default' | 'dyslexic'
+
+/**
  * Settings state
  */
 interface SettingsState {
   theme: Theme
   fontSize: FontSize
+  fontFamily: FontFamily
   showQuickRefTooltips: boolean
 
   // Actions
   setTheme: (theme: Theme) => void
   setFontSize: (size: FontSize) => void
+  setFontFamily: (family: FontFamily) => void
   toggleQuickRefTooltips: () => void
   resetAllCache: () => void
 }
@@ -37,13 +44,25 @@ export const FONT_SIZE_VALUES: Record<FontSize, string> = {
 }
 
 /**
+ * Font family display names
+ */
+export const FONT_FAMILY_NAMES: Record<FontFamily, string> = {
+  default: 'Default',
+  dyslexic: 'Dyslexia Friendly',
+}
+
+/**
  * Theme display names
  */
 export const THEME_NAMES: Record<Theme, string> = {
   dark: 'Dark',
   light: 'Light',
+  lighter: 'High Contrast Light',
   darker: 'OLED Dark',
   dnd: 'D&D Classic',
+  wow: 'World of Warcraft',
+  'final-fantasy': 'Final Fantasy',
+  diablo: 'Diablo III',
 }
 
 /**
@@ -54,6 +73,7 @@ export const useSettingsStore = create<SettingsState>()(
     (set) => ({
       theme: 'dark',
       fontSize: 'medium',
+      fontFamily: 'default',
       showQuickRefTooltips: true,
 
       setTheme: (theme: Theme) => {
@@ -64,6 +84,11 @@ export const useSettingsStore = create<SettingsState>()(
       setFontSize: (fontSize: FontSize) => {
         set({ fontSize })
         applyFontSize(fontSize)
+      },
+
+      setFontFamily: (fontFamily: FontFamily) => {
+        set({ fontFamily })
+        applyFontFamily(fontFamily)
       },
 
       toggleQuickRefTooltips: () => {
@@ -94,6 +119,7 @@ export const useSettingsStore = create<SettingsState>()(
         if (state) {
           applyTheme(state.theme)
           applyFontSize(state.fontSize)
+          applyFontFamily(state.fontFamily)
         }
       },
     }
@@ -107,7 +133,7 @@ function applyTheme(theme: Theme) {
   const root = document.documentElement
 
   // Remove all theme classes
-  root.classList.remove('theme-dark', 'theme-light', 'theme-darker', 'theme-dnd')
+  root.classList.remove('theme-dark', 'theme-light', 'theme-lighter', 'theme-darker', 'theme-dnd', 'theme-wow', 'theme-final-fantasy', 'theme-diablo')
 
   // Add new theme class
   root.classList.add(`theme-${theme}`)
@@ -122,6 +148,16 @@ function applyTheme(theme: Theme) {
       root.style.setProperty('--text-secondary', '#4a4a4a')
       root.style.setProperty('--text-muted', '#6a6a6a')
       root.style.setProperty('--border-color', '#d1d1d1')
+      break
+    case 'lighter':
+      // High contrast light mode
+      root.style.setProperty('--bg-primary', '#ffffff')
+      root.style.setProperty('--bg-secondary', '#fafafa')
+      root.style.setProperty('--bg-tertiary', '#f0f0f0')
+      root.style.setProperty('--text-primary', '#000000')
+      root.style.setProperty('--text-secondary', '#1a1a1a')
+      root.style.setProperty('--text-muted', '#4a4a4a')
+      root.style.setProperty('--border-color', '#e0e0e0')
       break
     case 'darker':
       root.style.setProperty('--bg-primary', '#000000')
@@ -141,6 +177,36 @@ function applyTheme(theme: Theme) {
       root.style.setProperty('--text-muted', '#8a7a61')
       root.style.setProperty('--border-color', '#5a4a31')
       break
+    case 'wow':
+      // World of Warcraft theme - Azeroth-inspired with gold accents
+      root.style.setProperty('--bg-primary', '#0d0d0d')
+      root.style.setProperty('--bg-secondary', '#1a1410')
+      root.style.setProperty('--bg-tertiary', '#2a2420')
+      root.style.setProperty('--text-primary', '#f0d0a0')
+      root.style.setProperty('--text-secondary', '#d4af37')
+      root.style.setProperty('--text-muted', '#8b7355')
+      root.style.setProperty('--border-color', '#4a3f2f')
+      break
+    case 'final-fantasy':
+      // Final Fantasy theme - Crystal/menu aesthetics with blue tones
+      root.style.setProperty('--bg-primary', '#0a0e1a')
+      root.style.setProperty('--bg-secondary', '#141a2e')
+      root.style.setProperty('--bg-tertiary', '#1e2a4a')
+      root.style.setProperty('--text-primary', '#e0f0ff')
+      root.style.setProperty('--text-secondary', '#a0c0ff')
+      root.style.setProperty('--text-muted', '#6080c0')
+      root.style.setProperty('--border-color', '#304a7a')
+      break
+    case 'diablo':
+      // Diablo III theme - Gothic with dark red accents
+      root.style.setProperty('--bg-primary', '#0f0a0a')
+      root.style.setProperty('--bg-secondary', '#1a0f0f')
+      root.style.setProperty('--bg-tertiary', '#2a1414')
+      root.style.setProperty('--text-primary', '#ffd0d0')
+      root.style.setProperty('--text-secondary', '#d08080')
+      root.style.setProperty('--text-muted', '#8a5050')
+      root.style.setProperty('--border-color', '#4a2020')
+      break
     case 'dark':
     default:
       root.style.setProperty('--bg-primary', '#111827')
@@ -159,4 +225,21 @@ function applyTheme(theme: Theme) {
  */
 function applyFontSize(size: FontSize) {
   document.documentElement.style.setProperty('--font-size-base', FONT_SIZE_VALUES[size])
+}
+
+/**
+ * Apply font family to document
+ */
+function applyFontFamily(family: FontFamily) {
+  const root = document.documentElement
+
+  if (family === 'dyslexic') {
+    // Use OpenDyslexic font with fallbacks
+    root.style.setProperty('--font-family', '"OpenDyslexic", "Comic Sans MS", sans-serif')
+    root.classList.add('font-dyslexic')
+  } else {
+    // Use default font
+    root.style.setProperty('--font-family', '"Inter", system-ui, sans-serif')
+    root.classList.remove('font-dyslexic')
+  }
 }

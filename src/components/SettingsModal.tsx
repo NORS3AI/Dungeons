@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useSettingsStore, THEME_NAMES, FONT_SIZE_VALUES, type Theme, type FontSize } from '../stores/settingsStore'
+import { useSettingsStore, THEME_NAMES, FONT_SIZE_VALUES, FONT_FAMILY_NAMES, type Theme, type FontSize, type FontFamily } from '../stores/settingsStore'
 
 interface SettingsModalProps {
   isOpen: boolean
@@ -9,7 +9,7 @@ interface SettingsModalProps {
 export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const modalRef = useRef<HTMLDivElement>(null)
   const [showResetConfirm, setShowResetConfirm] = useState(false)
-  const { theme, fontSize, showQuickRefTooltips, setTheme, setFontSize, toggleQuickRefTooltips, resetAllCache } = useSettingsStore()
+  const { theme, fontSize, fontFamily, showQuickRefTooltips, setTheme, setFontSize, setFontFamily, toggleQuickRefTooltips, resetAllCache } = useSettingsStore()
 
   // Close on escape key
   useEffect(() => {
@@ -39,8 +39,9 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
   if (!isOpen) return null
 
-  const themes: Theme[] = ['dark', 'light', 'darker', 'dnd']
+  const themes: Theme[] = ['dark', 'light', 'lighter', 'darker', 'dnd', 'wow', 'final-fantasy', 'diablo']
   const fontSizes: FontSize[] = ['small', 'medium', 'large', 'xlarge']
+  const fontFamilies: FontFamily[] = ['default', 'dyslexic']
 
   const fontSizeLabels: Record<FontSize, string> = {
     small: 'Small',
@@ -83,12 +84,12 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
           {/* Theme Selection */}
           <div>
             <label className="block text-sm font-semibold text-gray-300 mb-3">Theme</label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
               {themes.map((t) => (
                 <button
                   key={t}
                   onClick={() => setTheme(t)}
-                  className={`px-4 py-3 rounded-lg text-sm font-medium transition-all
+                  className={`px-3 py-2.5 rounded-lg text-xs md:text-sm font-medium transition-all
                              focus:outline-none focus:ring-2 focus:ring-dnd-gold
                              ${
                                theme === t
@@ -147,6 +148,33 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 Preview: The quick brown fox jumps over the lazy dog.
               </p>
             </div>
+          </div>
+
+          {/* Font Family */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-300 mb-3">
+              Font Family
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              {fontFamilies.map((family) => (
+                <button
+                  key={family}
+                  onClick={() => setFontFamily(family)}
+                  className={`px-4 py-3 rounded-lg text-sm font-medium transition-all
+                             focus:outline-none focus:ring-2 focus:ring-dnd-gold
+                             ${
+                               fontFamily === family
+                                 ? 'bg-dnd-gold text-gray-900'
+                                 : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                             }`}
+                >
+                  {FONT_FAMILY_NAMES[family]}
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              Dyslexia Friendly font uses OpenDyslexic, designed to make reading easier for people with dyslexia.
+            </p>
           </div>
 
           {/* Quick Reference Tooltips */}
