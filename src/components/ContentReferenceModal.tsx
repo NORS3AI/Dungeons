@@ -93,6 +93,34 @@ const CLASS_INFO: Record<string, { description: string; hitDie: string; primaryA
     saves: 'Intelligence & Wisdom',
     features: ['Spellcasting', 'Arcane Recovery', 'Arcane Tradition', 'Spell Mastery', 'Signature Spells'],
   },
+  'Death Knight': {
+    description: 'A fallen champion raised by dark powers, wielding runic magic and commanding the forces of death itself.',
+    hitDie: 'd10',
+    primaryAbility: 'Strength & Constitution',
+    saves: 'Strength & Constitution',
+    features: ['Runic Power', 'Rune Weapon', 'Death Strike', 'Anti-Magic Shell', 'Raise Dead'],
+  },
+  Necromancer: {
+    description: 'Master of the dark arts who commands undead minions and wields devastating curse magic.',
+    hitDie: 'd6',
+    primaryAbility: 'Intelligence',
+    saves: 'Intelligence & Wisdom',
+    features: ['Essence', 'Raise Skeleton', 'Bone Spear', 'Corpse Explosion', 'Army of the Dead'],
+  },
+  'Demon Hunter': {
+    description: 'A relentless slayer who sacrificed part of their humanity to gain demonic powers.',
+    hitDie: 'd10',
+    primaryAbility: 'Dexterity',
+    saves: 'Dexterity & Charisma',
+    features: ['Spectral Sight', 'Fel Rush', 'Metamorphosis', 'Blade Dance', 'Demonic Wards'],
+  },
+  Amazon: {
+    description: 'A warrior from the Skovos Isles, master of javelin, bow, and spear combat with elemental magic.',
+    hitDie: 'd10',
+    primaryAbility: 'Dexterity & Strength',
+    saves: 'Dexterity & Wisdom',
+    features: ['Fighting Style', 'Power Strike', 'Lightning Fury', 'Dodge', 'Valkyrie'],
+  },
 }
 
 // Race information database
@@ -252,11 +280,24 @@ export function ContentReferenceModal({ isOpen, onClose, type, name }: ContentRe
         {/* Header */}
         <div className="sticky top-0 bg-gray-800 flex items-center justify-between p-6 border-b border-gray-700">
           <div>
-            <h2 id="reference-title" className="text-3xl font-bold text-gold-500">
-              {name}
-            </h2>
+            <div className="flex items-center gap-3">
+              <h2 id="reference-title" className="text-3xl font-bold text-gold-500">
+                {name}
+              </h2>
+              {type === 'class' && ['Death Knight', 'Necromancer', 'Demon Hunter', 'Amazon'].includes(name) && (
+                <span className="px-3 py-1 bg-purple-900/30 text-purple-400 text-sm rounded font-medium border border-purple-500/30">
+                  Custom Class
+                </span>
+              )}
+            </div>
             <p className="text-sm text-gray-400 mt-1">
-              {type === 'class' ? 'Character Class' : 'Playable Race'}
+              {type === 'class' ? (
+                ['Death Knight', 'Necromancer', 'Demon Hunter', 'Amazon'].includes(name)
+                  ? 'Custom Character Class (WoW/Diablo)'
+                  : 'PHB 2024 Character Class'
+              ) : (
+                'Playable Race'
+              )}
             </p>
           </div>
           <button

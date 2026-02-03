@@ -304,18 +304,22 @@ export function HomePage() {
                   <p className="text-xs text-gray-500 mb-3 italic">Click any class to learn more</p>
                   <div className="space-y-2 text-sm">
                     {[
-                      { name: 'Barbarian', subcount: '4 subclasses' },
-                      { name: 'Bard', subcount: '4 subclasses' },
-                      { name: 'Cleric', subcount: '7 domains' },
-                      { name: 'Druid', subcount: '3 subclasses' },
-                      { name: 'Fighter', subcount: '5 subclasses' },
-                      { name: 'Monk', subcount: '4 subclasses' },
-                      { name: 'Paladin', subcount: '4 oaths' },
-                      { name: 'Ranger', subcount: '4 subclasses' },
-                      { name: 'Rogue', subcount: '4 subclasses' },
-                      { name: 'Sorcerer', subcount: '4 origins' },
-                      { name: 'Warlock', subcount: '4 patrons' },
-                      { name: 'Wizard', subcount: '8 schools' },
+                      { name: 'Amazon', subcount: '3 disciplines', custom: true },
+                      { name: 'Barbarian', subcount: '2 subclasses' },
+                      { name: 'Bard', subcount: '2 subclasses' },
+                      { name: 'Cleric', subcount: '2 domains' },
+                      { name: 'Death Knight', subcount: '3 specializations', custom: true },
+                      { name: 'Demon Hunter', subcount: '3 specializations', custom: true },
+                      { name: 'Druid', subcount: '2 subclasses' },
+                      { name: 'Fighter', subcount: '3 subclasses' },
+                      { name: 'Monk', subcount: '2 subclasses' },
+                      { name: 'Necromancer', subcount: '3 paths', custom: true },
+                      { name: 'Paladin', subcount: '2 oaths' },
+                      { name: 'Ranger', subcount: '2 subclasses' },
+                      { name: 'Rogue', subcount: '2 subclasses' },
+                      { name: 'Sorcerer', subcount: '2 origins' },
+                      { name: 'Warlock', subcount: '5 patrons' },
+                      { name: 'Wizard', subcount: '2 schools' },
                     ].map((cls) => (
                       <button
                         key={cls.name}
@@ -323,15 +327,24 @@ export function HomePage() {
                         className="w-full text-left p-2 rounded-lg hover:bg-gray-700/50 transition-colors
                                  border border-transparent hover:border-gold-500/30 group"
                       >
-                        <span className="font-semibold text-white group-hover:text-gold-400 transition-colors">
-                          {cls.name}
-                        </span>
-                        <span className="text-gray-400"> - {cls.subcount}</span>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <span className="font-semibold text-white group-hover:text-gold-400 transition-colors">
+                              {cls.name}
+                            </span>
+                            <span className="text-gray-400"> - {cls.subcount}</span>
+                          </div>
+                          {cls.custom && (
+                            <span className="px-2 py-0.5 bg-purple-900/30 text-purple-400 text-xs rounded font-medium">
+                              Custom
+                            </span>
+                          )}
+                        </div>
                       </button>
                     ))}
                   </div>
                   <p className="mt-4 text-gold-400 font-medium">
-                    Total: 12 Classes, 28 Subclasses
+                    Total: 16 Classes (12 PHB + 4 Custom), 42 Subclasses
                   </p>
                 </div>
 
