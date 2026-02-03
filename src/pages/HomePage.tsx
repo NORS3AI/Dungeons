@@ -58,57 +58,97 @@ export function HomePage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-12">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-6xl font-bold text-gold-500 mb-4">
+      <div className="text-center mb-16 animate-in fade-in duration-700">
+        <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-gold-400 via-yellow-500 to-gold-600
+                       bg-clip-text text-transparent mb-4 drop-shadow-lg">
           Dungeons
         </h1>
-        <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-          D&D 5th Edition Character Creator & DM Tool.
-          Create characters with a simple click-and-create flow.
+        <p className="text-xl md:text-2xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
+          D&D 5th Edition Character Creator & DM Tool
+        </p>
+        <p className="text-gray-500 mt-2">
+          Create characters with a simple click-and-create flow
         </p>
       </div>
 
       {/* Main Action Cards */}
       <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-12">
-        <Link to="/create" className="card hover:border-gold-500 transition-colors group">
-          <div className="text-4xl mb-4">&#9876;</div>
-          <h2 className="text-2xl font-bold text-gold-500 mb-2 group-hover:text-gold-400">
-            Create Character
-          </h2>
-          <p className="text-gray-400">
-            Build your hero step by step. Choose race, class, stats, spells, and equipment.
-          </p>
+        <Link to="/create" className="group relative overflow-hidden">
+          <div className="card-interactive relative z-10">
+            <div className="text-6xl mb-4 transform group-hover:scale-110 transition-transform duration-300">
+              &#9876;
+            </div>
+            <h2 className="text-2xl font-bold text-gold-500 mb-3 group-hover:text-gold-400 transition-colors">
+              Create Character
+            </h2>
+            <p className="text-gray-400 leading-relaxed">
+              Build your hero step by step. Choose race, class, stats, spells, and equipment.
+            </p>
+            <div className="mt-4 flex items-center text-gold-500 text-sm font-medium group-hover:translate-x-2 transition-transform">
+              Get Started
+              <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </div>
+          <div className="absolute inset-0 bg-gradient-to-br from-gold-500/10 to-transparent opacity-0
+                          group-hover:opacity-100 transition-opacity duration-300 rounded-xl" />
         </Link>
 
-        <Link to="/campaign" className="card hover:border-gold-500 transition-colors group">
-          <div className="text-4xl mb-4">&#128220;</div>
-          <h2 className="text-2xl font-bold text-gold-500 mb-2 group-hover:text-gold-400">
-            DM Tools
-          </h2>
-          <p className="text-gray-400">
-            Manage your campaign. Track characters, NPCs, and run encounters.
-          </p>
+        <Link to="/campaign" className="group relative overflow-hidden">
+          <div className="card-interactive relative z-10">
+            <div className="text-6xl mb-4 transform group-hover:scale-110 transition-transform duration-300">
+              &#128220;
+            </div>
+            <h2 className="text-2xl font-bold text-gold-500 mb-3 group-hover:text-gold-400 transition-colors">
+              DM Tools
+            </h2>
+            <p className="text-gray-400 leading-relaxed">
+              Manage your campaign. Track characters, NPCs, and run encounters.
+            </p>
+            <div className="mt-4 flex items-center text-gold-500 text-sm font-medium group-hover:translate-x-2 transition-transform">
+              Launch Tools
+              <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </div>
+          <div className="absolute inset-0 bg-gradient-to-br from-gold-500/10 to-transparent opacity-0
+                          group-hover:opacity-100 transition-opacity duration-300 rounded-xl" />
         </Link>
       </div>
 
       {/* My Characters Section */}
       <div className="mt-16 max-w-4xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-dnd-gold">My Characters</h2>
-          <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-gold-400 to-yellow-600
+                         bg-clip-text text-transparent">
+            My Characters
+          </h2>
+          <div className="flex gap-2 flex-wrap">
             <button
               onClick={handleImportClick}
-              className="px-4 py-2 text-sm bg-gray-700 hover:bg-gray-600 text-white rounded-lg
-                       transition-colors focus:outline-none focus:ring-2 focus:ring-dnd-gold"
+              className="flex items-center gap-2 px-4 py-2 text-sm bg-gray-700 hover:bg-gray-600
+                       text-white rounded-lg shadow-md hover:shadow-lg transform hover:scale-105
+                       transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-dnd-gold"
             >
-              Import Character
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+              Import
             </button>
             {characters.length > 0 && (
               <button
                 onClick={handleExportAll}
-                className="px-4 py-2 text-sm bg-gray-700 hover:bg-gray-600 text-white rounded-lg
-                         transition-colors focus:outline-none focus:ring-2 focus:ring-dnd-gold"
+                className="flex items-center gap-2 px-4 py-2 text-sm bg-gray-700 hover:bg-gray-600
+                         text-white rounded-lg shadow-md hover:shadow-lg transform hover:scale-105
+                         transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-dnd-gold"
               >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                </svg>
                 Export All
               </button>
             )}
@@ -130,55 +170,89 @@ export function HomePage() {
         )}
 
         {characters.length === 0 ? (
-          <div className="card text-center py-12">
-            <p className="text-gray-400 mb-4">No characters yet.</p>
+          <div className="card text-center py-16">
+            <div className="text-6xl mb-4 opacity-50">🎭</div>
+            <p className="text-gray-400 mb-4 text-lg">No characters yet</p>
             <Link
               to="/create"
-              className="text-dnd-gold hover:text-yellow-400 font-medium"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-gold-600 to-yellow-600
+                       text-white font-semibold rounded-lg shadow-lg hover:shadow-xl
+                       transform hover:scale-105 transition-all duration-200"
             >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
               Create your first character
             </Link>
           </div>
         ) : (
-          <div className="space-y-3">
-            {characters.map((character) => (
+          <div className="grid gap-4">
+            {characters.map((character, index) => (
               <div
                 key={character.id}
-                className="card flex items-center justify-between hover:border-gray-600"
+                className="card hover:border-gold-500/50 group transition-all duration-300
+                          hover:shadow-2xl animate-in fade-in slide-in-from-bottom-4"
+                style={{ animationDelay: `${index * 50}ms` }}
               >
-                <div className="flex-1">
-                  <h3 className="font-bold text-white">
-                    {character.name || 'Unnamed Character'}
-                  </h3>
-                  <p className="text-sm text-gray-400">
-                    Level {character.level}{' '}
-                    {character.race?.name || 'Unknown Race'}{' '}
-                    {character.class?.name || 'Unknown Class'}
-                    {character.subclass && ` (${character.subclass.name})`}
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleViewCharacter(character.id)}
-                    className="px-3 py-1 text-sm bg-dnd-gold text-gray-900 rounded hover:bg-yellow-500
-                             transition-colors"
-                  >
-                    View
-                  </button>
-                  <button
-                    onClick={() => handleExportCharacter(character.id)}
-                    className="px-3 py-1 text-sm bg-gray-700 text-gray-300 rounded hover:bg-gray-600
-                             transition-colors"
-                  >
-                    Export
-                  </button>
-                  <button
-                    onClick={() => handleDeleteCharacter(character.id, character.name)}
-                    className="px-3 py-1 text-sm bg-red-900/30 text-red-400 rounded hover:bg-red-900/50
-                             transition-colors"
-                  >
-                    Delete
-                  </button>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex-1 space-y-2">
+                    <h3 className="text-xl font-bold text-white group-hover:text-gold-400 transition-colors">
+                      {character.name || 'Unnamed Character'}
+                    </h3>
+                    <div className="flex flex-wrap items-center gap-2 text-sm">
+                      <span className="px-2 py-1 bg-gold-600/20 text-gold-400 rounded-md font-medium border border-gold-600/30">
+                        Level {character.level}
+                      </span>
+                      <span className="text-gray-400">
+                        {character.race?.name || 'Unknown Race'}
+                      </span>
+                      <span className="text-gray-600">•</span>
+                      <span className="text-gray-400">
+                        {character.class?.name || 'Unknown Class'}
+                        {character.subclass && ` (${character.subclass.name})`}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 flex-wrap">
+                    <button
+                      onClick={() => handleViewCharacter(character.id)}
+                      className="flex items-center gap-1 px-4 py-2 text-sm bg-gradient-to-r from-gold-600 to-yellow-600
+                               text-white font-medium rounded-lg shadow-md hover:shadow-lg
+                               transform hover:scale-105 transition-all duration-200"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                      View
+                    </button>
+                    <button
+                      onClick={() => handleExportCharacter(character.id)}
+                      className="flex items-center gap-1 px-3 py-2 text-sm bg-gray-700 text-gray-300
+                               rounded-lg hover:bg-gray-600 shadow-md hover:shadow-lg
+                               transform hover:scale-105 transition-all duration-200"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                      </svg>
+                      Export
+                    </button>
+                    <button
+                      onClick={() => handleDeleteCharacter(character.id, character.name)}
+                      className="flex items-center gap-1 px-3 py-2 text-sm bg-red-900/30 text-red-400
+                               rounded-lg hover:bg-red-900/50 border border-red-800/50
+                               shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
