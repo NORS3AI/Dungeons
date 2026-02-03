@@ -2,13 +2,23 @@ import { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCharacterStore } from '../stores/characterStore'
 import { exportCharacterToJSON, importCharacterFromJSON, exportAllCharactersToJSON } from '../utils/characterIO'
+import { ContentReferenceModal } from '../components/ContentReferenceModal'
 
 export function HomePage() {
   const navigate = useNavigate()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [importError, setImportError] = useState<string | null>(null)
   const [showFullContent, setShowFullContent] = useState(false)
+  const [referenceModal, setReferenceModal] = useState<{ type: 'class' | 'race' | null; name: string | null }>({ type: null, name: null })
   const { characters, loadCharacter, deleteCharacter, importCharacter } = useCharacterStore()
+
+  const handleShowReference = (type: 'class' | 'race', name: string) => {
+    setReferenceModal({ type, name })
+  }
+
+  const handleCloseReference = () => {
+    setReferenceModal({ type: null, name: null })
+  }
 
   const handleExportCharacter = (characterId: string) => {
     const character = characters.find((c) => c.id === characterId)
@@ -291,55 +301,34 @@ export function HomePage() {
                     <span className="text-2xl">⚔️</span>
                     Classes & Subclasses
                   </h3>
-                  <div className="space-y-3 text-sm">
-                    <div>
-                      <span className="font-semibold text-white">Barbarian</span>
-                      <span className="text-gray-400"> - 4 subclasses</span>
-                    </div>
-                    <div>
-                      <span className="font-semibold text-white">Bard</span>
-                      <span className="text-gray-400"> - 4 subclasses</span>
-                    </div>
-                    <div>
-                      <span className="font-semibold text-white">Cleric</span>
-                      <span className="text-gray-400"> - 7 domains</span>
-                    </div>
-                    <div>
-                      <span className="font-semibold text-white">Druid</span>
-                      <span className="text-gray-400"> - 3 subclasses</span>
-                    </div>
-                    <div>
-                      <span className="font-semibold text-white">Fighter</span>
-                      <span className="text-gray-400"> - 5 subclasses</span>
-                    </div>
-                    <div>
-                      <span className="font-semibold text-white">Monk</span>
-                      <span className="text-gray-400"> - 4 subclasses</span>
-                    </div>
-                    <div>
-                      <span className="font-semibold text-white">Paladin</span>
-                      <span className="text-gray-400"> - 4 oaths</span>
-                    </div>
-                    <div>
-                      <span className="font-semibold text-white">Ranger</span>
-                      <span className="text-gray-400"> - 4 subclasses</span>
-                    </div>
-                    <div>
-                      <span className="font-semibold text-white">Rogue</span>
-                      <span className="text-gray-400"> - 4 subclasses</span>
-                    </div>
-                    <div>
-                      <span className="font-semibold text-white">Sorcerer</span>
-                      <span className="text-gray-400"> - 4 origins</span>
-                    </div>
-                    <div>
-                      <span className="font-semibold text-white">Warlock</span>
-                      <span className="text-gray-400"> - 4 patrons</span>
-                    </div>
-                    <div>
-                      <span className="font-semibold text-white">Wizard</span>
-                      <span className="text-gray-400"> - 8 schools</span>
-                    </div>
+                  <p className="text-xs text-gray-500 mb-3 italic">Click any class to learn more</p>
+                  <div className="space-y-2 text-sm">
+                    {[
+                      { name: 'Barbarian', subcount: '4 subclasses' },
+                      { name: 'Bard', subcount: '4 subclasses' },
+                      { name: 'Cleric', subcount: '7 domains' },
+                      { name: 'Druid', subcount: '3 subclasses' },
+                      { name: 'Fighter', subcount: '5 subclasses' },
+                      { name: 'Monk', subcount: '4 subclasses' },
+                      { name: 'Paladin', subcount: '4 oaths' },
+                      { name: 'Ranger', subcount: '4 subclasses' },
+                      { name: 'Rogue', subcount: '4 subclasses' },
+                      { name: 'Sorcerer', subcount: '4 origins' },
+                      { name: 'Warlock', subcount: '4 patrons' },
+                      { name: 'Wizard', subcount: '8 schools' },
+                    ].map((cls) => (
+                      <button
+                        key={cls.name}
+                        onClick={() => handleShowReference('class', cls.name)}
+                        className="w-full text-left p-2 rounded-lg hover:bg-gray-700/50 transition-colors
+                                 border border-transparent hover:border-gold-500/30 group"
+                      >
+                        <span className="font-semibold text-white group-hover:text-gold-400 transition-colors">
+                          {cls.name}
+                        </span>
+                        <span className="text-gray-400"> - {cls.subcount}</span>
+                      </button>
+                    ))}
                   </div>
                   <p className="mt-4 text-gold-400 font-medium">
                     Total: 12 Classes, 28 Subclasses
@@ -353,13 +342,21 @@ export function HomePage() {
                       <span className="text-2xl">👥</span>
                       Playable Races
                     </h3>
+                    <p className="text-xs text-gray-500 mb-3 italic">Click any race to learn more</p>
                     <div className="flex flex-wrap gap-2 text-sm">
                       {['Human', 'Elf', 'Dwarf', 'Halfling', 'Gnome', 'Half-Elf', 'Half-Orc', 'Tiefling',
                         'Dragonborn', 'Drow', 'Aasimar', 'Goliath', 'Tabaxi', 'Kenku', 'Firbolg',
                         'Lizardfolk', 'Triton', 'Tortle'].map(race => (
-                        <span key={race} className="px-2 py-1 bg-gray-700/50 text-gray-300 rounded-md">
+                        <button
+                          key={race}
+                          onClick={() => handleShowReference('race', race)}
+                          className="px-3 py-1.5 bg-gray-700/50 text-gray-300 rounded-md
+                                   hover:bg-gold-600/20 hover:text-gold-400 hover:border-gold-500/50
+                                   border border-transparent transition-all duration-200
+                                   transform hover:scale-105"
+                        >
                           {race}
-                        </span>
+                        </button>
                       ))}
                     </div>
                     <p className="mt-3 text-gold-400 font-medium">Total: 18 Races</p>
@@ -409,6 +406,14 @@ export function HomePage() {
           )}
         </div>
       </div>
+
+      {/* Content Reference Modal */}
+      <ContentReferenceModal
+        isOpen={referenceModal.type !== null}
+        onClose={handleCloseReference}
+        type={referenceModal.type}
+        name={referenceModal.name}
+      />
     </div>
   )
 }
