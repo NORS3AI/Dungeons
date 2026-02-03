@@ -294,6 +294,16 @@ export function HomePage() {
 
           {showFullContent && (
             <div className="mt-8 pt-8 border-t border-gray-700 animate-in fade-in slide-in-from-top-4 duration-300">
+              {/* Summary Stats */}
+              <div className="mb-8 p-4 bg-gradient-to-r from-gold-600/10 to-yellow-600/10 rounded-lg border border-gold-500/30">
+                <p className="text-center text-2xl font-bold text-gold-400">
+                  653 Total Pieces of Game Content
+                </p>
+                <p className="text-center text-sm text-gray-400 mt-1">
+                  Everything you need to start playing D&D 5e right now
+                </p>
+              </div>
+
               <div className="grid md:grid-cols-2 gap-8 text-left">
                 {/* Classes Column */}
                 <div>
@@ -344,7 +354,7 @@ export function HomePage() {
                     ))}
                   </div>
                   <p className="mt-4 text-gold-400 font-medium">
-                    Total: 16 Classes (12 PHB + 4 Custom), 42 Subclasses
+                    Total: 16 Classes (12 PHB + 4 Custom), 40 Subclasses
                   </p>
                 </div>
 
@@ -387,7 +397,7 @@ export function HomePage() {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-400">Class Features & Traits</span>
-                        <span className="font-semibold text-white">100+</span>
+                        <span className="font-semibold text-white">96</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-400">Feats</span>
