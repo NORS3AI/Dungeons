@@ -501,7 +501,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     abilityScores: ['DEX', 'CHA'],
   },
   Aasimar: {
-    description: 'Mortals touched by celestial power, aasimar are guided by divine beings.',
+    description: 'Mortals touched by celestial power, aasimar are guided by divine beings. Aasimar carry the light of the heavens in their souls, descended from humans touched by the power of Mount Celestia. They are born to serve as champions of the gods, their births hailed as blessed events.\n\nAasimar appear mostly human, with lustrous hair, flawless skin, and piercing eyes. They possess an otherworldly beauty that makes them stand out in any crowd. Most aasimar have a link to an angelic guide who offers advice and urges them toward their divine purpose.\n\nNot all aasimar embrace their destiny—some struggle with their calling, while others may be tempted toward darkness. The celestial spark within them can manifest as Protector (guardians of others), Scourge (divine avengers), or Fallen (those who have turned from their path).\n\nAasimar adventurers are often driven by divine visions or the need to combat specific evils threatening the world. They walk the line between the mortal and divine realms, forever marked by their celestial heritage.',
     size: 'Medium',
     speed: '30 feet',
     vision: 'Darkvision 60 ft',
