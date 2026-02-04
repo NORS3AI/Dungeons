@@ -4173,6 +4173,18 @@ export const WEAPONS: Record<string, WeaponRef> = {
     cost: '5 gp',
     description: 'A three-pronged spear associated with sea gods and aquatic warriors. Can be thrown or used for melee.',
   },
+  'net': {
+    id: 'net',
+    name: 'Net',
+    category: 'martial',
+    type: 'ranged',
+    damage: '—',
+    damageType: 'none',
+    properties: ['Special', 'Thrown (range 5/15)'],
+    weight: '3 lb.',
+    cost: '1 gp',
+    description: 'A Large or smaller creature hit by a net is restrained until freed. A net has no effect on formless or Huge+ creatures. A creature can use its action to make DC 10 STR check to free itself or another. Dealing 5 slashing damage to the net (AC 10) frees the creature and destroys the net.',
+  },
   'war-pick': {
     id: 'war-pick',
     name: 'War Pick',
