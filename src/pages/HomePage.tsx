@@ -33,6 +33,9 @@ export function HomePage() {
     'Lizardfolk': ['CON', 'WIS'],
     'Triton': ['STR', 'CON', 'CHA'],
     'Tortle': ['STR', 'WIS'],
+    'Yuan-ti Pureblood': ['CHA', 'INT'],
+    'Kobold': ['DEX'],
+    'Aarakocra': ['DEX', 'WIS'],
   }
 
   const handleShowReference = (type: 'class' | 'race', name: string) => {
@@ -320,7 +323,7 @@ export function HomePage() {
               {/* Summary Stats */}
               <div className="mb-8 p-4 bg-gradient-to-r from-gold-600/10 to-yellow-600/10 rounded-lg border border-gold-500/30">
                 <p className="text-center text-2xl font-bold text-gold-400">
-                  653 Total Pieces of Game Content
+                  656 Total Pieces of Game Content
                 </p>
                 <p className="text-center text-sm text-gray-400 mt-1">
                   Everything you need to start playing D&D 5e right now
@@ -420,7 +423,7 @@ export function HomePage() {
                     <div className="flex flex-wrap gap-2 text-sm">
                       {['Human', 'Elf', 'Dwarf', 'Halfling', 'Gnome', 'Half-Elf', 'Half-Orc', 'Tiefling',
                         'Dragonborn', 'Drow', 'Aasimar', 'Goliath', 'Tabaxi', 'Kenku', 'Firbolg',
-                        'Lizardfolk', 'Triton', 'Tortle']
+                        'Lizardfolk', 'Triton', 'Tortle', 'Yuan-ti Pureblood', 'Kobold', 'Aarakocra']
                         .filter(race => {
                           // Filter by selected ability
                           if (!selectedAbility) return true
@@ -464,8 +467,8 @@ export function HomePage() {
                       {selectedAbility
                         ? `${['Human', 'Elf', 'Dwarf', 'Halfling', 'Gnome', 'Half-Elf', 'Half-Orc', 'Tiefling',
                             'Dragonborn', 'Drow', 'Aasimar', 'Goliath', 'Tabaxi', 'Kenku', 'Firbolg',
-                            'Lizardfolk', 'Triton', 'Tortle'].filter(race => raceAbilities[race]?.includes(selectedAbility)).length} Races with ${selectedAbility} bonus`
-                        : 'Total: 18 Races'
+                            'Lizardfolk', 'Triton', 'Tortle', 'Yuan-ti Pureblood', 'Kobold', 'Aarakocra'].filter(race => raceAbilities[race]?.includes(selectedAbility)).length} Races with ${selectedAbility} bonus`
+                        : 'Total: 21 Races'
                       }
                     </p>
                   </div>

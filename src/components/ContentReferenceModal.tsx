@@ -603,6 +603,44 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     ],
     abilityScores: ['STR', 'WIS'],
   },
+  'Yuan-ti Pureblood': {
+    description: 'Descended from ancient serpent empires, yuan-ti purebloods are resistant to magic and poisonous.',
+    size: 'Medium',
+    speed: '30 feet',
+    vision: 'Darkvision 60 ft',
+    traits: [
+      { name: 'Darkvision (60 ft)' },
+      { name: 'Innate Spellcasting - Know Poison Spray, cast Animal Friendship (snakes), Suggestion' },
+      { name: 'Magic Resistance - Advantage on saves vs. spells and magical effects', id: 'magic-resistance' },
+      { name: 'Poison Immunity - Immune to poison damage and poisoned condition' },
+    ],
+    abilityScores: ['CHA', 'INT'],
+  },
+  Kobold: {
+    description: 'Small reptilian humanoids who excel at working together and setting traps.',
+    size: 'Small',
+    speed: '30 feet',
+    vision: 'Darkvision 60 ft',
+    traits: [
+      { name: 'Darkvision (60 ft)' },
+      { name: 'Grovel, Cower, and Beg - Grant advantage to allies on attacks', id: 'grovel-cower-beg' },
+      { name: 'Pack Tactics - Advantage on attacks if ally within 5 feet of target', id: 'pack-tactics' },
+      { name: 'Sunlight Sensitivity - Disadvantage on attacks & Perception in sunlight', id: 'sunlight-sensitivity' },
+    ],
+    abilityScores: ['DEX'],
+  },
+  Aarakocra: {
+    description: 'Avian humanoids from the Elemental Plane of Air with the gift of flight.',
+    size: 'Medium',
+    speed: '25 feet (fly 50 feet)',
+    vision: 'Normal vision',
+    traits: [
+      { name: 'Flight - Fly speed of 50 feet (cannot fly in medium or heavy armor)' },
+      { name: 'Talons - Unarmed strikes deal 1d4 slashing damage' },
+      { name: 'Wind Caller - Know the Gust of Wind spell' },
+    ],
+    abilityScores: ['DEX', 'WIS'],
+  },
 }
 
 export function ContentReferenceModal({ isOpen, onClose, type, name }: ContentReferenceModalProps) {
