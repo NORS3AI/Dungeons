@@ -96,20 +96,48 @@ View multiple sheets simultaneously:
 
 ## Supported Content
 
-### Current Development (Phase 1)
+### Currently Available (658 Total Pieces of Game Content)
 
-| Classes | Subclass | Status |
-|---------|----------|--------|
-| Fighter | Ranger | In Progress |
-| Warlock | Great Old One | In Progress |
+| Content Type | Count | Notes |
+|--------------|-------|-------|
+| **Classes** | 16 | 12 PHB 2024 + 4 Custom (Death Knight, Necromancer, Demon Hunter, Amazon) |
+| **Subclasses** | 40 | Full specialization options across all classes |
+| **Races** | 23 | PHB core + Volo's + Eberron + aquatic races |
+| **Spells** | 401 | Cantrips through 9th level from PHB 2024 |
+| **Class Features & Traits** | 96 | Clickable references with full mechanics |
+| **Feats** | 18 | Including GWM, Lucky, Sentinel, Alert, etc. |
+| **Weapons** | 38 | Simple & martial (includes Net and Trident) |
+| **Armor & Shields** | 13 | Light, medium, heavy armor types |
+| **Conditions** | 14 | Blinded, charmed, frightened, poisoned, etc. |
+| **Game Rules** | 30+ | Clickable references for spellcasting, combat, rests |
 
-| Races | Status |
-|-------|--------|
-| Drow (Dark Elf) | In Progress |
-| Tiefling | In Progress |
+### All 16 Classes Available
 
-### Planned (Full PHB 2024)
-All classes and races from the **2024 Player's Handbook** will be supported.
+**PHB 2024 Classes (12)**:
+- Barbarian, Bard, Cleric, Druid
+- Fighter, Monk, Paladin, Ranger
+- Rogue, Sorcerer, Warlock, Wizard
+
+**Custom Classes (4)**:
+- Death Knight (WoW-inspired), Necromancer (Diablo-inspired)
+- Demon Hunter (WoW-inspired), Amazon (Diablo-inspired)
+
+### All 23 Races Available
+
+**Core PHB Races (9)**:
+Human, Elf, Dwarf, Halfling, Gnome, Half-Elf, Half-Orc, Tiefling, Dragonborn
+
+**Elf Subraces (3)**:
+High Elf, Wood Elf, Drow (Dark Elf), Eladrin, Sea Elf
+
+**Exotic & Planar Races (11)**:
+Aasimar, Goliath, Tabaxi, Kenku, Firbolg, Lizardfolk, Triton, Tortle, Yuan-ti Pureblood, Kobold, Aarakocra
+
+**Interactive Features**:
+- Every race has clickable racial traits with full mechanics
+- Ability score filtering (filter by STR, DEX, CON, INT, WIS, CHA)
+- Custom SVG icons for visual distinction
+- 3-5 paragraphs of lore for each race
 
 ## Class Features
 

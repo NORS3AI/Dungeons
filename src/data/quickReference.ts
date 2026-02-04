@@ -4519,6 +4519,13 @@ export const TRAITS: Record<string, TraitRef> = {
     description: 'You have advantage on saving throws against being charmed, and magic can\'t put you to sleep.',
     mechanics: 'Advantage on saves vs. charm effects. Immunity to magical sleep.',
   },
+  'keen-senses': {
+    id: 'keen-senses',
+    name: 'Keen Senses',
+    source: 'Elf',
+    description: 'You have proficiency in the Perception skill. Your heightened senses allow you to notice details that others might miss.',
+    mechanics: 'Gain proficiency in Perception. If already proficient, gain expertise (double proficiency bonus).',
+  },
   'trance': {
     id: 'trance',
     name: 'Trance',
