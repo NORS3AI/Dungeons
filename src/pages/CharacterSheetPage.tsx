@@ -7,6 +7,7 @@ import { isWeapon, isArmor, isShield } from '../types/equipment'
 import type { Character, Ability, Equipment, Weapon, Armor, Shield, Currency } from '../types'
 import { ALL_PROFESSIONS, CATEGORY_INFO, formatIncome, getProfessionByRoll, type Profession } from '../data/professions'
 import { exportCharacterToJSON, exportCharacterToPDF } from '../utils/characterIO'
+import { QuickRefTooltip } from '../components/QuickRefTooltip'
 
 const ABILITY_NAMES: Record<Ability, string> = {
   strength: 'STR',
@@ -45,7 +46,7 @@ const SKILLS: { name: string; ability: Ability; key: SkillKey }[] = [
 export function CharacterSheetPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { characters, loadCharacter, currentCharacter, levelUp, updateCurrency, removeEquipment, toggleEquipment, saveCharacter } = useCharacterStore()
+  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, removeEquipment, toggleEquipment, saveCharacter } = useCharacterStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
   const [activeTab, setActiveTab] = useState<'main' | 'spells' | 'inventory' | 'features'>('main')
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
@@ -173,11 +174,23 @@ export function CharacterSheetPage() {
         <div className="flex gap-2 flex-wrap">
           <button
             onClick={() => levelUp()}
+            disabled={character.level >= 20}
             className="px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-lg
-                     transition-colors focus:outline-none focus:ring-2 focus:ring-green-500"
+                     transition-colors focus:outline-none focus:ring-2 focus:ring-green-500
+                     disabled:opacity-50 disabled:cursor-not-allowed"
             title="Advance to next level"
           >
             Level Up
+          </button>
+          <button
+            onClick={() => levelDown()}
+            disabled={character.level <= 1}
+            className="px-4 py-2 bg-red-700 hover:bg-red-600 text-white rounded-lg
+                     transition-colors focus:outline-none focus:ring-2 focus:ring-red-500
+                     disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Decrease character level"
+          >
+            Level Down
           </button>
           <button
             onClick={() => window.print()}
@@ -427,10 +440,12 @@ export function CharacterSheetPage() {
                     {character.knownSpells
                       .filter((s) => s.level === 0)
                       .map((spell) => (
-                        <div key={spell.id} className="p-3 bg-gray-900 rounded-lg border border-gray-700 hover:border-purple-500/50">
-                          <div className="font-medium text-purple-400">{spell.name}</div>
-                          <div className="text-xs text-gray-500">{spell.school} cantrip</div>
-                        </div>
+                        <QuickRefTooltip key={spell.id} type="spell" id={spell.id}>
+                          <div className="p-3 bg-gray-900 rounded-lg border border-gray-700 hover:border-purple-500/50 cursor-pointer transition-all">
+                            <div className="font-medium text-purple-400 hover:text-purple-300">{spell.name}</div>
+                            <div className="text-xs text-gray-500">{spell.school} cantrip</div>
+                          </div>
+                        </QuickRefTooltip>
                       ))}
                   </div>
                 </div>
@@ -445,12 +460,14 @@ export function CharacterSheetPage() {
                     <h3 className="text-lg font-bold text-white mb-4">Level {level} Spells</h3>
                     <div className="grid md:grid-cols-2 gap-3">
                       {spellsAtLevel.map((spell) => (
-                        <div key={spell.id} className="p-3 bg-gray-900 rounded-lg border border-gray-700 hover:border-purple-500/50">
-                          <div className="font-medium text-purple-400">{spell.name}</div>
-                          <div className="text-xs text-gray-500">
-                            {spell.school} | {spell.castingTime.amount} {spell.castingTime.unit}
+                        <QuickRefTooltip key={spell.id} type="spell" id={spell.id}>
+                          <div className="p-3 bg-gray-900 rounded-lg border border-gray-700 hover:border-purple-500/50 cursor-pointer transition-all">
+                            <div className="font-medium text-purple-400 hover:text-purple-300">{spell.name}</div>
+                            <div className="text-xs text-gray-500">
+                              {spell.school} | {spell.castingTime.amount} {spell.castingTime.unit}
+                            </div>
                           </div>
-                        </div>
+                        </QuickRefTooltip>
                       ))}
                     </div>
                   </div>
@@ -574,10 +591,12 @@ export function CharacterSheetPage() {
               <h3 className="text-lg font-bold text-white mb-4">Racial Traits</h3>
               <div className="space-y-3">
                 {character.race.traits.map((trait) => (
-                  <div key={trait.id} className="p-3 bg-gray-900 rounded-lg">
-                    <div className="font-medium text-dnd-gold">{trait.name}</div>
-                    <div className="text-sm text-gray-400 mt-1">{trait.description}</div>
-                  </div>
+                  <QuickRefTooltip key={trait.id} type="trait" id={trait.id}>
+                    <div className="p-3 bg-gray-900 rounded-lg hover:bg-gray-800 cursor-pointer transition-all">
+                      <div className="font-medium text-dnd-gold hover:text-yellow-400">{trait.name}</div>
+                      <div className="text-sm text-gray-400 mt-1">{trait.description}</div>
+                    </div>
+                  </QuickRefTooltip>
                 ))}
               </div>
             </div>
@@ -591,13 +610,15 @@ export function CharacterSheetPage() {
                 {character.class.features
                   .filter((f) => f.level <= character.level)
                   .map((feature) => (
-                    <div key={feature.id} className="p-3 bg-gray-900 rounded-lg">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-dnd-gold">{feature.name}</span>
-                        <span className="text-xs text-gray-500">Level {feature.level}</span>
+                    <QuickRefTooltip key={feature.id} type="trait" id={feature.id}>
+                      <div className="p-3 bg-gray-900 rounded-lg hover:bg-gray-800 cursor-pointer transition-all">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-dnd-gold hover:text-yellow-400">{feature.name}</span>
+                          <span className="text-xs text-gray-500">Level {feature.level}</span>
+                        </div>
+                        <div className="text-sm text-gray-400 mt-1">{feature.description}</div>
                       </div>
-                      <div className="text-sm text-gray-400 mt-1">{feature.description}</div>
-                    </div>
+                    </QuickRefTooltip>
                   ))}
               </div>
             </div>
