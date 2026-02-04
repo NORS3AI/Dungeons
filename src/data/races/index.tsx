@@ -752,7 +752,19 @@ export const TIEFLING: Race = {
 export const GOLIATH: Race = {
   id: 'goliath',
   name: 'Goliath',
-  icon: '🗿',
+  icon: (
+    <svg className="w-12 h-12 text-slate-500/40" viewBox="0 0 100 100" fill="currentColor">
+      <ellipse cx="50" cy="28" rx="20" ry="24" />
+      <path d="M30 50 Q50 70 70 50 L70 92 L30 92 Z" />
+      <rect x="20" y="52" width="12" height="35" rx="4" />
+      <rect x="68" y="52" width="12" height="35" rx="4" />
+      <path d="M34 92 L34 98 M66 92 L66 98" strokeWidth="8" stroke="currentColor" fill="none" />
+      <path d="M35 20 L25 12 M65 20 L75 12" strokeWidth="4" stroke="currentColor" fill="none" />
+      <rect x="42" y="24" width="16" height="8" rx="2" className="text-gray-700" fill="currentColor" />
+      <circle cx="43" cy="25" r="3" className="text-amber-600" fill="currentColor" />
+      <circle cx="57" cy="25" r="3" className="text-amber-600" fill="currentColor" />
+    </svg>
+  ),
   category: 'exotic',
   description: 'Goliaths are massive humanoids who live in the highest mountain peaks. Competitive and fair-minded, they value personal achievement and self-sufficiency.',
   sourceBook: { ...SOURCE_BOOKS.PHB2024, page: 163 },
@@ -774,7 +786,19 @@ export const GOLIATH: Race = {
 export const AASIMAR: Race = {
   id: 'aasimar',
   name: 'Aasimar',
-  icon: '😇',
+  icon: (
+    <svg className="w-12 h-12 text-yellow-300/40" viewBox="0 0 100 100" fill="currentColor">
+      <ellipse cx="50" cy="32" rx="15" ry="18" />
+      <path d="M35 48 Q50 58 65 48 L65 88 L35 88 Z" />
+      <rect x="28" y="50" width="8" height="25" rx="3" />
+      <rect x="64" y="50" width="8" height="25" rx="3" />
+      <path d="M38 88 L38 96 M62 88 L62 96" strokeWidth="6" stroke="currentColor" fill="none" />
+      <path d="M25 28 Q20 22 15 25 Q18 20 22 22 M75 28 Q80 22 85 25 Q82 20 78 22" className="text-amber-300" fill="currentColor" />
+      <circle cx="50" cy="15" r="8" className="text-yellow-400" fill="currentColor" opacity="0.5" />
+      <circle cx="45" cy="30" r="2" />
+      <circle cx="55" cy="30" r="2" />
+    </svg>
+  ),
   category: 'planar',
   description: 'Aasimar bear within their souls the light of the heavens. They are descended from humans with a touch of the power of Mount Celestia, the divine realm of many lawful good deities.',
   sourceBook: { ...SOURCE_BOOKS.MPMM, page: 7 },
@@ -845,7 +869,21 @@ export const AASIMAR: Race = {
 export const GENASI: Race = {
   id: 'genasi',
   name: 'Genasi',
-  icon: '🌀',
+  icon: (
+    <svg className="w-12 h-12 text-violet-400/40" viewBox="0 0 100 100" fill="currentColor">
+      <ellipse cx="50" cy="33" rx="16" ry="19" />
+      <path d="M34 50 Q50 60 66 50 L66 88 L34 88 Z" />
+      <rect x="27" y="52" width="8" height="24" rx="3" />
+      <rect x="65" y="52" width="8" height="24" rx="3" />
+      <path d="M38 88 L38 95 M62 88 L62 95" strokeWidth="6" stroke="currentColor" fill="none" />
+      <circle cx="44" cy="31" r="2.5" />
+      <circle cx="56" cy="31" r="2.5" />
+      <path d="M32 30 Q28 25 30 20 M68 30 Q72 25 70 20" strokeWidth="2" stroke="currentColor" fill="none" className="text-cyan-400" />
+      <path d="M38 40 Q42 38 46 40 M54 40 Q58 38 62 40" strokeWidth="2" stroke="currentColor" fill="none" className="text-orange-400" opacity="0.5" />
+      <circle cx="35" cy="55" r="3" className="text-green-500" fill="currentColor" opacity="0.4" />
+      <circle cx="65" cy="55" r="3" className="text-red-500" fill="currentColor" opacity="0.4" />
+    </svg>
+  ),
   category: 'planar',
   description: 'Genasi carry the power of the Elemental Planes in their blood. They are the offspring of genies and mortals, inheriting some elemental traits.',
   abilityBonuses: { constitution: 2 },
@@ -927,7 +965,20 @@ export const GENASI: Race = {
 export const TABAXI: Race = {
   id: 'tabaxi',
   name: 'Tabaxi',
-  icon: '🐱',
+  icon: (
+    <svg className="w-12 h-12 text-orange-400/40" viewBox="0 0 100 100" fill="currentColor">
+      <ellipse cx="50" cy="30" rx="16" ry="18" />
+      <path d="M34 46 Q50 56 66 46 L66 86 L34 86 Z" />
+      <rect x="26" y="48" width="8" height="25" rx="3" />
+      <rect x="66" y="48" width="8" height="25" rx="3" />
+      <path d="M38 86 L38 94 M62 86 L62 94" strokeWidth="6" stroke="currentColor" fill="none" />
+      <path d="M30 18 L25 8 Q25 15 28 18 M70 18 L75 8 Q75 15 72 18" />
+      <ellipse cx="43" cy="28" rx="3" ry="4" className="text-green-400" fill="currentColor" />
+      <ellipse cx="57" cy="28" rx="3" ry="4" className="text-green-400" fill="currentColor" />
+      <path d="M50 32 L47 36 L50 38 L53 36 Z" className="text-pink-400" fill="currentColor" />
+      <path d="M38 35 L30 35 M62 35 L70 35 M45 40 L42 44 M55 40 L58 44" strokeWidth="1.5" stroke="currentColor" fill="none" />
+    </svg>
+  ),
   category: 'exotic',
   description: 'Tabaxi are cat-like humanoids driven by curiosity to collect interesting artifacts, gather tales, and lay eyes on all the world\'s wonders.',
   abilityBonuses: { dexterity: 2, charisma: 1 },
@@ -948,7 +999,18 @@ export const TABAXI: Race = {
 export const TORTLE: Race = {
   id: 'tortle',
   name: 'Tortle',
-  icon: '🐢',
+  icon: (
+    <svg className="w-12 h-12 text-green-700/40" viewBox="0 0 100 100" fill="currentColor">
+      <ellipse cx="50" cy="35" rx="14" ry="16" />
+      <ellipse cx="50" cy="60" rx="28" ry="24" className="text-green-800" fill="currentColor" />
+      <path d="M22 55 L12 60 L18 65 M78 55 L88 60 L82 65" />
+      <path d="M35 84 L32 94 M65 84 L68 94" strokeWidth="6" stroke="currentColor" fill="none" />
+      <circle cx="44" cy="33" r="2.5" />
+      <circle cx="56" cy="33" r="2.5" />
+      <path d="M30 58 Q35 56 40 58 M45 60 Q50 58 55 60 M60 58 Q65 56 70 58" strokeWidth="2" stroke="currentColor" fill="none" className="text-yellow-700" opacity="0.6" />
+      <path d="M25 68 Q30 65 35 68 M40 70 Q45 68 50 70 M55 68 Q60 65 65 68" strokeWidth="2" stroke="currentColor" fill="none" className="text-yellow-700" opacity="0.6" />
+    </svg>
+  ),
   category: 'exotic',
   description: 'Tortles are turtle-like humanoids with a walking pace and sedentary nature. They carry their homes on their backs and are naturally armored.',
   abilityBonuses: { strength: 2, wisdom: 1 },
@@ -967,7 +1029,20 @@ export const TORTLE: Race = {
 export const FIRBOLG: Race = {
   id: 'firbolg',
   name: 'Firbolg',
-  icon: '🌿',
+  icon: (
+    <svg className="w-12 h-12 text-emerald-600/40" viewBox="0 0 100 100" fill="currentColor">
+      <ellipse cx="50" cy="30" rx="18" ry="22" />
+      <path d="M32 50 Q50 65 68 50 L68 90 L32 90 Z" />
+      <rect x="22" y="52" width="11" height="32" rx="4" />
+      <rect x="67" y="52" width="11" height="32" rx="4" />
+      <path d="M35 90 L35 98 M65 90 L65 98" strokeWidth="7" stroke="currentColor" fill="none" />
+      <ellipse cx="50" cy="22" rx="22" ry="18" className="text-green-700" fill="currentColor" opacity="0.4" />
+      <path d="M35 18 L30 10 Q28 12 30 15 M65 18 L70 10 Q72 12 70 15" className="text-green-600" fill="currentColor" />
+      <circle cx="43" cy="28" r="2.5" className="text-green-300" fill="currentColor" />
+      <circle cx="57" cy="28" r="2.5" className="text-green-300" fill="currentColor" />
+      <path d="M40 34 Q50 30 60 34" strokeWidth="2" stroke="currentColor" fill="none" />
+    </svg>
+  ),
   category: 'exotic',
   description: 'Firbolgs are gentle giants who live in remote forest strongholds. They are reclusive fey-like creatures who prefer peace and nature.',
   abilityBonuses: { wisdom: 2, strength: 1 },
@@ -986,7 +1061,19 @@ export const FIRBOLG: Race = {
 export const KENKU: Race = {
   id: 'kenku',
   name: 'Kenku',
-  icon: '🐦',
+  icon: (
+    <svg className="w-12 h-12 text-gray-800/40" viewBox="0 0 100 100" fill="currentColor">
+      <ellipse cx="50" cy="32" rx="14" ry="17" />
+      <path d="M36 47 Q50 57 64 47 L64 85 L36 85 Z" />
+      <rect x="30" y="49" width="7" height="23" rx="3" />
+      <rect x="63" y="49" width="7" height="23" rx="3" />
+      <path d="M39 85 L39 93 M61 85 L61 93" strokeWidth="5" stroke="currentColor" fill="none" />
+      <path d="M50 25 L45 15 Q48 17 50 20 Q52 17 55 15 Z" className="text-yellow-600" fill="currentColor" />
+      <circle cx="44" cy="30" r="3" className="text-yellow-500" fill="currentColor" />
+      <circle cx="56" cy="30" r="3" className="text-yellow-500" fill="currentColor" />
+      <path d="M22 50 L15 55 L18 60 M78 50 L85 55 L82 60" className="text-gray-700" fill="currentColor" />
+    </svg>
+  ),
   category: 'exotic',
   description: 'Kenku are cursed crow-like humanoids who lost their ability to fly and their creative voice. They can only mimic sounds they have heard.',
   abilityBonuses: { dexterity: 2, wisdom: 1 },
@@ -1004,7 +1091,20 @@ export const KENKU: Race = {
 export const LIZARDFOLK: Race = {
   id: 'lizardfolk',
   name: 'Lizardfolk',
-  icon: '🦎',
+  icon: (
+    <svg className="w-12 h-12 text-lime-600/40" viewBox="0 0 100 100" fill="currentColor">
+      <ellipse cx="50" cy="32" rx="16" ry="19" />
+      <path d="M34 49 Q50 60 66 49 L66 88 L34 88 Z" />
+      <rect x="28" y="51" width="8" height="25" rx="3" />
+      <rect x="64" y="51" width="8" height="25" rx="3" />
+      <path d="M38 88 L38 95 M62 88 L62 95" strokeWidth="6" stroke="currentColor" fill="none" />
+      <path d="M50 20 L50 10 Q52 12 54 14 Q56 10 58 12" className="text-lime-700" fill="currentColor" />
+      <ellipse cx="43" cy="30" rx="3.5" ry="5" className="text-yellow-400" fill="currentColor" />
+      <ellipse cx="57" cy="30" rx="3.5" ry="5" className="text-yellow-400" fill="currentColor" />
+      <path d="M40 38 L50 40 L60 38" strokeWidth="2" stroke="currentColor" fill="none" />
+      <path d="M50 50 L55 48 L60 50 L65 48 L70 50" strokeWidth="2" stroke="currentColor" fill="none" className="text-lime-700" opacity="0.5" />
+    </svg>
+  ),
   category: 'exotic',
   description: 'Lizardfolk are cold-blooded reptilian humanoids who view the world through a survival-focused lens. They are alien in thought and emotion to most humanoids.',
   abilityBonuses: { constitution: 2, wisdom: 1 },
@@ -1030,7 +1130,19 @@ export const LIZARDFOLK: Race = {
 export const AARAKOCRA: Race = {
   id: 'aarakocra',
   name: 'Aarakocra',
-  icon: '🦅',
+  icon: (
+    <svg className="w-12 h-12 text-sky-500/40" viewBox="0 0 100 100" fill="currentColor">
+      <ellipse cx="50" cy="35" rx="13" ry="16" />
+      <path d="M37 49 Q50 58 63 49 L63 82 L37 82 Z" />
+      <rect x="32" y="51" width="7" height="20" rx="3" />
+      <rect x="61" y="51" width="7" height="20" rx="3" />
+      <path d="M40 82 L40 90 M60 82 L60 90" strokeWidth="5" stroke="currentColor" fill="none" />
+      <path d="M15 45 Q20 35 30 40 Q25 45 25 50 M85 45 Q80 35 70 40 Q75 45 75 50" className="text-amber-400" fill="currentColor" />
+      <path d="M50 28 L46 20 Q48 22 50 25 Q52 22 54 20 Z" className="text-yellow-600" fill="currentColor" />
+      <circle cx="44" cy="33" r="2.5" className="text-yellow-500" fill="currentColor" />
+      <circle cx="56" cy="33" r="2.5" className="text-yellow-500" fill="currentColor" />
+    </svg>
+  ),
   category: 'aerial',
   description: 'Aarakocra are bird-like humanoids native to the Elemental Plane of Air. They have powerful wings that allow them to fly at incredible speeds.',
   abilityBonuses: { dexterity: 2, wisdom: 1 },
@@ -1048,7 +1160,21 @@ export const AARAKOCRA: Race = {
 export const OWLIN: Race = {
   id: 'owlin',
   name: 'Owlin',
-  icon: '🦉',
+  icon: (
+    <svg className="w-12 h-12 text-amber-700/40" viewBox="0 0 100 100" fill="currentColor">
+      <ellipse cx="50" cy="36" rx="18" ry="20" />
+      <path d="M32 54 Q50 64 68 54 L68 86 L32 86 Z" />
+      <rect x="26" y="56" width="8" height="22" rx="3" />
+      <rect x="66" y="56" width="8" height="22" rx="3" />
+      <path d="M36 86 L36 94 M64 86 L64 94" strokeWidth="6" stroke="currentColor" fill="none" />
+      <path d="M18 50 Q22 42 28 48 Q24 52 24 56 M82 50 Q78 42 72 48 Q76 52 76 56" className="text-amber-600" fill="currentColor" />
+      <circle cx="42" cy="34" r="6" className="text-yellow-400" fill="currentColor" />
+      <circle cx="58" cy="34" r="6" className="text-yellow-400" fill="currentColor" />
+      <circle cx="42" cy="34" r="3" className="text-gray-900" fill="currentColor" />
+      <circle cx="58" cy="34" r="3" className="text-gray-900" fill="currentColor" />
+      <path d="M50 42 L46 48 L50 50 L54 48 Z" className="text-yellow-600" fill="currentColor" />
+    </svg>
+  ),
   category: 'aerial',
   description: 'Owlins are owl-like humanoids who hail from the Feywild. They are known for their wisdom and their ability to fly silently through the night sky.',
   sourceBook: { ...SOURCE_BOOKS.SAC, page: 29 },
@@ -1069,7 +1195,20 @@ export const OWLIN: Race = {
 export const FAIRY: Race = {
   id: 'fairy',
   name: 'Fairy',
-  icon: '🧚',
+  icon: (
+    <svg className="w-12 h-12 text-pink-400/40" viewBox="0 0 100 100" fill="currentColor">
+      <ellipse cx="50" cy="48" rx="10" ry="12" />
+      <path d="M40 58 Q50 65 60 58 L60 85 L40 85 Z" />
+      <rect x="37" y="60" width="5" height="15" rx="2" />
+      <rect x="58" y="60" width="5" height="15" rx="2" />
+      <path d="M43 85 L43 92 M57 85 L57 92" strokeWidth="4" stroke="currentColor" fill="none" />
+      <path d="M30 50 Q25 40 30 35 Q35 38 32 45 M70 50 Q75 40 70 35 Q65 38 68 45" className="text-purple-400" fill="currentColor" opacity="0.6" />
+      <path d="M28 55 Q22 48 26 42 Q30 45 28 50 M72 55 Q78 48 74 42 Q70 45 72 50" className="text-cyan-400" fill="currentColor" opacity="0.5" />
+      <circle cx="47" cy="46" r="2" />
+      <circle cx="53" cy="46" r="2" />
+      <circle cx="50" cy="30" r="6" className="text-yellow-300" fill="currentColor" opacity="0.4" />
+    </svg>
+  ),
   category: 'aerial',
   description: 'Fairies are small fey creatures from the Feywild, known for their mischievous nature and innate magical abilities.',
   sourceBook: { ...SOURCE_BOOKS.WBTW, page: 12 },
@@ -1092,7 +1231,19 @@ export const FAIRY: Race = {
 export const TRITON: Race = {
   id: 'triton',
   name: 'Triton',
-  icon: '🧜',
+  icon: (
+    <svg className="w-12 h-12 text-cyan-500/40" viewBox="0 0 100 100" fill="currentColor">
+      <ellipse cx="50" cy="30" rx="15" ry="18" />
+      <path d="M35 46 Q50 56 65 46 L65 75 Q50 85 35 75 Z" />
+      <rect x="28" y="48" width="8" height="18" rx="3" />
+      <rect x="64" y="48" width="8" height="18" rx="3" />
+      <path d="M30 72 L25 80 L35 78 M70 72 L75 80 L65 78" className="text-teal-600" fill="currentColor" />
+      <path d="M35 85 Q40 90 45 92 Q50 95 55 92 Q60 90 65 85" className="text-teal-500" fill="currentColor" />
+      <circle cx="45" cy="28" r="2" />
+      <circle cx="55" cy="28" r="2" />
+      <path d="M38 24 L34 16 Q36 18 38 20 M62 24 L66 16 Q64 18 62 20" className="text-teal-400" fill="currentColor" />
+    </svg>
+  ),
   category: 'aquatic',
   description: 'Tritons are proud aquatic humanoids who hail from the Elemental Plane of Water. They view themselves as guardians of the ocean depths.',
   abilityBonuses: { strength: 1, constitution: 1, charisma: 1 },
@@ -1114,7 +1265,20 @@ export const TRITON: Race = {
 export const LOCATHAH: Race = {
   id: 'locathah',
   name: 'Locathah',
-  icon: '🐟',
+  icon: (
+    <svg className="w-12 h-12 text-blue-500/40" viewBox="0 0 100 100" fill="currentColor">
+      <ellipse cx="50" cy="34" rx="16" ry="19" />
+      <path d="M34 51 Q50 61 66 51 L66 86 L34 86 Z" />
+      <rect x="28" y="53" width="8" height="22" rx="3" />
+      <rect x="64" y="53" width="8" height="22" rx="3" />
+      <path d="M38 86 L38 93 M62 86 L62 93" strokeWidth="6" stroke="currentColor" fill="none" />
+      <ellipse cx="44" cy="32" rx="4" ry="5" className="text-yellow-400" fill="currentColor" />
+      <ellipse cx="56" cy="32" rx="4" ry="5" className="text-yellow-400" fill="currentColor" />
+      <path d="M50 20 L48 12 Q50 14 52 12 Z" className="text-blue-600" fill="currentColor" />
+      <path d="M30 55 L35 58 L30 61 M70 55 L65 58 L70 61" className="text-blue-600" fill="currentColor" />
+      <path d="M40 60 L45 58 L50 60 L55 58 L60 60" strokeWidth="2" stroke="currentColor" fill="none" className="text-blue-400" opacity="0.5" />
+    </svg>
+  ),
   category: 'aquatic',
   description: 'Locathah are fish-like humanoids who live in underwater communities. They are known for their resilience and determination.',
   abilityBonuses: { strength: 2, dexterity: 1 },
@@ -1139,7 +1303,19 @@ export const LOCATHAH: Race = {
 export const GOBLIN: Race = {
   id: 'goblin',
   name: 'Goblin',
-  icon: '👺',
+  icon: (
+    <svg className="w-12 h-12 text-green-500/40" viewBox="0 0 100 100" fill="currentColor">
+      <ellipse cx="50" cy="40" rx="16" ry="18" />
+      <path d="M34 56 Q50 65 66 56 L66 84 L34 84 Z" />
+      <rect x="28" y="58" width="7" height="18" rx="3" />
+      <rect x="65" y="58" width="7" height="18" rx="3" />
+      <path d="M38 84 L38 92 M62 84 L62 92" strokeWidth="5" stroke="currentColor" fill="none" />
+      <path d="M32 35 L26 28 Q28 32 30 34 M68 35 L74 28 Q72 32 70 34" />
+      <ellipse cx="43" cy="38" rx="4" ry="5" className="text-yellow-400" fill="currentColor" />
+      <ellipse cx="57" cy="38" rx="4" ry="5" className="text-yellow-400" fill="currentColor" />
+      <path d="M42 46 L45 50 L48 46 M52 46 L55 50 L58 46" strokeWidth="2" stroke="currentColor" fill="none" />
+    </svg>
+  ),
   category: 'monstrous',
   description: 'Goblins are small, black-hearted humanoids that lair in despoiled dungeons and other dismal settings. They are crafty and tricky.',
   abilityBonuses: { dexterity: 2, constitution: 1 },
@@ -1157,7 +1333,20 @@ export const GOBLIN: Race = {
 export const HOBGOBLIN: Race = {
   id: 'hobgoblin',
   name: 'Hobgoblin',
-  icon: '⚔️',
+  icon: (
+    <svg className="w-12 h-12 text-red-600/40" viewBox="0 0 100 100" fill="currentColor">
+      <ellipse cx="50" cy="32" rx="17" ry="20" />
+      <path d="M33 50 Q50 62 67 50 L67 88 L33 88 Z" />
+      <rect x="24" y="52" width="10" height="28" rx="4" />
+      <rect x="66" y="52" width="10" height="28" rx="4" />
+      <path d="M37 88 L37 96 M63 88 L63 96" strokeWidth="7" stroke="currentColor" fill="none" />
+      <rect x="42" y="24" width="16" height="6" rx="2" className="text-gray-700" fill="currentColor" />
+      <ellipse cx="43" cy="30" rx="3" ry="4" className="text-orange-500" fill="currentColor" />
+      <ellipse cx="57" cy="30" rx="3" ry="4" className="text-orange-500" fill="currentColor" />
+      <path d="M45 38 L48 42 L51 38 M55 38 L52 42" strokeWidth="2" stroke="currentColor" fill="none" />
+      <rect x="40" y="60" width="20" height="15" rx="2" className="text-gray-600" fill="currentColor" opacity="0.3" />
+    </svg>
+  ),
   category: 'monstrous',
   description: 'Hobgoblins are larger and more disciplined than their goblin cousins. They are militaristic and organized, valuing honor and martial prowess.',
   abilityBonuses: { constitution: 2, intelligence: 1 },
@@ -1176,7 +1365,20 @@ export const HOBGOBLIN: Race = {
 export const BUGBEAR: Race = {
   id: 'bugbear',
   name: 'Bugbear',
-  icon: '🐻',
+  icon: (
+    <svg className="w-12 h-12 text-amber-800/40" viewBox="0 0 100 100" fill="currentColor">
+      <ellipse cx="50" cy="34" rx="19" ry="22" />
+      <path d="M31 54 Q50 68 69 54 L69 90 L31 90 Z" />
+      <rect x="21" y="56" width="11" height="30" rx="4" />
+      <rect x="68" y="56" width="11" height="30" rx="4" />
+      <path d="M35 90 L35 98 M65 90 L65 98" strokeWidth="7" stroke="currentColor" fill="none" />
+      <circle cx="32" cy="25" r="8" className="text-amber-700" fill="currentColor" />
+      <circle cx="68" cy="25" r="8" className="text-amber-700" fill="currentColor" />
+      <ellipse cx="43" cy="32" rx="3" ry="4" className="text-yellow-700" fill="currentColor" />
+      <ellipse cx="57" cy="32" rx="3" ry="4" className="text-yellow-700" fill="currentColor" />
+      <path d="M44 40 L47 45 L50 40 M56 40 L53 45" strokeWidth="3" stroke="currentColor" fill="none" />
+    </svg>
+  ),
   category: 'monstrous',
   description: 'Bugbears are the hulking cousins of goblins and hobgoblins. They are stealthy and brutal, perfect ambush predators.',
   abilityBonuses: { strength: 2, dexterity: 1 },
@@ -1197,7 +1399,20 @@ export const BUGBEAR: Race = {
 export const ORC: Race = {
   id: 'orc',
   name: 'Orc',
-  icon: '👾',
+  icon: (
+    <svg className="w-12 h-12 text-green-700/40" viewBox="0 0 100 100" fill="currentColor">
+      <ellipse cx="50" cy="34" rx="18" ry="21" />
+      <path d="M32 53 Q50 66 68 53 L68 89 L32 89 Z" />
+      <rect x="23" y="55" width="10" height="28" rx="4" />
+      <rect x="67" y="55" width="10" height="28" rx="4" />
+      <path d="M36 89 L36 97 M64 89 L64 97" strokeWidth="7" stroke="currentColor" fill="none" />
+      <path d="M36 26 L30 18 Q32 22 34 24 M64 26 L70 18 Q68 22 66 24" />
+      <ellipse cx="43" cy="32" rx="3" ry="4" className="text-red-500" fill="currentColor" />
+      <ellipse cx="57" cy="32" rx="3" ry="4" className="text-red-500" fill="currentColor" />
+      <path d="M40 42 L43 48 L46 42 M54 42 L57 48 L60 42" strokeWidth="2" stroke="currentColor" fill="none" />
+      <path d="M48 46 L48 50 L52 50 L52 46" className="text-white" fill="currentColor" />
+    </svg>
+  ),
   category: 'monstrous',
   description: 'Orcs are savage raiders and pillagers with stooped postures, low foreheads, and piggish faces with prominent lower canines.',
   abilityBonuses: { strength: 2, constitution: 1 },
@@ -1216,7 +1431,20 @@ export const ORC: Race = {
 export const MINOTAUR: Race = {
   id: 'minotaur',
   name: 'Minotaur',
-  icon: '🐂',
+  icon: (
+    <svg className="w-12 h-12 text-stone-600/40" viewBox="0 0 100 100" fill="currentColor">
+      <ellipse cx="50" cy="36" rx="20" ry="23" />
+      <path d="M30 57 Q50 70 70 57 L70 90 L30 90 Z" />
+      <rect x="20" y="59" width="11" height="28" rx="4" />
+      <rect x="69" y="59" width="11" height="28" rx="4" />
+      <path d="M34 90 L34 98 M66 90 L66 98" strokeWidth="7" stroke="currentColor" fill="none" />
+      <path d="M30 28 Q25 20 22 25 Q20 28 22 32 M70 28 Q75 20 78 25 Q80 28 78 32" className="text-gray-700" fill="currentColor" />
+      <ellipse cx="43" cy="34" rx="4" ry="5" className="text-red-600" fill="currentColor" />
+      <ellipse cx="57" cy="34" rx="4" ry="5" className="text-red-600" fill="currentColor" />
+      <ellipse cx="50" cy="44" rx="4" ry="3" className="text-stone-800" fill="currentColor" />
+      <path d="M48 47 L48 52 M52 47 L52 52" strokeWidth="2" stroke="currentColor" fill="none" />
+    </svg>
+  ),
   category: 'monstrous',
   description: 'Minotaurs are barrel-chested humanoids with heads resembling those of bulls. They are known for their fierce temper and formidable presence.',
   abilityBonuses: { strength: 2, constitution: 1 },
@@ -1235,7 +1463,22 @@ export const MINOTAUR: Race = {
 export const CENTAUR: Race = {
   id: 'centaur',
   name: 'Centaur',
-  icon: '🏇',
+  icon: (
+    <svg className="w-12 h-12 text-amber-700/40" viewBox="0 0 100 100" fill="currentColor">
+      <ellipse cx="50" cy="28" rx="14" ry="17" />
+      <path d="M36 43 Q50 52 64 43" />
+      <rect x="30" y="45" width="8" height="15" rx="3" />
+      <rect x="62" y="45" width="8" height="15" rx="3" />
+      <ellipse cx="50" cy="70" rx="24" ry="18" className="text-amber-800" fill="currentColor" />
+      <rect x="34" y="88" width="6" height="10" rx="2" />
+      <rect x="42" y="88" width="6" height="10" rx="2" />
+      <rect x="52" y="88" width="6" height="10" rx="2" />
+      <rect x="60" y="88" width="6" height="10" rx="2" />
+      <circle cx="45" cy="26" r="2" />
+      <circle cx="55" cy="26" r="2" />
+      <path d="M46 18 Q50 10 54 18" strokeWidth="2" stroke="currentColor" fill="none" />
+    </svg>
+  ),
   category: 'monstrous',
   description: 'Centaurs have the upper body of a humanoid and the lower body of a large horse. They are swift and strong, roaming wild places in thundering herds.',
   abilityBonuses: { strength: 2, wisdom: 1 },
@@ -1254,7 +1497,21 @@ export const CENTAUR: Race = {
 export const YUAN_TI: Race = {
   id: 'yuan-ti',
   name: 'Yuan-ti Pureblood',
-  icon: '🐍',
+  icon: (
+    <svg className="w-12 h-12 text-green-600/40" viewBox="0 0 100 100" fill="currentColor">
+      <ellipse cx="50" cy="33" rx="15" ry="18" />
+      <path d="M35 49 Q50 59 65 49 L65 86 L35 86 Z" />
+      <rect x="28" y="51" width="8" height="24" rx="3" />
+      <rect x="64" y="51" width="8" height="24" rx="3" />
+      <path d="M38 86 L38 93 M62 86 L62 93" strokeWidth="6" stroke="currentColor" fill="none" />
+      <ellipse cx="43" cy="31" rx="4.5" ry="6" className="text-yellow-400" fill="currentColor" />
+      <ellipse cx="57" cy="31" rx="4.5" ry="6" className="text-yellow-400" fill="currentColor" />
+      <ellipse cx="43" cy="31" rx="1.5" ry="4" className="text-gray-900" fill="currentColor" />
+      <ellipse cx="57" cy="31" rx="1.5" ry="4" className="text-gray-900" fill="currentColor" />
+      <path d="M40 40 Q50 38 60 40" strokeWidth="2" stroke="currentColor" fill="none" />
+      <path d="M45 45 L48 47 L51 45" strokeWidth="1.5" stroke="currentColor" fill="none" className="text-red-500" />
+    </svg>
+  ),
   category: 'monstrous',
   description: 'Yuan-ti are serpentine humanoids created through dark rituals. Purebloods appear mostly human but have subtle serpentine features.',
   abilityBonuses: { charisma: 2, intelligence: 1 },
@@ -1275,7 +1532,21 @@ export const YUAN_TI: Race = {
 export const KOBOLD: Race = {
   id: 'kobold',
   name: 'Kobold',
-  icon: '🦴',
+  icon: (
+    <svg className="w-12 h-12 text-orange-600/40" viewBox="0 0 100 100" fill="currentColor">
+      <ellipse cx="50" cy="38" rx="15" ry="17" />
+      <path d="M35 53 Q50 62 65 53 L65 83 L35 83 Z" />
+      <rect x="29" y="55" width="7" height="19" rx="3" />
+      <rect x="64" y="55" width="7" height="19" rx="3" />
+      <path d="M38 83 L38 91 M62 83 L62 91" strokeWidth="5" stroke="currentColor" fill="none" />
+      <path d="M50 28 L47 20 Q49 22 51 22 Q53 22 55 20 Z" className="text-orange-700" fill="currentColor" />
+      <ellipse cx="43" cy="36" rx="4" ry="5" className="text-yellow-500" fill="currentColor" />
+      <ellipse cx="57" cy="36" rx="4" ry="5" className="text-yellow-500" fill="currentColor" />
+      <ellipse cx="43" cy="36" rx="2" ry="3" className="text-gray-900" fill="currentColor" />
+      <ellipse cx="57" cy="36" rx="2" ry="3" className="text-gray-900" fill="currentColor" />
+      <path d="M43 44 L46 47 L49 44 M51 44 L54 47 L57 44" strokeWidth="2" stroke="currentColor" fill="none" />
+    </svg>
+  ),
   category: 'monstrous',
   description: 'Kobolds are small reptilian humanoids who often serve dragons. They are crafty and use traps and ambush tactics.',
   abilityBonuses: { dexterity: 2 },
@@ -1297,7 +1568,20 @@ export const KOBOLD: Race = {
 export const WARFORGED: Race = {
   id: 'warforged',
   name: 'Warforged',
-  icon: '🤖',
+  icon: (
+    <svg className="w-12 h-12 text-gray-400/40" viewBox="0 0 100 100" fill="currentColor">
+      <rect x="35" y="25" width="30" height="30" rx="3" />
+      <rect x="35" y="55" width="30" height="35" rx="4" />
+      <rect x="25" y="57" width="10" height="28" rx="2" />
+      <rect x="65" y="57" width="10" height="28" rx="2" />
+      <rect x="38" y="90" width="10" height="8" rx="1" />
+      <rect x="52" y="90" width="10" height="8" rx="1" />
+      <circle cx="43" cy="38" r="3" className="text-cyan-400" fill="currentColor" />
+      <circle cx="57" cy="38" r="3" className="text-cyan-400" fill="currentColor" />
+      <rect x="46" y="44" width="8" height="3" rx="1" className="text-red-500" fill="currentColor" />
+      <path d="M35 62 L40 62 M60 62 L65 62 M40 70 L48 70 M52 70 L60 70" strokeWidth="2" stroke="currentColor" fill="none" className="text-gray-600" />
+    </svg>
+  ),
   category: 'exotic',
   description: 'Warforged are sentient constructs created as weapons of war. They struggle to find their purpose in a world at peace.',
   abilityBonuses: { constitution: 2 },
@@ -1316,7 +1600,24 @@ export const WARFORGED: Race = {
 export const CHANGELING: Race = {
   id: 'changeling',
   name: 'Changeling',
-  icon: '🎭',
+  icon: (
+    <svg className="w-12 h-12 text-purple-400/40" viewBox="0 0 100 100" fill="currentColor">
+      <ellipse cx="35" cy="35" rx="13" ry="16" opacity="0.5" />
+      <ellipse cx="65" cy="35" rx="13" ry="16" />
+      <path d="M22 49 Q35 58 48 49 L48 82 L22 82 Z" opacity="0.5" />
+      <path d="M52 49 Q65 58 78 49 L78 82 L52 82 Z" />
+      <rect x="18" y="51" width="6" height="20" rx="2" opacity="0.5" />
+      <rect x="42" y="51" width="6" height="20" rx="2" opacity="0.5" />
+      <rect x="52" y="51" width="6" height="20" rx="2" />
+      <rect x="76" y="51" width="6" height="20" rx="2" />
+      <path d="M26 82 L26 90 M44 82 L44 90" strokeWidth="5" stroke="currentColor" fill="none" opacity="0.5" />
+      <path d="M56 82 L56 90 M74 82 L74 90" strokeWidth="5" stroke="currentColor" fill="none" />
+      <circle cx="31" cy="33" r="2" opacity="0.5" />
+      <circle cx="39" cy="33" r="2" opacity="0.5" />
+      <circle cx="61" cy="33" r="2" />
+      <circle cx="69" cy="33" r="2" />
+    </svg>
+  ),
   category: 'exotic',
   description: 'Changelings can shift their appearance to match any humanoid they have seen. They are often mistrusted but make excellent spies and performers.',
   abilityBonuses: { charisma: 2 },
@@ -1333,7 +1634,20 @@ export const CHANGELING: Race = {
 export const KALASHTAR: Race = {
   id: 'kalashtar',
   name: 'Kalashtar',
-  icon: '🧘',
+  icon: (
+    <svg className="w-12 h-12 text-indigo-400/40" viewBox="0 0 100 100" fill="currentColor">
+      <ellipse cx="50" cy="32" rx="15" ry="18" />
+      <path d="M35 48 Q50 58 65 48 L65 88 L35 88 Z" />
+      <rect x="28" y="50" width="8" height="25" rx="3" />
+      <rect x="64" y="50" width="8" height="25" rx="3" />
+      <path d="M38 88 L38 96 M62 88 L62 96" strokeWidth="6" stroke="currentColor" fill="none" />
+      <ellipse cx="50" cy="32" rx="18" ry="16" className="text-purple-400" fill="currentColor" opacity="0.3" />
+      <circle cx="50" cy="18" r="7" className="text-indigo-300" fill="currentColor" opacity="0.5" />
+      <path d="M40 20 Q35 15 32 18 M60 20 Q65 15 68 18" strokeWidth="2" stroke="currentColor" fill="none" className="text-purple-300" opacity="0.6" />
+      <circle cx="45" cy="30" r="2" />
+      <circle cx="55" cy="30" r="2" />
+    </svg>
+  ),
   category: 'exotic',
   description: 'Kalashtar are humans bonded with spirits from the plane of dreams. They have telepathic abilities and are naturally resistant to psychic damage.',
   abilityBonuses: { wisdom: 2, charisma: 1 },
@@ -1353,7 +1667,20 @@ export const KALASHTAR: Race = {
 export const SHIFTER: Race = {
   id: 'shifter',
   name: 'Shifter',
-  icon: '🐺',
+  icon: (
+    <svg className="w-12 h-12 text-amber-600/40" viewBox="0 0 100 100" fill="currentColor">
+      <ellipse cx="50" cy="30" rx="17" ry="19" />
+      <path d="M33 47 Q50 58 67 47 L67 87 L33 87 Z" />
+      <rect x="26" y="49" width="9" height="26" rx="3" />
+      <rect x="65" y="49" width="9" height="26" rx="3" />
+      <path d="M37 87 L37 95 M63 87 L63 95" strokeWidth="6" stroke="currentColor" fill="none" />
+      <path d="M35 22 L28 12 Q30 16 33 19 M65 22 L72 12 Q70 16 67 19" />
+      <ellipse cx="43" cy="28" rx="3" ry="4" className="text-yellow-500" fill="currentColor" />
+      <ellipse cx="57" cy="28" rx="3" ry="4" className="text-yellow-500" fill="currentColor" />
+      <path d="M45 35 L48 38 L51 35 M55 35 L52 38" strokeWidth="2" stroke="currentColor" fill="none" />
+      <path d="M50 38 L50 42" strokeWidth="2" stroke="currentColor" fill="none" />
+    </svg>
+  ),
   category: 'exotic',
   description: 'Shifters are descendants of humans and lycanthropes. They can partially transform, gaining bestial features.',
   sourceBook: { ...SOURCE_BOOKS.MPMM, page: 32 },
@@ -1441,7 +1768,20 @@ export const SHIFTER: Race = {
 export const LOXODON: Race = {
   id: 'loxodon',
   name: 'Loxodon',
-  icon: '🐘',
+  icon: (
+    <svg className="w-12 h-12 text-gray-500/40" viewBox="0 0 100 100" fill="currentColor">
+      <ellipse cx="50" cy="32" rx="20" ry="24" />
+      <path d="M30 54 Q50 68 70 54 L70 90 L30 90 Z" />
+      <rect x="20" y="56" width="11" height="30" rx="4" />
+      <rect x="69" y="56" width="11" height="30" rx="4" />
+      <path d="M34 90 L34 98 M66 90 L66 98" strokeWidth="7" stroke="currentColor" fill="none" />
+      <path d="M35 18 L25 10 Q27 15 30 18 M65 18 L75 10 Q73 15 70 18" />
+      <circle cx="42" cy="28" r="3" className="text-gray-700" fill="currentColor" />
+      <circle cx="58" cy="28" r="3" className="text-gray-700" fill="currentColor" />
+      <path d="M50 35 L50 48 Q48 52 50 54 Q52 52 50 48" strokeWidth="3" stroke="currentColor" fill="none" />
+      <path d="M40 60 L45 58 L50 60 L55 58 L60 60" strokeWidth="2" stroke="currentColor" fill="none" className="text-gray-600" opacity="0.4" />
+    </svg>
+  ),
   category: 'exotic',
   description: 'Loxodons are elephant-like humanoids known for their incredible memory, loyalty, and calming presence.',
   abilityBonuses: { constitution: 2, wisdom: 1 },
@@ -1460,7 +1800,20 @@ export const LOXODON: Race = {
 export const VEDALKEN: Race = {
   id: 'vedalken',
   name: 'Vedalken',
-  icon: '🔬',
+  icon: (
+    <svg className="w-12 h-12 text-blue-400/40" viewBox="0 0 100 100" fill="currentColor">
+      <ellipse cx="50" cy="32" rx="16" ry="19" />
+      <path d="M34 49 Q50 59 66 49 L66 88 L34 88 Z" />
+      <rect x="27" y="51" width="8" height="25" rx="3" />
+      <rect x="65" y="51" width="8" height="25" rx="3" />
+      <path d="M38 88 L38 96 M62 88 L62 96" strokeWidth="6" stroke="currentColor" fill="none" />
+      <circle cx="44" cy="30" r="4" className="text-cyan-300" fill="currentColor" />
+      <circle cx="56" cy="30" r="4" className="text-cyan-300" fill="currentColor" />
+      <circle cx="44" cy="30" r="2" className="text-blue-600" fill="currentColor" />
+      <circle cx="56" cy="30" r="2" className="text-blue-600" fill="currentColor" />
+      <path d="M40 20 L35 15 M45 18 L42 12 M55 18 L58 12 M60 20 L65 15" strokeWidth="2" stroke="currentColor" fill="none" className="text-blue-300" opacity="0.5" />
+    </svg>
+  ),
   category: 'exotic',
   description: 'Vedalken are tall, blue-skinned humanoids who are obsessed with improving and perfecting everything they do. They are rational and detail-oriented.',
   abilityBonuses: { intelligence: 2, wisdom: 1 },
@@ -1478,7 +1831,20 @@ export const VEDALKEN: Race = {
 export const SIMIC_HYBRID: Race = {
   id: 'simic-hybrid',
   name: 'Simic Hybrid',
-  icon: '🧬',
+  icon: (
+    <svg className="w-12 h-12 text-teal-500/40" viewBox="0 0 100 100" fill="currentColor">
+      <ellipse cx="50" cy="32" rx="15" ry="18" />
+      <path d="M35 48 Q50 58 65 48 L65 88 L35 88 Z" />
+      <rect x="28" y="50" width="8" height="25" rx="3" />
+      <rect x="64" y="50" width="8" height="25" rx="3" />
+      <path d="M38 88 L38 96 M62 88 L62 96" strokeWidth="6" stroke="currentColor" fill="none" />
+      <circle cx="45" cy="30" r="2.5" />
+      <circle cx="55" cy="30" r="2.5" />
+      <path d="M32 52 L28 55 L32 58 M68 52 L72 55 L68 58" className="text-green-500" fill="currentColor" />
+      <path d="M40 60 Q35 62 35 67 M60 60 Q65 62 65 67" strokeWidth="2" stroke="currentColor" fill="none" className="text-teal-400" opacity="0.6" />
+      <path d="M45 70 L48 73 L51 70 M49 73 L49 78" strokeWidth="2" stroke="currentColor" fill="none" className="text-green-400" />
+    </svg>
+  ),
   category: 'exotic',
   description: 'Simic hybrids are the result of magical experimentation, combining humanoid and animal traits into new forms.',
   abilityBonuses: { constitution: 2 },
