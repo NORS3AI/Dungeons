@@ -33,6 +33,9 @@ export function HomePage() {
     'Lizardfolk': ['CON', 'WIS'],
     'Triton': ['STR', 'CON', 'CHA'],
     'Tortle': ['STR', 'WIS'],
+    'Yuan-ti Pureblood': ['CHA', 'INT'],
+    'Kobold': ['DEX'],
+    'Aarakocra': ['DEX', 'WIS'],
   }
 
   const handleShowReference = (type: 'class' | 'race', name: string) => {
@@ -94,7 +97,7 @@ export function HomePage() {
     <div className="max-w-7xl mx-auto px-4 py-12">
       <div className="text-center mb-16 animate-in fade-in duration-700">
         <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-gold-400 via-yellow-500 to-gold-600
-                       bg-clip-text text-transparent mb-4 pb-2 leading-tight drop-shadow-lg">
+                       bg-clip-text text-transparent mb-6 pb-4 leading-[1.2] overflow-visible">
           Dungeons
         </h1>
         <p className="text-xl md:text-2xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
@@ -106,9 +109,9 @@ export function HomePage() {
       </div>
 
       {/* Main Action Cards */}
-      <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-12">
-        <Link to="/create" className="group relative overflow-hidden">
-          <div className="card-interactive relative z-10">
+      <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-12 px-2 py-4">
+        <Link to="/create" className="group relative overflow-visible">
+          <div className="card-interactive relative z-10 overflow-visible">
             <div className="text-6xl mb-4 transform group-hover:scale-110 transition-transform duration-300">
               &#9876;
             </div>
@@ -129,8 +132,8 @@ export function HomePage() {
                           group-hover:opacity-100 transition-opacity duration-300 rounded-xl" />
         </Link>
 
-        <Link to="/campaign" className="group relative overflow-hidden">
-          <div className="card-interactive relative z-10">
+        <Link to="/campaign" className="group relative overflow-visible">
+          <div className="card-interactive relative z-10 overflow-visible">
             <div className="text-6xl mb-4 transform group-hover:scale-110 transition-transform duration-300">
               &#128220;
             </div>
@@ -320,7 +323,7 @@ export function HomePage() {
               {/* Summary Stats */}
               <div className="mb-8 p-4 bg-gradient-to-r from-gold-600/10 to-yellow-600/10 rounded-lg border border-gold-500/30">
                 <p className="text-center text-2xl font-bold text-gold-400">
-                  653 Total Pieces of Game Content
+                  656 Total Pieces of Game Content
                 </p>
                 <p className="text-center text-sm text-gray-400 mt-1">
                   Everything you need to start playing D&D 5e right now
@@ -420,7 +423,7 @@ export function HomePage() {
                     <div className="flex flex-wrap gap-2 text-sm">
                       {['Human', 'Elf', 'Dwarf', 'Halfling', 'Gnome', 'Half-Elf', 'Half-Orc', 'Tiefling',
                         'Dragonborn', 'Drow', 'Aasimar', 'Goliath', 'Tabaxi', 'Kenku', 'Firbolg',
-                        'Lizardfolk', 'Triton', 'Tortle']
+                        'Lizardfolk', 'Triton', 'Tortle', 'Yuan-ti Pureblood', 'Kobold', 'Aarakocra']
                         .filter(race => {
                           // Filter by selected ability
                           if (!selectedAbility) return true
@@ -464,8 +467,8 @@ export function HomePage() {
                       {selectedAbility
                         ? `${['Human', 'Elf', 'Dwarf', 'Halfling', 'Gnome', 'Half-Elf', 'Half-Orc', 'Tiefling',
                             'Dragonborn', 'Drow', 'Aasimar', 'Goliath', 'Tabaxi', 'Kenku', 'Firbolg',
-                            'Lizardfolk', 'Triton', 'Tortle'].filter(race => raceAbilities[race]?.includes(selectedAbility)).length} Races with ${selectedAbility} bonus`
-                        : 'Total: 18 Races'
+                            'Lizardfolk', 'Triton', 'Tortle', 'Yuan-ti Pureblood', 'Kobold', 'Aarakocra'].filter(race => raceAbilities[race]?.includes(selectedAbility)).length} Races with ${selectedAbility} bonus`
+                        : 'Total: 21 Races'
                       }
                     </p>
                   </div>
