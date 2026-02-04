@@ -366,11 +366,12 @@ const CLASS_INFO: Record<string, ClassInfo> = {
 }
 
 // Race information database
-const RACE_INFO: Record<string, { description: string; size: string; speed: string; traits: string[]; abilityScores: string[] }> = {
+const RACE_INFO: Record<string, { description: string; size: string; speed: string; vision: string; traits: string[]; abilityScores: string[] }> = {
   Human: {
     description: 'Versatile and ambitious, humans are the most adaptable and driven of the common races.',
     size: 'Medium',
     speed: '30 feet',
+    vision: 'Normal vision',
     traits: ['Ability Score Increase (+1 to all)', 'Extra Language', 'Skills Versatility'],
     abilityScores: ['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'],
   },
@@ -378,6 +379,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     description: 'Graceful and long-lived, elves are masters of magic and marksmanship.',
     size: 'Medium',
     speed: '30 feet',
+    vision: 'Darkvision 60 ft',
     traits: ['Darkvision (60 ft)', 'Keen Senses', 'Fey Ancestry', 'Trance'],
     abilityScores: ['DEX'],
   },
@@ -385,6 +387,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     description: 'Bold and hardy, dwarves are skilled warriors, miners, and workers of stone and metal.',
     size: 'Medium',
     speed: '25 feet',
+    vision: 'Darkvision 60 ft',
     traits: ['Darkvision (60 ft)', 'Dwarven Resilience', 'Dwarven Combat Training', 'Stonecunning'],
     abilityScores: ['CON'],
   },
@@ -392,6 +395,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     description: 'Small and practical, halflings are adept at fitting into communities of other races.',
     size: 'Small',
     speed: '25 feet',
+    vision: 'Normal vision',
     traits: ['Lucky', 'Brave', 'Halfling Nimbleness', 'Naturally Stealthy'],
     abilityScores: ['DEX'],
   },
@@ -399,6 +403,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     description: 'Energetic and inventive, gnomes are tinkerers and explorers with a zest for life.',
     size: 'Small',
     speed: '25 feet',
+    vision: 'Darkvision 60 ft',
     traits: ['Darkvision (60 ft)', 'Gnome Cunning', 'Natural Illusionist', 'Speak with Small Beasts'],
     abilityScores: ['INT'],
   },
@@ -406,6 +411,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     description: 'Walking in two worlds but belonging to neither, half-elves combine human and elven traits.',
     size: 'Medium',
     speed: '30 feet',
+    vision: 'Darkvision 60 ft',
     traits: ['Darkvision (60 ft)', 'Fey Ancestry', 'Skill Versatility', 'Ability Score Increase'],
     abilityScores: ['CHA'],
   },
@@ -413,6 +419,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     description: 'Born of human and orc heritage, half-orcs possess remarkable strength and endurance.',
     size: 'Medium',
     speed: '30 feet',
+    vision: 'Darkvision 60 ft',
     traits: ['Darkvision (60 ft)', 'Menacing', 'Relentless Endurance', 'Savage Attacks'],
     abilityScores: ['STR', 'CON'],
   },
@@ -420,6 +427,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     description: 'Bearing an infernal bloodline, tieflings are often met with suspicion but possess innate magic.',
     size: 'Medium',
     speed: '30 feet',
+    vision: 'Darkvision 60 ft',
     traits: ['Darkvision (60 ft)', 'Hellish Resistance', 'Infernal Legacy', 'Fire Resistance'],
     abilityScores: ['CHA', 'INT'],
   },
@@ -427,6 +435,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     description: 'Proud dragon-kin who walk as humanoids, breathing destructive energy.',
     size: 'Medium',
     speed: '30 feet',
+    vision: 'Darkvision 60 ft',
     traits: ['Draconic Ancestry', 'Breath Weapon', 'Damage Resistance', 'Draconic Language'],
     abilityScores: ['STR', 'CHA'],
   },
@@ -434,6 +443,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     description: 'Dark elves from the Underdark, wielding innate magic and superior darkvision.',
     size: 'Medium',
     speed: '30 feet',
+    vision: 'Superior Darkvision 120 ft',
     traits: ['Superior Darkvision (120 ft)', 'Sunlight Sensitivity', 'Drow Magic', 'Drow Weapon Training'],
     abilityScores: ['DEX', 'CHA'],
   },
@@ -441,6 +451,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     description: 'Mortals touched by celestial power, aasimar are guided by divine beings.',
     size: 'Medium',
     speed: '30 feet',
+    vision: 'Darkvision 60 ft',
     traits: ['Darkvision (60 ft)', 'Celestial Resistance', 'Healing Hands', 'Light Bearer'],
     abilityScores: ['CHA'],
   },
@@ -448,6 +459,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     description: 'Towering mountain dwellers known for their strength and competitive nature.',
     size: 'Medium',
     speed: '30 feet',
+    vision: 'Normal vision',
     traits: ["Stone's Endurance", "Powerful Build", 'Mountain Born', 'Natural Athlete'],
     abilityScores: ['STR', 'CON'],
   },
@@ -455,6 +467,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     description: 'Feline humanoids driven by curiosity and wanderlust.',
     size: 'Medium',
     speed: '30 feet',
+    vision: 'Darkvision 60 ft',
     traits: ['Darkvision (60 ft)', 'Feline Agility', "Cat's Claws", "Cat's Talent"],
     abilityScores: ['DEX', 'CHA'],
   },
@@ -462,6 +475,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     description: 'Cursed bird-folk who have lost their wings and their voices.',
     size: 'Medium',
     speed: '30 feet',
+    vision: 'Normal vision',
     traits: ['Expert Forgery', 'Kenku Training', 'Mimicry', 'Cursed by the Gods'],
     abilityScores: ['DEX'],
   },
@@ -469,6 +483,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     description: 'Gentle forest guardians with innate magic and a connection to nature.',
     size: 'Medium',
     speed: '30 feet',
+    vision: 'Normal vision',
     traits: ['Firbolg Magic', 'Hidden Step', 'Powerful Build', 'Speech of Beast and Leaf'],
     abilityScores: ['WIS', 'STR'],
   },
@@ -476,6 +491,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     description: 'Reptilian humanoids with alien thought processes and natural weapons.',
     size: 'Medium',
     speed: '30 feet (swim 30 feet)',
+    vision: 'Normal vision',
     traits: ['Bite', 'Hold Breath', 'Natural Armor', "Hunter's Lore"],
     abilityScores: ['CON', 'WIS'],
   },
@@ -483,6 +499,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     description: 'Aquatic guardians from the Elemental Plane of Water.',
     size: 'Medium',
     speed: '30 feet (swim 30 feet)',
+    vision: 'Darkvision 60 ft',
     traits: ['Amphibious', 'Control Air and Water', 'Emissary of the Sea', 'Guardians of the Depths'],
     abilityScores: ['STR', 'CON', 'CHA'],
   },
@@ -490,6 +507,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     description: 'Turtle-like humanoids with natural armor and a contemplative nature.',
     size: 'Medium',
     speed: '30 feet',
+    vision: 'Normal vision',
     traits: ['Natural Armor', 'Shell Defense', 'Hold Breath', 'Survival Instinct'],
     abilityScores: ['STR', 'WIS'],
   },
@@ -773,7 +791,7 @@ export function ContentReferenceModal({ isOpen, onClose, type, name }: ContentRe
                 </p>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="grid md:grid-cols-3 gap-4">
                 <div className="p-4 bg-gray-900/50 rounded-lg border border-gray-700">
                   <div className="text-sm text-gray-400 mb-1">Size</div>
                   <div className="text-lg font-semibold text-white">{raceInfo.size}</div>
@@ -781,6 +799,10 @@ export function ContentReferenceModal({ isOpen, onClose, type, name }: ContentRe
                 <div className="p-4 bg-gray-900/50 rounded-lg border border-gray-700">
                   <div className="text-sm text-gray-400 mb-1">Speed</div>
                   <div className="text-lg font-semibold text-white">{raceInfo.speed}</div>
+                </div>
+                <div className="p-4 bg-gray-900/50 rounded-lg border border-gray-700">
+                  <div className="text-sm text-gray-400 mb-1">Vision</div>
+                  <div className="text-lg font-semibold text-white">{raceInfo.vision}</div>
                 </div>
               </div>
 
