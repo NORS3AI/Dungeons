@@ -8,7 +8,16 @@ import { SOURCE_BOOKS } from '../../types/race'
 export const HUMAN: Race = {
   id: 'human',
   name: 'Human',
-  icon: '👤',
+  icon: (
+    <svg className="w-12 h-12 text-amber-400/40" viewBox="0 0 100 100" fill="currentColor">
+      <circle cx="50" cy="30" r="15" />
+      <rect x="35" y="47" width="30" height="35" rx="5" />
+      <rect x="25" y="50" width="10" height="25" rx="3" />
+      <rect x="65" y="50" width="10" height="25" rx="3" />
+      <rect x="38" y="82" width="10" height="15" rx="2" />
+      <rect x="52" y="82" width="10" height="15" rx="2" />
+    </svg>
+  ),
   category: 'common',
   description: 'The most adaptable and ambitious people, humans are remarkably diverse in their talents and ambitions. Whatever drives them, humans are the innovators and achievers of the multiverse.',
   sourceBook: { ...SOURCE_BOOKS.PHB2024, page: 166 },
@@ -28,7 +37,17 @@ export const HUMAN: Race = {
 export const DWARF: Race = {
   id: 'dwarf',
   name: 'Dwarf',
-  icon: '⛏️',
+  icon: (
+    <svg className="w-12 h-12 text-stone-400/40" viewBox="0 0 100 100" fill="currentColor">
+      <circle cx="50" cy="35" r="16" />
+      <path d="M34 50 Q50 60 66 50 L66 85 L34 85 Z" />
+      <rect x="28" y="52" width="8" height="22" rx="3" />
+      <rect x="64" y="52" width="8" height="22" rx="3" />
+      <path d="M36 85 L36 95 L44 95 L44 85 M56 85 L56 95 L64 95 L64 85" />
+      <ellipse cx="50" cy="47" rx="18" ry="8" className="text-amber-700" fill="currentColor" />
+      <rect x="42" y="30" width="16" height="6" rx="3" className="text-gray-600" fill="currentColor" />
+    </svg>
+  ),
   category: 'common',
   description: 'Bold and hardy, dwarves are known as skilled warriors, miners, and workers of stone and metal. They stand around 4 to 5 feet tall but are so broad and compact that they weigh as much as a human standing nearly two feet taller.',
   sourceBook: { ...SOURCE_BOOKS.PHB2024, page: 158 },
@@ -103,7 +122,17 @@ export const DWARF: Race = {
 export const ELF: Race = {
   id: 'elf',
   name: 'Elf',
-  icon: '🧝',
+  icon: (
+    <svg className="w-12 h-12 text-emerald-400/40" viewBox="0 0 100 100" fill="currentColor">
+      <ellipse cx="50" cy="32" rx="14" ry="18" />
+      <path d="M36 48 Q50 58 64 48 L64 88 L36 88 Z" />
+      <path d="M30 48 L30 72 M70 48 L70 72" strokeWidth="6" stroke="currentColor" fill="none" />
+      <path d="M36 28 L30 18 M64 28 L70 18" strokeWidth="3" stroke="currentColor" fill="none" />
+      <ellipse cx="44" cy="30" rx="2" ry="3" className="text-cyan-400" fill="currentColor" />
+      <ellipse cx="56" cy="30" rx="2" ry="3" className="text-cyan-400" fill="currentColor" />
+      <path d="M40 88 L40 97 M60 88 L60 97" strokeWidth="5" stroke="currentColor" fill="none" />
+    </svg>
+  ),
   category: 'common',
   description: 'Elves are a magical people of otherworldly grace, living in places of ethereal beauty. They love nature and magic, art and artistry, music and poetry.',
   sourceBook: { ...SOURCE_BOOKS.PHB2024, page: 160 },
@@ -234,7 +263,19 @@ export const ELF: Race = {
 export const HALFLING: Race = {
   id: 'halfling',
   name: 'Halfling',
-  icon: '🦶',
+  icon: (
+    <svg className="w-12 h-12 text-yellow-600/40" viewBox="0 0 100 100" fill="currentColor">
+      <circle cx="50" cy="40" r="13" />
+      <ellipse cx="50" cy="65" rx="12" ry="18" />
+      <rect x="38" y="60" width="7" height="15" rx="3" />
+      <rect x="55" y="60" width="7" height="15" rx="3" />
+      <rect x="42" y="83" width="7" height="12" rx="2" />
+      <rect x="51" y="83" width="7" height="12" rx="2" />
+      <circle cx="45" cy="38" r="2" />
+      <circle cx="55" cy="38" r="2" />
+      <path d="M45 45 Q50 47 55 45" strokeWidth="2" stroke="currentColor" fill="none" />
+    </svg>
+  ),
   category: 'common',
   description: 'The diminutive halflings survive in a world full of larger creatures by avoiding notice or, barring that, avoiding offense. Standing about 3 feet tall, they appear relatively harmless.',
   sourceBook: { ...SOURCE_BOOKS.PHB2024, page: 164 },
@@ -298,7 +339,19 @@ export const HALFLING: Race = {
 export const GNOME: Race = {
   id: 'gnome',
   name: 'Gnome',
-  icon: '🧙',
+  icon: (
+    <svg className="w-12 h-12 text-blue-400/40" viewBox="0 0 100 100" fill="currentColor">
+      <circle cx="50" cy="42" r="14" />
+      <path d="M36 55 Q50 65 64 55 L64 85 L36 85 Z" />
+      <rect x="32" y="58" width="7" height="18" rx="3" />
+      <rect x="61" y="58" width="7" height="18" rx="3" />
+      <path d="M38 85 L38 95 M62 85 L62 95" strokeWidth="6" stroke="currentColor" fill="none" />
+      <path d="M38 25 Q50 15 62 25" className="text-red-500" fill="currentColor" />
+      <circle cx="45" cy="40" r="2.5" />
+      <circle cx="55" cy="40" r="2.5" />
+      <ellipse cx="50" cy="32" rx="18" ry="12" className="text-red-600" fill="currentColor" />
+    </svg>
+  ),
   category: 'common',
   description: 'A gnome\'s energy and enthusiasm for living shines through every inch of their tiny body. They take delight in life, enjoying every moment of invention, exploration, and creation.',
   sourceBook: { ...SOURCE_BOOKS.PHB2024, page: 162 },
@@ -370,7 +423,18 @@ export const GNOME: Race = {
 export const HALF_ELF: Race = {
   id: 'half-elf',
   name: 'Half-Elf',
-  icon: '🧝‍♂️',
+  icon: (
+    <svg className="w-12 h-12 text-teal-400/40" viewBox="0 0 100 100" fill="currentColor">
+      <ellipse cx="50" cy="33" rx="15" ry="17" />
+      <path d="M35 48 Q50 58 65 48 L65 88 L35 88 Z" />
+      <rect x="28" y="50" width="8" height="25" rx="3" />
+      <rect x="64" y="50" width="8" height="25" rx="3" />
+      <path d="M38 88 L38 96 M62 88 L62 96" strokeWidth="6" stroke="currentColor" fill="none" />
+      <path d="M38 28 L34 22 M62 28 L66 22" strokeWidth="2" stroke="currentColor" fill="none" />
+      <circle cx="45" cy="31" r="2" />
+      <circle cx="55" cy="31" r="2" />
+    </svg>
+  ),
   category: 'common',
   description: 'Half-elves combine what some say are the best qualities of their elf and human parents: human curiosity, inventiveness, and ambition, tempered by the refined senses, love of nature, and artistic tastes of the elves.',
   sourceBook: { ...SOURCE_BOOKS.PHB, page: 38 },
@@ -389,7 +453,18 @@ export const HALF_ELF: Race = {
 export const HALF_ORC: Race = {
   id: 'half-orc',
   name: 'Half-Orc',
-  icon: '👹',
+  icon: (
+    <svg className="w-12 h-12 text-green-600/40" viewBox="0 0 100 100" fill="currentColor">
+      <ellipse cx="50" cy="35" rx="18" ry="20" />
+      <path d="M32 52 Q50 65 68 52 L68 90 L32 90 Z" />
+      <rect x="24" y="54" width="10" height="28" rx="4" />
+      <rect x="66" y="54" width="10" height="28" rx="4" />
+      <path d="M36 90 L36 98 M64 90 L64 98" strokeWidth="7" stroke="currentColor" fill="none" />
+      <ellipse cx="43" cy="32" rx="3" ry="4" className="text-yellow-600" fill="currentColor" />
+      <ellipse cx="57" cy="32" rx="3" ry="4" className="text-yellow-600" fill="currentColor" />
+      <path d="M42 42 L45 48 M58 42 L55 48" strokeWidth="3" stroke="currentColor" fill="none" />
+    </svg>
+  ),
   category: 'common',
   description: 'Half-orcs exhibit a blend of orcish and human characteristics. They are not as bestial as full orcs but still have gray skin, sloping foreheads, and prominent teeth.',
   sourceBook: { ...SOURCE_BOOKS.PHB2024, page: 168 },
@@ -410,7 +485,20 @@ export const HALF_ORC: Race = {
 export const DRAGONBORN: Race = {
   id: 'dragonborn',
   name: 'Dragonborn',
-  icon: '🐉',
+  icon: (
+    <svg className="w-12 h-12 text-red-500/40" viewBox="0 0 100 100" fill="currentColor">
+      <ellipse cx="50" cy="30" rx="18" ry="22" />
+      <path d="M32 50 L50 52 L68 50" />
+      <rect x="32" y="50" width="36" height="40" rx="6" />
+      <rect x="24" y="52" width="10" height="30" rx="4" />
+      <rect x="66" y="52" width="10" height="30" rx="4" />
+      <path d="M36 90 L36 98 M64 90 L64 98" strokeWidth="7" stroke="currentColor" fill="none" />
+      <path d="M35 20 L25 15 Q20 18 25 22 M65 20 L75 15 Q80 18 75 22" className="text-orange-600" fill="currentColor" />
+      <circle cx="42" cy="26" r="3" className="text-yellow-400" fill="currentColor" />
+      <circle cx="58" cy="26" r="3" className="text-yellow-400" fill="currentColor" />
+      <path d="M40 35 Q50 30 60 35" strokeWidth="2" stroke="currentColor" fill="none" />
+    </svg>
+  ),
   category: 'common',
   description: 'Dragonborn look very much like dragons standing erect in humanoid form, though they lack wings or a tail. They are tall and strongly built, with dragon-like scales.',
   sourceBook: { ...SOURCE_BOOKS.PHB2024, page: 156 },
@@ -580,7 +668,16 @@ export const DRAGONBORN: Race = {
 export const TIEFLING: Race = {
   id: 'tiefling',
   name: 'Tiefling',
-  icon: '😈',
+  icon: (
+    <svg className="w-12 h-12 text-purple-500/30" viewBox="0 0 100 100" fill="currentColor">
+      <ellipse cx="50" cy="25" rx="20" ry="25" />
+      <path d="M30 50 L50 90 L70 50 Q50 70 30 50" />
+      <path d="M25 20 L15 10 M75 20 L85 10" stroke="currentColor" strokeWidth="3" fill="none" />
+      <circle cx="42" cy="22" r="3" className="text-red-500" fill="currentColor" />
+      <circle cx="58" cy="22" r="3" className="text-red-500" fill="currentColor" />
+      <path d="M50 90 Q55 95 60 100 M50 90 Q45 95 40 100" stroke="currentColor" strokeWidth="3" fill="none" />
+    </svg>
+  ),
   category: 'common',
   description: 'Tieflings are derived from human bloodlines touched by the power of the Nine Hells. They might look like humans, but their infernal heritage has left a clear imprint.',
   sourceBook: { ...SOURCE_BOOKS.PHB2024, page: 170 },

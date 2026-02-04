@@ -1,4 +1,5 @@
 import type { AbilityScores } from './character'
+import type React from 'react'
 
 /**
  * Ability score bonus from a race
@@ -69,8 +70,8 @@ export interface Race {
   name: string
   description: string
 
-  // Visual icon (emoji or SVG identifier)
-  icon?: string
+  // Visual icon (emoji, SVG, or React node)
+  icon?: React.ReactNode
 
   // Category for organization
   category?: 'common' | 'exotic' | 'monstrous' | 'planar' | 'aquatic' | 'aerial'
