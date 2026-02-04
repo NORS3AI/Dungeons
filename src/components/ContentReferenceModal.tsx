@@ -641,6 +641,36 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     ],
     abilityScores: ['DEX', 'WIS'],
   },
+  Eladrin: {
+    description: 'Elves native to the Feywild whose emotions manifest as seasonal magic and physical transformations.',
+    size: 'Medium',
+    speed: '30 feet',
+    vision: 'Darkvision 60 ft',
+    traits: [
+      { name: 'Darkvision (60 ft)' },
+      { name: 'Fey Ancestry - Advantage on charm saves, immune to magical sleep', id: 'fey-ancestry' },
+      { name: 'Fey Step - Teleport up to 30 feet as bonus action (recharge on short/long rest)', id: 'fey-step' },
+      { name: 'Shifting Seasons - Your emotional state manifests as a season (Autumn=peace, Winter=sorrow, Spring=joy, Summer=wrath). Each season grants different magical abilities. Change season after long rest.' },
+      { name: 'Trance - 4 hours meditation = 8 hours sleep', id: 'trance' },
+    ],
+    abilityScores: ['DEX', 'CHA'],
+  },
+  'Sea Elf': {
+    description: 'Aquatic elves who dwell in the shallows and coral reefs of the ocean.',
+    size: 'Medium',
+    speed: '30 feet (swim 30 feet)',
+    vision: 'Darkvision 60 ft',
+    traits: [
+      { name: 'Darkvision (60 ft)' },
+      { name: 'Amphibious - Can breathe air and water' },
+      { name: 'Sea Elf Training - Proficiency with trident, light crossbow, and net' },
+      { name: 'Child of the Sea - Swim speed equals walking speed' },
+      { name: 'Fey Ancestry - Advantage on charm saves, immune to magical sleep', id: 'fey-ancestry' },
+      { name: 'Trance - 4 hours meditation = 8 hours sleep', id: 'trance' },
+      { name: 'Friend of the Sea - Communicate simple ideas with beasts that breathe water' },
+    ],
+    abilityScores: ['DEX', 'CON'],
+  },
 }
 
 export function ContentReferenceModal({ isOpen, onClose, type, name }: ContentReferenceModalProps) {
