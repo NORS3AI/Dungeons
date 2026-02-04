@@ -163,6 +163,7 @@ interface CharacterState {
 
   // Leveling
   levelUp: () => void
+  levelDown: () => void
   setLevel: (level: number) => void
   initializeHP: (rollResult: number) => void
   setLevelWithHP: (level: number, maxHP: number) => void
@@ -627,6 +628,40 @@ export const useCharacterStore = create<CharacterState>()(
 
           const newMaxHP = currentCharacter.hitPoints.maximum + hpIncrease
           const newCurrentHP = currentCharacter.hitPoints.current + hpIncrease
+
+          set({
+            currentCharacter: {
+              ...currentCharacter,
+              level: newLevel,
+              hitPoints: {
+                ...currentCharacter.hitPoints,
+                maximum: newMaxHP,
+                current: newCurrentHP,
+              },
+            },
+            history: {
+              past: [...history.past, currentCharacter],
+              future: [],
+            },
+          })
+        },
+
+        levelDown: () => {
+          const { currentCharacter, history } = get()
+          if (!currentCharacter || currentCharacter.level <= 1) return
+
+          const newLevel = currentCharacter.level - 1
+
+          // Calculate HP decrease (average + CON modifier, same as level up)
+          const hitDieAverage = currentCharacter.class?.hitDie === 'd10' ? 6 :
+                                currentCharacter.class?.hitDie === 'd8' ? 5 :
+                                currentCharacter.class?.hitDie === 'd12' ? 7 :
+                                currentCharacter.class?.hitDie === 'd6' ? 4 : 5
+          const conModifier = Math.floor((currentCharacter.abilityScores.constitution - 10) / 2)
+          const hpDecrease = Math.max(1, hitDieAverage + conModifier)
+
+          const newMaxHP = Math.max(1, currentCharacter.hitPoints.maximum - hpDecrease)
+          const newCurrentHP = Math.max(1, Math.min(currentCharacter.hitPoints.current - hpDecrease, newMaxHP))
 
           set({
             currentCharacter: {
