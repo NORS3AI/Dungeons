@@ -5,7 +5,7 @@ import { DiceRoller, DiceRollerButton, DiceRollerModal } from '../components/Dic
 import { calculateModifier, calculateProficiencyBonus } from '../types/dice'
 import { isWeapon, isArmor, isShield } from '../types/equipment'
 import type { Character, Ability, Equipment, Weapon, Armor, Shield, Currency } from '../types'
-import { ALL_PROFESSIONS, CATEGORY_INFO, formatIncome, getProfessionByRoll, type Profession } from '../data/professions'
+import { CATEGORY_INFO, formatIncome, getProfessionByRoll, type Profession } from '../data/professions'
 import { exportCharacterToJSON, exportCharacterToPDF } from '../utils/characterIO'
 import { QuickRefTooltip } from '../components/QuickRefTooltip'
 
@@ -1105,19 +1105,19 @@ function DailyIncomeRoller({
       <div className="bg-gray-800 rounded-xl p-6 w-full max-w-lg border border-gray-700 max-h-[90vh] overflow-y-auto">
         <h3 className="text-xl font-bold text-dnd-gold mb-4">Daily Income Roller</h3>
         <p className="text-gray-400 text-sm mb-4">
-          Roll d100 to determine your daily profession and earnings, or select a profession manually.
+          Roll d100 once to determine your daily profession and earnings.
         </p>
 
-        {/* Random Roll Section */}
+        {/* Roll Section */}
         <div className="bg-gray-900 rounded-lg p-4 mb-4">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-white font-medium">Random Profession</span>
+            <span className="text-white font-medium">Roll for Profession</span>
             <button
               onClick={handleRandomProfession}
-              disabled={isRolling}
-              className="px-4 py-2 bg-dnd-gold text-gray-900 rounded-lg font-medium hover:bg-yellow-500 transition-colors disabled:opacity-50"
+              disabled={isRolling || selectedProfession !== null}
+              className="px-4 py-2 bg-dnd-gold text-gray-900 rounded-lg font-medium hover:bg-yellow-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isRolling ? 'Rolling...' : 'Roll d100'}
+              {isRolling ? 'Rolling...' : selectedProfession ? 'Already Rolled' : 'Roll d100'}
             </button>
           </div>
           {rollResult !== null && (
@@ -1135,33 +1135,6 @@ function DailyIncomeRoller({
               )}
             </div>
           )}
-        </div>
-
-        {/* Manual Selection */}
-        <div className="mb-4">
-          <label className="text-white font-medium block mb-2">Or Select Profession</label>
-          <select
-            value={selectedProfession?.id || ''}
-            onChange={(e) => {
-              const profession = ALL_PROFESSIONS.find((p) => p.id === e.target.value)
-              setSelectedProfession(profession || null)
-              setRollResult(null)
-              setEarnedAmount(null)
-            }}
-            className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white
-                     focus:outline-none focus:ring-2 focus:ring-dnd-gold"
-          >
-            <option value="">Choose a profession...</option>
-            {Object.entries(CATEGORY_INFO).map(([category, info]) => (
-              <optgroup key={category} label={info.name}>
-                {ALL_PROFESSIONS.filter((p) => p.category === category).map((profession) => (
-                  <option key={profession.id} value={profession.id}>
-                    {profession.name} - {formatIncome(profession.dailyIncome)}/day
-                  </option>
-                ))}
-              </optgroup>
-            ))}
-          </select>
         </div>
 
         {/* Selected Profession Details */}
