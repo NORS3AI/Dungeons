@@ -365,14 +365,25 @@ const CLASS_INFO: Record<string, ClassInfo> = {
   },
 }
 
+// Race trait interface
+interface RaceTrait {
+  name: string
+  id?: string // Optional ID for clickable traits
+}
+
 // Race information database
-const RACE_INFO: Record<string, { description: string; size: string; speed: string; vision: string; traits: string[]; abilityScores: string[] }> = {
+const RACE_INFO: Record<string, { description: string; size: string; speed: string; vision: string; traits: RaceTrait[]; abilityScores: string[] }> = {
   Human: {
     description: 'Versatile and ambitious, humans are the most adaptable and driven of the common races.',
     size: 'Medium',
     speed: '30 feet',
     vision: 'Normal vision',
-    traits: ['Ability Score Increase (+1 to all)', 'Extra Language', 'Skills Versatility'],
+    traits: [
+      { name: 'Ability Score Increase (+1 to all)' },
+      { name: 'Resourceful - Gain Inspiration after each Long Rest', id: 'resourceful' },
+      { name: 'Skillful - Gain 1 additional skill proficiency', id: 'skillful' },
+      { name: 'Versatile - Gain 1 Origin feat at creation', id: 'versatile' },
+    ],
     abilityScores: ['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'],
   },
   Elf: {
@@ -380,7 +391,12 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     size: 'Medium',
     speed: '30 feet',
     vision: 'Darkvision 60 ft',
-    traits: ['Darkvision (60 ft)', 'Keen Senses', 'Fey Ancestry', 'Trance'],
+    traits: [
+      { name: 'Darkvision (60 ft)' },
+      { name: 'Keen Senses - Proficiency in Perception' },
+      { name: 'Fey Ancestry - Advantage on charm saves, immune to magical sleep', id: 'fey-ancestry' },
+      { name: 'Trance - 4 hours meditation = 8 hours sleep', id: 'trance' },
+    ],
     abilityScores: ['DEX'],
   },
   Dwarf: {
@@ -388,7 +404,12 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     size: 'Medium',
     speed: '25 feet',
     vision: 'Darkvision 60 ft',
-    traits: ['Darkvision (60 ft)', 'Dwarven Resilience', 'Dwarven Combat Training', 'Stonecunning'],
+    traits: [
+      { name: 'Darkvision (60 ft)' },
+      { name: 'Dwarven Resilience - Advantage on poison saves, resistance to poison', id: 'dwarven-resilience' },
+      { name: 'Dwarven Combat Training - Proficiency with battleaxe, handaxe, warhammer' },
+      { name: 'Stonecunning - Double proficiency on History checks related to stonework' },
+    ],
     abilityScores: ['CON'],
   },
   Halfling: {
@@ -396,7 +417,12 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     size: 'Small',
     speed: '25 feet',
     vision: 'Normal vision',
-    traits: ['Lucky', 'Brave', 'Halfling Nimbleness', 'Naturally Stealthy'],
+    traits: [
+      { name: 'Lucky - Reroll natural 1s on d20 rolls', id: 'lucky' },
+      { name: 'Brave - Advantage on saves vs. frightened', id: 'brave' },
+      { name: 'Halfling Nimbleness - Move through space of larger creatures', id: 'halfling-nimbleness' },
+      { name: 'Naturally Stealthy - Can hide behind larger creatures' },
+    ],
     abilityScores: ['DEX'],
   },
   Gnome: {
@@ -404,7 +430,12 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     size: 'Small',
     speed: '25 feet',
     vision: 'Darkvision 60 ft',
-    traits: ['Darkvision (60 ft)', 'Gnome Cunning', 'Natural Illusionist', 'Speak with Small Beasts'],
+    traits: [
+      { name: 'Darkvision (60 ft)' },
+      { name: 'Gnome Cunning - Advantage on INT/WIS/CHA saves vs. magic', id: 'gnome-cunning' },
+      { name: 'Natural Illusionist - Know Minor Illusion cantrip' },
+      { name: 'Speak with Small Beasts - Communicate simple ideas with Small beasts' },
+    ],
     abilityScores: ['INT'],
   },
   'Half-Elf': {
@@ -412,7 +443,11 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     size: 'Medium',
     speed: '30 feet',
     vision: 'Darkvision 60 ft',
-    traits: ['Darkvision (60 ft)', 'Fey Ancestry', 'Skill Versatility', 'Ability Score Increase'],
+    traits: [
+      { name: 'Darkvision (60 ft)' },
+      { name: 'Fey Ancestry - Advantage on charm saves, immune to magical sleep', id: 'fey-ancestry' },
+      { name: 'Skill Versatility - Gain 2 additional skill proficiencies', id: 'skill-versatility' },
+    ],
     abilityScores: ['CHA'],
   },
   'Half-Orc': {
@@ -420,7 +455,12 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     size: 'Medium',
     speed: '30 feet',
     vision: 'Darkvision 60 ft',
-    traits: ['Darkvision (60 ft)', 'Menacing', 'Relentless Endurance', 'Savage Attacks'],
+    traits: [
+      { name: 'Darkvision (60 ft)' },
+      { name: 'Menacing - Proficiency in Intimidation' },
+      { name: 'Relentless Endurance - Once per long rest, drop to 1 HP instead of 0', id: 'relentless-endurance' },
+      { name: 'Savage Attacks - Extra weapon die on melee critical hits', id: 'savage-attacks' },
+    ],
     abilityScores: ['STR', 'CON'],
   },
   Tiefling: {
@@ -428,7 +468,11 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     size: 'Medium',
     speed: '30 feet',
     vision: 'Darkvision 60 ft',
-    traits: ['Darkvision (60 ft)', 'Hellish Resistance', 'Infernal Legacy', 'Fire Resistance'],
+    traits: [
+      { name: 'Darkvision (60 ft)' },
+      { name: 'Hellish Resistance - Resistance to fire damage', id: 'hellish-resistance' },
+      { name: 'Infernal Legacy - Know Thaumaturgy, cast Hellish Rebuke & Darkness', id: 'infernal-legacy' },
+    ],
     abilityScores: ['CHA', 'INT'],
   },
   Dragonborn: {
@@ -436,7 +480,11 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     size: 'Medium',
     speed: '30 feet',
     vision: 'Darkvision 60 ft',
-    traits: ['Draconic Ancestry', 'Breath Weapon', 'Damage Resistance', 'Draconic Language'],
+    traits: [
+      { name: 'Draconic Ancestry - Choose dragon type for breath weapon & resistance', id: 'draconic-ancestry' },
+      { name: 'Breath Weapon - Exhale destructive energy based on ancestry', id: 'breath-weapon' },
+      { name: 'Damage Resistance - Resistance to damage type of your draconic ancestry' },
+    ],
     abilityScores: ['STR', 'CHA'],
   },
   Drow: {
@@ -444,7 +492,12 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     size: 'Medium',
     speed: '30 feet',
     vision: 'Superior Darkvision 120 ft',
-    traits: ['Superior Darkvision (120 ft)', 'Sunlight Sensitivity', 'Drow Magic', 'Drow Weapon Training'],
+    traits: [
+      { name: 'Superior Darkvision (120 ft)', id: 'superior-darkvision' },
+      { name: 'Sunlight Sensitivity - Disadvantage on attacks & Perception in sunlight', id: 'sunlight-sensitivity' },
+      { name: 'Drow Magic - Know Dancing Lights, cast Faerie Fire & Darkness', id: 'drow-magic' },
+      { name: 'Drow Weapon Training - Proficiency with rapiers, shortswords, hand crossbows' },
+    ],
     abilityScores: ['DEX', 'CHA'],
   },
   Aasimar: {
@@ -452,7 +505,12 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     size: 'Medium',
     speed: '30 feet',
     vision: 'Darkvision 60 ft',
-    traits: ['Darkvision (60 ft)', 'Celestial Resistance', 'Healing Hands', 'Light Bearer'],
+    traits: [
+      { name: 'Darkvision (60 ft)' },
+      { name: 'Celestial Resistance - Resistance to necrotic & radiant damage', id: 'celestial-resistance' },
+      { name: 'Healing Hands - Heal creatures equal to your level once per long rest', id: 'healing-hands' },
+      { name: 'Light Bearer - Know the Light cantrip' },
+    ],
     abilityScores: ['CHA'],
   },
   Goliath: {
@@ -460,7 +518,12 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     size: 'Medium',
     speed: '30 feet',
     vision: 'Normal vision',
-    traits: ["Stone's Endurance", "Powerful Build", 'Mountain Born', 'Natural Athlete'],
+    traits: [
+      { name: "Stone's Endurance - Reduce damage once per short rest", id: 'stones-endurance' },
+      { name: "Powerful Build - Count as Large for carrying capacity", id: 'powerful-build' },
+      { name: 'Mountain Born - Acclimated to high altitude and cold' },
+      { name: 'Natural Athlete - Proficiency in Athletics' },
+    ],
     abilityScores: ['STR', 'CON'],
   },
   Tabaxi: {
@@ -468,7 +531,12 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     size: 'Medium',
     speed: '30 feet',
     vision: 'Darkvision 60 ft',
-    traits: ['Darkvision (60 ft)', 'Feline Agility', "Cat's Claws", "Cat's Talent"],
+    traits: [
+      { name: 'Darkvision (60 ft)' },
+      { name: 'Feline Agility - Double speed until end of turn', id: 'feline-agility' },
+      { name: "Cat's Claws - Unarmed strikes deal 1d6 slashing, climbing speed = walking speed" },
+      { name: "Cat's Talent - Proficiency in Perception and Stealth" },
+    ],
     abilityScores: ['DEX', 'CHA'],
   },
   Kenku: {
@@ -476,7 +544,11 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     size: 'Medium',
     speed: '30 feet',
     vision: 'Normal vision',
-    traits: ['Expert Forgery', 'Kenku Training', 'Mimicry', 'Cursed by the Gods'],
+    traits: [
+      { name: 'Expert Forgery - Advantage on checks to produce forgeries' },
+      { name: 'Kenku Training - Proficiency in two skills of your choice' },
+      { name: 'Mimicry - Can mimic sounds and voices heard', id: 'mimicry' },
+    ],
     abilityScores: ['DEX'],
   },
   Firbolg: {
@@ -484,7 +556,12 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     size: 'Medium',
     speed: '30 feet',
     vision: 'Normal vision',
-    traits: ['Firbolg Magic', 'Hidden Step', 'Powerful Build', 'Speech of Beast and Leaf'],
+    traits: [
+      { name: 'Firbolg Magic - Cast Detect Magic & Disguise Self', id: 'firbolg-magic' },
+      { name: 'Hidden Step - Bonus action to turn invisible until next turn', id: 'hidden-step' },
+      { name: "Powerful Build - Count as Large for carrying capacity", id: 'powerful-build' },
+      { name: 'Speech of Beast and Leaf - Limited communication with beasts & plants' },
+    ],
     abilityScores: ['WIS', 'STR'],
   },
   Lizardfolk: {
@@ -492,7 +569,12 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     size: 'Medium',
     speed: '30 feet (swim 30 feet)',
     vision: 'Normal vision',
-    traits: ['Bite', 'Hold Breath', 'Natural Armor', "Hunter's Lore"],
+    traits: [
+      { name: 'Bite - Unarmed strike deals 1d6 + STR piercing damage' },
+      { name: 'Hold Breath - Can hold breath for 15 minutes' },
+      { name: 'Natural Armor - AC = 13 + DEX modifier when unarmored', id: 'natural-armor' },
+      { name: "Hunter's Lore - Proficiency in two skills from Animal Handling, Nature, Perception, Stealth, Survival" },
+    ],
     abilityScores: ['CON', 'WIS'],
   },
   Triton: {
@@ -500,7 +582,12 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     size: 'Medium',
     speed: '30 feet (swim 30 feet)',
     vision: 'Darkvision 60 ft',
-    traits: ['Amphibious', 'Control Air and Water', 'Emissary of the Sea', 'Guardians of the Depths'],
+    traits: [
+      { name: 'Amphibious - Can breathe air and water' },
+      { name: 'Control Air and Water - Cast Fog Cloud, Gust of Wind, Wall of Water' },
+      { name: 'Emissary of the Sea - Communicate simple ideas with beasts that breathe water' },
+      { name: 'Guardians of the Depths - Resistance to cold damage, ignore deep water pressure' },
+    ],
     abilityScores: ['STR', 'CON', 'CHA'],
   },
   Tortle: {
@@ -508,7 +595,12 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     size: 'Medium',
     speed: '30 feet',
     vision: 'Normal vision',
-    traits: ['Natural Armor', 'Shell Defense', 'Hold Breath', 'Survival Instinct'],
+    traits: [
+      { name: 'Natural Armor - AC = 17 when unarmored (cannot wear armor)', id: 'natural-armor' },
+      { name: 'Shell Defense - Action to withdraw into shell, +4 AC, disadvantage on DEX saves', id: 'shell-defense' },
+      { name: 'Hold Breath - Can hold breath for 1 hour' },
+      { name: 'Survival Instinct - Proficiency in Survival' },
+    ],
     abilityScores: ['STR', 'WIS'],
   },
 }
@@ -811,6 +903,9 @@ export function ContentReferenceModal({ isOpen, onClose, type, name }: ContentRe
                   <span>✨</span>
                   Racial Traits
                 </h3>
+                <p className="text-xs text-gray-400 mb-3 italic">
+                  Click traits with underlines to learn more details
+                </p>
                 <div className="grid gap-2">
                   {raceInfo.traits.map((trait, index) => (
                     <div
@@ -819,7 +914,15 @@ export function ContentReferenceModal({ isOpen, onClose, type, name }: ContentRe
                                hover:border-gold-500/50 transition-colors"
                     >
                       <span className="text-gold-500">•</span>
-                      <span className="text-gray-300">{trait}</span>
+                      {trait.id ? (
+                        <QuickRefTooltip type="trait" id={trait.id}>
+                          <span className="text-gray-300 hover:text-gold-400 cursor-pointer underline decoration-dotted">
+                            {trait.name}
+                          </span>
+                        </QuickRefTooltip>
+                      ) : (
+                        <span className="text-gray-300">{trait.name}</span>
+                      )}
                     </div>
                   ))}
                 </div>
