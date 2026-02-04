@@ -10,35 +10,7 @@ export function HomePage() {
   const [importError, setImportError] = useState<string | null>(null)
   const [showFullContent, setShowFullContent] = useState(false)
   const [referenceModal, setReferenceModal] = useState<{ type: 'class' | 'race' | null; name: string | null }>({ type: null, name: null })
-  const [selectedAbility, setSelectedAbility] = useState<string | null>(null)
   const { characters, loadCharacter, deleteCharacter, importCharacter } = useCharacterStore()
-
-  // Race data with ability bonuses
-  const raceAbilities: Record<string, string[]> = {
-    'Human': ['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'],
-    'Elf': ['DEX'],
-    'Dwarf': ['CON'],
-    'Halfling': ['DEX'],
-    'Gnome': ['INT'],
-    'Half-Elf': ['CHA'],
-    'Half-Orc': ['STR', 'CON'],
-    'Tiefling': ['CHA', 'INT'],
-    'Dragonborn': ['STR', 'CHA'],
-    'Drow': ['DEX', 'CHA'],
-    'Aasimar': ['CHA'],
-    'Goliath': ['STR', 'CON'],
-    'Tabaxi': ['DEX', 'CHA'],
-    'Kenku': ['DEX'],
-    'Firbolg': ['WIS', 'STR'],
-    'Lizardfolk': ['CON', 'WIS'],
-    'Triton': ['STR', 'CON', 'CHA'],
-    'Tortle': ['STR', 'WIS'],
-    'Yuan-ti Pureblood': ['CHA', 'INT'],
-    'Kobold': ['DEX'],
-    'Aarakocra': ['DEX', 'WIS'],
-    'Eladrin': ['DEX', 'CHA'],
-    'Sea Elf': ['DEX', 'CON'],
-  }
 
   const handleShowReference = (type: 'class' | 'race', name: string) => {
     setReferenceModal({ type, name })
@@ -395,83 +367,25 @@ export function HomePage() {
                     </h3>
                     <p className="text-xs text-gray-500 mb-3 italic">Click any race to learn more</p>
 
-                    {/* Ability Score Filter Buttons */}
-                    <div className="mb-4 flex flex-wrap gap-2">
-                      <button
-                        onClick={() => setSelectedAbility(null)}
-                        className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-200 ${
-                          selectedAbility === null
-                            ? 'bg-gold-600 text-white border-2 border-gold-500'
-                            : 'bg-gray-700/30 text-gray-400 border border-gray-600 hover:bg-gray-700/50 hover:text-gray-300'
-                        }`}
-                      >
-                        All Races
-                      </button>
-                      {['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'].map((ability) => (
-                        <button
-                          key={ability}
-                          onClick={() => setSelectedAbility(ability)}
-                          className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-200 ${
-                            selectedAbility === ability
-                              ? 'bg-blue-600 text-white border-2 border-blue-500 shadow-lg shadow-blue-500/30'
-                              : 'bg-gray-700/30 text-gray-400 border border-gray-600 hover:bg-blue-600/20 hover:text-blue-400 hover:border-blue-500/50'
-                          }`}
-                        >
-                          {ability}
-                        </button>
-                      ))}
-                    </div>
-
                     <div className="flex flex-wrap gap-2 text-sm">
                       {['Human', 'Elf', 'Dwarf', 'Halfling', 'Gnome', 'Half-Elf', 'Half-Orc', 'Tiefling',
                         'Dragonborn', 'Drow', 'Aasimar', 'Goliath', 'Tabaxi', 'Kenku', 'Firbolg',
                         'Lizardfolk', 'Triton', 'Tortle', 'Yuan-ti Pureblood', 'Kobold', 'Aarakocra', 'Eladrin', 'Sea Elf']
-                        .filter(race => {
-                          // Filter by selected ability
-                          if (!selectedAbility) return true
-                          return raceAbilities[race]?.includes(selectedAbility)
-                        })
-                        .map(race => {
-                          const abilities = raceAbilities[race] || []
-                          return (
-                            <button
-                              key={race}
-                              onClick={() => handleShowReference('race', race)}
-                              className="group px-3 py-2 bg-gray-700/50 text-gray-300 rounded-md
-                                       hover:bg-gold-600/20 hover:text-gold-400 hover:border-gold-500/50
-                                       border border-transparent transition-all duration-200
-                                       transform hover:scale-105 flex flex-col items-start gap-1"
-                            >
-                              <span className="font-medium">{race}</span>
-                              <div className="flex flex-wrap gap-1">
-                                {abilities.map(ability => (
-                                  <span
-                                    key={ability}
-                                    className={`px-1.5 py-0.5 rounded text-[10px] font-bold transition-colors ${
-                                      ability === 'STR' ? 'bg-red-900/40 text-red-400 group-hover:bg-red-900/60' :
-                                      ability === 'DEX' ? 'bg-green-900/40 text-green-400 group-hover:bg-green-900/60' :
-                                      ability === 'CON' ? 'bg-orange-900/40 text-orange-400 group-hover:bg-orange-900/60' :
-                                      ability === 'INT' ? 'bg-blue-900/40 text-blue-400 group-hover:bg-blue-900/60' :
-                                      ability === 'WIS' ? 'bg-purple-900/40 text-purple-400 group-hover:bg-purple-900/60' :
-                                      ability === 'CHA' ? 'bg-pink-900/40 text-pink-400 group-hover:bg-pink-900/60' :
-                                      'bg-gray-900/40 text-gray-400 group-hover:bg-gray-900/60'
-                                    }`}
-                                  >
-                                    {ability}
-                                  </span>
-                                ))}
-                              </div>
-                            </button>
-                          )
-                        })}
+                        .map(race => (
+                          <button
+                            key={race}
+                            onClick={() => handleShowReference('race', race)}
+                            className="px-3 py-2 bg-gray-700/50 text-gray-300 rounded-md
+                                     hover:bg-gold-600/20 hover:text-gold-400 hover:border-gold-500/50
+                                     border border-transparent transition-all duration-200
+                                     transform hover:scale-105 font-medium"
+                          >
+                            {race}
+                          </button>
+                        ))}
                     </div>
                     <p className="mt-3 text-gold-400 font-medium">
-                      {selectedAbility
-                        ? `${['Human', 'Elf', 'Dwarf', 'Halfling', 'Gnome', 'Half-Elf', 'Half-Orc', 'Tiefling',
-                            'Dragonborn', 'Drow', 'Aasimar', 'Goliath', 'Tabaxi', 'Kenku', 'Firbolg',
-                            'Lizardfolk', 'Triton', 'Tortle', 'Yuan-ti Pureblood', 'Kobold', 'Aarakocra', 'Eladrin', 'Sea Elf'].filter(race => raceAbilities[race]?.includes(selectedAbility)).length} Races with ${selectedAbility} bonus`
-                        : 'Total: 23 Races'
-                      }
+                      Total: 23 Races
                     </p>
                   </div>
 
