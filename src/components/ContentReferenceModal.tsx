@@ -514,7 +514,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     abilityScores: ['CHA'],
   },
   Goliath: {
-    description: 'Towering mountain dwellers known for their strength and competitive nature.',
+    description: 'Towering mountain dwellers known for their strength and competitive nature. Goliaths are massive humanoids who dwell among the highest mountain peaks, standing between 7 and 8 feet tall and weighing 280 to 340 pounds. Their skin is mottled with dark and light patches.\n\nEvery day brings a new challenge to a goliath. Food, water, and shelter are rare in the uppermost mountain reaches, and a single mistake can bring doom to an entire tribe. Goliaths thus place a premium on self-sufficiency and individual skill.\n\nGoliath society is fiercely competitive. From birth, they are taught that they must earn their place through displays of strength and prowess. This competitive nature represents their fundamental drive to improve themselves and their communities.\n\nGoliath adventurers often leave their mountain homes to prove themselves in the wider world. They view adventuring as the ultimate competition, a chance to prove their worth against the greatest threats.',
     size: 'Medium',
     speed: '30 feet',
     vision: 'Normal vision',
@@ -527,7 +527,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     abilityScores: ['STR', 'CON'],
   },
   Tabaxi: {
-    description: 'Feline humanoids driven by curiosity and wanderlust.',
+    description: 'Feline humanoids driven by curiosity and wanderlust. Hailing from a strange and distant land, wandering tabaxi are catlike humanoids driven by curiosity to collect interesting artifacts, gather tales and stories, and lay eyes on all the world has to offer.\n\nTabaxi have feline heads, sleek bodies covered in spotted or striped fur, and long tails. Their claws are retractable, and they possess an innate climbing ability. They stand roughly human height but are more slender and graceful.\n\nTabaxi treasure knowledge rather than material things. A chest filled with gold coins might be useful for buying food or a coil of rope, but it is not intrinsically interesting. They are driven by an insatiable curiosity about everything, seeking out stories, legends, and lore.\n\nMost tabaxi remain in their distant homeland, but a rare few become wanderers who journey to the far corners of the world. Tabaxi adventurers are driven by their obsessive curiosity, collecting stories and knowledge to bring back to their clans.',
     size: 'Medium',
     speed: '30 feet',
     vision: 'Darkvision 60 ft',
@@ -540,7 +540,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     abilityScores: ['DEX', 'CHA'],
   },
   Kenku: {
-    description: 'Cursed bird-folk who have lost their wings and their voices.',
+    description: 'Cursed bird-folk who have lost their wings and their voices. Haunted by an ancient crime that robbed them of their wings, the flightless kenku wander the world as vagabonds and burglars who live at the edge of human society. They are unable to speak in their own voices, instead mimicking the sounds and voices they hear.\n\nKenku are covered in russet-brown to black feathers, roughly humanoid-shaped with bird-like talons for hands and feet. They are slightly shorter than humans, averaging 5 feet tall. Their beaks give them a natural unarmed strike weapon.\n\nKenku suffer from a sinister reputation that is not wholly unearned, but they can prove to be valuable allies. They are supremely talented mimics, able to reproduce any sound they hear with perfect accuracy, which makes them excellent spies and infiltrators.\n\nKenku adventurers often seek to regain what was taken from their people - the power of flight and the ability to create. Others simply try to earn enough coin to survive in a world that views them with suspicion and fear.',
     size: 'Medium',
     speed: '30 feet',
     vision: 'Normal vision',
