@@ -7,6 +7,7 @@ interface CharacterDetails {
   weight: string
   backstory: string
   playerName: string
+  startingLevel: number
 }
 
 interface CharacterDetailsFormProps {
@@ -31,25 +32,26 @@ export function CharacterDetailsForm({
     weight: initialValues.weight ?? '',
     backstory: initialValues.backstory ?? '',
     playerName: initialValues.playerName ?? '',
+    startingLevel: initialValues.startingLevel ?? 1,
   })
 
   const [errors, setErrors] = useState<Partial<Record<keyof CharacterDetails, string>>>({})
   const [touched, setTouched] = useState<Partial<Record<keyof CharacterDetails, boolean>>>({})
 
   // Refs for keyboard navigation
-  const inputRefs = useRef<(HTMLInputElement | HTMLTextAreaElement | null)[]>([])
+  const inputRefs = useRef<(HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | null)[]>([])
 
   // Focus first input on mount
   useEffect(() => {
     inputRefs.current[0]?.focus()
   }, [])
 
-  const validateField = (field: keyof CharacterDetails, value: string): string | undefined => {
+  const validateField = (field: keyof CharacterDetails, value: string | number): string | undefined => {
     switch (field) {
       case 'name':
-        if (!value.trim()) return 'Character name is required'
-        if (value.length < 2) return 'Name must be at least 2 characters'
-        if (value.length > 50) return 'Name must be 50 characters or less'
+        if (typeof value === 'string' && !value.trim()) return 'Character name is required'
+        if (typeof value === 'string' && value.length < 2) return 'Name must be at least 2 characters'
+        if (typeof value === 'string' && value.length > 50) return 'Name must be 50 characters or less'
         break
       case 'age':
         if (value && (isNaN(Number(value)) || Number(value) < 0)) {
@@ -57,22 +59,25 @@ export function CharacterDetailsForm({
         }
         break
       case 'height':
-        if (value && value.length > 20) return 'Height must be 20 characters or less'
+        if (typeof value === 'string' && value.length > 20) return 'Height must be 20 characters or less'
         break
       case 'weight':
-        if (value && value.length > 20) return 'Weight must be 20 characters or less'
+        if (typeof value === 'string' && value.length > 20) return 'Weight must be 20 characters or less'
         break
       case 'backstory':
-        if (value.length > 5000) return 'Backstory must be 5000 characters or less'
+        if (typeof value === 'string' && value.length > 5000) return 'Backstory must be 5000 characters or less'
         break
       case 'playerName':
-        if (value.length > 50) return 'Player name must be 50 characters or less'
+        if (typeof value === 'string' && value.length > 50) return 'Player name must be 50 characters or less'
+        break
+      case 'startingLevel':
+        if (typeof value === 'number' && (value < 1 || value > 20)) return 'Starting level must be between 1 and 20'
         break
     }
     return undefined
   }
 
-  const handleChange = (field: keyof CharacterDetails, value: string) => {
+  const handleChange = (field: keyof CharacterDetails, value: string | number) => {
     setDetails((prev) => ({ ...prev, [field]: value }))
 
     // Clear error when user starts typing
@@ -127,6 +132,7 @@ export function CharacterDetailsForm({
       weight: true,
       backstory: true,
       playerName: true,
+      startingLevel: true,
     })
 
     if (!hasErrors) {
@@ -185,6 +191,34 @@ export function CharacterDetailsForm({
           )}
         </div>
 
+        {/* Starting Level */}
+        <div>
+          <label htmlFor="startingLevel" className={labelClass}>
+            Starting Level <span className="text-red-400">*</span>
+          </label>
+          <select
+            ref={(el) => { inputRefs.current[1] = el as HTMLSelectElement }}
+            id="startingLevel"
+            value={details.startingLevel}
+            onChange={(e) => handleChange('startingLevel', parseInt(e.target.value))}
+            onBlur={() => handleBlur('startingLevel')}
+            className={inputClass('startingLevel')}
+            aria-required="true"
+            aria-invalid={!!errors.startingLevel && touched.startingLevel}
+          >
+            {Array.from({ length: 20 }, (_, i) => i + 1).map((level) => (
+              <option key={level} value={level}>
+                Level {level}
+              </option>
+            ))}
+          </select>
+          {errors.startingLevel && touched.startingLevel && (
+            <p className={errorClass} role="alert">
+              {errors.startingLevel}
+            </p>
+          )}
+        </div>
+
         {/* Age */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
@@ -192,13 +226,13 @@ export function CharacterDetailsForm({
               Age
             </label>
             <input
-              ref={(el) => { inputRefs.current[1] = el }}
+              ref={(el) => { inputRefs.current[2] = el }}
               id="age"
               type="text"
               value={details.age}
               onChange={(e) => handleChange('age', e.target.value)}
               onBlur={() => handleBlur('age')}
-              onKeyDown={(e) => handleKeyDown(e, 1)}
+              onKeyDown={(e) => handleKeyDown(e, 2)}
               placeholder="e.g., 25"
               className={inputClass('age')}
               aria-invalid={!!errors.age && touched.age}
@@ -216,13 +250,13 @@ export function CharacterDetailsForm({
               Height
             </label>
             <input
-              ref={(el) => { inputRefs.current[2] = el }}
+              ref={(el) => { inputRefs.current[3] = el }}
               id="height"
               type="text"
               value={details.height}
               onChange={(e) => handleChange('height', e.target.value)}
               onBlur={() => handleBlur('height')}
-              onKeyDown={(e) => handleKeyDown(e, 2)}
+              onKeyDown={(e) => handleKeyDown(e, 3)}
               placeholder="e.g., 5'10&quot;"
               className={inputClass('height')}
             />
@@ -239,13 +273,13 @@ export function CharacterDetailsForm({
               Weight
             </label>
             <input
-              ref={(el) => { inputRefs.current[3] = el }}
+              ref={(el) => { inputRefs.current[4] = el }}
               id="weight"
               type="text"
               value={details.weight}
               onChange={(e) => handleChange('weight', e.target.value)}
               onBlur={() => handleBlur('weight')}
-              onKeyDown={(e) => handleKeyDown(e, 3)}
+              onKeyDown={(e) => handleKeyDown(e, 4)}
               placeholder="e.g., 150 lbs"
               className={inputClass('weight')}
             />
@@ -263,13 +297,13 @@ export function CharacterDetailsForm({
             Player Name
           </label>
           <input
-            ref={(el) => { inputRefs.current[4] = el }}
+            ref={(el) => { inputRefs.current[5] = el }}
             id="playerName"
             type="text"
             value={details.playerName}
             onChange={(e) => handleChange('playerName', e.target.value)}
             onBlur={() => handleBlur('playerName')}
-            onKeyDown={(e) => handleKeyDown(e, 4)}
+            onKeyDown={(e) => handleKeyDown(e, 5)}
             placeholder="Your name (for DM tracking)"
             className={inputClass('playerName')}
           />
@@ -286,7 +320,7 @@ export function CharacterDetailsForm({
             Background Story / Notes
           </label>
           <textarea
-            ref={(el) => { inputRefs.current[5] = el }}
+            ref={(el) => { inputRefs.current[6] = el }}
             id="backstory"
             value={details.backstory}
             onChange={(e) => handleChange('backstory', e.target.value)}
