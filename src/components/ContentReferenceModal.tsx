@@ -711,7 +711,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     abilityScores: ['WIS', 'CHA'],
   },
   Shifter: {
-    description: 'Descended from lycanthropes, shifters can temporarily enhance their animalistic features.',
+    description: 'Descended from lycanthropes, shifters can temporarily enhance their animalistic features. Shifters are sometimes called weretouched, as they are descendants of people who contracted full or partial lycanthropy. Humanoids with a bestial aspect, shifters cannot fully change shape, but they can temporarily enhance their animalistic features by entering a state they call shifting.\n\nShifters are similar to humans in height and build but are typically more lithe and flexible. Their facial features have a bestial cast, with wide, flat noses and large eyes. Most shifters have prominent canine teeth. They have thick, often coarse hair, and some have hair sprouting from odd locations on their bodies.\n\nWhatever their form, shifters have a strong, adaptable nature. They excel at surviving in the wild, connecting with animals, and sensing threats. Different shifter subraces display different bestial aspects: beasthide shifters call on the bear, longtooth on the tiger, swiftstride on the wolf, and wildhunt on aspects of keen-sensed predators.\n\nShifters are uncomfortable when surrounded by lots of people and tend to avoid large cities. They value personal freedom highly and chafe under any kind of long-term obligation. Most shifters adventure to explore the wilderness and prove their independence from civilized society.',
     size: 'Medium',
     speed: '30 feet',
     vision: 'Darkvision 60 ft',
@@ -723,7 +723,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     abilityScores: ['DEX'],
   },
   'Beasthide Shifter': {
-    description: 'Shifters with stoic, bear-like resilience and thick, toughened skin.',
+    description: 'Shifters with stoic, bear-like resilience and thick, toughened skin. Beasthide shifters are typically tied to the bear or the boar. Stoic and solid, beasthide shifters are natural tanks. When shifting, their skin thickens and hardens, providing natural armor superior to most conventional protection.\n\nThese shifters often have broad, muscular builds and thick body hair. Their features suggest strength and endurance. When they shift, their skin becomes tough and leathery, and they gain incredible resilience to damage. This toughness makes them excellent front-line fighters and bodyguards.\n\nBeasthide shifters value strength, both physical and of character. They often serve as protectors in shifter communities, standing as immovable guardians. Their patient, enduring nature makes them reliable allies, though they can be stubborn when challenged.',
     size: 'Medium',
     speed: '30 feet',
     vision: 'Darkvision 60 ft',
@@ -736,7 +736,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     abilityScores: ['STR', 'CON'],
   },
   'Longtooth Shifter': {
-    description: 'Fierce shifters with prominent fangs and predatory instincts.',
+    description: 'Fierce shifters with prominent fangs and predatory instincts. Longtooth shifters are fierce and aggressive, often associated with tigers, wolves, or other predators. They have prominent canines that grow even longer and sharper when shifting, becoming deadly natural weapons.\n\nThese shifters tend to be lean and muscular, with sharp features and intense eyes. Their predatory nature makes them natural hunters and warriors. When shifting, they can make devastating bite attacks, tearing into enemies with savage fury. This ferocity makes them feared in combat.\n\nLongtooth shifters often struggle to control their aggressive impulses. They value strength and dominance, sometimes leading to conflicts with others. However, those who earn their respect become lifelong allies, defended with the same ferocity they show in battle.',
     size: 'Medium',
     speed: '30 feet',
     vision: 'Darkvision 60 ft',
@@ -749,7 +749,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     abilityScores: ['STR', 'DEX'],
   },
   'Swiftstride Shifter': {
-    description: 'Graceful and quick shifters embodying the speed of hunting cats.',
+    description: 'Graceful and quick shifters embodying the speed of hunting cats. Swiftstride shifters are typically associated with cats or other swift predators. Graceful and quick, they excel at rapid movement and evasion. When shifting, they gain incredible speed and the ability to dart away from danger.\n\nThese shifters have lithe, flexible builds and graceful movements. Their features are often sharp and angular, with bright, alert eyes. When shifting, they move with supernatural quickness, able to dodge attacks and reposition instantly. This mobility makes them excellent scouts and skirmishers.\n\nSwiftstride shifters value freedom and movement. They dislike being pinned down or trapped, both physically and socially. Their quick minds and bodies make them adapt to changing circumstances with ease, though they can be flighty and unreliable when forced into long-term commitments.',
     size: 'Medium',
     speed: '35 feet',
     vision: 'Darkvision 60 ft',
@@ -762,7 +762,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     abilityScores: ['DEX', 'CHA'],
   },
   'Wildhunt Shifter': {
-    description: 'Shifters attuned to nature with heightened senses and tracking abilities.',
+    description: 'Shifters attuned to nature with heightened senses and tracking abilities. Wildhunt shifters are associated with wolves and other pack hunters known for their keen senses and tracking abilities. These shifters have an almost supernatural connection to nature, able to sense threats and track prey with uncanny accuracy.\n\nWildhunt shifters often have angular features and intense, focused eyes. Their connection to nature shows in their movements and mannerisms. When shifting, they gain incredible awareness of their surroundings, making them nearly impossible to surprise or outmaneuver. This awareness makes them excellent scouts and trackers.\n\nWildhunt shifters value wisdom and awareness over brute strength. They observe carefully before acting and trust their instincts implicitly. Their patient, thoughtful nature makes them excellent advisors, though they can seem distant or aloof to those who do not understand their contemplative ways.',
     size: 'Medium',
     speed: '30 feet',
     vision: 'Darkvision 60 ft',
@@ -775,7 +775,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     abilityScores: ['WIS', 'DEX'],
   },
   'Simic Hybrid': {
-    description: 'Magically enhanced humanoids with biological adaptations from the Simic Combine.',
+    description: 'Magically enhanced humanoids with biological adaptations from the Simic Combine. The Simic Combine uses magic to fuse different life forms together, creating hybrids that combine the best traits of multiple creatures. These hybrids were created to be superior guardians and soldiers, but have since evolved into a distinct people seeking their own place in the world.\n\nSimic hybrids appear mostly human but with visible animal characteristics. Some have crablike claws, others have fin-like protrusions, and still others sport bioluminescent patches of skin. As they grow and develop, they gain additional enhancements, their bodies adapting to incorporate new animal traits.\n\nUnlike many other races, Simic hybrids have no ancient culture or traditions. They are a new people, created through magic, and must forge their own identity. Many struggle with questions of purpose and belonging, wondering if they are people or experiments. Some embrace their unique nature, while others resent their artificial origins.\n\nSimic hybrids often become adventurers to discover who they truly are beyond their creators\' intentions. They seek to prove themselves as individuals and find acceptance in a world that views them as strange aberrations.',
     size: 'Medium',
     speed: '30 feet',
     vision: 'Darkvision 60 ft',
@@ -787,7 +787,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     abilityScores: ['CON'],
   },
   Vedalken: {
-    description: 'Tall, blue-skinned humanoids known for their logic, curiosity, and tireless pursuit of perfection.',
+    description: 'Tall, blue-skinned humanoids known for their logic, curiosity, and tireless pursuit of perfection. Vedalken believe that nothing is perfect and that everything can be improved. This drive for perfection motivates them to seek ever-greater knowledge and to constantly refine their skills and creations.\n\nVedalken stand between 6 and 6½ feet tall. They are hairless, with blue or purple skin that can range from cerulean to deep indigo. Their eyes are typically darker shades of blue or violet. Their fingers are long and dexterous, perfect for their meticulous work. Vedalken rarely sleep, instead entering a state of meditation for several hours.\n\nNaturally inquisitive and analytical, vedalken bring exceptional focus to their studies and investigations. They approach every situation with careful observation and methodical testing. Nothing is taken for granted or accepted as fact until thoroughly examined. This makes them excellent researchers and inventors, though their pursuit of perfection can border on obsession.\n\nVedalken society values logic and reason above emotion. Displays of strong feeling are considered unseemly, and vedalken pride themselves on their dispassionate approach to life. However, beneath this cool exterior, many vedalken struggle with the same emotions as other races, simply choosing to suppress them in pursuit of rational clarity.\n\nVedalken adventurers typically seek knowledge and new experiences to test their theories. They view adventuring as a form of research, each encounter providing data for their endless quest to understand and improve the world.',
     size: 'Medium',
     speed: '30 feet',
     vision: 'Normal vision',
@@ -799,7 +799,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     abilityScores: ['INT', 'WIS'],
   },
   Loxodon: {
-    description: 'Elephant-headed humanoids with immense strength, wisdom, and unwavering loyalty.',
+    description: 'Elephant-headed humanoids with immense strength, wisdom, and unwavering loyalty. Loxodons tower above most humanoids, standing over 7 feet tall. They have the heads (trunks included) and feet of elephants, and their thick, leathery skin provides excellent natural armor. Their trunks are as dexterous as human hands.\n\nLoxodon culture emphasizes community, spirituality, and personal serenity. They believe in letting go of anger and resentment, seeking harmony with themselves and their environment. Their long memories (both literal and cultural) make them excellent historians and advisors, though they can hold grudges for equally long periods when truly wronged.\n\nMost loxodons are deeply spiritual, drawn to lives of contemplation and service. They make natural clerics, monks, and paladins. Their communities are tight-knit, with strong familial bonds and deep respect for elders. Loxodons value wisdom and patience, preferring careful consideration over hasty action.\n\nLoxodons\' trunks are incredibly versatile tools. They can use them to grapple opponents, manipulate objects with great delicacy, snorkel while swimming, or trumpet warning calls. Combined with their thick hide and powerful build, these traits make loxodons formidable in both peace and war.\n\nLoxodon adventurers often leave their communities to complete spiritual quests, protect the innocent, or seek ancient wisdom. They bring calm stability to adventuring parties, serving as wise counselors and immovable defenders.',
     size: 'Medium',
     speed: '30 feet',
     vision: 'Normal vision',
@@ -813,7 +813,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     abilityScores: ['CON', 'WIS'],
   },
   Centaur: {
-    description: 'Half-human, half-horse beings who roam the wild with the speed of the wind.',
+    description: 'Half-human, half-horse beings who roam the wild with the speed of the wind. Centaurs gallop throughout the multiverse and trace their origins to many different realms. Centaurs exemplify a strong connection to the natural world. Their upper bodies are humanoid, but their lower bodies are those of powerful horses. They stand between 6 and 7 feet tall.\n\nCentaurs are nature-focused people who prefer wide-open spaces to cramped cities. They are skilled hunters and scouts, able to traverse great distances with incredible speed. Their equine bodies make them superb cavalry—essentially cavalry units unto themselves. However, their horse bodies also present challenges in urban environments and when climbing.\n\nMost centaurs maintain a nomadic lifestyle, following the seasons and the herds. They have a deep connection to the cycles of nature and often serve as druids or rangers. Centaur communities value freedom and individual strength, with leadership going to those who prove themselves worthy through deeds.\n\nCentaurs have powerful territorial instincts and will defend their lands fiercely. They can be suspicious of outsiders but are loyal friends to those who earn their trust. In combat, centaurs use their speed to devastating effect, charging into battle with lances or trampling enemies beneath their hooves.\n\nCentaur adventurers often serve as scouts, messengers, or warriors. Their speed and stamina make them valuable members of any expedition, though they may struggle in confined spaces or urban settings where their size becomes a hindrance.',
     size: 'Medium',
     speed: '40 feet',
     vision: 'Normal vision',
@@ -827,7 +827,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     abilityScores: ['STR', 'WIS'],
   },
   Minotaur: {
-    description: 'Powerful bull-headed warriors with horns that can gore enemies.',
+    description: 'Powerful bull-headed warriors with horns that can gore enemies. Minotaurs are barrel-chested humanoids with heads resembling those of bulls. Their horns range in size from about 1 foot long to great, curling weapons easily three times that length. They often carve and decorate their horns with precious metals and gemstones.\n\nMinotaurs possess fierce tempers and aggressive natures. They are straightforward and direct, preferring action to deliberation. In combat, they are terrifying opponents, using their horns to gore enemies and their powerful frames to shove foes aside. Their natural sense of direction means they never get lost, able to retrace their steps perfectly.\n\nMinotaur culture revolves around strength, honor, and combat prowess. They value directness and view deception as weakness. Trials of strength and ritual combat determine leadership positions, with the strongest and most skilled rising to positions of authority. They respect worthy opponents and despise cowardice.\n\nDespite their fearsome appearance and aggressive reputation, minotaurs are capable of great loyalty and friendship. Once a minotaur considers someone a friend or ally, they will defend them with unwavering dedication. They value actions over words and judge others by their deeds rather than their claims.\n\nMinotaur adventurers often seek to prove their worth in combat, test themselves against legendary challenges, or escape the rigid hierarchies of minotaur society. They make formidable barbarians, fighters, and paladins, bringing raw power and directness to any adventuring party.',
     size: 'Medium',
     speed: '30 feet',
     vision: 'Normal vision',
@@ -840,7 +840,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     abilityScores: ['STR', 'CON'],
   },
   Orc: {
-    description: 'Fierce warriors with powerful builds and an innate connection to the fury of battle.',
+    description: 'Fierce warriors with powerful builds and an innate connection to the fury of battle. Orcs are a proud people of deep tradition who prefer to live by the spear rather than by farming and city life. They consider battle scars beautiful marks of survival and prowess. Their culture values strength, bravery, and personal glory won through combat.\n\nOrcs stand well over 6 feet tall and are powerfully built, with gray skin and prominent lower canines that resemble small tusks. They favor simple, practical clothing and often adorn themselves with trophies from defeated enemies or animals they have hunted. Their eyes are typically brown, black, or red.\n\nUnlike the evil orcs of legend, many orc communities have moved beyond raiding and pillaging. Modern orcs seek to prove their valor through honorable combat and tests of strength. They value loyalty, courage, and  direct action. Deception and cowardice are among the worst offenses in orc society.\n\nOrcs have an aggressive nature that drives them to seek out challenges and tests of their might. This makes them natural warriors and adventurers. They live for the thrill of battle and the glory it brings, but temper their aggression with codes of honor and respect for worthy opponents.\n\nOrc adventurers often leave their tribes to seek greater challenges, prove themselves against legendary foes, or escape the rigid social hierarchies of orc society. They bring unmatched ferocity and physical power to adventuring parties, though they must learn to work with others who do not share their direct, confrontational approach to problem-solving.',
     size: 'Medium',
     speed: '30 feet',
     vision: 'Darkvision 60 ft',
@@ -853,7 +853,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     abilityScores: ['STR', 'CON'],
   },
   Bugbear: {
-    description: 'Hairy goblinoids with long limbs and a talent for stealth and ambush.',
+    description: 'Hairy goblinoids with long limbs and a talent for stealth and ambush. Bugbears are born for battle and mayhem. Surviving by raiding and hunting, they bully the weak and despise being bossed around, but their love of carnage means they will fight for powerful masters if bloodshed and treasure are assured.\n\nBugbears are massive hairy humanoids, standing 6 to 8 feet tall despite their hunched posture. Their long arms and legs give them impressive reach in combat. They are covered in coarse hair ranging from yellow-brown to reddish-brown, and their noses are similar to those of bears. Despite their size, bugbears move with surprising stealth.\n\nMost bugbears are bullies who enjoy frightening and brutalizing weaker creatures. However, they respect strength and fear those who prove themselves superior. Bugbears who find themselves among adventurers often discover that cooperation and loyalty can bring greater rewards than solitary raiding.\n\nBugbears excel at ambush tactics, using their long reach and stealth to strike from hiding. They make excellent scouts and skirmishers when they can discipline themselves to work as part of a team. Their natural sneakiness belies their size, making them terrifying opponents who can appear from nowhere.\n\nBugbear adventurers are often outcasts from their tribes or those seeking greater challenges than bullying kobolds and goblins. They bring surprising stealth and devastating surprise attacks to adventuring parties, though they must learn to channel their violent impulses productively.',
     size: 'Medium',
     speed: '30 feet',
     vision: 'Darkvision 60 ft',
@@ -867,7 +867,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     abilityScores: ['STR', 'DEX'],
   },
   Hobgoblin: {
-    description: 'Disciplined and militaristic goblinoids who value honor and martial prowess.',
+    description: 'Disciplined and militaristic goblinoids who value honor and martial prowess. War is the lifeblood of hobgoblins. Its glories are the dreams that inspire them. Its horrors do not feature in their nightmares. Hobgoblins are militaristic and organized, believing that order and discipline are the keys to power.\n\nHobgoblins stand nearly as tall as humans and have muscular, gray-skinned builds. Their faces have reddish-orange to dark red skin tones, and many sport elaborate facial hair. They favor military uniforms with clear insignia showing rank and unit affiliation. Hobgoblin culture revolves around military organization and honor.\n\nHobgoblins value martial skill and tactical acumen above all else. They live in strict hierarchies where rank is everything, and insubordination is severely punished. However, they also value honor and will keep their word even to enemies they respect. Cowardice and treachery are unforgivable in hobgoblin society.\n\nUnlike goblins and bugbears, hobgoblins are disciplined and strategic. They excel at coordinated tactics and formations. Individual hobgoblins train extensively in weapons and armor, making them formidable warriors. They respect strength and competence in others, even non-hobgoblins who prove themselves capable.\n\nHobgoblin adventurers often serve as mercenaries or leave their legions to seek greater glory. They bring military discipline, tactical thinking, and combat expertise to adventuring parties. Some struggle to adapt to the less structured nature of adventuring life, but those who succeed become highly effective team members.',
     size: 'Medium',
     speed: '30 feet',
     vision: 'Darkvision 60 ft',
@@ -879,7 +879,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     abilityScores: ['CON', 'INT'],
   },
   Goblin: {
-    description: 'Small, cunning creatures who use their size and agility to survive.',
+    description: 'Small, cunning creatures who use their size and agility to survive. Goblins are small, black-hearted humanoids that lair in caves, abandoned mines, despoiled dungeons, and other dismal settings. Individually weak, they gather in large numbers to torment other creatures. However, not all goblins follow this path—some seek adventure and freedom from their oppressive tribes.\n\nGoblins are between 3 and 4 feet tall and weigh about 40 to 45 pounds. They have flat faces with broad noses, pointed ears, and sharp teeth. Their skin ranges from yellow through orange to deep red, and their eyes are usually red or yellow. They favor dark leathers and ragged clothing.\n\nMost goblins are driven by greed, cowardice, and a cruel sense of humor. They enjoy tormenting weaker creatures and will grovel before those stronger than themselves. However, goblins who escape the influence of stronger masters often discover courage and ingenuity they never knew they possessed.\n\nGoblins excel at hit-and-run tactics, using their small size and nimbleness to avoid direct confrontation. They are surprisingly good at hiding and fleeing from danger. When forced to fight, they prefer overwhelming numbers and ambush tactics. Individually, they are crafty survivors rather than brave warriors.\n\nGoblin adventurers are often outcasts or escapees from oppressive tribes. Free from their cruel societies, they can develop loyalty and even heroism. They bring nimbleness, cunning, and an underdog\' s determination to adventuring parties, proving that even the smallest creatures can achieve great things.',
     size: 'Small',
     speed: '30 feet',
     vision: 'Darkvision 60 ft',
@@ -891,7 +891,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     abilityScores: ['DEX', 'CON'],
   },
   Locathah: {
-    description: 'Fish-like humanoids from the ocean depths with colorful scales and fins.',
+    description: 'Fish-like humanoids from the ocean depths with colorful scales and fins. Locathah are aquatic humanoids with fish-like features who live in small tribal communities in the shallows and reefs. They are fiercely territorial defenders of their homes, but also deeply spiritual people who value family and tradition.\n\nLocathah have humanoid bodies covered in colorful scales that range through the full spectrum of ocean colors—reds, oranges, yellows, greens, blues, and purples. They have large, expressive eyes and fins on their heads, arms, and legs. Their hands and feet are webbed, perfectly adapted for swimming.\n\nLocathah society revolves around tight-knit family groups and shared defense of tribal territories. They are deeply spiritual, with shamans and priests playing central roles in their communities. Locathah value honor, loyalty, and courage, viewing themselves as guardians of the ocean shallows against both surface and deep-sea threats.\n\nUnlike many aquatic races, locathah can survive on land, though they must return to water regularly or risk exhaustion. This makes them effective amphibious warriors and scouts. They have developed remarkable mental fortitude, resisting mind-affecting magic better than most humanoids.\n\nLocathah adventurers often serve as representatives of their people, seeking alliances with surface dwellers or exploring beyond their territorial waters. They bring amphibious capabilities, mental resilience, and unwavering loyalty to adventuring parties, though they must carefully manage their need to remain hydrated.',
     size: 'Medium',
     speed: '30 feet (swim 30 feet)',
     vision: 'Normal vision',
@@ -904,7 +904,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     abilityScores: ['STR', 'DEX'],
   },
   Fairy: {
-    description: 'Tiny magical beings from the Feywild with colorful wings and innate spellcasting.',
+    description: 'Tiny magical beings from the Feywild with colorful wings and innate spellcasting. The Feywild is home to many fantastic peoples, including fairies. Fairies are small folk with insect-like wings and a strong connection to nature and magic. They embody the wild, whimsical spirit of the fey realm, bringing joy and mischief wherever they go.\n\nFairies stand between 2 and 3 feet tall despite being Small-sized creatures in game terms. They have delicate features and colorful insect or butterfly wings that allow them to fly. Their hair and skin come in all colors of the rainbow, and many glow faintly with fey light. They favor bright, natural clothing decorated with flowers and leaves.\n\nFairies are playful and mischievous by nature, delighting in pranks and games. However, they can also be fierce defenders of nature and those they care about. Fairies view the world through a lens of wonder and possibility, seeing magic in everything. Their alien perspective can make them seem flighty or childish to other races.\n\nFairies possess innate magical abilities tied to nature and illusion. They can manipulate small natural phenomena, create faerie lights, and alter their size. Their flight gives them exceptional mobility, though they retain the fragility inherent to small creatures. Despite their size, fairies can be surprisingly formidable with their magic.\n\nFairy adventurers often leave the Feywild out of curiosity, seeking to experience the Material Plane\'s wonders. They bring flight, nature magic, and a unique perspective to adventuring parties. Their small size and whimsical nature hide surprising resilience and magical power.',
     size: 'Small',
     speed: '30 feet',
     vision: 'Normal vision',
@@ -916,7 +916,7 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
     abilityScores: ['DEX', 'CHA'],
   },
   Owlin: {
-    description: 'Owl-like humanoids with keen senses, silent flight, and nocturnal wisdom.',
+    description: 'Owl-like humanoids with keen senses, silent flight, and nocturnal wisdom. Owlin are owl-folk who possess the keen senses and silent flight of their avian counterparts. Descended from the Plane of Air or touched by its magic, owlin combine humanoid and owl features to create a unique people adapted for both day and night.\n\nOwlin stand between 5 and 6 feet tall with humanoid bodies covered in soft feathers. Their heads are distinctly owl-like, with large eyes capable of seeing in near-total darkness and necks that can turn to look directly behind them. Their feathered wings allow for completely silent flight, making them exceptional scouts and hunters.\n\nOwlin society values wisdom, observation, and patience. They prefer to watch and learn before acting, gathering information before making decisions. This thoughtful approach makes them excellent advisors and strategists, though others may view them as overly cautious or aloof. Owlin have rich oral traditions, passing knowledge through stories and legends.\n\nOwlin are naturally nocturnal, most comfortable in darkness and twilight. Their superior darkvision allows them to see clearly even in conditions that would blind other races. Combined with their silent flight, this makes them nearly impossible to detect when they wish to remain hidden. They excel at reconnaissance and ambush tactics.\n\nOwlin adventurers often serve as scouts, rangers, or seekers of ancient wisdom. They bring exceptional perception, flight, and stealth to adventuring parties. Their patient, observant nature helps them spot dangers others might miss, though they must learn to act decisively when observation alone is insufficient.',
     size: 'Medium',
     speed: '30 feet',
     vision: 'Darkvision 120 ft',
