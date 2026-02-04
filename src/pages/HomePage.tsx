@@ -106,9 +106,9 @@ export function HomePage() {
       </div>
 
       {/* Main Action Cards */}
-      <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-12">
-        <Link to="/create" className="group relative overflow-hidden">
-          <div className="card-interactive relative z-10">
+      <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-12 px-2 py-4">
+        <Link to="/create" className="group relative overflow-visible">
+          <div className="card-interactive relative z-10 overflow-visible">
             <div className="text-6xl mb-4 transform group-hover:scale-110 transition-transform duration-300">
               &#9876;
             </div>
@@ -129,8 +129,8 @@ export function HomePage() {
                           group-hover:opacity-100 transition-opacity duration-300 rounded-xl" />
         </Link>
 
-        <Link to="/campaign" className="group relative overflow-hidden">
-          <div className="card-interactive relative z-10">
+        <Link to="/campaign" className="group relative overflow-visible">
+          <div className="card-interactive relative z-10 overflow-visible">
             <div className="text-6xl mb-4 transform group-hover:scale-110 transition-transform duration-300">
               &#128220;
             </div>
