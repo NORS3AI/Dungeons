@@ -94,7 +94,7 @@ export function HomePage() {
     <div className="max-w-7xl mx-auto px-4 py-12">
       <div className="text-center mb-16 animate-in fade-in duration-700">
         <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-gold-400 via-yellow-500 to-gold-600
-                       bg-clip-text text-transparent mb-4 pb-2 leading-tight drop-shadow-lg">
+                       bg-clip-text text-transparent mb-6 pb-4 leading-[1.2] overflow-visible">
           Dungeons
         </h1>
         <p className="text-xl md:text-2xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
