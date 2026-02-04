@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import type { Class, Equipment, Weapon } from '../types'
 import { isArmor, isShield } from '../types/equipment'
 import {
@@ -8,6 +8,8 @@ import {
   ADVENTURING_GEAR,
   EQUIPMENT_PACKS,
 } from '../data/equipment'
+import { calculateTotalWeight } from '../utils/calculations'
+import { formatWeight } from '../utils/formatting'
 
 interface EquipmentSelectorProps {
   characterClass?: Class
@@ -23,7 +25,7 @@ export function EquipmentSelector({ characterClass, onSubmit, onBack }: Equipmen
   const [selectedPackId, setSelectedPackId] = useState<string | null>(null)
 
   // Filter weapons based on class proficiencies
-  const getAvailableWeapons = () => {
+  const availableWeapons = useMemo(() => {
     if (!characterClass) return ALL_WEAPONS
 
     const hasSimple = characterClass.weaponProficiencies.includes('simple')
@@ -34,10 +36,10 @@ export function EquipmentSelector({ characterClass, onSubmit, onBack }: Equipmen
       if (hasSimple && weapon.weaponType === 'simple') return true
       return characterClass.weaponProficiencies.includes(weapon.id)
     })
-  }
+  }, [characterClass])
 
   // Filter armor based on class proficiencies
-  const getAvailableArmor = () => {
+  const availableArmor = useMemo(() => {
     if (!characterClass) return [...ALL_ARMOR, ...SHIELDS]
 
     const hasLight = characterClass.armorProficiencies.includes('light')
@@ -56,7 +58,7 @@ export function EquipmentSelector({ characterClass, onSubmit, onBack }: Equipmen
       return [...armor, ...SHIELDS]
     }
     return armor
-  }
+  }, [characterClass])
 
   // Count selected weapons
   const selectedWeaponCount = selectedEquipment.filter(
@@ -232,7 +234,7 @@ export function EquipmentSelector({ characterClass, onSubmit, onBack }: Equipmen
               </span>
             </div>
             <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2">
-              {getAvailableWeapons().map((weapon) => {
+              {availableWeapons.map((weapon) => {
                 const canSelect = canSelectWeapon(weapon.id)
                 return (
                   <button
@@ -286,12 +288,12 @@ export function EquipmentSelector({ characterClass, onSubmit, onBack }: Equipmen
               </div>
             </div>
             <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2">
-            {getAvailableArmor().length === 0 ? (
+            {availableArmor.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
                 Your class has no armor proficiencies.
               </div>
             ) : (
-              getAvailableArmor().map((item) => {
+              availableArmor.map((item) => {
                 const canSelect = canSelectArmor(item.id, item)
                 return (
                   <button
@@ -393,7 +395,7 @@ export function EquipmentSelector({ characterClass, onSubmit, onBack }: Equipmen
           </div>
           <div className="mt-3 pt-3 border-t border-gray-700 flex justify-between text-sm">
             <span className="text-gray-400">
-              Total Weight: {selectedEquipment.reduce((sum, item) => sum + item.weight * item.quantity, 0).toFixed(1)} lb
+              Total Weight: {formatWeight(calculateTotalWeight(selectedEquipment))} lb
             </span>
           </div>
         </div>

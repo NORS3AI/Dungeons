@@ -96,20 +96,44 @@ export const useSettingsStore = create<SettingsState>()(
       },
 
       resetAllCache: () => {
-        // Clear all localStorage
-        localStorage.clear()
-        // Clear all sessionStorage
-        sessionStorage.clear()
-        // Clear any service worker caches
-        if ('caches' in window) {
-          caches.keys().then((names) => {
-            names.forEach((name) => {
-              caches.delete(name)
-            })
-          })
+        try {
+          // Clear all localStorage
+          try {
+            localStorage.clear()
+          } catch (err) {
+            console.error('Failed to clear localStorage:', err)
+          }
+
+          // Clear all sessionStorage
+          try {
+            sessionStorage.clear()
+          } catch (err) {
+            console.error('Failed to clear sessionStorage:', err)
+          }
+
+          // Clear any service worker caches
+          if ('caches' in window) {
+            caches.keys()
+              .then((names) => {
+                return Promise.all(
+                  names.map((name) =>
+                    caches.delete(name).catch((err) => {
+                      console.error(`Failed to delete cache ${name}:`, err)
+                    })
+                  )
+                )
+              })
+              .catch((err) => {
+                console.error('Failed to access caches:', err)
+              })
+          }
+
+          // Force reload to apply changes
+          window.location.reload()
+        } catch (err) {
+          console.error('Failed to reset cache:', err)
+          alert('Failed to reset cache. Please try again or clear your browser cache manually.')
         }
-        // Force reload to apply changes
-        window.location.reload()
       },
     }),
     {

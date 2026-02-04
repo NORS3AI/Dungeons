@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import {
   type SpellRef,
   type SkillRef,
@@ -331,13 +331,25 @@ function ReferenceContent({ type, data }: { type: RefType; data: AnyRef }) {
 export function QuickRefTooltip({ type, id, children, className = '' }: QuickRefTooltipProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [data, setData] = useState<AnyRef | null>(null)
+  const cache = useRef<Map<string, AnyRef>>(new Map())
 
   const colors = getTypeColors(type)
 
   useEffect(() => {
     if (isOpen) {
-      const refData = getReference(type, id)
-      setData(refData)
+      const cacheKey = `${type}:${id}`
+
+      // Check cache first
+      const cached = cache.current.get(cacheKey)
+      if (cached) {
+        setData(cached)
+      } else {
+        const refData = getReference(type, id)
+        if (refData) {
+          cache.current.set(cacheKey, refData)
+          setData(refData)
+        }
+      }
     }
   }, [isOpen, type, id])
 

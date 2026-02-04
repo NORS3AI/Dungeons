@@ -24,6 +24,7 @@ const ABILITY_ABBREV: Record<Ability, string> = {
   wisdom: 'WIS',
   charisma: 'CHA',
 }
+const MAX_DICE_COUNT = 20
 
 const ROLL_PURPOSES: { value: RollPurpose; label: string; description: string }[] = [
   { value: 'raw', label: 'Raw', description: 'No automatic modifiers' },
@@ -356,8 +357,8 @@ export function DiceRoller({ onRoll, compact = false, character }: DiceRollerPro
           </span>
           <button
             type="button"
-            onClick={() => setDiceCount((c) => Math.min(20, c + 1))}
-            disabled={diceCount >= 20}
+            onClick={() => setDiceCount((c) => Math.min(MAX_DICE_COUNT, c + 1))}
+            disabled={diceCount >= MAX_DICE_COUNT}
             className="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-r-lg
                      font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >

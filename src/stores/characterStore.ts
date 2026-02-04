@@ -102,11 +102,32 @@ function createEmptyCharacter(): Character {
 }
 
 /**
+ * Maximum number of history states to keep (prevents memory leak)
+ */
+const MAX_HISTORY_SIZE = 50
+
+/**
  * Undo/Redo state history
  */
 interface HistoryState {
   past: Character[]
   future: Character[]
+}
+
+/**
+ * Add a state to history with size limit
+ */
+function addToHistory(history: HistoryState, state: Character): HistoryState {
+  const newPast = [...history.past, state]
+  // Keep only the last MAX_HISTORY_SIZE states
+  const trimmedPast = newPast.length > MAX_HISTORY_SIZE
+    ? newPast.slice(-MAX_HISTORY_SIZE)
+    : newPast
+
+  return {
+    past: trimmedPast,
+    future: [],
+  }
 }
 
 /**
@@ -272,10 +293,7 @@ export const useCharacterStore = create<CharacterState>()(
 
           set({
             currentCharacter: { ...currentCharacter, ...details },
-            history: {
-              past: [...history.past, currentCharacter],
-              future: [],
-            },
+            history: addToHistory(history, currentCharacter),
           })
         },
 
@@ -285,10 +303,7 @@ export const useCharacterStore = create<CharacterState>()(
 
           set({
             currentCharacter: { ...currentCharacter, race },
-            history: {
-              past: [...history.past, currentCharacter],
-              future: [],
-            },
+            history: addToHistory(history, currentCharacter),
           })
         },
 
@@ -308,10 +323,7 @@ export const useCharacterStore = create<CharacterState>()(
               class: characterClass,
               savingThrows,
             },
-            history: {
-              past: [...history.past, currentCharacter],
-              future: [],
-            },
+            history: addToHistory(history, currentCharacter),
           })
         },
 
@@ -321,10 +333,7 @@ export const useCharacterStore = create<CharacterState>()(
 
           set({
             currentCharacter: { ...currentCharacter, subclass },
-            history: {
-              past: [...history.past, currentCharacter],
-              future: [],
-            },
+            history: addToHistory(history, currentCharacter),
           })
         },
 
@@ -334,10 +343,7 @@ export const useCharacterStore = create<CharacterState>()(
 
           set({
             currentCharacter: { ...currentCharacter, background },
-            history: {
-              past: [...history.past, currentCharacter],
-              future: [],
-            },
+            history: addToHistory(history, currentCharacter),
           })
         },
 
@@ -347,10 +353,7 @@ export const useCharacterStore = create<CharacterState>()(
 
           set({
             currentCharacter: { ...currentCharacter, abilityScores: scores },
-            history: {
-              past: [...history.past, currentCharacter],
-              future: [],
-            },
+            history: addToHistory(history, currentCharacter),
           })
         },
 
@@ -363,10 +366,7 @@ export const useCharacterStore = create<CharacterState>()(
               ...currentCharacter,
               knownSpells: [...currentCharacter.knownSpells, spell],
             },
-            history: {
-              past: [...history.past, currentCharacter],
-              future: [],
-            },
+            history: addToHistory(history, currentCharacter),
           })
         },
 
@@ -380,10 +380,7 @@ export const useCharacterStore = create<CharacterState>()(
               knownSpells: currentCharacter.knownSpells.filter((s) => s.id !== spellId),
               preparedSpells: currentCharacter.preparedSpells.filter((id) => id !== spellId),
             },
-            history: {
-              past: [...history.past, currentCharacter],
-              future: [],
-            },
+            history: addToHistory(history, currentCharacter),
           })
         },
 
@@ -396,10 +393,7 @@ export const useCharacterStore = create<CharacterState>()(
               ...currentCharacter,
               equipment: [...currentCharacter.equipment, item],
             },
-            history: {
-              past: [...history.past, currentCharacter],
-              future: [],
-            },
+            history: addToHistory(history, currentCharacter),
           })
         },
 
@@ -412,10 +406,7 @@ export const useCharacterStore = create<CharacterState>()(
               ...currentCharacter,
               equipment: currentCharacter.equipment.filter((e) => e.id !== itemId),
             },
-            history: {
-              past: [...history.past, currentCharacter],
-              future: [],
-            },
+            history: addToHistory(history, currentCharacter),
           })
         },
 
@@ -448,10 +439,7 @@ export const useCharacterStore = create<CharacterState>()(
               ...currentCharacter,
               equipment,
             },
-            history: {
-              past: [...history.past, currentCharacter],
-              future: [],
-            },
+            history: addToHistory(history, currentCharacter),
           })
         },
 
@@ -464,10 +452,7 @@ export const useCharacterStore = create<CharacterState>()(
               ...currentCharacter,
               currency: { ...currentCharacter.currency, ...currency },
             },
-            history: {
-              past: [...history.past, currentCharacter],
-              future: [],
-            },
+            history: addToHistory(history, currentCharacter),
           })
         },
 
@@ -639,10 +624,7 @@ export const useCharacterStore = create<CharacterState>()(
                 current: newCurrentHP,
               },
             },
-            history: {
-              past: [...history.past, currentCharacter],
-              future: [],
-            },
+            history: addToHistory(history, currentCharacter),
           })
         },
 
@@ -673,10 +655,7 @@ export const useCharacterStore = create<CharacterState>()(
                 current: newCurrentHP,
               },
             },
-            history: {
-              past: [...history.past, currentCharacter],
-              future: [],
-            },
+            history: addToHistory(history, currentCharacter),
           })
         },
 
@@ -689,10 +668,7 @@ export const useCharacterStore = create<CharacterState>()(
               ...currentCharacter,
               level,
             },
-            history: {
-              past: [...history.past, currentCharacter],
-              future: [],
-            },
+            history: addToHistory(history, currentCharacter),
           })
         },
 
@@ -713,10 +689,7 @@ export const useCharacterStore = create<CharacterState>()(
                 temporary: 0,
               },
             },
-            history: {
-              past: [...history.past, currentCharacter],
-              future: [],
-            },
+            history: addToHistory(history, currentCharacter),
           })
         },
 
@@ -734,10 +707,7 @@ export const useCharacterStore = create<CharacterState>()(
                 temporary: currentCharacter.hitPoints.temporary,
               },
             },
-            history: {
-              past: [...history.past, currentCharacter],
-              future: [],
-            },
+            history: addToHistory(history, currentCharacter),
           })
         },
 
