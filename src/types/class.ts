@@ -2305,7 +2305,7 @@ export const NECROMANCER: Class = {
   primaryAbility: ['intelligence'],
   savingThrows: ['intelligence', 'wisdom'],
   armorProficiencies: ['light'],
-  weaponProficiencies: ['daggers', 'darts', 'slings', 'quarterstaffs', 'light crossbows'],
+  weaponProficiencies: ['dagger', 'dart', 'sling', 'quarterstaff', 'light-crossbow'],
   toolProficiencies: [],
   skillChoices: {
     choose: 2,

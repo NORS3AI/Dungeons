@@ -28,12 +28,21 @@ interface StatAllocatorProps {
 }
 
 /**
- * Roll 4d6 drop lowest
+ * Roll 4d6 drop lowest, 3 times, and take the highest
  */
 function roll4d6DropLowest(): number {
-  const rolls = Array.from({ length: 4 }, () => Math.floor(Math.random() * 6) + 1)
-  rolls.sort((a, b) => b - a)
-  return rolls[0] + rolls[1] + rolls[2]
+  const results: number[] = []
+
+  // Roll 3 times
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const rolls = Array.from({ length: 4 }, () => Math.floor(Math.random() * 6) + 1)
+    rolls.sort((a, b) => b - a)
+    const result = rolls[0] + rolls[1] + rolls[2]
+    results.push(result)
+  }
+
+  // Return the highest of the 3 attempts
+  return Math.max(...results)
 }
 
 /**
@@ -212,7 +221,7 @@ export function StatAllocator({ initialScores, race, background, onSubmit, onBac
         {[
           { id: 'standard', name: 'Standard Array', desc: '15, 14, 13, 12, 10, 8', disabled: true },
           { id: 'pointBuy', name: 'Point Buy', desc: '27 points to spend', disabled: true },
-          { id: 'roll', name: 'Roll', desc: '4d6 drop lowest', disabled: false },
+          { id: 'roll', name: 'Roll', desc: '4d6 drop lowest × 3, take highest', disabled: false },
         ].map((m) => (
           <button
             key={m.id}
@@ -392,6 +401,10 @@ export function StatAllocator({ initialScores, race, background, onSubmit, onBac
       {/* Roll Method */}
       {method === 'roll' && (
         <div className="mb-8">
+          <p className="text-gray-400 mb-4 text-sm">
+            Each ability will roll <span className="text-dnd-gold font-medium">4d6 drop lowest, 3 times</span>,
+            and automatically use the <span className="text-green-400 font-medium">highest result</span>.
+          </p>
           <div className="mb-4 flex items-center gap-4">
             <button
               type="button"
@@ -399,7 +412,7 @@ export function StatAllocator({ initialScores, race, background, onSubmit, onBac
               className="px-6 py-3 bg-dnd-gold text-gray-900 rounded-lg font-semibold
                        hover:bg-yellow-500 transition-colors duration-200"
             >
-              Roll 4d6 Drop Lowest (x6)
+              Roll for All Abilities (3 attempts each)
             </button>
             {rolledScores.length > 0 && (
               <div className="text-gray-400">

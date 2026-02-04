@@ -1,187 +1,13 @@
 import { useState, useMemo } from 'react'
 import type { Spell, Class, Subclass } from '../types'
-import { ELDRITCH_BLAST } from '../types'
 import { SpellCard } from './SpellCard'
-
-// Sample Warlock Cantrips
-const WARLOCK_CANTRIPS: Spell[] = [
-  ELDRITCH_BLAST,
-  {
-    id: 'chill-touch',
-    name: 'Chill Touch',
-    description: 'Create a ghostly skeletal hand that assails a creature with the chill of the grave.',
-    level: 0,
-    school: 'necromancy',
-    castingTime: { amount: 1, unit: 'action' },
-    range: { type: 'ranged', distance: 120 },
-    components: { verbal: true, somatic: true, material: false },
-    duration: { type: 'timed', amount: 1, unit: 'round' },
-    damage: { dice: '1d8', type: 'necrotic' },
-    attackRoll: true,
-    ritual: false,
-    concentration: false,
-    classes: ['warlock', 'wizard', 'sorcerer'],
-  },
-  {
-    id: 'minor-illusion',
-    name: 'Minor Illusion',
-    description: 'Create a sound or image of an object within range that lasts for 1 minute.',
-    level: 0,
-    school: 'illusion',
-    castingTime: { amount: 1, unit: 'action' },
-    range: { type: 'ranged', distance: 30 },
-    components: { verbal: false, somatic: true, material: true, materialDescription: 'a bit of fleece' },
-    duration: { type: 'timed', amount: 1, unit: 'minute' },
-    ritual: false,
-    concentration: false,
-    classes: ['warlock', 'wizard', 'sorcerer', 'bard'],
-  },
-  {
-    id: 'prestidigitation',
-    name: 'Prestidigitation',
-    description: 'A minor magical trick used for practice or entertainment.',
-    level: 0,
-    school: 'transmutation',
-    castingTime: { amount: 1, unit: 'action' },
-    range: { type: 'ranged', distance: 10 },
-    components: { verbal: true, somatic: true, material: false },
-    duration: { type: 'timed', amount: 1, unit: 'hour' },
-    ritual: false,
-    concentration: false,
-    classes: ['warlock', 'wizard', 'sorcerer', 'bard'],
-  },
-  {
-    id: 'mage-hand',
-    name: 'Mage Hand',
-    description: 'A spectral floating hand appears to manipulate objects at range.',
-    level: 0,
-    school: 'conjuration',
-    castingTime: { amount: 1, unit: 'action' },
-    range: { type: 'ranged', distance: 30 },
-    components: { verbal: true, somatic: true, material: false },
-    duration: { type: 'timed', amount: 1, unit: 'minute' },
-    ritual: false,
-    concentration: false,
-    classes: ['warlock', 'wizard', 'sorcerer', 'bard'],
-  },
-]
-
-// Sample Warlock 1st Level Spells
-const WARLOCK_LEVEL_1_SPELLS: Spell[] = [
-  {
-    id: 'hex',
-    name: 'Hex',
-    description: 'Curse a creature to take extra necrotic damage and have disadvantage on one ability check.',
-    level: 1,
-    school: 'enchantment',
-    castingTime: { amount: 1, unit: 'bonusAction' },
-    range: { type: 'ranged', distance: 90 },
-    components: { verbal: true, somatic: true, material: true, materialDescription: 'the petrified eye of a newt' },
-    duration: { type: 'concentration', amount: 1, unit: 'hour' },
-    damage: { dice: '1d6', type: 'necrotic' },
-    ritual: false,
-    concentration: true,
-    classes: ['warlock'],
-    atHigherLevels: 'Duration increases at higher spell slot levels.',
-  },
-  {
-    id: 'armor-of-agathys',
-    name: 'Armor of Agathys',
-    description: 'Gain 5 temporary HP. Creatures that hit you with melee attacks take 5 cold damage.',
-    level: 1,
-    school: 'abjuration',
-    castingTime: { amount: 1, unit: 'action' },
-    range: { type: 'self' },
-    components: { verbal: true, somatic: true, material: true, materialDescription: 'a cup of water' },
-    duration: { type: 'timed', amount: 1, unit: 'hour' },
-    ritual: false,
-    concentration: false,
-    classes: ['warlock'],
-    atHigherLevels: 'Both the temp HP and cold damage increase by 5 for each slot level above 1st.',
-  },
-  {
-    id: 'hellish-rebuke',
-    name: 'Hellish Rebuke',
-    description: 'React to being damaged by surrounding yourself in hellish flames.',
-    level: 1,
-    school: 'evocation',
-    castingTime: { amount: 1, unit: 'reaction', reactionTrigger: 'being damaged by a creature within 60 feet' },
-    range: { type: 'ranged', distance: 60 },
-    components: { verbal: true, somatic: true, material: false },
-    duration: { type: 'instantaneous' },
-    damage: { dice: '2d10', type: 'fire' },
-    savingThrow: { ability: 'dexterity', effect: 'half damage' },
-    ritual: false,
-    concentration: false,
-    classes: ['warlock'],
-  },
-  {
-    id: 'charm-person',
-    name: 'Charm Person',
-    description: 'Attempt to charm a humanoid you can see within range.',
-    level: 1,
-    school: 'enchantment',
-    castingTime: { amount: 1, unit: 'action' },
-    range: { type: 'ranged', distance: 30 },
-    components: { verbal: true, somatic: true, material: false },
-    duration: { type: 'timed', amount: 1, unit: 'hour' },
-    savingThrow: { ability: 'wisdom', effect: 'negates' },
-    ritual: false,
-    concentration: false,
-    classes: ['warlock', 'wizard', 'sorcerer', 'bard'],
-  },
-  {
-    id: 'witch-bolt',
-    name: 'Witch Bolt',
-    description: 'A beam of crackling blue energy lances toward a creature, dealing lightning damage.',
-    level: 1,
-    school: 'evocation',
-    castingTime: { amount: 1, unit: 'action' },
-    range: { type: 'ranged', distance: 30 },
-    components: { verbal: true, somatic: true, material: true, materialDescription: 'a twig from a lightning-struck tree' },
-    duration: { type: 'concentration', amount: 1, unit: 'minute' },
-    damage: { dice: '1d12', type: 'lightning' },
-    attackRoll: true,
-    ritual: false,
-    concentration: true,
-    classes: ['warlock', 'wizard', 'sorcerer'],
-  },
-]
-
-// Great Old One expanded spells (level 1)
-const GOO_EXPANDED_SPELLS: Spell[] = [
-  {
-    id: 'dissonant-whispers',
-    name: 'Dissonant Whispers',
-    description: 'Whisper a discordant melody only one creature can hear, causing psychic damage.',
-    level: 1,
-    school: 'enchantment',
-    castingTime: { amount: 1, unit: 'action' },
-    range: { type: 'ranged', distance: 60 },
-    components: { verbal: true, somatic: false, material: false },
-    duration: { type: 'instantaneous' },
-    damage: { dice: '3d6', type: 'psychic' },
-    savingThrow: { ability: 'wisdom', effect: 'half damage, no flee' },
-    ritual: false,
-    concentration: false,
-    classes: ['bard', 'warlock'],
-  },
-  {
-    id: 'tashas-hideous-laughter',
-    name: "Tasha's Hideous Laughter",
-    description: 'A creature falls prone in fits of laughter, incapacitated.',
-    level: 1,
-    school: 'enchantment',
-    castingTime: { amount: 1, unit: 'action' },
-    range: { type: 'ranged', distance: 30 },
-    components: { verbal: true, somatic: true, material: true, materialDescription: 'tiny tarts and a feather' },
-    duration: { type: 'concentration', amount: 1, unit: 'minute' },
-    savingThrow: { ability: 'wisdom', effect: 'negates' },
-    ritual: false,
-    concentration: true,
-    classes: ['wizard', 'bard', 'warlock'],
-  },
-]
+import {
+  WARLOCK_CANTRIPS,
+  WARLOCK_LEVEL_1_SPELLS,
+  NECROMANCER_CANTRIPS,
+  NECROMANCER_LEVEL_1_SPELLS,
+  GOO_EXPANDED_SPELLS,
+} from '../data/spells'
 
 interface SpellSelectorProps {
   characterClass?: Class | null
@@ -208,6 +34,7 @@ export function SpellSelector({
   // Determine available spells based on class
   const availableCantrips = useMemo(() => {
     if (characterClass?.id === 'warlock') return WARLOCK_CANTRIPS
+    if (characterClass?.id === 'necromancer') return NECROMANCER_CANTRIPS
     return []
   }, [characterClass])
 
@@ -219,6 +46,9 @@ export function SpellSelector({
         spells.push(...GOO_EXPANDED_SPELLS)
       }
       return spells
+    }
+    if (characterClass?.id === 'necromancer') {
+      return [...NECROMANCER_LEVEL_1_SPELLS]
     }
     return []
   }, [characterClass, subclass])

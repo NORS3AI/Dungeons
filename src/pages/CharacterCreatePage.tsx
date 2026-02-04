@@ -48,8 +48,8 @@ export function CharacterCreatePage() {
     initializeHP,
   } = useCharacterStore()
 
-  // HP rolling state
-  const [hpRoll, setHpRoll] = useState<{ result: number; isRolling: boolean } | null>(null)
+  // HP rolling state - track 3 rolls and select highest
+  const [hpRoll, setHpRoll] = useState<{ rolls: number[]; highest: number; isRolling: boolean } | null>(null)
 
   // Initialize new character if none exists
   useEffect(() => {
@@ -315,7 +315,8 @@ export function CharacterCreatePage() {
                     // Need to roll HP
                     <div className="text-center">
                       <p className="text-gray-400 mb-4">
-                        Roll your hit die to determine starting health!
+                        Roll your hit die 3 times to determine starting health!<br />
+                        <span className="text-sm text-green-400">The highest of the 3 rolls will be used.</span>
                       </p>
                       <div className="flex flex-col items-center gap-4">
                         <div className="text-lg text-gray-300">
@@ -329,20 +330,38 @@ export function CharacterCreatePage() {
 
                         {hpRoll?.isRolling ? (
                           <div className="text-2xl text-dnd-gold animate-bounce">🎲</div>
-                        ) : hpRoll?.result ? (
+                        ) : hpRoll?.highest ? (
                           <div className="space-y-3">
-                            <div className="text-3xl font-bold text-white">
-                              Rolled: <span className="text-dnd-gold">{hpRoll.result}</span>
+                            <div className="text-lg text-gray-400 mb-3 text-center">
+                              You rolled 3 times:
                             </div>
-                            <div className="text-xl text-gray-400">
+                            <div className="flex gap-3 justify-center mb-4">
+                              {hpRoll.rolls.map((roll, index) => (
+                                <div
+                                  key={index}
+                                  className={`px-4 py-3 rounded-lg font-bold text-2xl ${
+                                    roll === hpRoll.highest
+                                      ? 'bg-green-600 text-white border-2 border-green-400'
+                                      : 'bg-gray-800 text-gray-400'
+                                  }`}
+                                >
+                                  {roll}
+                                </div>
+                              ))}
+                            </div>
+                            <div className="text-center text-sm text-green-400 mb-4">
+                              ⭐ Highest roll: {hpRoll.highest}
+                            </div>
+                            <div className="text-xl text-gray-400 text-center mb-4">
                               Total HP: <span className="text-red-400 font-bold">
-                                {Math.max(1, hpRoll.result + calculateModifier(currentCharacter.abilityScores.constitution))}
+                                {Math.max(1, hpRoll.highest + calculateModifier(currentCharacter.abilityScores.constitution))}
                               </span>
+                              {' '}({hpRoll.highest} + {calculateModifier(currentCharacter.abilityScores.constitution)} CON)
                             </div>
                             <div className="flex gap-3 justify-center">
                               <button
                                 onClick={() => {
-                                  initializeHP(hpRoll.result)
+                                  initializeHP(hpRoll.highest)
                                 }}
                                 className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg font-medium transition-colors"
                               >
@@ -359,19 +378,25 @@ export function CharacterCreatePage() {
                         ) : (
                           <button
                             onClick={() => {
-                              setHpRoll({ result: 0, isRolling: true })
+                              setHpRoll({ rolls: [], highest: 0, isRolling: true })
                               setTimeout(() => {
                                 const hitDie = currentCharacter.class?.hitDie || '1d8'
-                                const roll = rollDice(hitDie)
-                                if (roll) {
-                                  setHpRoll({ result: roll.grandTotal, isRolling: false })
+                                // Roll 3 times
+                                const rolls: number[] = []
+                                for (let i = 0; i < 3; i++) {
+                                  const roll = rollDice(hitDie)
+                                  if (roll) {
+                                    rolls.push(roll.grandTotal)
+                                  }
                                 }
+                                const highest = Math.max(...rolls)
+                                setHpRoll({ rolls, highest, isRolling: false })
                               }, 500)
                             }}
                             className="px-6 py-3 bg-red-600 hover:bg-red-500 text-white rounded-lg font-bold text-lg transition-colors flex items-center gap-2"
                           >
                             <span>🎲</span>
-                            Roll for HP
+                            Roll for HP (3 times)
                           </button>
                         )}
                       </div>
