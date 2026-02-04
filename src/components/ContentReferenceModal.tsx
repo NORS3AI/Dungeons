@@ -31,6 +31,20 @@ interface ClassInfo {
   subclasses?: SubclassInfo[] // Available subclasses
 }
 
+interface RaceSpell {
+  spellId: string
+  name: string
+  level: string | number
+}
+
+interface SpellData {
+  id: string
+  name: string
+  level: string | number
+  school: string
+  description: string
+}
+
 // Class information database
 const CLASS_INFO: Record<string, ClassInfo> = {
   Barbarian: {
@@ -233,8 +247,8 @@ const CLASS_INFO: Record<string, ClassInfo> = {
         name: 'The Hexblade',
         description: 'You have made your pact with a mysterious entity from the Shadowfell.',
         features: [
-          { name: "Hexblade's Curse - Curse a target for bonus damage and crit on 19-20" },
-          { name: 'Hex Warrior - Use CHA for weapon attacks with one weapon' },
+          { name: "Hexblade's Curse - Curse a target for bonus damage and crit on 19-20", id: 'hexblades-curse' },
+          { name: 'Hex Warrior - Use CHA for weapon attacks with one weapon', id: 'hex-warrior' },
           { name: 'Accursed Specter - Raise a specter from a humanoid you kill' },
           { name: 'Master of Hexes - Transfer your curse when target dies' },
         ],
@@ -365,6 +379,80 @@ const CLASS_INFO: Record<string, ClassInfo> = {
   },
 }
 
+// Spell reference database for racial spells
+const SPELL_DATA: Record<string, SpellData> = {
+  'dancing-lights': {
+    id: 'dancing-lights',
+    name: 'Dancing Lights',
+    level: 'Cantrip',
+    school: 'Evocation',
+    description: 'You create up to four torch-sized lights within 120 feet, making them appear as torches, lanterns, or glowing orbs that hover in the air for up to 1 minute. Each light sheds dim light in a 10-foot radius. You can combine the four lights into one glowing vaguely humanoid form.',
+  },
+  'faerie-fire': {
+    id: 'faerie-fire',
+    name: 'Faerie Fire',
+    level: 1,
+    school: 'Evocation',
+    description: 'Each object in a 20-foot cube within 60 feet is outlined in blue, green, or violet light. Creatures in the area that fail a Dexterity save are also outlined. For 1 minute (concentration), outlined targets shed dim light in a 10-foot radius, attack rolls against them have advantage, and they can\'t benefit from being invisible.',
+  },
+  'darkness': {
+    id: 'darkness',
+    name: 'Darkness',
+    level: 2,
+    school: 'Evocation',
+    description: 'Magical darkness spreads from a point within 60 feet to fill a 15-foot-radius sphere for up to 10 minutes (concentration). A creature with darkvision can\'t see through this darkness, and nonmagical light can\'t illuminate it.',
+  },
+  'thaumaturgy': {
+    id: 'thaumaturgy',
+    name: 'Thaumaturgy',
+    level: 'Cantrip',
+    school: 'Transmutation',
+    description: 'You manifest a minor wonder within 30 feet: Your voice booms 3x louder, flames flicker/brighten/dim/change color, harmless tremors, instantaneous sounds, unlocked doors fly open or slam shut, or alter your eyes\' appearance for 1 minute.',
+  },
+  'hellish-rebuke': {
+    id: 'hellish-rebuke',
+    name: 'Hellish Rebuke',
+    level: 1,
+    school: 'Evocation',
+    description: 'When damaged by a creature within 60 feet, you can use your reaction to surround them with hellish flames. The creature takes 2d10 fire damage on a failed Dexterity save, or half on success. Higher levels: +1d10 per slot level above 1st.',
+  },
+  'enlarge-reduce': {
+    id: 'enlarge-reduce',
+    name: 'Enlarge/Reduce',
+    level: 2,
+    school: 'Transmutation',
+    description: 'You cause a creature or object within 30 feet to grow or shrink for up to 1 minute (concentration). Enlarge doubles size category, grants advantage on Strength checks/saves, and +1d4 weapon damage. Reduce halves size, grants disadvantage on Strength checks/saves, and -1d4 weapon damage.',
+  },
+  'invisibility': {
+    id: 'invisibility',
+    name: 'Invisibility',
+    level: 2,
+    school: 'Illusion',
+    description: 'A creature you touch becomes invisible for up to 1 hour (concentration). Anything the target is wearing or carrying is invisible as long as it\'s on the target. The spell ends if the target attacks or casts a spell.',
+  },
+  'druidcraft': {
+    id: 'druidcraft',
+    name: 'Druidcraft',
+    level: 'Cantrip',
+    school: 'Transmutation',
+    description: 'You create a minor natural effect within 30 feet: predict weather for 24 hours, make a flower bloom or seed pod open, create harmless sensory effects like falling leaves, or light/snuff out a candle, torch, or small campfire.',
+  },
+  'produce-flame': {
+    id: 'produce-flame',
+    name: 'Produce Flame',
+    level: 'Cantrip',
+    school: 'Conjuration',
+    description: 'A flickering flame appears in your hand, shedding bright light in 10 feet and dim light for 10 more feet. It lasts 10 minutes and doesn\'t harm you. You can attack with it (spell attack, 1d8 fire damage) or hurl it 30 feet as a ranged spell attack.',
+  },
+  'burning-hands': {
+    id: 'burning-hands',
+    name: 'Burning Hands',
+    level: 1,
+    school: 'Evocation',
+    description: 'Fire shoots from your outstretched hands in a 15-foot cone. Creatures in the area take 3d6 fire damage on a failed Dexterity save, or half on success. Higher levels: +1d6 per slot level above 1st.',
+  },
+}
+
 // Race trait interface
 interface RaceTrait {
   name: string
@@ -372,7 +460,7 @@ interface RaceTrait {
 }
 
 // Race information database
-const RACE_INFO: Record<string, { description: string; size: string; speed: string; vision: string; traits: RaceTrait[]; abilityScores: string[] }> = {
+const RACE_INFO: Record<string, { description: string; size: string; speed: string; vision: string; traits: RaceTrait[]; abilityScores: string[]; spells?: RaceSpell[] }> = {
   Human: {
     description: 'Versatile and ambitious, humans are the most adaptable and driven of the common races.',
     size: 'Medium',
@@ -411,6 +499,23 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
       { name: 'Stonecunning - Double proficiency on History checks related to stonework' },
     ],
     abilityScores: ['CON'],
+  },
+  'Duergar (Gray Dwarf)': {
+    description: 'Deep-dwelling duergar dwarves from the Underdark, masters of forging and psionic enlargement. Also known as gray dwarves, duergar are grim and bitter kin of shield dwarves. They were enslaved by mind flayers eons ago and gained psionic abilities before breaking free. They dwell in the deepest reaches of the Underdark.',
+    size: 'Medium',
+    speed: '25 feet',
+    vision: 'Superior Darkvision 120 ft',
+    traits: [
+      { name: 'Superior Darkvision (120 ft)', id: 'superior-darkvision' },
+      { name: 'Sunlight Sensitivity - Disadvantage on attacks & Perception in sunlight', id: 'sunlight-sensitivity' },
+      { name: 'Duergar Resilience - Advantage on saves vs. illusions, charm, paralysis', id: 'duergar-resilience' },
+      { name: 'Duergar Magic - Cast Enlarge/Reduce and Invisibility (self only)', id: 'duergar-magic' },
+    ],
+    abilityScores: ['STR', 'CON'],
+    spells: [
+      { spellId: 'enlarge-reduce', name: 'Enlarge/Reduce', level: 2 },
+      { spellId: 'invisibility', name: 'Invisibility', level: 2 },
+    ],
   },
   Halfling: {
     description: 'Small and practical, halflings are adept at fitting into communities of other races.',
@@ -474,6 +579,11 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
       { name: 'Infernal Legacy - Know Thaumaturgy, cast Hellish Rebuke & Darkness', id: 'infernal-legacy' },
     ],
     abilityScores: ['CHA', 'INT'],
+    spells: [
+      { spellId: 'thaumaturgy', name: 'Thaumaturgy', level: 'Cantrip' },
+      { spellId: 'hellish-rebuke', name: 'Hellish Rebuke', level: 1 },
+      { spellId: 'darkness', name: 'Darkness', level: 2 },
+    ],
   },
   Dragonborn: {
     description: 'Proud dragon-kin who walk as humanoids, breathing destructive energy.',
@@ -499,6 +609,11 @@ const RACE_INFO: Record<string, { description: string; size: string; speed: stri
       { name: 'Drow Weapon Training - Proficiency with rapiers, shortswords, hand crossbows' },
     ],
     abilityScores: ['DEX', 'CHA'],
+    spells: [
+      { spellId: 'dancing-lights', name: 'Dancing Lights', level: 'Cantrip' },
+      { spellId: 'faerie-fire', name: 'Faerie Fire', level: 1 },
+      { spellId: 'darkness', name: 'Darkness', level: 2 },
+    ],
   },
   Aasimar: {
     description: 'Mortals touched by celestial power, aasimar are guided by divine beings. Aasimar carry the light of the heavens in their souls, descended from humans touched by the power of Mount Celestia. They are born to serve as champions of the gods, their births hailed as blessed events.\n\nAasimar appear mostly human, with lustrous hair, flawless skin, and piercing eyes. They possess an otherworldly beauty that makes them stand out in any crowd. Most aasimar have a link to an angelic guide who offers advice and urges them toward their divine purpose.\n\nNot all aasimar embrace their destiny—some struggle with their calling, while others may be tempted toward darkness. The celestial spark within them can manifest as Protector (guardians of others), Scourge (divine avengers), or Fallen (those who have turned from their path).\n\nAasimar adventurers are often driven by divine visions or the need to combat specific evils threatening the world. They walk the line between the mortal and divine realms, forever marked by their celestial heritage.',
@@ -1251,6 +1366,44 @@ export function ContentReferenceModal({ isOpen, onClose, type, name }: ContentRe
                   ))}
                 </div>
               </div>
+
+              {/* Innate Spells */}
+              {raceInfo.spells && raceInfo.spells.length > 0 && (
+                <div>
+                  <h3 className="text-xl font-bold text-purple-500 mb-3 flex items-center gap-2">
+                    <span>🔮</span>
+                    Innate Spellcasting
+                  </h3>
+                  <p className="text-xs text-gray-400 mb-3 italic">
+                    Click any spell to see full details
+                  </p>
+                  <div className="grid gap-2">
+                    {raceInfo.spells.map((spell) => (
+                      <QuickRefTooltip key={spell.spellId} type="spell" id={spell.spellId}>
+                        <div
+                          className="flex items-center justify-between p-3 bg-purple-900/20 border border-purple-500/30
+                                   rounded-lg hover:bg-purple-900/30 hover:border-purple-500/50 transition-all cursor-pointer"
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className="text-purple-400">✦</span>
+                            <div>
+                              <div className="text-gray-200 font-medium hover:text-purple-300 transition-colors">
+                                {spell.name}
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                {SPELL_DATA[spell.spellId]?.school || 'Magic'}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="px-3 py-1 bg-purple-900/40 text-purple-300 text-sm rounded-full">
+                            Level {spell.level}
+                          </div>
+                        </div>
+                      </QuickRefTooltip>
+                    ))}
+                  </div>
+                </div>
+              )}
             </>
           )}
         </div>

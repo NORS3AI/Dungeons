@@ -5221,6 +5221,20 @@ export const TRAITS: Record<string, TraitRef> = {
     description: 'Starting at 14th level, you can plunge a creature into an illusory realm. As an action, choose a creature that you can see within 60 feet of you. It must make a Wisdom saving throw against your warlock spell save DC. On a failed save, it is charmed or frightened by you (your choice) for 1 minute or until your concentration is broken. This effect ends early if the creature takes any damage. Until this illusion ends, the creature thinks it is lost in a misty realm. Once you use this feature, you can\'t use it again until you finish a short or long rest.',
     mechanics: 'Action: Target WIS save or charmed/frightened for 1 minute. Recharges on short/long rest.',
   },
+  'hexblades-curse': {
+    id: 'hexblades-curse',
+    name: 'Hexblade\'s Curse',
+    source: 'Warlock (The Hexblade, Level 1)',
+    description: 'As a bonus action, you can curse a creature you can see within 30 feet for 1 minute. You gain bonus damage equal to your proficiency bonus against the cursed target, score a critical hit on a 19 or 20, and regain HP equal to your Warlock level + CHA modifier when the target dies. The curse ends early if the target dies or you lose concentration. You can use this feature once per short or long rest.',
+    mechanics: 'Bonus action. Range 30 ft. Duration 1 minute. Bonus damage = proficiency bonus. Crit on 19-20. Regain HP on kill = Warlock level + CHA mod. Once per short/long rest.',
+  },
+  'hex-warrior': {
+    id: 'hex-warrior',
+    name: 'Hex Warrior',
+    source: 'Warlock (The Hexblade, Level 1)',
+    description: 'You acquire training with medium armor, shields, and martial weapons. When you finish a long rest, you can touch one weapon that lacks the two-handed property. Until your next long rest, you can use your Charisma modifier instead of Strength or Dexterity for attack and damage rolls with that weapon. This benefit lasts until you finish a long rest.',
+    mechanics: 'Proficiency: Medium armor, shields, martial weapons. Touch 1 weapon after long rest. Use CHA for attacks/damage with that weapon (not two-handed). Lasts until next long rest.',
+  },
 }
 
 // RULES DATA - Game mechanics explanations for new players
