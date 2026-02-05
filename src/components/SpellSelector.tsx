@@ -6,6 +6,8 @@ import {
   WARLOCK_LEVEL_1_SPELLS,
   NECROMANCER_CANTRIPS,
   NECROMANCER_LEVEL_1_SPELLS,
+  WIZARD_CANTRIPS,
+  WIZARD_LEVEL_1_SPELLS,
   GOO_EXPANDED_SPELLS,
 } from '../data/spells'
 
@@ -35,6 +37,7 @@ export function SpellSelector({
   const availableCantrips = useMemo(() => {
     if (characterClass?.id === 'warlock') return WARLOCK_CANTRIPS
     if (characterClass?.id === 'necromancer') return NECROMANCER_CANTRIPS
+    if (characterClass?.id === 'wizard') return WIZARD_CANTRIPS
     return []
   }, [characterClass])
 
@@ -49,6 +52,9 @@ export function SpellSelector({
     }
     if (characterClass?.id === 'necromancer') {
       return [...NECROMANCER_LEVEL_1_SPELLS]
+    }
+    if (characterClass?.id === 'wizard') {
+      return [...WIZARD_LEVEL_1_SPELLS]
     }
     return []
   }, [characterClass, subclass])
