@@ -9,6 +9,7 @@ export * from './common'
 // Class spells
 export * from './warlock'
 export * from './necromancer'
+export * from './wizard'
 
 // Subclass spells
 export * from './subclasses/great-old-one'
