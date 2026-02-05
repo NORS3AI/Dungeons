@@ -40,6 +40,7 @@ import {
   JAVELIN_AMAZON, BOW_AMAZON, PASSIVE_MAGIC_AMAZON,
 } from '../types'
 import { ClassCard } from './ClassCard'
+import { ClassDetailModal } from './ClassDetailModal'
 import { QuickRefTooltip } from './QuickRefTooltip'
 import { ScrollNavigation } from './ScrollNavigation'
 
@@ -133,6 +134,7 @@ export function ClassSelector({
   const [selectedSubclass, setSelectedSubclass] = useState<Subclass | null>(initialSubclass || null)
   const [selectedSkills, setSelectedSkills] = useState<string[]>(initialSkills)
   const [selectedFightingStyle, setSelectedFightingStyle] = useState<string | null>(initialFightingStyle)
+  const [modalClass, setModalClass] = useState<Class | null>(null)
 
   const handleClassSelect = (classData: Class) => {
     setSelectedClass(classData)
@@ -160,6 +162,14 @@ export function ClassSelector({
 
   const handleFightingStyleSelect = (styleId: string) => {
     setSelectedFightingStyle(styleId === selectedFightingStyle ? null : styleId)
+  }
+
+  const handleReadMore = (classData: Class) => {
+    setModalClass(classData)
+  }
+
+  const handleCloseModal = () => {
+    setModalClass(null)
   }
 
   const handleSubmit = () => {
@@ -197,6 +207,7 @@ export function ClassSelector({
             classData={classData}
             isSelected={selectedClass?.id === classData.id}
             onSelect={handleClassSelect}
+            onReadMore={handleReadMore}
           />
         ))}
       </div>
@@ -530,6 +541,15 @@ export function ClassSelector({
 
       {/* Scroll Navigation */}
       <ScrollNavigation />
+
+      {/* Class Detail Modal */}
+      {modalClass && (
+        <ClassDetailModal
+          classData={modalClass}
+          isOpen={!!modalClass}
+          onClose={handleCloseModal}
+        />
+      )}
     </div>
   )
 }

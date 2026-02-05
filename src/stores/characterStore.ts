@@ -171,6 +171,7 @@ interface CharacterState {
   removeEquipment: (itemId: string) => void
   toggleEquipment: (itemId: string) => void
   updateCurrency: (currency: Partial<Currency>) => void
+  setDailyIncome: (professionName: string, amount: number, currency: 'copper' | 'silver' | 'gold') => void
 
   // Combat/Session updates
   updateHitPoints: (hp: Partial<Character['hitPoints']>) => void
@@ -451,6 +452,19 @@ export const useCharacterStore = create<CharacterState>()(
             currentCharacter: {
               ...currentCharacter,
               currency: { ...currentCharacter.currency, ...currency },
+            },
+            history: addToHistory(history, currentCharacter),
+          })
+        },
+
+        setDailyIncome: (professionName: string, amount: number, currency: 'copper' | 'silver' | 'gold') => {
+          const { currentCharacter, history } = get()
+          if (!currentCharacter) return
+
+          set({
+            currentCharacter: {
+              ...currentCharacter,
+              dailyIncome: { professionName, amount, currency },
             },
             history: addToHistory(history, currentCharacter),
           })
