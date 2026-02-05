@@ -2228,7 +2228,7 @@ export const WILD_MAGIC: Subclass = {
 // ============================================
 
 /**
- * Death Knight - World of Warcraft inspired
+ * Death Knight - World of Warcraft inspired (BALANCED)
  */
 export const DEATH_KNIGHT: Class = {
   id: 'death-knight',
@@ -2249,12 +2249,12 @@ export const DEATH_KNIGHT: Class = {
   spellcasting: 'third',
   spellcastingAbility: 'constitution',
   features: [
-    { id: 'runic-power', name: 'Runic Power', description: 'You have a pool of runic power equal to your level + CON modifier. Regain all on short/long rest.', level: 1 },
-    { id: 'rune-weapon', name: 'Rune Weapon', description: 'Bonus action: infuse weapon with necrotic energy for 1 minute, +1d6 necrotic damage.', level: 1, charges: { amount: 2, rechargeOn: 'shortRest' } },
-    { id: 'death-grip', name: 'Death Grip', description: 'Pull a Large or smaller creature within 30 feet to you. STR save or speed reduced to 0.', level: 2, charges: { amount: 2, rechargeOn: 'shortRest' } },
+    { id: 'runic-power', name: 'Runic Power', description: 'Pool of 4 + level. Regain half on short rest, all on long rest. Regenerate 1 point on critical hit.', level: 1 },
+    { id: 'rune-weapon', name: 'Rune Weapon', description: 'Costs 2 Runic Power. Bonus action: infuse weapon for 1 minute, +1d4 necrotic damage.', level: 1 },
+    { id: 'death-grip', name: 'Death Grip', description: 'Costs 3 Runic Power. Pull Large or smaller creature within 20ft. STR save or pulled and speed 0 until end of your next turn.', level: 2 },
     { id: 'extra-attack-dk', name: 'Extra Attack', description: 'Attack twice when you take the Attack action.', level: 5 },
-    { id: 'lichborne', name: 'Lichborne', description: 'Immune to charm and fear. No need to eat, drink, or breathe.', level: 7 },
-    { id: 'army-of-the-dead', name: 'Army of the Dead', description: 'Summon 8 ghouls for 1 minute.', level: 14, charges: { amount: 1, rechargeOn: 'longRest' } },
+    { id: 'lichborne', name: 'Lichborne', description: 'Immune to charm and fear. Advantage on saves vs disease and poison.', level: 7 },
+    { id: 'army-of-the-dead', name: 'Army of the Dead', description: 'Costs 5 Runic Power. Summon 4 ghouls for 1 minute.', level: 14, charges: { amount: 1, rechargeOn: 'longRest' } },
   ],
 }
 
@@ -2264,9 +2264,9 @@ export const BLOOD_DEATH_KNIGHT: Subclass = {
   description: 'Vampiric tanks that sustain themselves through the lifeforce of enemies.',
   parentClassId: 'death-knight',
   features: [
-    { id: 'blood-boil', name: 'Blood Boil', description: 'Bonus action: enemies within 10ft take 2d6 necrotic, gain temp HP equal to half damage.', level: 3, charges: { amount: 3, rechargeOn: 'shortRest' } },
-    { id: 'vampiric-blood', name: 'Vampiric Blood', description: 'Increase max HP by 30% for 1 minute, heal 25% of melee damage dealt.', level: 6, charges: { amount: 1, rechargeOn: 'shortRest' } },
-    { id: 'dancing-rune-weapon', name: 'Dancing Rune Weapon', description: 'Summon spectral weapon that mirrors your attacks for half damage.', level: 14, charges: { amount: 1, rechargeOn: 'longRest' } },
+    { id: 'blood-boil', name: 'Blood Boil', description: 'Costs 3 Runic Power. Bonus action: enemies within 10ft take 1d8 necrotic, gain temp HP = half damage dealt. CON save for half damage.', level: 3 },
+    { id: 'vampiric-blood', name: 'Vampiric Blood', description: 'Costs 4 Runic Power. Gain temp HP = level + CON modifier for 1 minute, heal 10% of melee damage dealt.', level: 6 },
+    { id: 'dancing-rune-weapon', name: 'Dancing Rune Weapon', description: 'Costs 5 Runic Power. Summon spectral weapon that mirrors your attacks for 1 minute, dealing half damage.', level: 14, charges: { amount: 1, rechargeOn: 'longRest' } },
   ],
 }
 
@@ -2276,9 +2276,9 @@ export const FROST_DEATH_KNIGHT: Subclass = {
   description: 'Wield the power of ice and cold, devastating enemies with frozen strikes.',
   parentClassId: 'death-knight',
   features: [
-    { id: 'frost-strike', name: 'Frost Strike', description: 'Spend 2 runic power for +2d8 cold damage and reduce speed by 10ft.', level: 3 },
-    { id: 'killing-machine', name: 'Killing Machine', description: 'Crit range 19-20. On crit, regain 2 runic power.', level: 6 },
-    { id: 'breath-of-sindragosa', name: 'Breath of Sindragosa', description: '30ft cone, 8d8 cold damage, failed save = restrained.', level: 14, charges: { amount: 1, rechargeOn: 'longRest' } },
+    { id: 'frost-strike', name: 'Frost Strike', description: 'Costs 2 Runic Power. Add +1d8 cold damage and reduce target speed by 10ft until end of your next turn.', level: 3 },
+    { id: 'killing-machine', name: 'Killing Machine', description: 'Once per short rest: gain advantage on next attack roll. On crit, regain 2 Runic Power.', level: 6, charges: { amount: 1, rechargeOn: 'shortRest' } },
+    { id: 'breath-of-sindragosa', name: 'Breath of Sindragosa', description: 'Costs 6 Runic Power. 30ft cone, 6d8 cold damage, CON save for half. Failed save = speed halved for 1 round.', level: 14, charges: { amount: 1, rechargeOn: 'longRest' } },
   ],
 }
 
@@ -2288,14 +2288,14 @@ export const UNHOLY_DEATH_KNIGHT: Subclass = {
   description: 'Spread disease and command undead minions.',
   parentClassId: 'death-knight',
   features: [
-    { id: 'raise-dead', name: 'Raise Dead', description: 'Raise ghoul from corpse. Max ghouls = CON modifier.', level: 3 },
-    { id: 'festering-wound', name: 'Festering Wound', description: 'Attacks inflict wounds dealing 1d6 necrotic per turn. Max 4 wounds.', level: 6 },
-    { id: 'summon-gargoyle', name: 'Summon Gargoyle', description: 'Summon gargoyle for 1 minute, 3d6+5 necrotic ranged attacks.', level: 14, charges: { amount: 1, rechargeOn: 'longRest' } },
+    { id: 'raise-dead', name: 'Raise Dead', description: 'Costs 4 Runic Power. Raise ghoul from corpse for 1 hour. Max ghouls = 1 (increases to 2 at level 11).', level: 3 },
+    { id: 'festering-wound', name: 'Festering Wound', description: 'Costs 2 Runic Power. Target bleeds for 1d4 necrotic per turn for 1 minute. Max 3 wounds. CON save ends effect.', level: 6 },
+    { id: 'summon-gargoyle', name: 'Summon Gargoyle', description: 'Costs 5 Runic Power. Summon gargoyle for 1 minute with 2d8 necrotic ranged attacks.', level: 14, charges: { amount: 1, rechargeOn: 'longRest' } },
   ],
 }
 
 /**
- * Necromancer - Diablo Series inspired
+ * Necromancer - Diablo Series inspired (BALANCED)
  */
 export const NECROMANCER: Class = {
   id: 'necromancer',
@@ -2316,11 +2316,11 @@ export const NECROMANCER: Class = {
   spellcasting: 'full',
   spellcastingAbility: 'intelligence',
   features: [
-    { id: 'essence', name: 'Essence', description: 'Pool of 10 + level. Regenerates when minions deal damage or creatures die nearby.', level: 1 },
-    { id: 'raise-skeleton', name: 'Raise Skeleton', description: 'Raise skeleton warrior from corpse. Max = INT modifier.', level: 1 },
-    { id: 'corpse-explosion', name: 'Corpse Explosion', description: 'Explode corpse for 3d8 necrotic in 10ft radius.', level: 2, charges: { amount: 3, rechargeOn: 'shortRest' } },
-    { id: 'bone-armor', name: 'Bone Armor', description: '+2 AC and temp HP = level + INT for 1 minute.', level: 3, charges: { amount: 2, rechargeOn: 'shortRest' } },
-    { id: 'summon-golem', name: 'Summon Golem', description: 'Summon bone/blood/iron golem for 1 hour.', level: 11, charges: { amount: 1, rechargeOn: 'longRest' } },
+    { id: 'essence', name: 'Essence', description: 'Pool of 5 + level. Regain half on short rest, all on long rest. Regenerates 1 point when minions deal damage or creatures die within 30ft.', level: 1 },
+    { id: 'raise-skeleton', name: 'Raise Skeleton', description: 'Costs 3 Essence. Raise skeleton warrior from corpse. Max skeletons = 1 (increases to 2 at level 11). Lasts 1 hour.', level: 1 },
+    { id: 'corpse-explosion', name: 'Corpse Explosion', description: 'Costs 2 Essence. Explode corpse for 2d8 necrotic in 10ft radius. DEX save for half damage.', level: 2 },
+    { id: 'bone-armor', name: 'Bone Armor', description: 'Costs 3 Essence. Gain temp HP = level + INT modifier for 1 minute.', level: 3 },
+    { id: 'summon-golem', name: 'Summon Golem', description: 'Costs 5 Essence. Summon bone/blood/iron golem for 1 hour. Only one golem at a time.', level: 11, charges: { amount: 1, rechargeOn: 'longRest' } },
   ],
 }
 
@@ -2330,9 +2330,9 @@ export const BONE_NECROMANCER: Subclass = {
   description: 'Focus on offensive bone magic, using remains as deadly weapons.',
   parentClassId: 'necromancer',
   features: [
-    { id: 'bone-spear', name: 'Bone Spear', description: 'Launch bone spear for 3d10 piercing, pierces to second target.', level: 2 },
-    { id: 'bone-spirit', name: 'Bone Spirit', description: 'Homing skull explodes for 6d6 necrotic.', level: 6, charges: { amount: 2, rechargeOn: 'shortRest' } },
-    { id: 'bone-storm', name: 'Bone Storm', description: 'Vortex of bones deals 4d6 slashing to creatures within 10ft.', level: 14, charges: { amount: 1, rechargeOn: 'longRest' } },
+    { id: 'bone-spear', name: 'Bone Spear', description: 'Costs 2 Essence. Launch bone spear for 2d10 piercing, pierces to second target for 1d10.', level: 2 },
+    { id: 'bone-spirit', name: 'Bone Spirit', description: 'Costs 4 Essence. Homing skull explodes for 5d6 necrotic.', level: 6 },
+    { id: 'bone-storm', name: 'Bone Storm', description: 'Costs 5 Essence. Vortex of bones deals 3d6 slashing to creatures within 10ft for 3 rounds.', level: 14 },
   ],
 }
 
@@ -2342,9 +2342,9 @@ export const BLOOD_NECROMANCER: Subclass = {
   description: 'Manipulate lifeforce, draining enemies and empowering yourself.',
   parentClassId: 'necromancer',
   features: [
-    { id: 'blood-surge', name: 'Blood Surge', description: 'Drain blood from creatures within 15ft for 2d8 necrotic, heal half.', level: 2 },
-    { id: 'siphon-blood', name: 'Siphon Blood', description: 'Heal for half necrotic spell damage dealt.', level: 6 },
-    { id: 'hemorrhage', name: 'Hemorrhage', description: 'Target bleeds for 4d10 + 2d10/turn for 1 minute.', level: 14, charges: { amount: 1, rechargeOn: 'longRest' } },
+    { id: 'blood-surge', name: 'Blood Surge', description: 'Costs 2 Essence. Drain blood from creatures within 15ft for 2d6 necrotic, heal half damage dealt.', level: 2 },
+    { id: 'siphon-blood', name: 'Siphon Blood', description: 'Passive: Heal for 25% of necrotic spell damage dealt.', level: 6 },
+    { id: 'hemorrhage', name: 'Hemorrhage', description: 'Costs 5 Essence. Target bleeds for 3d8 + 1d8/turn for 1 minute. CON save ends effect.', level: 14 },
   ],
 }
 
@@ -2354,14 +2354,14 @@ export const SUMMONER_NECROMANCER: Subclass = {
   description: 'Command vast armies of undead.',
   parentClassId: 'necromancer',
   features: [
-    { id: 'skeleton-mastery', name: 'Skeleton Mastery', description: 'Double skeleton limit. Skeletons gain +2 attack and +1d6 damage.', level: 2 },
-    { id: 'revive', name: 'Revive', description: 'Revive any creature that died within 1 minute as undead.', level: 6, charges: { amount: 2, rechargeOn: 'longRest' } },
-    { id: 'death-lord', name: 'Death Lord', description: 'Undead gain +4 AC, resistance to all damage, +2d6 necrotic.', level: 14 },
+    { id: 'skeleton-mastery', name: 'Skeleton Mastery', description: 'Increase skeleton limit by 1. Skeletons gain +1 attack and damage.', level: 2 },
+    { id: 'revive', name: 'Revive', description: 'Costs 4 Essence. Revive any Medium or smaller creature that died within 1 minute as undead for 10 minutes.', level: 6 },
+    { id: 'death-lord', name: 'Death Lord', description: 'Passive: Undead minions gain +2 AC, +10 HP, and +1d6 necrotic damage.', level: 14 },
   ],
 }
 
 /**
- * Demon Hunter - World of Warcraft + Diablo inspired
+ * Demon Hunter - World of Warcraft + Diablo inspired (BALANCED)
  */
 export const DEMON_HUNTER: Class = {
   id: 'demon-hunter',
@@ -2382,11 +2382,11 @@ export const DEMON_HUNTER: Class = {
   spellcasting: 'half',
   spellcastingAbility: 'charisma',
   features: [
-    { id: 'spectral-sight', name: 'Spectral Sight', description: 'See invisible creatures within 60ft and into Ethereal Plane.', level: 1 },
-    { id: 'fel-rush', name: 'Fel Rush', description: 'Dash 30ft, creatures you pass take 2d8 fire damage.', level: 3, charges: { amount: 2, rechargeOn: 'shortRest' } },
+    { id: 'spectral-sight', name: 'Spectral Sight', description: 'See invisible creatures within 30ft. Darkvision extends by 30ft.', level: 1 },
+    { id: 'fel-rush', name: 'Fel Rush', description: 'Dash 20ft, creatures you pass take 1d8 fire damage. DEX save for half.', level: 3, charges: { amount: 2, rechargeOn: 'shortRest' } },
     { id: 'extra-attack-dh', name: 'Extra Attack', description: 'Attack twice when you take the Attack action.', level: 5 },
-    { id: 'blade-dance', name: 'Blade Dance', description: 'All creatures within 10ft take 4d6 slashing + 2d6 fire.', level: 6, charges: { amount: 2, rechargeOn: 'shortRest' } },
-    { id: 'metamorphosis', name: 'Metamorphosis', description: 'Transform: +2 AC, 60ft fly, +2d6 fire damage for 1 minute.', level: 9, charges: { amount: 1, rechargeOn: 'longRest' } },
+    { id: 'blade-dance', name: 'Blade Dance', description: 'All creatures within 5ft take 2d6 slashing. DEX save for half.', level: 6, charges: { amount: 2, rechargeOn: 'shortRest' } },
+    { id: 'metamorphosis', name: 'Metamorphosis', description: 'Transform for 1 minute: +1 AC, 30ft fly, +1d6 fire damage on attacks.', level: 9, charges: { amount: 1, rechargeOn: 'longRest' } },
   ],
 }
 
@@ -2396,9 +2396,9 @@ export const VENGEANCE_DEMON_HUNTER: Subclass = {
   description: 'Tanks who use pain to fuel demonic powers.',
   parentClassId: 'demon-hunter',
   features: [
-    { id: 'demon-spikes', name: 'Demon Spikes', description: '+2 AC, attackers take 1d6 piercing for 1 minute.', level: 3, charges: { amount: 2, rechargeOn: 'shortRest' } },
-    { id: 'infernal-strike', name: 'Infernal Strike', description: 'Leap 30ft, 3d6 fire damage on landing, DEX save or prone.', level: 6, charges: { amount: 2, rechargeOn: 'shortRest' } },
-    { id: 'fel-devastation', name: 'Fel Devastation', description: '30ft cone, 2d6 fire/round for 3 rounds, heal 25% dealt.', level: 14, charges: { amount: 1, rechargeOn: 'longRest' } },
+    { id: 'demon-spikes', name: 'Demon Spikes', description: '+1 AC, attackers take 1d4 piercing for 1 minute.', level: 3, charges: { amount: 2, rechargeOn: 'shortRest' } },
+    { id: 'infernal-strike', name: 'Infernal Strike', description: 'Leap 20ft, 2d6 fire damage on landing. DEX save or prone.', level: 6, charges: { amount: 2, rechargeOn: 'shortRest' } },
+    { id: 'fel-devastation', name: 'Fel Devastation', description: '20ft cone, 2d6 fire/round for 2 rounds. Heal 10% of damage dealt.', level: 14, charges: { amount: 1, rechargeOn: 'longRest' } },
   ],
 }
 
@@ -2408,9 +2408,9 @@ export const HAVOC_DEMON_HUNTER: Subclass = {
   description: 'Melee DPS specialists dealing massive chaotic fel damage.',
   parentClassId: 'demon-hunter',
   features: [
-    { id: 'eye-beam', name: 'Eye Beam', description: '60ft line, 6d6 fire damage, DEX save for half.', level: 3, charges: { amount: 2, rechargeOn: 'shortRest' } },
-    { id: 'momentum', name: 'Momentum', description: 'After Fel Rush, next attack deals +2d6 damage.', level: 6 },
-    { id: 'demonic', name: 'Demonic', description: 'Eye Beam triggers Metamorphosis for 1 round.', level: 14 },
+    { id: 'eye-beam', name: 'Eye Beam', description: '40ft line, 4d6 fire damage. DEX save for half.', level: 3, charges: { amount: 2, rechargeOn: 'shortRest' } },
+    { id: 'momentum', name: 'Momentum', description: 'After Fel Rush, next attack deals +1d6 damage.', level: 6 },
+    { id: 'demonic', name: 'Demonic', description: 'Once per long rest: Eye Beam triggers Metamorphosis for 1 minute.', level: 14, charges: { amount: 1, rechargeOn: 'longRest' } },
   ],
 }
 
@@ -2420,14 +2420,14 @@ export const SHADOW_DEMON_HUNTER: Subclass = {
   description: 'Blend stealth and ranged attacks, striking from darkness.',
   parentClassId: 'demon-hunter',
   features: [
-    { id: 'shadow-power', name: 'Shadow Power', description: 'Hide as bonus action. First attack from hiding deals +2d6.', level: 3 },
-    { id: 'multishot', name: 'Multishot', description: '30ft cone, 4d6 piercing, DEX save for half.', level: 6, charges: { amount: 3, rechargeOn: 'shortRest' } },
-    { id: 'rain-of-vengeance', name: 'Rain of Vengeance', description: '30ft radius, 8d6 piercing, DEX save for half.', level: 14, charges: { amount: 1, rechargeOn: 'longRest' } },
+    { id: 'shadow-power', name: 'Shadow Power', description: 'Hide as bonus action once per short rest. First attack from hiding deals +1d8.', level: 3, charges: { amount: 1, rechargeOn: 'shortRest' } },
+    { id: 'multishot', name: 'Multishot', description: '15ft cone, 3d6 piercing. DEX save for half.', level: 6, charges: { amount: 2, rechargeOn: 'shortRest' } },
+    { id: 'rain-of-vengeance', name: 'Rain of Vengeance', description: '20ft radius, 6d6 piercing. DEX save for half.', level: 14, charges: { amount: 1, rechargeOn: 'longRest' } },
   ],
 }
 
 /**
- * Amazon - Diablo 2 inspired
+ * Amazon - Diablo 2 inspired (BALANCED)
  */
 export const AMAZON: Class = {
   id: 'amazon',
@@ -2453,12 +2453,12 @@ export const AMAZON: Class = {
     { id: 'spear-fighting', name: 'Spear Fighting', description: '+1 attack and damage with spear/javelin + shield.' },
   ],
   features: [
-    { id: 'inner-sight', name: 'Inner Sight', description: 'Bonus action: target cannot benefit from invisible/hidden/cover against you.', level: 1 },
-    { id: 'critical-strike', name: 'Critical Strike', description: 'Crit range 19-20 with weapons.', level: 1 },
-    { id: 'dodge-reaction', name: 'Dodge', description: 'Reaction: impose disadvantage on attack against you.', level: 2, charges: { amount: 3, rechargeOn: 'shortRest' } },
+    { id: 'inner-sight', name: 'Inner Sight', description: 'Bonus action: target cannot benefit from invisible/hidden against you for 1 minute. Once per short rest.', level: 1, charges: { amount: 1, rechargeOn: 'shortRest' } },
+    { id: 'critical-strike', name: 'Critical Strike', description: 'Once per short rest: gain advantage on next attack roll.', level: 1, charges: { amount: 1, rechargeOn: 'shortRest' } },
+    { id: 'dodge-reaction', name: 'Dodge', description: 'Reaction: impose disadvantage on attack against you.', level: 2, charges: { amount: 2, rechargeOn: 'shortRest' } },
     { id: 'extra-attack-amazon', name: 'Extra Attack', description: 'Attack twice when you take the Attack action.', level: 5 },
-    { id: 'avoid', name: 'Avoid', description: 'DEX saves: no damage on success, half on failure.', level: 7 },
-    { id: 'summon-valkyrie', name: 'Summon Valkyrie', description: 'Summon Valkyrie (AC 18, HP = 4x level) for 1 minute.', level: 11, charges: { amount: 1, rechargeOn: 'longRest' } },
+    { id: 'avoid', name: 'Avoid', description: 'Advantage on DEX saves.', level: 7 },
+    { id: 'summon-valkyrie', name: 'Summon Valkyrie', description: 'Summon Valkyrie (AC 16, HP = 2x level + 10) for 1 minute.', level: 11, charges: { amount: 1, rechargeOn: 'longRest' } },
   ],
 }
 
@@ -2468,9 +2468,9 @@ export const JAVELIN_AMAZON: Subclass = {
   description: 'Lightning-infused thrown weapons and devastating charged strikes.',
   parentClassId: 'amazon',
   features: [
-    { id: 'power-strike', name: 'Power Strike', description: 'Add 2d6 lightning damage to javelin/spear attacks.', level: 3, charges: { amount: 4, rechargeOn: 'shortRest' } },
-    { id: 'charged-strike', name: 'Charged Strike', description: 'On hit, release bolts hitting up to 3 creatures for 3d6 lightning.', level: 6, charges: { amount: 3, rechargeOn: 'shortRest' } },
-    { id: 'lightning-fury', name: 'Lightning Fury', description: '20ft radius, 8d6 lightning damage, DEX save for half.', level: 14, charges: { amount: 1, rechargeOn: 'longRest' } },
+    { id: 'power-strike', name: 'Power Strike', description: 'Add 1d6 lightning damage to javelin/spear attacks.', level: 3, charges: { amount: 3, rechargeOn: 'shortRest' } },
+    { id: 'charged-strike', name: 'Charged Strike', description: 'On hit, release bolt hitting 1 additional creature within 10ft for 2d6 lightning.', level: 6, charges: { amount: 2, rechargeOn: 'shortRest' } },
+    { id: 'lightning-fury', name: 'Lightning Fury', description: '15ft radius, 6d6 lightning damage. DEX save for half.', level: 14, charges: { amount: 1, rechargeOn: 'longRest' } },
   ],
 }
 
@@ -2480,9 +2480,9 @@ export const BOW_AMAZON: Subclass = {
   description: 'Master elemental arrows infused with fire, ice, and magical energy.',
   parentClassId: 'amazon',
   features: [
-    { id: 'magic-arrow', name: 'Magic Arrow', description: 'Ranged attacks deal +1d4 force damage (2d4 at 11th).', level: 3 },
-    { id: 'immolation-arrow', name: 'Immolation Arrow', description: 'Arrow explodes for 4d6 fire in 10ft radius.', level: 6, charges: { amount: 3, rechargeOn: 'shortRest' } },
-    { id: 'strafe', name: 'Strafe', description: 'Fire at up to 6 creatures, normal damage +1d6 each.', level: 14, charges: { amount: 2, rechargeOn: 'shortRest' } },
+    { id: 'magic-arrow', name: 'Magic Arrow', description: 'Ranged attacks deal +1d4 force damage (increases to +1d6 at 11th).', level: 3 },
+    { id: 'immolation-arrow', name: 'Immolation Arrow', description: 'Arrow explodes for 3d6 fire in 10ft radius. DEX save for half.', level: 6, charges: { amount: 2, rechargeOn: 'shortRest' } },
+    { id: 'strafe', name: 'Strafe', description: 'Fire at up to 4 creatures, each takes normal weapon damage. DEX save or disadvantage on next attack.', level: 14, charges: { amount: 1, rechargeOn: 'longRest' } },
   ],
 }
 
@@ -2492,8 +2492,8 @@ export const PASSIVE_MAGIC_AMAZON: Subclass = {
   description: 'Focus on defensive techniques and summoning abilities.',
   parentClassId: 'amazon',
   features: [
-    { id: 'decoy', name: 'Decoy', description: 'Create illusory duplicate within 30ft. WIS save to distinguish.', level: 3, charges: { amount: 3, rechargeOn: 'shortRest' } },
-    { id: 'improved-dodge', name: 'Improved Dodge', description: 'Dodge has unlimited uses. Move 5ft when you dodge.', level: 6 },
-    { id: 'blade-guardian', name: 'Blade Guardian', description: 'Spectral blades give +2 AC, auto-attack melee attackers for 2d8.', level: 14, charges: { amount: 1, rechargeOn: 'longRest' } },
+    { id: 'decoy', name: 'Decoy', description: 'Create illusory duplicate within 30ft for 1 minute. WIS save to distinguish.', level: 3, charges: { amount: 2, rechargeOn: 'shortRest' } },
+    { id: 'improved-dodge', name: 'Improved Dodge', description: 'Dodge has 3 charges per short rest. Move 5ft when you dodge.', level: 6, charges: { amount: 3, rechargeOn: 'shortRest' } },
+    { id: 'blade-guardian', name: 'Blade Guardian', description: 'Spectral blades give +1 AC for 1 minute, auto-attack melee attackers for 1d8 force.', level: 14, charges: { amount: 1, rechargeOn: 'longRest' } },
   ],
 }
