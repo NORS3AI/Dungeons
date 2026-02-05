@@ -46,7 +46,7 @@ const SKILLS: { name: string; ability: Ability; key: SkillKey }[] = [
 export function CharacterSheetPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, removeEquipment, toggleEquipment, saveCharacter } = useCharacterStore()
+  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, removeEquipment, toggleEquipment, saveCharacter } = useCharacterStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
   const [activeTab, setActiveTab] = useState<'main' | 'spells' | 'inventory' | 'features'>('main')
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
@@ -496,12 +496,36 @@ export function CharacterSheetPage() {
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold text-white">Currency</h3>
               <div className="flex gap-2">
-                <button
-                  onClick={() => setShowIncomeRoller(true)}
-                  className="px-3 py-1 text-sm bg-dnd-gold text-gray-900 rounded-lg hover:bg-yellow-500 transition-colors"
-                >
-                  Daily Income
-                </button>
+                {!character.dailyIncome ? (
+                  <button
+                    onClick={() => setShowIncomeRoller(true)}
+                    className="px-3 py-1 text-sm bg-dnd-gold text-gray-900 rounded-lg hover:bg-yellow-500 transition-colors"
+                  >
+                    Daily Income
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      if (!character.dailyIncome) return
+
+                      const earned: Partial<Currency> = {}
+                      if (character.dailyIncome.currency === 'gold') earned.gold = character.dailyIncome.amount
+                      else if (character.dailyIncome.currency === 'silver') earned.silver = character.dailyIncome.amount
+                      else if (character.dailyIncome.currency === 'copper') earned.copper = character.dailyIncome.amount
+
+                      const newCurrency = { ...character.currency }
+                      for (const [key, value] of Object.entries(earned)) {
+                        newCurrency[key as keyof Currency] += value
+                      }
+                      updateCurrency(newCurrency)
+                      saveCharacter()
+                    }}
+                    className="px-3 py-1 text-sm bg-blue-700 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                    title={character.dailyIncome ? `Collect ${character.dailyIncome.amount} ${character.dailyIncome.currency === 'gold' ? 'GP' : character.dailyIncome.currency === 'silver' ? 'SP' : 'CP'} from ${character.dailyIncome.professionName}` : 'New Day'}
+                  >
+                    New Day
+                  </button>
+                )}
                 <button
                   onClick={() => setShowCurrencyModal(true)}
                   className="px-3 py-1 text-sm bg-green-700 text-white rounded-lg hover:bg-green-600 transition-colors"
@@ -526,6 +550,14 @@ export function CharacterSheetPage() {
                 </div>
               ))}
             </div>
+            {character.dailyIncome && (
+              <div className="mt-3 p-3 bg-blue-900/20 border border-blue-600/50 rounded-lg">
+                <div className="text-sm text-blue-400 font-medium">{character.dailyIncome.professionName}</div>
+                <div className="text-xs text-gray-400">
+                  Daily Income: {character.dailyIncome.amount} {character.dailyIncome.currency === 'gold' ? 'GP' : character.dailyIncome.currency === 'silver' ? 'SP' : 'CP'}/day
+                </div>
+              </div>
+            )}
           </div>
 
           {/* All Equipment (Inventory) */}
@@ -575,6 +607,10 @@ export function CharacterSheetPage() {
                   newCurrency[key as keyof Currency] += value
                 }
                 updateCurrency(newCurrency)
+                saveCharacter()
+              }}
+              onSetProfession={(professionName, amount, currency) => {
+                setDailyIncome(professionName, amount, currency)
                 saveCharacter()
               }}
               onClose={() => setShowIncomeRoller(false)}
@@ -1054,9 +1090,11 @@ function CurrencyModal({
 // Daily Income Roller
 function DailyIncomeRoller({
   onEarn,
+  onSetProfession,
   onClose,
 }: {
   onEarn: (currency: Partial<Currency>) => void
+  onSetProfession: (professionName: string, amount: number, currency: 'copper' | 'silver' | 'gold') => void
   onClose: () => void
 }) {
   const [selectedProfession, setSelectedProfession] = useState<Profession | null>(null)
@@ -1090,6 +1128,9 @@ function DailyIncomeRoller({
 
     const { amount, currency } = selectedProfession.dailyIncome
     setEarnedAmount({ amount, currency })
+
+    // Save profession permanently
+    onSetProfession(selectedProfession.name, amount, currency)
 
     // Convert to currency object
     const earned: Partial<Currency> = {}

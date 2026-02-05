@@ -178,6 +178,13 @@ export interface Character {
   equipment: Equipment[]
   currency: Currency
 
+  // Daily Income
+  dailyIncome?: {
+    professionName: string
+    amount: number
+    currency: 'copper' | 'silver' | 'gold'
+  }
+
   // Meta
   createdAt: string
   updatedAt: string
