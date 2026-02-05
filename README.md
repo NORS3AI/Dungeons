@@ -96,14 +96,14 @@ View multiple sheets simultaneously:
 
 ## Supported Content
 
-### Currently Available (658 Total Pieces of Game Content)
+### Currently Available (658+ Total Pieces of Game Content)
 
 | Content Type | Count | Notes |
 |--------------|-------|-------|
-| **Classes** | 16 | 12 PHB 2024 + 4 Custom (Death Knight, Necromancer, Demon Hunter, Amazon) |
+| **Classes** | 16 | 12 PHB 2024 + 4 Custom (Balanced WoW/Diablo-inspired) |
 | **Subclasses** | 40 | Full specialization options across all classes |
 | **Races** | 23 | PHB core + Volo's + Eberron + aquatic races |
-| **Spells** | 401 | Cantrips through 9th level from PHB 2024 |
+| **Spells** | 401+ | Organized by class: Warlock, Wizard, Cleric, Necromancer |
 | **Class Features & Traits** | 96 | Clickable references with full mechanics |
 | **Feats** | 18 | Including GWM, Lucky, Sentinel, Alert, etc. |
 | **Weapons** | 38 | Simple & martial (includes Net and Trident) |
@@ -118,9 +118,11 @@ View multiple sheets simultaneously:
 - Fighter, Monk, Paladin, Ranger
 - Rogue, Sorcerer, Warlock, Wizard
 
-**Custom Classes (4)**:
-- Death Knight (WoW-inspired), Necromancer (Diablo-inspired)
-- Demon Hunter (WoW-inspired), Amazon (Diablo-inspired)
+**Custom Classes (4)** - Balanced for play:
+- Death Knight (WoW-inspired) - Runic power system, necromantic warrior
+- Necromancer (Diablo-inspired) - Essence system, summoner & curses
+- Demon Hunter (WoW-inspired) - Fel energy, mobility & transformation
+- Amazon (Diablo-inspired) - Javelin/bow specialist with elemental magic
 
 ### All 23 Races Available
 
@@ -246,7 +248,13 @@ Dungeons/
 │   ├── data/
 │   │   ├── classes/       # Class JSON (fighter.json, warlock.json)
 │   │   ├── races/         # Race JSON (drow.json, tiefling.json)
-│   │   ├── spells/        # Spell data
+│   │   ├── spells/        # Spell data organized by class
+│   │   │   ├── common.ts       # Shared spells
+│   │   │   ├── warlock.ts      # Warlock spells
+│   │   │   ├── wizard.ts       # Wizard spells
+│   │   │   ├── cleric.ts       # Cleric spells
+│   │   │   ├── necromancer.ts  # Necromancer spells
+│   │   │   └── subclasses/     # Patron/domain expanded spells
 │   │   └── equipment/     # Weapons, armor, gear
 │   ├── hooks/             # Custom React hooks
 │   ├── stores/            # Zustand state stores

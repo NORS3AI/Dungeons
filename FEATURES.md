@@ -23,136 +23,106 @@ Complete reference for all classes, subclasses, and special features available i
 | Warlock | d8 | CHA | Pact | 1 |
 | Wizard | d6 | INT | Full | 2 |
 
-### Custom Classes (4) - WoW/Diablo Inspired
+### Custom Classes (4) - WoW/Diablo Inspired (Balanced)
 
-| Class | Hit Die | Primary | Spellcasting | Subclass Level |
-|-------|---------|---------|--------------|----------------|
-| Amazon | d10 | DEX/STR | Half | 3 |
-| Death Knight | d10 | STR/CON | Third | 3 |
-| Demon Hunter | d10 | DEX | Half | 3 |
-| Necromancer | d6 | INT | Full | 2 |
+| Class | Hit Die | Primary | Spellcasting | Subclass Level | Notes |
+|-------|---------|---------|--------------|----------------|-------|
+| Amazon | d10 | DEX/STR | Half | 3 | Balanced resource costs |
+| Death Knight | d10 | STR/CON | Third | 3 | Runic Power system |
+| Demon Hunter | d10 | DEX | Half | 3 | Balanced AoE/mobility |
+| Necromancer | d6 | INT | Full | 2 | Essence system |
+
+**All custom classes have been balanced for competitive play with PHB classes.**
 
 ---
 
 ## Custom Classes Detail
 
-### Death Knight (World of Warcraft)
+### Death Knight (World of Warcraft) - BALANCED
 
 *A fallen champion raised by dark powers, wielding runic magic and commanding the forces of death itself.*
 
-**Resource:** Runic Power (level + CON modifier)
+**Resource:** Runic Power (4 + level, regain half on short rest, all on long rest)
 
 **Key Features:**
 | Level | Feature |
 |-------|---------|
-| 1 | Runic Power, Rune Weapon (+1d6 necrotic) |
-| 2 | Death Grip (pull enemies 30ft) |
-| 3 | Anti-Magic Shell (spell resistance) |
+| 1 | Runic Power pool, Rune Weapon (costs 2 RP, +1d4 necrotic) |
+| 2 | Death Grip (costs 3 RP, pull 20ft, STR save) |
 | 5 | Extra Attack |
-| 6 | Dark Command (taunt) |
-| 7 | Lichborne (immune charm/fear) |
-| 9 | Death and Decay (AoE DoT) |
-| 14 | Army of the Dead (summon 8 ghouls) |
-| 18 | Purgatory (cheat death) |
-| 20 | Apocalypse (10d10 necrotic cone) |
+| 7 | Lichborne (immune charm/fear, advantage vs disease/poison) |
+| 14 | Army of the Dead (costs 5 RP, summon 4 ghouls) |
 
 **Subclasses:**
-- **Blood** - Vampiric tank with self-healing (Blood Boil, Vampiric Blood, Dancing Rune Weapon)
-- **Frost** - Cold damage DPS with dual weapons (Frost Strike, Killing Machine, Breath of Sindragosa)
-- **Unholy** - Disease and pet master (Raise Dead, Festering Wound, Summon Gargoyle)
+- **Blood** - Vampiric tank with life drain (Blood Boil: 1d8 necrotic + temp HP, Vampiric Blood: temp HP + 10% healing)
+- **Frost** - Cold damage with weapon mastery (Frost Strike: +1d8 cold, Breath of Sindragosa: 6d8 cold cone)
+- **Unholy** - Disease and undead commander (Raise Dead: 1-2 ghouls, Festering Wound: 1d4 necrotic DoT)
 
 ---
 
-### Necromancer (Diablo Series)
+### Necromancer (Diablo Series) - BALANCED
 
 *A master of the dark arts who commands undead minions, manipulates bones and blood, and wields devastating curse magic.*
 
-**Resource:** Essence (10 + level, regenerates from minion damage/deaths)
+**Resource:** Essence (5 + level, regain half on short rest, all on long rest, +1 when minions deal damage/creatures die nearby)
 
 **Key Features:**
 | Level | Feature |
 |-------|---------|
-| 1 | Essence, Raise Skeleton (INT mod skeletons) |
-| 2 | Corpse Explosion (3d8 necrotic AoE) |
-| 3 | Bone Armor (+2 AC, temp HP) |
-| 5 | Command Undead (control undead) |
-| 6 | Life From Death (heal when creatures die) |
-| 7 | Skeleton Mage (ranged minions) |
-| 9 | Blood Nova (sacrifice HP for damage) |
-| 11 | Summon Golem (powerful construct) |
-| 14 | Death Nova (8d8 necrotic burst) |
-| 18 | Land of the Dead (unlimited corpse explosions) |
-| 20 | Avatar of Death (max damage spells) |
+| 1 | Essence pool, Raise Skeleton (costs 3, max 1, increases to 2 at level 11) |
+| 2 | Corpse Explosion (costs 2, 2d8 necrotic AoE, DEX save for half) |
+| 3 | Bone Armor (costs 3, temp HP = level + INT) |
+| 11 | Summon Golem (costs 5 + 1 charge/long rest, one golem at a time) |
 
 **Subclasses:**
-- **Path of Bone** - Offensive bone magic (Bone Spear, Bone Spirit, Bone Storm)
-- **Path of Blood** - Life manipulation (Blood Surge, Siphon Blood, Hemorrhage)
-- **Path of the Summoner** - Army commander (Skeleton Mastery, Revive, Death Lord)
+- **Path of Bone** - Offensive bone magic (Bone Spear: 2d10 piercing, Bone Spirit: 5d6 necrotic, Bone Storm: 3d6 slashing)
+- **Path of Blood** - Life manipulation (Blood Surge: 2d6 necrotic + heal, Siphon Blood: 25% healing, Hemorrhage: 3d8 + 1d8/turn)
+- **Path of the Summoner** - Enhanced minions (Skeleton Mastery: +1 limit & bonuses, Revive: 10-min undead, Death Lord: +2 AC/+10 HP/+1d6 damage)
 
 ---
 
-### Demon Hunter (WoW + Diablo)
+### Demon Hunter (WoW + Diablo) - BALANCED
 
 *A relentless slayer who has sacrificed part of their humanity to gain demonic powers, hunting fiends with supernatural abilities.*
 
-**Resources:**
-- Hatred (10 + DEX mod, offensive, regenerates 1/round)
-- Discipline (10 + WIS mod, defensive, short rest recharge)
-
 **Key Features:**
 | Level | Feature |
 |-------|---------|
-| 1 | Hatred/Discipline, Spectral Sight (see invisible) |
-| 2 | Demon Mark (+1d6 damage to marked) |
-| 3 | Fel Rush (30ft dash + 2d8 fire) |
+| 1 | Spectral Sight (see invisible 30ft, +30ft darkvision) |
+| 3 | Fel Rush (20ft dash, 1d8 fire, DEX save, 2 charges/short rest) |
 | 5 | Extra Attack |
-| 6 | Blade Dance (AoE 4d6 slashing + 2d6 fire) |
-| 7 | Immolation Aura (1d8 fire to adjacent) |
-| 9 | Metamorphosis (+2 AC, 60ft fly, +2d6 fire) |
-| 11 | Chaos Strike (crit heals you) |
-| 14 | Soul Rend (kill heals 2d10 + CHA) |
-| 18 | Demonic Appetite (crit on 18-20 in Meta) |
-| 20 | The Hunt (120ft teleport + 10d10 fire) |
-
-**Fighting Styles:**
-- Dual Wield (dual any one-handed weapons)
-- Thrown Glaives (+2 damage, return)
+| 6 | Blade Dance (5ft AoE, 2d6 slashing, DEX save, 2 charges/short rest) |
+| 9 | Metamorphosis (+1 AC, 30ft fly, +1d6 fire, 1 charge/long rest) |
 
 **Subclasses:**
-- **Vengeance** - Tank specialization (Demon Spikes, Infernal Strike, Fel Devastation)
-- **Havoc** - Melee DPS (Eye Beam, Momentum, Demonic)
-- **Shadow** - Ranged/stealth (Shadow Power, Multishot, Rain of Vengeance)
+- **Vengeance** - Tank (Demon Spikes: +1 AC + 1d4 retaliation, Infernal Strike: 20ft leap + 2d6 fire)
+- **Havoc** - Melee DPS (Eye Beam: 40ft line 4d6 fire, Momentum: +1d6 after Fel Rush)
+- **Shadow** - Ranged/stealth (Shadow Power: hide + 1d8 bonus, Multishot: 15ft cone 3d6, Rain of Vengeance: 20ft radius 6d6)
 
 ---
 
-### Amazon (Diablo 2)
+### Amazon (Diablo 2) - BALANCED
 
 *A warrior from the Skovos Isles, master of javelin, bow, and spear combat enhanced by elemental and divine magic.*
 
 **Key Features:**
 | Level | Feature |
 |-------|---------|
-| 1 | Inner Sight (remove hiding/cover), Critical Strike (19-20) |
-| 2 | Dodge (reaction to impose disadvantage) |
-| 3 | Penetrate (ignore cover, pierce targets) |
+| 1 | Inner Sight (1 charge/short rest, negate invisibility/hiding), Critical Strike (1 charge/short rest, advantage) |
+| 2 | Dodge (reaction, disadvantage, 2 charges/short rest) |
 | 5 | Extra Attack |
-| 6 | Slow Missiles (reduce ranged damage) |
-| 7 | Avoid (Evasion-like) |
-| 9 | Evade (bonus action Dash/Disengage) |
-| 11 | Summon Valkyrie (spirit warrior) |
-| 14 | Pierce (hit 3 targets in line) |
-| 18 | Fend (multi-attack melee) |
-| 20 | Avatar of Athena (+4 attack, +10 damage) |
+| 7 | Avoid (advantage on DEX saves) |
+| 11 | Summon Valkyrie (AC 16, HP = 2x level + 10, 1 charge/long rest) |
 
 **Fighting Styles:**
 - Archery (+2 ranged attack)
 - Thrown Weapon Fighting (+2 damage, quick draw)
-- Spear Fighting (+1 attack/damage, one-handed with shield)
+- Spear Fighting (+1 attack/damage with shield)
 
 **Subclasses:**
-- **Javelin and Spear** - Lightning damage (Power Strike, Lightning Bolt, Lightning Fury)
-- **Bow and Crossbow** - Elemental arrows (Magic Arrow, Immolation Arrow, Strafe)
-- **Passive and Magic** - Defense/summons (Decoy, Improved Dodge, Blade Guardian)
+- **Javelin and Spear** - Lightning-infused (Power Strike: +1d6 lightning, Charged Strike: +1 target 2d6, Lightning Fury: 15ft radius 6d6)
+- **Bow and Crossbow** - Elemental arrows (Magic Arrow: +1d4 force, Immolation Arrow: 3d6 fire AoE, Strafe: 4 targets)
+- **Passive and Magic** - Defense/summons (Decoy: illusion, Improved Dodge: 3 charges, Blade Guardian: +1 AC + 1d8 retaliation)
 
 ---
 
@@ -232,13 +202,29 @@ The Fighter class now has a fully detailed **Dual Two-Handed** fighting style fo
 
 ---
 
+## Spell Data Organization
+
+Spells are now organized by class in separate files for better maintainability:
+- **Common Spells**: Shared spells like Detect Magic, Mage Hand, Minor Illusion
+- **Warlock Spells**: Pact Magic spells + Great Old One expanded spells
+- **Wizard Spells**: Full arcane spell list (cantrips through level 9)
+- **Cleric Spells**: Divine spells with domain options
+- **Necromancer Spells**: Death magic and summoning spells
+
+All spell data includes proper TypeScript typing for:
+- Damage dice, spell schools, components
+- Casting time, range (with shape/size for AoE)
+- Duration, concentration, ritual status
+- Saving throws, attack rolls
+
 ## Total Content
 
-- **16 Classes** (12 PHB + 4 Custom)
+- **16 Classes** (12 PHB + 4 Custom, all balanced)
 - **40 Subclasses** (28 PHB + 12 Custom)
-- **440+ Spells** (401 PHB + 40+ WoW/Diablo)
+- **440+ Spells** (PHB core + Warlock + Wizard + Cleric + Necromancer)
 - **6 Fighting Styles** for Fighter
-- **Comprehensive Weapon Mastery** system
+- **Resource Systems** for custom classes (Runic Power, Essence)
+- **Comprehensive balancing** for all custom content
 
 ---
 

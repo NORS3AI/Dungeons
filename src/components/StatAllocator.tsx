@@ -28,21 +28,21 @@ interface StatAllocatorProps {
 }
 
 /**
- * Roll 4d6 drop lowest, 3 times, and take the highest
+ * Roll 4d6 drop lowest for a single ability
  */
 function roll4d6DropLowest(): number {
-  const results: number[] = []
+  const rolls = Array.from({ length: 4 }, () => Math.floor(Math.random() * 6) + 1)
+  rolls.sort((a, b) => b - a)
+  return rolls[0] + rolls[1] + rolls[2]
+}
 
-  // Roll 3 times
-  for (let attempt = 0; attempt < 3; attempt++) {
-    const rolls = Array.from({ length: 4 }, () => Math.floor(Math.random() * 6) + 1)
-    rolls.sort((a, b) => b - a)
-    const result = rolls[0] + rolls[1] + rolls[2]
-    results.push(result)
-  }
-
-  // Return the highest of the 3 attempts
-  return Math.max(...results)
+/**
+ * Roll a complete set of 6 ability scores
+ */
+function rollAbilitySet(): number[] {
+  const scores = Array.from({ length: 6 }, () => roll4d6DropLowest())
+  scores.sort((a, b) => b - a)
+  return scores
 }
 
 /**
@@ -99,6 +99,8 @@ export function StatAllocator({ initialScores, race, background, onSubmit, onBac
     wisdom: null,
     charisma: null,
   })
+  const [rollAttempts, setRollAttempts] = useState<number[][]>([]) // Store all 3 roll sets
+  const [selectedRollIndex, setSelectedRollIndex] = useState<number | null>(null) // Which set is selected
 
   // Calculate final scores with racial bonuses
   const getFinalScore = useCallback(
@@ -147,9 +149,41 @@ export function StatAllocator({ initialScores, race, background, onSubmit, onBac
 
   // Roll handlers
   const handleRollAll = () => {
-    const scores = Array.from({ length: 6 }, () => roll4d6DropLowest())
-    scores.sort((a, b) => b - a)
-    setRolledScores(scores)
+    if (rollAttempts.length >= 3) return // Max 3 rolls
+
+    const newSet = rollAbilitySet()
+    const newAttempts = [...rollAttempts, newSet]
+    setRollAttempts(newAttempts)
+
+    // After 3 rolls, automatically select the highest total
+    if (newAttempts.length === 3) {
+      const bestIndex = newAttempts.reduce((maxIdx, set, idx, arr) => {
+        const currentTotal = set.reduce((sum, val) => sum + val, 0)
+        const maxTotal = arr[maxIdx].reduce((sum, val) => sum + val, 0)
+        return currentTotal > maxTotal ? idx : maxIdx
+      }, 0)
+      setSelectedRollIndex(bestIndex)
+      setRolledScores(newAttempts[bestIndex])
+    } else if (newAttempts.length === 1) {
+      // Auto-select first roll
+      setSelectedRollIndex(0)
+      setRolledScores(newSet)
+    }
+
+    // Reset assignments when rolling
+    setRollAssignments({
+      strength: null,
+      dexterity: null,
+      constitution: null,
+      intelligence: null,
+      wisdom: null,
+      charisma: null,
+    })
+  }
+
+  const selectRollSet = (index: number) => {
+    setSelectedRollIndex(index)
+    setRolledScores(rollAttempts[index])
     setRollAssignments({
       strength: null,
       dexterity: null,
@@ -402,24 +436,77 @@ export function StatAllocator({ initialScores, race, background, onSubmit, onBac
       {method === 'roll' && (
         <div className="mb-8">
           <p className="text-gray-400 mb-4 text-sm">
-            Each ability will roll <span className="text-dnd-gold font-medium">4d6 drop lowest, 3 times</span>,
-            and automatically use the <span className="text-green-400 font-medium">highest result</span>.
+            Roll a complete set of 6 abilities (4d6 drop lowest for each). You can roll{' '}
+            <span className="text-dnd-gold font-medium">up to 3 times</span>.{' '}
+            After 3 rolls, the <span className="text-green-400 font-medium">highest total set</span> will be automatically selected.
           </p>
           <div className="mb-4 flex items-center gap-4">
             <button
               type="button"
               onClick={handleRollAll}
-              className="px-6 py-3 bg-dnd-gold text-gray-900 rounded-lg font-semibold
-                       hover:bg-yellow-500 transition-colors duration-200"
+              disabled={rollAttempts.length >= 3}
+              className={`px-6 py-3 rounded-lg font-semibold transition-colors duration-200 ${
+                rollAttempts.length >= 3
+                  ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                  : 'bg-dnd-gold text-gray-900 hover:bg-yellow-500'
+              }`}
             >
-              Roll for All Abilities (3 attempts each)
+              {rollAttempts.length === 0
+                ? 'Roll Ability Scores (1/3)'
+                : rollAttempts.length === 1
+                  ? 'Roll Again (2/3)'
+                  : rollAttempts.length === 2
+                    ? 'Final Roll (3/3)'
+                    : 'All Rolls Complete'}
             </button>
-            {rolledScores.length > 0 && (
+            {rollAttempts.length > 0 && (
               <div className="text-gray-400">
-                Rolled: <span className="text-white font-medium">{rolledScores.join(', ')}</span>
+                Rolls: <span className="text-dnd-gold font-medium">{rollAttempts.length}/3</span>
               </div>
             )}
           </div>
+
+          {/* Show all rolled sets */}
+          {rollAttempts.length > 0 && (
+            <div className="mb-4 space-y-2">
+              <div className="text-sm text-gray-400 mb-2">Your rolled sets:</div>
+              {rollAttempts.map((set, idx) => {
+                const total = set.reduce((sum, val) => sum + val, 0)
+                const isSelected = selectedRollIndex === idx
+                const isHighest = rollAttempts.length === 3 && idx === selectedRollIndex
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => selectRollSet(idx)}
+                    disabled={rollAttempts.length === 3}
+                    className={`w-full p-3 rounded-lg border-2 transition-all ${
+                      isSelected
+                        ? 'border-dnd-gold bg-dnd-gold/10'
+                        : 'border-gray-700 bg-gray-800 hover:border-gray-600'
+                    } ${rollAttempts.length === 3 ? 'cursor-default' : 'cursor-pointer'}`}
+                  >
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-3">
+                        <span className="text-gray-400 text-sm">Set {idx + 1}:</span>
+                        <span className="text-white font-medium">{set.join(', ')}</span>
+                        {isHighest && (
+                          <span className="px-2 py-0.5 bg-green-500/20 text-green-400 text-xs rounded">
+                            Highest Total (Auto-Selected)
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-sm">
+                        <span className="text-gray-500">Total: </span>
+                        <span className={`font-bold ${isHighest ? 'text-green-400' : 'text-white'}`}>
+                          {total}
+                        </span>
+                      </div>
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+          )}
 
           {rolledScores.length > 0 && (
             <>
