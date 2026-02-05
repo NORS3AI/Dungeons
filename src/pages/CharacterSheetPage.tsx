@@ -158,7 +158,7 @@ export function CharacterSheetPage() {
     <div className="max-w-6xl mx-auto px-4 py-8">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-8">
-        <div>
+        <div className="text-left">
           <h1 className="text-4xl font-bold text-dnd-gold mb-2">
             {character.name || 'Unnamed Character'}
           </h1>
@@ -588,13 +588,13 @@ export function CharacterSheetPage() {
           {/* Racial Traits */}
           {character.race?.traits && character.race.traits.length > 0 && (
             <div className="card bg-gray-800 border-gray-700 p-4">
-              <h3 className="text-lg font-bold text-white mb-4">Racial Traits</h3>
-              <div className="space-y-3">
+              <h3 className="text-lg font-bold text-white mb-4 text-left">Racial Traits</h3>
+              <div className="space-y-3 text-left">
                 {character.race.traits.map((trait) => (
                   <QuickRefTooltip key={trait.id} type="trait" id={trait.id}>
-                    <div className="p-3 bg-gray-900 rounded-lg hover:bg-gray-800 cursor-pointer transition-all">
-                      <div className="font-medium text-dnd-gold hover:text-yellow-400">{trait.name}</div>
-                      <div className="text-sm text-gray-400 mt-1">{trait.description}</div>
+                    <div className="p-3 bg-gray-900 rounded-lg hover:bg-gray-800 cursor-pointer transition-all text-left">
+                      <div className="font-medium text-dnd-gold hover:text-yellow-400 text-left">{trait.name}</div>
+                      <div className="text-sm text-gray-400 mt-1 text-left">{trait.description}</div>
                     </div>
                   </QuickRefTooltip>
                 ))}
