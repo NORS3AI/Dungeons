@@ -51,12 +51,11 @@ export function CharacterCreatePage() {
   // HP rolling state - track 3 rolls and select highest
   const [hpRoll, setHpRoll] = useState<{ rolls: number[]; highest: number; isRolling: boolean } | null>(null)
 
-  // Initialize new character if none exists
+  // Always initialize a new character when entering creation
   useEffect(() => {
-    if (!currentCharacter) {
-      createNewCharacter()
-    }
-  }, [currentCharacter, createNewCharacter])
+    createNewCharacter()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Scroll to top when step changes
   useEffect(() => {
