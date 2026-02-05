@@ -788,7 +788,7 @@ export const WIZARD: Class = {
   hitDie: 'd6',
   primaryAbility: ['intelligence'],
   savingThrows: ['intelligence', 'wisdom'],
-  armorProficiencies: [],
+  armorProficiencies: ['light'],
   weaponProficiencies: ['dagger', 'dart', 'sling', 'quarterstaff', 'light-crossbow'],
   toolProficiencies: [],
   skillChoices: {
