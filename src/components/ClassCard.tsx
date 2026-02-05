@@ -4,6 +4,7 @@ interface ClassCardProps {
   classData: Class
   isSelected: boolean
   onSelect: (classData: Class) => void
+  onReadMore?: (classData: Class) => void
 }
 
 /**
@@ -50,47 +51,67 @@ function getSpellcastingLabel(type: Class['spellcasting']): string | null {
  * Class Card Component
  * Displays a class option with visual styling and key information
  */
-export function ClassCard({ classData, isSelected, onSelect }: ClassCardProps) {
+export function ClassCard({ classData, isSelected, onSelect, onReadMore }: ClassCardProps) {
   const spellcastingLabel = getSpellcastingLabel(classData.spellcasting)
 
   return (
-    <button
-      type="button"
-      onClick={() => onSelect(classData)}
+    <div
       className={`w-full text-left p-6 rounded-xl border-2 transition-all duration-200
-                 focus:outline-none focus:ring-2 focus:ring-dnd-gold focus:ring-offset-2 focus:ring-offset-gray-900
                  ${
                    isSelected
                      ? 'border-dnd-gold bg-gray-800 shadow-lg shadow-dnd-gold/20'
                      : 'border-gray-700 bg-gray-800/50 hover:border-gray-500 hover:bg-gray-800'
                  }`}
-      aria-pressed={isSelected}
     >
-      {/* Header */}
-      <div className="flex items-start justify-between mb-4">
-        <div>
-          <h3 className={`text-xl font-bold ${isSelected ? 'text-dnd-gold' : 'text-white'}`}>
-            {classData.name}
-          </h3>
-          <p className="text-sm text-gray-400">
-            Hit Die: {formatHitDie(classData.hitDie)} | {formatAbilities(classData.primaryAbility)}
-          </p>
-        </div>
-        {isSelected && (
-          <div className="flex items-center justify-center w-6 h-6 bg-dnd-gold rounded-full">
-            <svg className="w-4 h-4 text-gray-900" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fillRule="evenodd"
-                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                clipRule="evenodd"
-              />
-            </svg>
+      <button
+        type="button"
+        onClick={() => onSelect(classData)}
+        className="w-full text-left focus:outline-none focus:ring-2 focus:ring-dnd-gold focus:ring-offset-2 focus:ring-offset-gray-900 rounded-lg"
+        aria-pressed={isSelected}
+      >
+        {/* Header */}
+        <div className="flex items-start justify-between mb-4">
+          <div>
+            <h3 className={`text-xl font-bold ${isSelected ? 'text-dnd-gold' : 'text-white'}`}>
+              {classData.name}
+            </h3>
+            <p className="text-sm text-gray-400">
+              Hit Die: {formatHitDie(classData.hitDie)} | {formatAbilities(classData.primaryAbility)}
+            </p>
           </div>
-        )}
-      </div>
+          {isSelected && (
+            <div className="flex items-center justify-center w-6 h-6 bg-dnd-gold rounded-full">
+              <svg className="w-4 h-4 text-gray-900" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+          )}
+        </div>
 
-      {/* Description */}
-      <p className="text-gray-300 text-sm mb-4 line-clamp-2">{classData.description}</p>
+        {/* Description */}
+        <p className="text-gray-300 text-sm mb-4 line-clamp-2">{classData.description}</p>
+      </button>
+
+      {/* Read More Button */}
+      {onReadMore && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation()
+            onReadMore(classData)
+          }}
+          className="text-dnd-gold text-sm font-medium hover:text-yellow-500 transition-colors mb-4 flex items-center gap-1"
+        >
+          Read more
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      )}
 
       {/* Tags */}
       <div className="flex flex-wrap gap-2 mb-4">
@@ -129,6 +150,6 @@ export function ClassCard({ classData, isSelected, onSelect }: ClassCardProps) {
           {classData.savingThrows.map((s) => s.slice(0, 3)).join(', ')}
         </span>
       </div>
-    </button>
+    </div>
   )
 }

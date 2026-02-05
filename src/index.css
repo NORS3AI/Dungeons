@@ -42,6 +42,7 @@
     @apply bg-gray-900 text-gray-100 antialiased;
     font-family: var(--font-family);
     transition: background-color 0.3s ease, color 0.3s ease;
+    overflow-x: hidden;
   }
 
   /* Smooth transitions for theme changes */
