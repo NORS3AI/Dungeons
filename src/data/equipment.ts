@@ -1,6 +1,6 @@
 import type { Weapon, Armor, Shield, GenericEquipment, Currency } from '../types/equipment'
 
-const ZERO_COST: Currency = { copper: 0, silver: 0, electrum: 0, gold: 0, platinum: 0 }
+const ZERO_COST: Currency = { copper: 0, silver: 0, gold: 0, platinum: 0 }
 const cost = (gold: number, silver = 0, copper = 0): Currency => ({
   ...ZERO_COST,
   gold,

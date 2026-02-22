@@ -1,10 +1,10 @@
 /**
  * Currency in D&D
+ * Conversion: 100 copper = 1 silver, 100 silver = 1 gold, 100 gold = 1 platinum
  */
 export interface Currency {
   copper: number
   silver: number
-  electrum: number
   gold: number
   platinum: number
 }
@@ -15,7 +15,6 @@ export interface Currency {
 export const EMPTY_CURRENCY: Currency = {
   copper: 0,
   silver: 0,
-  electrum: 0,
   gold: 0,
   platinum: 0,
 }
@@ -25,10 +24,40 @@ export const EMPTY_CURRENCY: Currency = {
  */
 export const CURRENCY_TO_COPPER: Record<keyof Currency, number> = {
   copper: 1,
-  silver: 10,
-  electrum: 50,
-  gold: 100,
-  platinum: 1000,
+  silver: 100,
+  gold: 10000,
+  platinum: 1000000,
+}
+
+/**
+ * Auto-convert currency to higher denominations
+ * 100 copper -> 1 silver, 100 silver -> 1 gold, 100 gold -> 1 platinum
+ */
+export function autoConvertCurrency(currency: Currency): Currency {
+  let { copper, silver, gold, platinum } = currency
+
+  // Convert copper to silver (100:1)
+  if (copper >= 100) {
+    const converted = Math.floor(copper / 100)
+    silver += converted
+    copper = copper % 100
+  }
+
+  // Convert silver to gold (100:1)
+  if (silver >= 100) {
+    const converted = Math.floor(silver / 100)
+    gold += converted
+    silver = silver % 100
+  }
+
+  // Convert gold to platinum (100:1)
+  if (gold >= 100) {
+    const converted = Math.floor(gold / 100)
+    platinum += converted
+    gold = gold % 100
+  }
+
+  return { copper, silver, gold, platinum }
 }
 
 /**
@@ -254,7 +283,7 @@ export const GREATSWORD: Weapon = {
   damage: { dice: '2d6', type: 'slashing' },
   properties: ['heavy', 'twoHanded'],
   weight: 6,
-  cost: { copper: 0, silver: 0, electrum: 0, gold: 50, platinum: 0 },
+  cost: { copper: 0, silver: 0, gold: 50, platinum: 0 },
   quantity: 1,
 }
 
@@ -269,6 +298,6 @@ export const LONGSWORD: Weapon = {
   versatileDamage: '1d10',
   properties: ['versatile'],
   weight: 3,
-  cost: { copper: 0, silver: 0, electrum: 0, gold: 15, platinum: 0 },
+  cost: { copper: 0, silver: 0, gold: 15, platinum: 0 },
   quantity: 1,
 }

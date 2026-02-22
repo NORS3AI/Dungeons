@@ -156,6 +156,7 @@ export type {
 export {
   EMPTY_CURRENCY,
   CURRENCY_TO_COPPER,
+  autoConvertCurrency,
   isWeapon,
   isArmor,
   isShield,
