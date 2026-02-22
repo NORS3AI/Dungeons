@@ -4,13 +4,15 @@ import { useCharacterStore } from '../stores/characterStore'
 import { DiceRoller, DiceRollerButton, DiceRollerModal } from '../components/DiceRoller'
 import { calculateModifier, calculateProficiencyBonus } from '../types/dice'
 import { isWeapon, isArmor, isShield } from '../types/equipment'
-import type { Character, Ability, Equipment, Weapon, Armor, Shield, Currency } from '../types'
+import type { Character, Ability, Equipment, Weapon, Armor, Shield, Currency, GenericEquipment } from '../types'
 import { CATEGORY_INFO, formatIncome, getProfessionByRoll, type Profession } from '../data/professions'
 import { exportCharacterToJSON, exportCharacterToPDF } from '../utils/characterIO'
 import { QuickRefTooltip } from '../components/QuickRefTooltip'
 import { CharacterEditModal } from '../components/CharacterEditModal'
 import { FightingStanceSelector } from '../components/FightingStanceSelector'
+import { LootCache } from '../components/LootCache'
 import { FIGHTING_STANCES } from '../data/fightingStances'
+import type { LootItem } from '../data/lootGenerator'
 
 const ABILITY_NAMES: Record<Ability, string> = {
   strength: 'STR',
@@ -49,9 +51,9 @@ const SKILLS: { name: string; ability: Ability; key: SkillKey }[] = [
 export function CharacterSheetPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, setFightingStance, saveCharacter } = useCharacterStore()
+  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, setFightingStance, addEquipment, saveCharacter } = useCharacterStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
-  const [activeTab, setActiveTab] = useState<'main' | 'spells' | 'inventory' | 'features'>('main')
+  const [activeTab, setActiveTab] = useState<'main' | 'spells' | 'inventory' | 'features' | 'loot'>('main')
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
   const [showIncomeRoller, setShowIncomeRoller] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
@@ -176,11 +178,44 @@ export function CharacterSheetPage() {
     saveCharacter()
   }
 
+  const handleAddLootToInventory = (lootItem: LootItem) => {
+    // Convert LootItem to Equipment (generic item)
+    // Map loot categories to GenericEquipment categories
+    let category: GenericEquipment['category'] = 'treasure'
+    if (lootItem.category === 'Consumable') category = 'consumable'
+    else if (lootItem.category === 'Gear' || lootItem.category === 'Ammunition') category = 'adventuringGear'
+    else if (lootItem.category === 'Weapon' || lootItem.category === 'Armor') category = 'trinket'
+    else category = 'treasure' // Wondrous, Currency, etc.
+
+    // Convert gold value to Currency object
+    const cost: Currency = {
+      copper: 0,
+      silver: 0,
+      electrum: 0,
+      gold: lootItem.value,
+      platinum: 0,
+    }
+
+    const equipment: GenericEquipment = {
+      id: lootItem.id,
+      name: lootItem.name,
+      category: category,
+      description: lootItem.description,
+      weight: 0,
+      cost: cost,
+      equipped: false,
+      quantity: lootItem.quantity || 1,
+    }
+    addEquipment(equipment)
+    saveCharacter()
+  }
+
   const tabs = [
     { id: 'main', label: 'Overview' },
     { id: 'spells', label: 'Spells' },
     { id: 'inventory', label: 'Inventory' },
     { id: 'features', label: 'Features' },
+    { id: 'loot', label: 'Loot Cache' },
   ] as const
 
   return (
@@ -724,6 +759,13 @@ export function CharacterSheetPage() {
             </div>
           )}
         </div>
+      )}
+
+      {activeTab === 'loot' && (
+        <LootCache
+          character={character}
+          onAddToInventory={handleAddLootToInventory}
+        />
       )}
 
       {/* Floating Dice Button */}
