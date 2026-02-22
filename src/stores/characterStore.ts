@@ -13,7 +13,7 @@ import type {
   Condition,
   FightingStance,
 } from '../types'
-import { DEFAULT_ABILITY_SCORES, EMPTY_CURRENCY } from '../types'
+import { DEFAULT_ABILITY_SCORES, EMPTY_CURRENCY, autoConvertCurrency } from '../types'
 
 /**
  * Character creation step
@@ -391,7 +391,7 @@ export const useCharacterStore = create<CharacterState>()(
             description: `Starting equipment from ${background.name} background`,
             category: 'adventuringGear' as const,
             weight: 1,
-            cost: { copper: 0, silver: 0, electrum: 0, gold: 0, platinum: 0 },
+            cost: { copper: 0, silver: 0, gold: 0, platinum: 0 },
             quantity: 1,
             equipped: false,
           }))
@@ -575,10 +575,16 @@ export const useCharacterStore = create<CharacterState>()(
           const { currentCharacter, history } = get()
           if (!currentCharacter) return
 
+          // Merge new currency and auto-convert to higher denominations
+          const updatedCurrency = autoConvertCurrency({
+            ...currentCharacter.currency,
+            ...currency,
+          })
+
           set({
             currentCharacter: {
               ...currentCharacter,
-              currency: { ...currentCharacter.currency, ...currency },
+              currency: updatedCurrency,
             },
             history: addToHistory(history, currentCharacter),
           })

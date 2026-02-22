@@ -56,7 +56,6 @@ export function EquipmentEditor({ lootItem, onSave, onCancel }: EquipmentEditorP
     const cost: Currency = {
       copper: 0,
       silver: 0,
-      electrum: 0,
       gold: goldValue,
       platinum: 0,
     }

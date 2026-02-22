@@ -840,7 +840,6 @@ export function CharacterSheetPage() {
               {[
                 { key: 'platinum', label: 'PP', color: 'text-gray-300', bgColor: 'bg-gray-600/20' },
                 { key: 'gold', label: 'GP', color: 'text-yellow-400', bgColor: 'bg-yellow-600/20' },
-                { key: 'electrum', label: 'EP', color: 'text-blue-300', bgColor: 'bg-blue-600/20' },
                 { key: 'silver', label: 'SP', color: 'text-gray-400', bgColor: 'bg-gray-500/20' },
                 { key: 'copper', label: 'CP', color: 'text-orange-400', bgColor: 'bg-orange-600/20' },
               ].map(({ key, label, color, bgColor }) => (
@@ -1750,7 +1749,6 @@ function CurrencyModal({
   const [values, setValues] = useState({
     platinum: 0,
     gold: 0,
-    electrum: 0,
     silver: 0,
     copper: 0,
   })
@@ -1808,7 +1806,6 @@ function CurrencyModal({
           {[
             { key: 'platinum', label: 'Platinum (PP)', color: 'text-gray-300' },
             { key: 'gold', label: 'Gold (GP)', color: 'text-yellow-400' },
-            { key: 'electrum', label: 'Electrum (EP)', color: 'text-blue-300' },
             { key: 'silver', label: 'Silver (SP)', color: 'text-gray-400' },
             { key: 'copper', label: 'Copper (CP)', color: 'text-orange-400' },
           ].map(({ key, label, color }) => (
