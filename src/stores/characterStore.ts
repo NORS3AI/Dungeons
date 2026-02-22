@@ -74,6 +74,7 @@ function createEmptyCharacter(): Character {
       wisdom: false,
       charisma: false,
     },
+    languages: ['Common'],
     hitPoints: { current: 0, maximum: 0, temporary: 0 },
     armorClass: 10,
     initiative: 0,
@@ -165,6 +166,7 @@ interface CharacterState {
   setSubclass: (subclass: Subclass) => void
   setBackground: (background: Background) => void
   setAbilityScores: (scores: AbilityScores) => void
+  setLanguages: (languages: string[]) => void
   addSpell: (spell: Spell) => void
   removeSpell: (spellId: string) => void
   addEquipment: (item: Equipment) => void
@@ -354,6 +356,21 @@ export const useCharacterStore = create<CharacterState>()(
 
           set({
             currentCharacter: { ...currentCharacter, abilityScores: scores },
+            history: addToHistory(history, currentCharacter),
+          })
+        },
+
+        setLanguages: (languages: string[]) => {
+          const { currentCharacter, history } = get()
+          if (!currentCharacter) return
+
+          // Ensure Common is always included
+          const languagesWithCommon = languages.includes('Common')
+            ? languages
+            : ['Common', ...languages]
+
+          set({
+            currentCharacter: { ...currentCharacter, languages: languagesWithCommon },
             history: addToHistory(history, currentCharacter),
           })
         },

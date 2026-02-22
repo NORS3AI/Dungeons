@@ -159,6 +159,7 @@ export interface Character {
   abilityScores: AbilityScores
   skills: Skills
   savingThrows: SavingThrows
+  languages: string[]
 
   // Combat
   hitPoints: HitPoints

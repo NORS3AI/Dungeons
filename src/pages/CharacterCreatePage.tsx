@@ -9,6 +9,7 @@ import { BackgroundSelector } from '../components/BackgroundSelector'
 import { StatAllocator } from '../components/StatAllocator'
 import { SpellSelector } from '../components/SpellSelector'
 import { EquipmentSelector } from '../components/EquipmentSelector'
+import { LanguageSelector } from '../components/LanguageSelector'
 import type { Race, Class, Subclass, AbilityScores, Spell, Background, Equipment } from '../types'
 import { calculateModifier } from '../types'
 import { rollDice } from '../types/dice'
@@ -39,6 +40,7 @@ export function CharacterCreatePage() {
     setSubclass,
     setBackground,
     setAbilityScores,
+    setLanguages,
     addSpell,
     addEquipment,
     nextStep,
@@ -282,6 +284,17 @@ export function CharacterCreatePage() {
                       </div>
                     ))}
                   </div>
+                </div>
+
+                {/* Languages */}
+                <div className="card bg-gray-800 border border-gray-700 p-6">
+                  <LanguageSelector
+                    currentLanguages={currentCharacter.languages}
+                    raceName={currentCharacter.race?.name}
+                    className={currentCharacter.class?.name}
+                    backgroundName={currentCharacter.background?.name}
+                    onChange={(languages) => setLanguages(languages)}
+                  />
                 </div>
 
                 {/* Starting HP Roll */}
