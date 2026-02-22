@@ -39,6 +39,15 @@ export function EquipmentEditor({ lootItem, onSave, onCancel }: EquipmentEditorP
   // Generic equipment category
   const [genericCategory, setGenericCategory] = useState<GenericEquipment['category']>('treasure')
 
+  // Magical item charges
+  const [hasMagicalCharges, setHasMagicalCharges] = useState(false)
+  const [spellName, setSpellName] = useState('')
+  const [spellDamageDice, setSpellDamageDice] = useState('')
+  const [spellDamageType, setSpellDamageType] = useState<string>('fire')
+  const [currentCharges, setCurrentCharges] = useState(7)
+  const [maxCharges, setMaxCharges] = useState(7)
+  const [rechargeRate, setRechargeRate] = useState('1d6+1 at dawn')
+
   const handleSave = () => {
     const cost: Currency = {
       copper: 0,
@@ -47,6 +56,16 @@ export function EquipmentEditor({ lootItem, onSave, onCancel }: EquipmentEditorP
       gold: goldValue,
       platinum: 0,
     }
+
+    // Create charges object if magical charges are enabled
+    const charges = hasMagicalCharges && spellName && spellDamageDice ? {
+      spellName,
+      damageDice: spellDamageDice,
+      damageType: spellDamageType as any,
+      currentCharges,
+      maxCharges,
+      rechargeRate,
+    } : undefined
 
     let equipment: Equipment
 
@@ -64,6 +83,7 @@ export function EquipmentEditor({ lootItem, onSave, onCancel }: EquipmentEditorP
         properties,
         equipped: false,
         quantity,
+        charges,
       } as Weapon
     } else if (equipmentType === 'armor') {
       equipment = {
@@ -80,6 +100,7 @@ export function EquipmentEditor({ lootItem, onSave, onCancel }: EquipmentEditorP
         cost,
         equipped: false,
         quantity,
+        charges,
       } as Armor
     } else if (equipmentType === 'shield') {
       equipment = {
@@ -91,6 +112,7 @@ export function EquipmentEditor({ lootItem, onSave, onCancel }: EquipmentEditorP
         cost,
         equipped: false,
         quantity,
+        charges,
       } as Shield
     } else {
       equipment = {
@@ -102,6 +124,7 @@ export function EquipmentEditor({ lootItem, onSave, onCancel }: EquipmentEditorP
         cost,
         equipped: false,
         quantity,
+        charges,
       } as GenericEquipment
     }
 
@@ -377,6 +400,112 @@ export function EquipmentEditor({ lootItem, onSave, onCancel }: EquipmentEditorP
               />
             </div>
           )}
+
+          {/* Magical Item Charges */}
+          <div className="border-t border-gray-700 pt-6">
+            <div className="flex items-center gap-3 mb-4">
+              <input
+                type="checkbox"
+                id="has-magical-charges"
+                checked={hasMagicalCharges}
+                onChange={(e) => setHasMagicalCharges(e.target.checked)}
+                className="w-5 h-5 bg-gray-800 border-gray-700 rounded focus:ring-purple-500"
+              />
+              <label htmlFor="has-magical-charges" className="text-lg font-medium text-purple-400">
+                ✨ This is a magical item with charges
+              </label>
+            </div>
+
+            {hasMagicalCharges && (
+              <div className="space-y-4 bg-purple-900/10 border border-purple-700/30 rounded-lg p-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-2">Spell/Effect Name</label>
+                    <input
+                      type="text"
+                      value={spellName}
+                      onChange={(e) => setSpellName(e.target.value)}
+                      placeholder="e.g., Fireball, Lightning Bolt"
+                      className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-purple-500 focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-2">Damage Dice</label>
+                    <input
+                      type="text"
+                      value={spellDamageDice}
+                      onChange={(e) => setSpellDamageDice(e.target.value)}
+                      placeholder="e.g., 8d6, 10d8"
+                      className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-purple-500 focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-2">Damage Type</label>
+                    <select
+                      value={spellDamageType}
+                      onChange={(e) => setSpellDamageType(e.target.value)}
+                      className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-purple-500 focus:outline-none"
+                    >
+                      <option value="fire">Fire</option>
+                      <option value="cold">Cold</option>
+                      <option value="lightning">Lightning</option>
+                      <option value="thunder">Thunder</option>
+                      <option value="acid">Acid</option>
+                      <option value="poison">Poison</option>
+                      <option value="force">Force</option>
+                      <option value="necrotic">Necrotic</option>
+                      <option value="radiant">Radiant</option>
+                      <option value="psychic">Psychic</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-2">Recharge Rate</label>
+                    <input
+                      type="text"
+                      value={rechargeRate}
+                      onChange={(e) => setRechargeRate(e.target.value)}
+                      placeholder="e.g., 1d6+1 at dawn, never"
+                      className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-purple-500 focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-2">Current Charges</label>
+                    <input
+                      type="number"
+                      min="0"
+                      max={maxCharges}
+                      value={currentCharges}
+                      onChange={(e) => setCurrentCharges(parseInt(e.target.value) || 0)}
+                      className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-purple-500 focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-2">Maximum Charges</label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={maxCharges}
+                      onChange={(e) => {
+                        const newMax = parseInt(e.target.value) || 1
+                        setMaxCharges(newMax)
+                        if (currentCharges > newMax) setCurrentCharges(newMax)
+                      }}
+                      className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-purple-500 focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="text-sm text-purple-300 bg-purple-900/20 p-3 rounded-lg">
+                  💡 <strong>Example:</strong> Wand of Fireballs - Fireball (8d6 fire damage), 7/7 charges, recharges 1d6+1 at dawn
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Footer */}

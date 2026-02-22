@@ -92,6 +92,18 @@ export type DamageType =
 export type ArmorType = 'light' | 'medium' | 'heavy'
 
 /**
+ * Magical item charges for items like Wand of Fireballs
+ */
+export interface MagicalItemCharges {
+  spellName: string // e.g., "Fireball"
+  damageDice: string // e.g., "8d6"
+  damageType?: DamageType // e.g., "fire"
+  currentCharges: number
+  maxCharges: number
+  rechargeRate?: string // e.g., "1d6+1 at dawn", "never"
+}
+
+/**
  * Base equipment item
  */
 export interface BaseEquipment {
@@ -103,6 +115,7 @@ export interface BaseEquipment {
   cost: Currency
   quantity: number
   equipped?: boolean
+  charges?: MagicalItemCharges // For magical items with limited uses
 }
 
 /**

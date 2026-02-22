@@ -173,6 +173,7 @@ interface CharacterState {
   addEquipment: (item: Equipment) => void
   removeEquipment: (itemId: string) => void
   toggleEquipment: (itemId: string) => void
+  useItemCharge: (itemId: string) => void
   updateCurrency: (currency: Partial<Currency>) => void
   setDailyIncome: (professionName: string, amount: number, currency: 'copper' | 'silver' | 'gold') => void
   setFightingStance: (stance: FightingStance) => void
@@ -450,6 +451,32 @@ export const useCharacterStore = create<CharacterState>()(
             // If equipping shield, unequip other shields
             if (item.category === 'shield' && e.category === 'shield' && !item.equipped) {
               return { ...e, equipped: false }
+            }
+            return e
+          })
+
+          set({
+            currentCharacter: {
+              ...currentCharacter,
+              equipment,
+            },
+            history: addToHistory(history, currentCharacter),
+          })
+        },
+
+        useItemCharge: (itemId: string) => {
+          const { currentCharacter, history } = get()
+          if (!currentCharacter) return
+
+          const equipment = currentCharacter.equipment.map((e) => {
+            if (e.id === itemId && e.charges && e.charges.currentCharges > 0) {
+              return {
+                ...e,
+                charges: {
+                  ...e.charges,
+                  currentCharges: e.charges.currentCharges - 1,
+                },
+              }
             }
             return e
           })
