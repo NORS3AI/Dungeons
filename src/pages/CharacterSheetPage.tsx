@@ -8,6 +8,7 @@ import type { Character, Ability, Equipment, Weapon, Armor, Shield, Currency } f
 import { CATEGORY_INFO, formatIncome, getProfessionByRoll, type Profession } from '../data/professions'
 import { exportCharacterToJSON, exportCharacterToPDF } from '../utils/characterIO'
 import { QuickRefTooltip } from '../components/QuickRefTooltip'
+import { CharacterEditModal } from '../components/CharacterEditModal'
 
 const ABILITY_NAMES: Record<Ability, string> = {
   strength: 'STR',
@@ -46,11 +47,12 @@ const SKILLS: { name: string; ability: Ability; key: SkillKey }[] = [
 export function CharacterSheetPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, removeEquipment, toggleEquipment, saveCharacter } = useCharacterStore()
+  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, saveCharacter } = useCharacterStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
   const [activeTab, setActiveTab] = useState<'main' | 'spells' | 'inventory' | 'features'>('main')
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
   const [showIncomeRoller, setShowIncomeRoller] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
   const [isExportingPDF, setIsExportingPDF] = useState(false)
 
   useEffect(() => {
@@ -147,6 +149,18 @@ export function CharacterSheetPage() {
     }
   }
 
+  const handleSaveDetails = (details: {
+    name: string
+    playerName: string
+    age: string
+    height: string
+    weight: string
+    backstory: string
+  }) => {
+    updateCharacterDetails(details)
+    saveCharacter()
+  }
+
   const tabs = [
     { id: 'main', label: 'Overview' },
     { id: 'spells', label: 'Spells' },
@@ -219,12 +233,12 @@ export function CharacterSheetPage() {
             Export JSON
           </button>
           <button
-            onClick={() => navigate('/create')}
+            onClick={() => setShowEditModal(true)}
             className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg
                      transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500"
-            title="Edit character"
+            title="Edit character details"
           >
-            Edit
+            Edit Details
           </button>
         </div>
       </div>
@@ -684,6 +698,14 @@ export function CharacterSheetPage() {
       {/* Floating Dice Button */}
       <DiceRollerButton onClick={() => setShowDiceRoller(true)} />
       <DiceRollerModal isOpen={showDiceRoller} onClose={() => setShowDiceRoller(false)} character={character} />
+
+      {/* Edit Character Modal */}
+      <CharacterEditModal
+        character={character}
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        onSave={handleSaveDetails}
+      />
     </div>
   )
 }
