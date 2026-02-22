@@ -1,424 +1,167 @@
 # Dungeons - Patch Notes
 
-All notable changes to this project will be documented in this file.
+## Version 0.2.0 - February 22, 2026
 
-Version format: `v0.0.pX-alpha` where X = phase number
+### 🆕 New Features
 
----
+#### **Equipment Editor System**
+- **Loot Cache Equipment Editor**: When adding items from loot cache, open a full editor modal to customize items before adding to inventory
+  - Convert loot to Weapons, Armor, Shields, or Generic Equipment
+  - Edit all item properties: name, description, weight, value, quantity
+  - **Weapon editor**: Set damage dice, damage type, weapon category (simple/martial), weapon type (melee/ranged), properties
+  - **Armor editor**: Set base AC, armor type, max DEX bonus, strength requirements, stealth disadvantage
+  - **Shield editor**: Set AC bonus
+  - **Generic equipment**: Set category (adventuring gear, consumable, trinket, treasure, tool)
+  - All items appear in inventory and can be equipped/unequipped
 
-## [v0.0.p1-alpha] - 2026-02-01 @ 9:39 AM MST-AZ
+#### **9th Level Spell Selection**
+- **Spell Scroll Loot Integration**: Collecting a 9th level spell scroll from loot cache opens spell selection modal
+- **Choose Any 9th Level Spell**: Select from all 21 legendary 9th level spells:
+  - Astral Projection, Blade of Disaster, Foresight, Gate, Imprisonment
+  - Invulnerability, Mass Heal, Mass Polymorph, Meteor Swarm
+  - Power Word Heal, Power Word Kill, Prismatic Wall, Psychic Scream
+  - Ravenous Void, Shapechange, Storm of Vengeance, Time Ravage
+  - Time Stop, True Polymorph, True Resurrection, Weird, Wish
+- **Permanent Spell Learning**: Selected spell is permanently added to known spells
+- **Spell Details**: View full spell description, casting time, range, components, duration, and available classes
 
-### Phase 1: Project Setup & Infrastructure
+#### **Bleeding & Injury Condition System**
+- **6 New Injury Conditions**:
+  - **Bleeding (Minor)**: 1 damage per turn, DC 10 Medicine or magical healing to stop
+  - **Bleeding (Moderate)**: 1d4 damage per turn, DC 12 Medicine or magical healing to stop
+  - **Bleeding (Severe)**: 1d6 damage per turn, DC 15 Medicine or 5+ HP magical healing to stop
+  - **Broken Bone**: Disadvantage on limb actions, speed reduction if leg broken, requires treatment
+  - **Concussed**: Disadvantage on Int checks/concentration, -2 AC, no reactions, ends on rest
+  - **Infected**: Max HP reduction (1d4/day), disadvantage on CON saves, requires DC 15 Medicine or magical healing
+- **Condition Manager**: Comprehensive modal with 4 categories:
+  - **Injury** (red): Bleeding, broken bones, concussion, infection
+  - **Standard** (blue): All D&D 5e conditions (blinded, charmed, frightened, etc.)
+  - **Combat** (orange): Enraged
+  - **Exhaustion** (purple): Levels 1-6
+- **Condition Tracking Button**: Shows active condition count badge in character sheet header
 
-**Initial Release - Foundation Complete**
+#### **HP Editor for DMs**
+- **Quick HP Adjustment Modal**: Manage player health during gameplay
+- **Quick Damage Buttons**: Apply 5, 10, 20, or Max damage instantly
+- **Quick Healing Buttons**: Heal 5, 10, 20 HP or Full heal instantly
+- **Custom Values**: Input custom damage/healing amounts
+- **Temporary HP**: Manage temporary hit points separately
+- **Death Saves**: Track successes and failures
 
-#### Project Configuration
-- Initialized React 18 + TypeScript project with Vite
-- Configured Tailwind CSS with custom D&D theme colors (gold, parchment, blood red, dungeon gray)
-- Set up React Router v6 for page-based navigation
-- Configured Zustand for state management with localStorage persistence
-- Set up Vitest testing framework with jsdom environment
-- Added ESLint and TypeScript strict mode
+#### **Character Level Management**
+- **Spell Selection on Level Up**: Warlock/Spellcasters auto-prompt for new spells when leveling
+- **Level Persistence**: All level changes now save immediately
+- **Level Up/Down Buttons**: Adjust character level with automatic updates
 
-#### Core Type Definitions
-- **`src/types/character.ts`** - Complete character interface with:
-  - Ability scores (STR, DEX, CON, INT, WIS, CHA)
-  - All 18 D&D skills with proficiency tracking
-  - HP tracking (current, max, temporary)
-  - Death saves, conditions, exhaustion levels
-  - Equipment slots and inventory
-  - Spell slots (levels 1-9)
-  - Features with charge tracking
+#### **Loot Cache System**
+- **Random Loot Generation**: Generate level-appropriate loot based on character progression
+- **Rarity Tiers**: Common, Uncommon, Rare, Very Rare, Legendary items
+- **Class/Race Preferences**: Display preferred items for your class and race
+- **Adjustable Quantity**: Generate 1, 3, 5, or 10 items at once
 
-- **`src/types/race.ts`** - Race system with:
-  - Racial traits and ability score bonuses
-  - Darkvision and speed modifiers
-  - Racial spells by level
-  - Complete DROW definition (Superior Darkvision, Sunlight Sensitivity, Drow Magic)
-  - Complete TIEFLING definition (Hellish Resistance, Infernal Legacy)
+#### **Fighter Stance System**
+- **3 Fighting Stances** for Fighters:
+  - **Two-Handed**: Standard greatsword/greataxe (2d6/1d12 damage)
+  - **Dual Two-Handed**: Wield two greatswords simultaneously (4d6 damage, -4 AC penalty)
+  - **Sword & Board**: Simple weapon + shield (+2 AC)
+- **Real-time AC Updates**: AC recalculates instantly when changing stances
+- **Stance Selector**: Switch stances directly from character sheet
 
-- **`src/types/class.ts`** - Class/Subclass system with:
-  - Hit dice, primary abilities, saving throws
-  - Proficiencies (armor, weapons, tools, skills)
-  - Features by level with charges/resets
-  - Spellcasting configuration
-  - Complete FIGHTER definition (Second Wind, Action Surge, Extra Attack)
-  - Complete WARLOCK definition (Pact Magic, Eldritch Invocations)
-  - GREAT_OLD_ONE subclass (Awakened Mind, Entropic Ward, expanded spells)
+#### **Quick Dice Roller (Home Page)**
+- **Front Page Dice Roller**: Available on lower right without needing a character
+- **Advantage/Disadvantage**: Roll with advantage or disadvantage
+- **Multiple Roll Types**: Attack rolls, saving throws, ability checks
+- **Custom Modifiers**: Add flat bonuses to rolls
 
-- **`src/types/spell.ts`** - Spell system with:
-  - All spell schools (Abjuration through Transmutation)
-  - Casting time, range, components, duration
-  - Damage/healing dice, scaling rules
-  - Concentration and ritual flags
+#### **Language Selection System**
+- **Language Choices**: Select languages based on race, class, and background
+- **Common Default**: All characters speak Common by default
+- **Suggestions**: Contextual suggestions for languages that make sense for your character
 
-- **`src/types/equipment.ts`** - Equipment system with:
-  - Weapon properties (finesse, heavy, light, two-handed, etc.)
-  - Armor types and AC calculations
-  - Currency tracking (cp, sp, ep, gp, pp)
-  - **Homebrew Weapon Mastery Options:**
-    - Two-Handed: 2d6 damage, no AC modifier
-    - Dual Two-Handed: 4d6 damage, -4 AC penalty
-    - Sword & Board: 1d8 damage, +2 AC (shield)
+#### **Character Edit Modal**
+- **Quick Edits for DMs**: Edit character name and basic info without using full creation wizard
+- **Save Changes Instantly**: Updates save immediately to character data
 
-- **`src/types/dice.ts`** - Dice rolling system with:
-  - Support for d3 through d1000
-  - Dice notation parser (NdX+M format)
-  - Advantage/disadvantage rolling
-  - Modifier calculations
-  - Roll history tracking
-  - `calculateModifier(score)` - floor((score - 10) / 2)
-  - `calculateProficiencyBonus(level)` - floor((level - 1) / 4) + 2
+#### **Shield Proficiency Check**
+- **Hide Shield Options**: Shield selection hidden for classes without shield proficiency
+- **Class-Based UI**: Equipment selector adapts to class capabilities
 
-#### State Management
-- **`src/stores/characterStore.ts`** - Character management with:
-  - CRUD operations for characters
-  - Multi-step creation wizard tracking
-  - Combat state (conditions, death saves)
-  - Equipment management
-  - Spell slot tracking
-  - Feature charge tracking
-  - Short rest / Long rest mechanics
-  - Undo/redo functionality (10-state history)
-  - localStorage persistence
+#### **Enraged Condition**
+- **Combat State**: +1 damage bonus, -1 AC penalty
+- **Damage Display**: Shows "+1 enraged" bonus in equipped weapon damage
+- **AC Calculation**: Auto-applies -1 AC when enraged condition is active
 
-- **`src/stores/campaignStore.ts`** - DM campaign tools with:
-  - Party character tracking
-  - NPC creation and management
-  - Session notes per character
-  - Initiative tracker with turn management
-  - Combat HP tracking
-  - NPC duplication for quick encounters
+### 🛠️ Technical Improvements
 
-#### UI Components
-- **`src/components/Layout.tsx`** - Main app layout with:
-  - Responsive navigation header
-  - D&D themed styling (dark background, gold accents)
-  - React Router Outlet integration
+#### **Spell Converter Utility**
+- **SpellRef to Spell Conversion**: Convert quick reference spell data to full Spell type
+- **Parse Complex Fields**: Automatically parse casting time, range, components, duration
+- **Material Cost Extraction**: Detect material costs and consumed components from strings
+- **Concentration Detection**: Auto-detect concentration spells from duration strings
 
-#### Pages
-- **`src/pages/HomePage.tsx`** - Landing page with:
-  - Hero section with call-to-action
-  - Feature highlights (Character Creator, Campaign Tools, Dice Roller)
-  - Navigation to create and campaign pages
+#### **Type Safety Enhancements**
+- **Equipment Type System**: Full discriminated unions for Weapon, Armor, Shield, GenericEquipment
+- **Spell Type Structures**: Structured interfaces for all spell properties
+- **Condition Types**: Type-safe condition tracking with exhaustion levels
 
-- **`src/pages/CharacterCreatePage.tsx`** - Creation wizard placeholder
-- **`src/pages/CharacterSheetPage.tsx`** - Character sheet placeholder
-- **`src/pages/CampaignPage.tsx`** - DM dashboard placeholder
+### 🐛 Bug Fixes
+- **Level Changes Not Saving**: Fixed level up/down not persisting to save data
+- **Spell Selection Missing**: Fixed spell selector not appearing when leveling up spellcasters
+- **Equipment Type Mismatches**: Resolved weapon category vs weapon type confusion
+- **Missing Required Fields**: Added description fields to weapons and armor
 
-#### Testing
-- **`src/test/setup.ts`** - Vitest configuration
-- **`src/test/dice.test.ts`** - Dice system unit tests:
-  - Modifier calculation tests
-  - Proficiency bonus calculation tests
-  - Dice notation parsing tests
-  - Roll result validation tests
-
-#### Deployment
-- **`.github/workflows/deploy.yml`** - GitHub Actions CI/CD:
-  - Automatic deployment on push to `main` or `claude/*` branches
-  - Node.js 20 with npm caching
-  - Build and deploy to GitHub Pages
-
-- **`public/404.html`** - SPA routing fix for GitHub Pages
-- **`public/dice.svg`** - Purple D20 favicon
-
-#### Configuration Files
-- `package.json` - Dependencies and scripts
-- `vite.config.ts` - Vite configuration with `/Dungeons/` base path
-- `tsconfig.json` - TypeScript configuration
-- `tsconfig.node.json` - Node TypeScript configuration
-- `tailwind.config.js` - Tailwind with custom theme
-- `postcss.config.js` - PostCSS configuration
-- `.gitignore` - Git ignore rules
-
-#### Documentation
-- `README.md` - Project overview with Play Now links
-- `CLAUDE.md` - Development context and 10-phase roadmap
+### 📝 Quality of Life
+- **Immediate State Persistence**: All character changes save immediately
+- **Condition Count Badge**: See active condition count at a glance
+- **Equipment Customization**: Full control over loot before adding to inventory
+- **Spell Details View**: Comprehensive spell information in selection modals
 
 ---
 
-## [v0.0.p2-alpha] - 2026-02-01 @ 9:46 AM MST-AZ
+## Version 0.1.0 - Initial Release
 
-### Phase 2: Character Details Page
+### Core Features
+- **Character Creation Wizard**: Step-by-step character creation flow
+- **12 Classes, 28 Subclasses**: Full class and subclass support
+- **18 Races**: All PHB races available
+- **401 Spells**: Complete PHB 2024 spell list (cantrips through 9th level)
+- **Character Sheet**: Comprehensive character display with all stats
+- **Inventory System**: Equipment, weapons, armor, currency tracking
+- **Dice Roller**: Full dice notation support (NdX+M format)
+- **DM Tools**: Campaign dashboard, NPC management
+- **Condition Tracking**: All D&D 5e conditions
+- **Quick Reference System**: Clickable tooltips for spells, skills, conditions
+- **Daily Income**: Profession-based income generation
+- **Fighting Styles**: Multiple combat stance options for Fighters
+- **Spell Slots**: Auto-calculated spell slot tracking
 
-**Character Creation Wizard - Step 1 Complete**
-
-#### New Components
-- **`src/components/CharacterDetailsForm.tsx`** - Full character details form with:
-  - Character Name input (required, 2-50 characters)
-  - Age input with numeric validation
-  - Height input (free text, e.g., "5'10\"")
-  - Weight input (free text, e.g., "150 lbs")
-  - Player Name input (for DM tracking)
-  - Backstory/Notes textarea (up to 5000 characters with counter)
-  - Full ARIA accessibility attributes
-  - Real-time validation with error messages
-
-- **`src/components/WizardSteps.tsx`** - Progress indicator with:
-  - Desktop view: Horizontal step indicators with checkmarks
-  - Mobile view: Compact progress bar with step counter
-  - Clickable navigation to completed steps
-  - 7-step character creation flow defined
-  - Visual states: pending, current, completed
-
-#### Keyboard Navigation
-- **Tab** to move forward through fields
-- **Shift+Tab** to move backward
-- **Enter** to advance to next field (on text inputs)
-- Auto-focus on first input when page loads
-- Keyboard shortcuts hint displayed at bottom
-
-#### Form Validation
-- Required field indication with red asterisk
-- Real-time validation on blur
-- Error messages with ARIA alerts for screen readers
-- Next button disabled until required fields valid
-- Character limits with visual feedback
-
-#### Updated Pages
-- **`src/pages/CharacterCreatePage.tsx`** - Complete wizard implementation:
-  - WizardSteps progress indicator at top
-  - Step-by-step flow with Back/Next navigation
-  - Details form integrated with characterStore
-  - Placeholder pages for steps 2-6 (Race, Class, Stats, Spells, Equipment)
-  - Review page shows character summary
-  - Save Character button on final step
-  - Navigate to character sheet after save
-
-#### Store Integration
-- Form data syncs with `useCharacterStore`
-- Character details persisted on navigation
-- Undo/redo history maintained
-- Auto-create new character on page load if none exists
+### Data Content
+- **6 Abilities**: STR, DEX, CON, INT, WIS, CHA with descriptions
+- **18 Skills**: All skills with ability associations
+- **37 Weapons**: Simple and martial weapons with full stats
+- **13 Armor Sets**: Light, medium, heavy armor and shields
+- **14 Standard Conditions**: D&D 5e status effects
+- **100+ Class Traits**: Features for all classes and subclasses
+- **30+ Game Rules**: Clickable references for new players
 
 ---
 
-## [v0.0.p3-alpha] - 2026-02-01 @ 10:04 AM MST-AZ
-
-### Phase 3: Race Selection Page
-
-**Character Creation Wizard - Step 2 Complete**
-
-#### New Components
-- **`src/components/RaceCard.tsx`** - Visual race card with:
-  - Race name and size display
-  - Description preview (2-line clamp)
-  - Ability bonus badges (+2 DEX, +1 CHA format)
-  - Speed and vision quick stats
-  - Languages list
-  - Selected state with gold border and checkmark
-  - Full keyboard accessibility (Tab navigation, aria-pressed)
-
-- **`src/components/RaceSelector.tsx`** - Race selection page with:
-  - Grid layout for race cards (responsive 1-2 columns)
-  - Available races: Drow, Tiefling
-  - "Coming soon" placeholder for future races
-  - Detailed trait panel on selection
-
-#### Race Details Panel (on selection)
-- **Ability Score Increases** - Visual display with ability name and bonus
-- **Racial Traits** - Full description for each trait
-- **Innate Spellcasting** - Spell list with level requirements and uses/day
-- **Weapon Proficiencies** - List of racial weapon proficiencies
-- **Damage Resistances** - Highlighted resistance badges
-- **Quick Stats Grid** - Size, Speed, Vision Range, Languages count
-
-#### Available Races
-- **Drow** - +2 DEX, +1 CHA, Superior Darkvision 120ft
-  - Traits: Fey Ancestry, Trance, Sunlight Sensitivity
-  - Spells: Dancing Lights (1), Faerie Fire (3), Darkness (5)
-  - Proficiencies: Rapier, Shortsword, Hand Crossbow
-
-- **Tiefling** - +2 CHA, +1 INT, Darkvision 60ft
-  - Traits: Hellish Resistance (fire)
-  - Spells: Thaumaturgy (1), Hellish Rebuke (3), Darkness (5)
-
-#### Updated Pages
-- **`src/pages/CharacterCreatePage.tsx`** - Race step integration:
-  - RaceSelector component replaces placeholder
-  - Race selection saved to characterStore via setRace()
-  - Preserves selected race when navigating back
-  - Review page now displays selected race name
-
-#### Store Integration
-- Race selection persisted via `setRace()` action
-- Undo/redo history tracks race changes
-- Race displayed in Review step summary
+## Coming Soon
+- **Multi-Class Support**: Allow characters to multiclass
+- **Backgrounds System**: Formal background selection with traits
+- **Feats Selection**: PHB feats at ASI levels
+- **PDF Export**: Export character sheets to PDF
+- **Cloud Saves**: Account system for character cloud storage
+- **Theme System**: Multiple UI themes (Light, Dark, D&D, WoW, Final Fantasy, Diablo)
+- **Font Accessibility**: Adjustable font sizes and dyslexia-friendly fonts
+- **Campaign Sharing**: Real-time character updates for DM and players
+- **Multi-Panel View**: Side-by-side character sheets for encounters
+- **NPC Templates**: Pre-built NPC stat blocks
 
 ---
 
-## [v0.0.p4-alpha] - 2026-02-01 @ 10:12 AM MST-AZ
-
-### Phase 4: Class Selection Page
-
-**Character Creation Wizard - Step 3 Complete**
-
-#### New Components
-- **`src/components/ClassCard.tsx`** - Visual class card with:
-  - Class name, hit die, primary ability display
-  - Description preview
-  - Spellcasting type badge (Martial, Pact Magic, etc.)
-  - Armor/weapon proficiency previews
-  - Saving throw indicators
-  - Subclass level display
-
-- **`src/components/ClassSelector.tsx`** - Class selection page with:
-  - Grid layout for class cards
-  - Detailed class features panel on selection
-  - Primary stats overview (Hit Die, Primary Ability, Saves)
-  - Proficiencies display (Armor, Weapons)
-  - Skill choices list
-  - Level 1 features with charge information
-  - Fighting Styles (for Fighter)
-  - **Subclass selection** (required for Warlock at level 1)
-
-#### Available Classes
-- **Fighter** - d10, STR/DEX primary, Martial
-  - Features: Fighting Style, Second Wind (1/short rest)
-  - 6 Fighting Style options
-  - Subclass at level 3 (Martial Archetype)
-
-- **Warlock** - d8, CHA primary, Pact Magic
-  - Features: Pact Magic (short rest spell slots)
-  - 2 cantrips, 2 spells known at level 1
-  - Subclass at level 1 (Otherworldly Patron)
-  - **Great Old One** subclass implemented:
-    - Awakened Mind (telepathy 30ft)
-    - Expanded spells: Dissonant Whispers, Tasha's Hideous Laughter
-
----
-
-## [v0.0.p5-alpha] - 2026-02-01 @ 10:12 AM MST-AZ
-
-### Phase 5: Stat Allocation Page
-
-**Character Creation Wizard - Step 4 Complete**
-
-#### New Component
-- **`src/components/StatAllocator.tsx`** - Full ability score allocation with:
-  - **Three allocation methods** via toggle buttons
-  - Racial bonus integration and display
-  - Real-time modifier calculations
-  - Final score summary with modifiers
-
-#### Standard Array Method
-- Fixed values: 15, 14, 13, 12, 10, 8
-- Dropdown selectors for each ability
-- Track available values
-- Prevent duplicate assignments
-
-#### Point Buy Method
-- 27 points total to distribute
-- Score range: 8-15
-- Point cost reference table (8=0, 9=1, 10=2, 11=3, 12=4, 13=5, 14=7, 15=9)
-- +/- buttons with validation
-- Points remaining counter
-- Real-time cost display per ability
-
-#### Roll Method (4d6 Drop Lowest)
-- "Roll All" button generates 6 scores
-- Each score: roll 4d6, drop lowest die
-- Assign rolled values to abilities
-- Scores sorted high to low
-- Handle duplicate values correctly
-
-#### Integration
-- Racial bonuses auto-applied from selected race
-- Final scores = Base + Racial Bonus
-- Modifiers shown: floor((score - 10) / 2)
-- Results saved to characterStore via `setAbilityScores()`
-
----
-
-## [v0.0.p6-alpha] - 2026-02-01 @ 10:12 AM MST-AZ
-
-### Phase 6: Spell Selection Page
-
-**Character Creation Wizard - Step 5 Complete**
-
-#### New Components
-- **`src/components/SpellCard.tsx`** - Visual spell card with:
-  - Spell name and school badge (color-coded)
-  - Level indicator (Cantrip, 1st Level, etc.)
-  - Description preview (2-line clamp)
-  - Casting time, range, components display
-  - Concentration/Ritual badges
-  - Damage dice and type (if applicable)
-  - Selected state with checkmark
-
-- **`src/components/SpellSelector.tsx`** - Spell selection page with:
-  - Separate sections for Cantrips and 1st Level spells
-  - Selection counter (X / Y selected)
-  - Class-based spell filtering
-  - Subclass expanded spells support
-  - Pact Magic information display
-  - Selected spells summary panel
-  - Non-spellcaster skip option (for Fighter)
-
-#### Available Warlock Cantrips (5)
-- Eldritch Blast, Chill Touch, Minor Illusion, Prestidigitation, Mage Hand
-
-#### Available Warlock 1st Level Spells (5)
-- Hex, Armor of Agathys, Hellish Rebuke, Charm Person, Witch Bolt
-
-#### Great Old One Expanded Spells (2)
-- Dissonant Whispers, Tasha's Hideous Laughter
-- Marked with "Expanded" badge
-
-#### Spell Data Structure
-- Full spell properties: school, casting time, range, components, duration
-- Damage/healing dice with scaling
-- Saving throw effects
-- Attack roll indicator
-- Concentration and ritual flags
-
-#### Updated Review Page
-- Ability scores displayed with modifiers
-- Known spells listed
-- Subclass shown with class
-- Improved summary layout
-
----
-
-## Upcoming Phases
-
-### Phase 7: Equipment Page (Planned)
-- Starting equipment packs
-- Weapon/armor selection
-- Inventory management
-
-### Phase 8: Character Sheet & Review (Planned)
-- Complete character display
-- Internal linking system
-- Edit mode
-
-### Phase 9: DM Tools (Planned)
-- Campaign dashboard
-- NPC creator UI
-- Multi-panel view
-- Initiative tracker UI
-
-### Phase 10: Polish & Advanced (Planned)
-- User accounts
-- Theme system (8 themes)
-- Font size controls
-- PDF export
-- Cloud sync
-
----
-
-## Version History
-
-| Version | Date | Phase | Description |
-|---------|------|-------|-------------|
-| v0.0.p6-alpha | 2026-02-01 | 6 | Spell Selection Page |
-| v0.0.p5-alpha | 2026-02-01 | 5 | Stat Allocation Page |
-| v0.0.p4-alpha | 2026-02-01 | 4 | Class Selection Page |
-| v0.0.p3-alpha | 2026-02-01 | 3 | Race Selection Page |
-| v0.0.p2-alpha | 2026-02-01 | 2 | Character Details Page |
-| v0.0.p1-alpha | 2026-02-01 | 1 | Project Setup & Infrastructure |
-
----
-
-*This changelog follows [Keep a Changelog](https://keepachangelog.com/) principles.*
+**Build Version**: 0.2.0
+**Last Updated**: February 22, 2026
+**TypeScript Version**: 5.x
+**React Version**: 18.x
+**Vite Version**: 5.x
