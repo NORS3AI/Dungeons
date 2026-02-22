@@ -12,8 +12,10 @@ import { CharacterEditModal } from '../components/CharacterEditModal'
 import { FightingStanceSelector } from '../components/FightingStanceSelector'
 import { LootCache } from '../components/LootCache'
 import { HPEditor, HPEditorButton } from '../components/HPEditor'
+import { LevelUpSpellSelector } from '../components/LevelUpSpellSelector'
 import { FIGHTING_STANCES } from '../data/fightingStances'
 import type { LootItem } from '../data/lootGenerator'
+import type { Spell } from '../types'
 
 const ABILITY_NAMES: Record<Ability, string> = {
   strength: 'STR',
@@ -52,13 +54,15 @@ const SKILLS: { name: string; ability: Ability; key: SkillKey }[] = [
 export function CharacterSheetPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, setFightingStance, addEquipment, updateHitPoints, saveCharacter } = useCharacterStore()
+  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, setFightingStance, addEquipment, updateHitPoints, addSpell, saveCharacter } = useCharacterStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
   const [activeTab, setActiveTab] = useState<'main' | 'spells' | 'inventory' | 'features' | 'loot'>('main')
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
   const [showIncomeRoller, setShowIncomeRoller] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [showHPEditor, setShowHPEditor] = useState(false)
+  const [showSpellSelector, setShowSpellSelector] = useState(false)
+  const [levelingUpTo, setLevelingUpTo] = useState<number | null>(null)
   const [isExportingPDF, setIsExportingPDF] = useState(false)
 
   useEffect(() => {
@@ -217,6 +221,30 @@ export function CharacterSheetPage() {
     saveCharacter()
   }
 
+  const handleLevelUp = () => {
+    const newLevel = character.level + 1
+
+    // Check if this is a spellcaster and if they gain spells
+    const isSpellcaster = character.class?.spellcasting !== undefined
+
+    if (isSpellcaster) {
+      // Set the level they're leveling up to and show spell selector
+      setLevelingUpTo(newLevel)
+      levelUp()
+      setShowSpellSelector(true)
+    } else {
+      // Just level up normally
+      levelUp()
+      saveCharacter()
+    }
+  }
+
+  const handleAddLevelUpSpells = (spells: Spell[]) => {
+    spells.forEach(spell => addSpell(spell))
+    saveCharacter()
+    setLevelingUpTo(null)
+  }
+
   const tabs = [
     { id: 'main', label: 'Overview' },
     { id: 'spells', label: 'Spells' },
@@ -244,7 +272,7 @@ export function CharacterSheetPage() {
         </div>
         <div className="flex gap-2 flex-wrap">
           <button
-            onClick={() => levelUp()}
+            onClick={handleLevelUp}
             disabled={character.level >= 20}
             className="px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-lg
                      transition-colors focus:outline-none focus:ring-2 focus:ring-green-500
@@ -801,6 +829,20 @@ export function CharacterSheetPage() {
           character={character}
           onUpdateHP={handleUpdateHP}
           onClose={() => setShowHPEditor(false)}
+        />
+      )}
+
+      {/* Level Up Spell Selector */}
+      {showSpellSelector && levelingUpTo && (
+        <LevelUpSpellSelector
+          character={character}
+          newLevel={levelingUpTo}
+          onAddSpells={handleAddLevelUpSpells}
+          onClose={() => {
+            setShowSpellSelector(false)
+            setLevelingUpTo(null)
+            saveCharacter()
+          }}
         />
       )}
     </div>
