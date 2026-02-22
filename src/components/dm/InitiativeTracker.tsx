@@ -6,6 +6,7 @@ import { rollDice } from '../../types/dice'
 import { ConditionManager } from '../ConditionManager'
 import type { Character, Condition } from '../../types'
 import { CONDITIONS } from '../../data/quickReference'
+import { PartyMemberSwitcher } from './PartyMemberSwitcher'
 
 export function InitiativeTracker() {
   const { characters } = useCharacterStore()
@@ -170,6 +171,7 @@ export function InitiativeTracker() {
           )}
         </div>
         <div className="flex gap-2">
+          <PartyMemberSwitcher compact />
           <button
             onClick={handleRollAll}
             className="px-4 py-2 bg-dnd-gold text-gray-900 rounded-lg font-medium hover:bg-yellow-500 transition-colors"

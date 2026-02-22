@@ -3,6 +3,8 @@ import { useCampaignStore, type NPC } from '../../stores/campaignStore'
 import { useCharacterStore } from '../../stores/characterStore'
 import { calculateModifier } from '../../utils/calculations'
 import { rollDice } from '../../types/dice'
+import { PartyMemberSwitcher } from './PartyMemberSwitcher'
+import { NPCStatBlock } from './MultiPanelLayout'
 
 interface EncounterCombatant {
   id: string
@@ -27,6 +29,7 @@ export function EncounterBuilder() {
   const [inCombat, setInCombat] = useState(false)
   const [showAddModal, setShowAddModal] = useState(false)
   const [npcCounts, setNpcCounts] = useState<Record<string, number>>({})
+  const [selectedNPC, setSelectedNPC] = useState<NPC | null>(null)
 
   const partyCharacters = characters.filter((c) => partyCharacterIds.includes(c.id))
 
@@ -144,6 +147,15 @@ export function EncounterBuilder() {
 
   const currentCombatant = combatants[currentTurn]
 
+  const handleViewNPC = (combatant: EncounterCombatant) => {
+    if (combatant.npcId) {
+      const npc = npcs.find((n) => n.id === combatant.npcId)
+      if (npc) {
+        setSelectedNPC(npc)
+      }
+    }
+  }
+
   return (
     <div className="space-y-4">
       {/* Header */}
@@ -155,6 +167,7 @@ export function EncounterBuilder() {
           )}
         </div>
         <div className="flex gap-2">
+          <PartyMemberSwitcher compact />
           {!inCombat ? (
             <>
               <button
@@ -221,6 +234,7 @@ export function EncounterBuilder() {
               onUpdateInit={(init) => updateCombatantInit(combatant.id, init)}
               onToggleCondition={(cond) => toggleCondition(combatant.id, cond)}
               inCombat={inCombat}
+              onViewNPC={!combatant.isPlayer ? () => handleViewNPC(combatant) : undefined}
             />
           ))}
         </div>
@@ -293,6 +307,24 @@ export function EncounterBuilder() {
           </div>
         </div>
       )}
+
+      {/* NPC Stat Block Modal */}
+      {selectedNPC && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/70" onClick={() => setSelectedNPC(null)} />
+          <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-gray-800 rounded-xl border border-gray-700 p-6">
+            <button
+              onClick={() => setSelectedNPC(null)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-white z-10"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <NPCStatBlock npc={selectedNPC} />
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -311,6 +343,7 @@ interface CombatantRowProps {
   onUpdateInit: (initiative: number) => void
   onToggleCondition: (condition: string) => void
   inCombat: boolean
+  onViewNPC?: () => void
 }
 
 function CombatantRow({
@@ -321,6 +354,7 @@ function CombatantRow({
   onUpdateInit,
   onToggleCondition,
   inCombat,
+  onViewNPC,
 }: CombatantRowProps) {
   const [hpInput, setHpInput] = useState('')
   const [showConditions, setShowConditions] = useState(false)
@@ -386,7 +420,17 @@ function CombatantRow({
         {/* Name & Info */}
         <div className="flex-1">
           <div className={`font-semibold text-lg ${combatant.isPlayer ? 'text-green-400' : 'text-red-400'}`}>
-            {combatant.name}
+            {onViewNPC ? (
+              <button
+                onClick={onViewNPC}
+                className="hover:underline hover:text-red-300 transition-colors"
+                title="View enemy details"
+              >
+                {combatant.name}
+              </button>
+            ) : (
+              combatant.name
+            )}
             {isDead && <span className="text-gray-500 ml-2">(Dead)</span>}
           </div>
           <div className="text-sm text-gray-400">

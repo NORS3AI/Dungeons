@@ -47,25 +47,25 @@ type SkillKey = 'acrobatics' | 'animalHandling' | 'arcana' | 'athletics' | 'dece
   'history' | 'insight' | 'intimidation' | 'investigation' | 'medicine' | 'nature' |
   'perception' | 'performance' | 'persuasion' | 'religion' | 'sleightOfHand' | 'stealth' | 'survival'
 
-const SKILLS: { name: string; ability: Ability; key: SkillKey }[] = [
-  { name: 'Acrobatics', ability: 'dexterity', key: 'acrobatics' },
-  { name: 'Animal Handling', ability: 'wisdom', key: 'animalHandling' },
-  { name: 'Arcana', ability: 'intelligence', key: 'arcana' },
-  { name: 'Athletics', ability: 'strength', key: 'athletics' },
-  { name: 'Deception', ability: 'charisma', key: 'deception' },
-  { name: 'History', ability: 'intelligence', key: 'history' },
-  { name: 'Insight', ability: 'wisdom', key: 'insight' },
-  { name: 'Intimidation', ability: 'charisma', key: 'intimidation' },
-  { name: 'Investigation', ability: 'intelligence', key: 'investigation' },
-  { name: 'Medicine', ability: 'wisdom', key: 'medicine' },
-  { name: 'Nature', ability: 'intelligence', key: 'nature' },
-  { name: 'Perception', ability: 'wisdom', key: 'perception' },
-  { name: 'Performance', ability: 'charisma', key: 'performance' },
-  { name: 'Persuasion', ability: 'charisma', key: 'persuasion' },
-  { name: 'Religion', ability: 'intelligence', key: 'religion' },
-  { name: 'Sleight of Hand', ability: 'dexterity', key: 'sleightOfHand' },
-  { name: 'Stealth', ability: 'dexterity', key: 'stealth' },
-  { name: 'Survival', ability: 'wisdom', key: 'survival' },
+const SKILLS: { name: string; ability: Ability; key: SkillKey; refId: string }[] = [
+  { name: 'Acrobatics', ability: 'dexterity', key: 'acrobatics', refId: 'acrobatics' },
+  { name: 'Animal Handling', ability: 'wisdom', key: 'animalHandling', refId: 'animal-handling' },
+  { name: 'Arcana', ability: 'intelligence', key: 'arcana', refId: 'arcana' },
+  { name: 'Athletics', ability: 'strength', key: 'athletics', refId: 'athletics' },
+  { name: 'Deception', ability: 'charisma', key: 'deception', refId: 'deception' },
+  { name: 'History', ability: 'intelligence', key: 'history', refId: 'history' },
+  { name: 'Insight', ability: 'wisdom', key: 'insight', refId: 'insight' },
+  { name: 'Intimidation', ability: 'charisma', key: 'intimidation', refId: 'intimidation' },
+  { name: 'Investigation', ability: 'intelligence', key: 'investigation', refId: 'investigation' },
+  { name: 'Medicine', ability: 'wisdom', key: 'medicine', refId: 'medicine' },
+  { name: 'Nature', ability: 'intelligence', key: 'nature', refId: 'nature' },
+  { name: 'Perception', ability: 'wisdom', key: 'perception', refId: 'perception' },
+  { name: 'Performance', ability: 'charisma', key: 'performance', refId: 'performance' },
+  { name: 'Persuasion', ability: 'charisma', key: 'persuasion', refId: 'persuasion' },
+  { name: 'Religion', ability: 'intelligence', key: 'religion', refId: 'religion' },
+  { name: 'Sleight of Hand', ability: 'dexterity', key: 'sleightOfHand', refId: 'sleight-of-hand' },
+  { name: 'Stealth', ability: 'dexterity', key: 'stealth', refId: 'stealth' },
+  { name: 'Survival', ability: 'wisdom', key: 'survival', refId: 'survival' },
 ]
 
 export function CharacterSheetPage() {
@@ -633,9 +633,11 @@ export function CharacterSheetPage() {
                       <span className={`w-2 h-2 rounded-full ${
                         isSkillProficient(skill.key) ? 'bg-dnd-gold' : 'bg-gray-600'
                       }`} />
-                      <span className="text-gray-300 text-sm hover:text-dnd-gold">
-                        {skill.name}
-                      </span>
+                      <QuickRefTooltip type="skill" id={skill.refId}>
+                        <span className="text-gray-300 text-sm">
+                          {skill.name}
+                        </span>
+                      </QuickRefTooltip>
                       <span className="text-xs text-gray-600">({ABILITY_NAMES[skill.ability]})</span>
                     </div>
                     <span className="text-white font-medium">{formatMod(getSkillMod(skill))}</span>
