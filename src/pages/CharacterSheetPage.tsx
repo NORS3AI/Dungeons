@@ -11,8 +11,13 @@ import { QuickRefTooltip } from '../components/QuickRefTooltip'
 import { CharacterEditModal } from '../components/CharacterEditModal'
 import { FightingStanceSelector } from '../components/FightingStanceSelector'
 import { LootCache } from '../components/LootCache'
+import { HPEditor, HPEditorButton } from '../components/HPEditor'
+import { LevelUpSpellSelector } from '../components/LevelUpSpellSelector'
+import { ConditionManager, ConditionManagerButton } from '../components/ConditionManager'
+import { NinthLevelSpellSelector } from '../components/NinthLevelSpellSelector'
 import { FIGHTING_STANCES } from '../data/fightingStances'
 import type { LootItem } from '../data/lootGenerator'
+import type { Spell, Condition } from '../types'
 
 const ABILITY_NAMES: Record<Ability, string> = {
   strength: 'STR',
@@ -51,12 +56,17 @@ const SKILLS: { name: string; ability: Ability; key: SkillKey }[] = [
 export function CharacterSheetPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, setFightingStance, addEquipment, saveCharacter } = useCharacterStore()
+  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, setFightingStance, addEquipment, updateHitPoints, addSpell, addCondition, removeCondition, saveCharacter } = useCharacterStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
   const [activeTab, setActiveTab] = useState<'main' | 'spells' | 'inventory' | 'features' | 'loot'>('main')
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
   const [showIncomeRoller, setShowIncomeRoller] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
+  const [showHPEditor, setShowHPEditor] = useState(false)
+  const [showSpellSelector, setShowSpellSelector] = useState(false)
+  const [showConditionManager, setShowConditionManager] = useState(false)
+  const [showNinthLevelSpellSelector, setShowNinthLevelSpellSelector] = useState(false)
+  const [levelingUpTo, setLevelingUpTo] = useState<number | null>(null)
   const [isExportingPDF, setIsExportingPDF] = useState(false)
 
   useEffect(() => {
@@ -179,6 +189,13 @@ export function CharacterSheetPage() {
   }
 
   const handleAddLootToInventory = (lootItem: LootItem) => {
+    // Check if this is a 9th level spell scroll
+    if (lootItem.id.startsWith('spell-scroll-9')) {
+      // Trigger the 9th level spell selection modal
+      setShowNinthLevelSpellSelector(true)
+      return
+    }
+
     // Convert LootItem to Equipment (generic item)
     // Map loot categories to GenericEquipment categories
     let category: GenericEquipment['category'] = 'treasure'
@@ -210,6 +227,52 @@ export function CharacterSheetPage() {
     saveCharacter()
   }
 
+  const handleUpdateHP = (hp: Partial<Character['hitPoints']>) => {
+    updateHitPoints(hp)
+    saveCharacter()
+  }
+
+  const handleLevelUp = () => {
+    const newLevel = character.level + 1
+
+    // Level up the character
+    levelUp()
+
+    // Save immediately to persist the level change
+    saveCharacter()
+
+    // Check if this is a spellcaster and if they gain spells
+    const isSpellcaster = character.class?.spellcasting !== undefined
+
+    if (isSpellcaster) {
+      // Set the level they're leveling up to and show spell selector
+      setLevelingUpTo(newLevel)
+      setShowSpellSelector(true)
+    }
+  }
+
+  const handleAddLevelUpSpells = (spells: Spell[]) => {
+    spells.forEach(spell => addSpell(spell))
+    saveCharacter()
+    setLevelingUpTo(null)
+  }
+
+  const handleAddCondition = (condition: Condition) => {
+    addCondition(condition)
+    saveCharacter()
+  }
+
+  const handleRemoveCondition = (condition: Condition) => {
+    removeCondition(condition)
+    saveCharacter()
+  }
+
+  const handleSelectNinthLevelSpell = (spell: Spell) => {
+    addSpell(spell)
+    saveCharacter()
+    setShowNinthLevelSpellSelector(false)
+  }
+
   const tabs = [
     { id: 'main', label: 'Overview' },
     { id: 'spells', label: 'Spells' },
@@ -237,7 +300,7 @@ export function CharacterSheetPage() {
         </div>
         <div className="flex gap-2 flex-wrap">
           <button
-            onClick={() => levelUp()}
+            onClick={handleLevelUp}
             disabled={character.level >= 20}
             className="px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-lg
                      transition-colors focus:outline-none focus:ring-2 focus:ring-green-500
@@ -247,7 +310,10 @@ export function CharacterSheetPage() {
             Level Up
           </button>
           <button
-            onClick={() => levelDown()}
+            onClick={() => {
+              levelDown()
+              saveCharacter()
+            }}
             disabled={character.level <= 1}
             className="px-4 py-2 bg-red-700 hover:bg-red-600 text-white rounded-lg
                      transition-colors focus:outline-none focus:ring-2 focus:ring-red-500
@@ -290,6 +356,10 @@ export function CharacterSheetPage() {
           >
             Edit Details
           </button>
+          <ConditionManagerButton
+            onClick={() => setShowConditionManager(true)}
+            activeCount={character.conditions.length}
+          />
         </div>
       </div>
 
@@ -383,10 +453,18 @@ export function CharacterSheetPage() {
                   </div>
                 </div>
                 <div className="bg-gray-900 rounded-lg p-3 text-center border border-red-900/50">
-                  <div className="text-xs text-gray-500 uppercase mb-1">HP</div>
+                  <div className="text-xs text-gray-500 uppercase mb-1 flex items-center justify-center">
+                    HP
+                    <HPEditorButton onClick={() => setShowHPEditor(true)} />
+                  </div>
                   <div className="text-2xl font-bold text-red-400">
                     {character.hitPoints.current}/{character.hitPoints.maximum}
                   </div>
+                  {character.hitPoints.temporary > 0 && (
+                    <div className="text-xs text-blue-400 mt-1">
+                      +{character.hitPoints.temporary} temp
+                    </div>
+                  )}
                 </div>
                 <div className="bg-gray-900 rounded-lg p-3 text-center border border-gray-700">
                   <div className="text-xs text-gray-500 uppercase mb-1">Speed</div>
@@ -779,6 +857,47 @@ export function CharacterSheetPage() {
         onClose={() => setShowEditModal(false)}
         onSave={handleSaveDetails}
       />
+
+      {/* HP Editor Modal */}
+      {showHPEditor && (
+        <HPEditor
+          character={character}
+          onUpdateHP={handleUpdateHP}
+          onClose={() => setShowHPEditor(false)}
+        />
+      )}
+
+      {/* Level Up Spell Selector */}
+      {showSpellSelector && levelingUpTo && (
+        <LevelUpSpellSelector
+          character={character}
+          newLevel={levelingUpTo}
+          onAddSpells={handleAddLevelUpSpells}
+          onClose={() => {
+            setShowSpellSelector(false)
+            setLevelingUpTo(null)
+            saveCharacter()
+          }}
+        />
+      )}
+
+      {/* Ninth Level Spell Selector */}
+      {showNinthLevelSpellSelector && (
+        <NinthLevelSpellSelector
+          onSelectSpell={handleSelectNinthLevelSpell}
+          onClose={() => setShowNinthLevelSpellSelector(false)}
+        />
+      )}
+
+      {/* Condition Manager */}
+      {showConditionManager && (
+        <ConditionManager
+          character={character}
+          onAddCondition={handleAddCondition}
+          onRemoveCondition={handleRemoveCondition}
+          onClose={() => setShowConditionManager(false)}
+        />
+      )}
     </div>
   )
 }
