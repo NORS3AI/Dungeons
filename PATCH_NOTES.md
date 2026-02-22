@@ -1,5 +1,48 @@
 # Dungeons - Patch Notes
 
+## Version 0.2.2 - February 22, 2026
+
+### 🆕 New Features
+
+#### **Cloak Equipment Slot**
+- **Separate Cloak Slot**: New equipment category for cloaks (e.g., Cloak of Invisibility)
+- **Equip Alongside Armor**: Cloaks can be worn in addition to armor and shields
+- **Optional AC Bonus**: Cloaks can provide AC bonuses (0-3)
+- **Magical Effects Field**: Description field for special cloak abilities
+- **Indigo Theme**: Equipped cloaks display with indigo-themed UI
+- **AC Calculation**: Cloak AC bonuses automatically added to total AC
+- **Exclusivity**: Only one cloak can be equipped at a time
+
+#### **Inventory Quantity Controls**
+- **+/- Buttons**: All inventory items now have quantity increment/decrement buttons
+- **Position**: Buttons placed to the left of the trash icon
+- **Minimum Quantity**: Items cannot be reduced below 1
+- **Universal**: Works for weapons, armor, shields, cloaks, and generic items
+- **Use Cases**: Track items taken/missing or added from merchants
+
+#### **Manual Item Addition**
+- **"Add Item" Button**: Located in inventory section header
+- **Custom Items**: Allows creating items for shopping or custom loot
+- **Full Editor**: Opens equipment editor with blank template
+- **All Types Supported**: Can create weapons, armor, shields, cloaks, or generic items
+
+### 🛠️ Technical Improvements
+
+#### **Equipment System Enhancements**
+- **Cloak Interface**: Added with acBonus and magicalEffect properties
+- **Type Guards**: Added `isCloak()` function for type discrimination
+- **Equipment Union**: Updated to include Cloak type
+- **Generic Equipment**: Excludes cloak category
+- **Store Function**: `changeEquipmentQuantity(itemId, change)` added
+
+#### **UI/UX Improvements**
+- **Equipment Editor**: 5-button grid for equipment type selection (added cloak)
+- **Equipped Gear Display**: Dedicated cloak section with magical effect display
+- **Quantity Display**: Visual feedback when adjusting item quantities
+- **Add Item UX**: Clear, accessible button for manual item creation
+
+---
+
 ## Version 0.2.1 - February 22, 2026
 
 ### 🎯 Major Changes
