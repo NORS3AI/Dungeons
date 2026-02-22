@@ -35,7 +35,8 @@ export function LanguageSelector({
   // Update parent when languages change
   useEffect(() => {
     onChange(selectedLanguages)
-  }, [selectedLanguages, onChange])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedLanguages])
 
   const toggleLanguage = (languageId: string) => {
     // Cannot remove Common
