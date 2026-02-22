@@ -38,6 +38,7 @@ export type EquipmentCategory =
   | 'weapon'
   | 'armor'
   | 'shield'
+  | 'cloak'
   | 'adventuringGear'
   | 'tool'
   | 'mount'
@@ -158,16 +159,26 @@ export interface Shield extends BaseEquipment {
 }
 
 /**
+ * Cloak equipment (e.g., Cloak of Invisibility)
+ * Equippable alongside armor
+ */
+export interface Cloak extends BaseEquipment {
+  category: 'cloak'
+  acBonus?: number // Optional AC bonus
+  magicalEffect?: string // Description of magical effect
+}
+
+/**
  * Generic equipment (gear, tools, etc.)
  */
 export interface GenericEquipment extends BaseEquipment {
-  category: Exclude<EquipmentCategory, 'weapon' | 'armor' | 'shield'>
+  category: Exclude<EquipmentCategory, 'weapon' | 'armor' | 'shield' | 'cloak'>
 }
 
 /**
  * All equipment types
  */
-export type Equipment = Weapon | Armor | Shield | GenericEquipment
+export type Equipment = Weapon | Armor | Shield | Cloak | GenericEquipment
 
 /**
  * Type guard for weapons
@@ -188,6 +199,13 @@ export function isArmor(item: Equipment): item is Armor {
  */
 export function isShield(item: Equipment): item is Shield {
   return item.category === 'shield'
+}
+
+/**
+ * Type guard for cloaks
+ */
+export function isCloak(item: Equipment): item is Cloak {
+  return item.category === 'cloak'
 }
 
 /**

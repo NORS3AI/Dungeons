@@ -3,8 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useCharacterStore } from '../stores/characterStore'
 import { DiceRoller, DiceRollerButton, DiceRollerModal } from '../components/DiceRoller'
 import { calculateModifier, calculateProficiencyBonus } from '../types/dice'
-import { isWeapon, isArmor, isShield } from '../types/equipment'
-import type { Character, Ability, Equipment, Weapon, Armor, Shield, Currency } from '../types'
+import { isWeapon, isArmor, isShield, isCloak } from '../types/equipment'
+import type { Character, Ability, Equipment, Weapon, Armor, Shield, Cloak, Currency } from '../types'
 import { CATEGORY_INFO, formatIncome, getProfessionByRoll, type Profession } from '../data/professions'
 import { exportCharacterToJSON, exportCharacterToPDF } from '../utils/characterIO'
 import { QuickRefTooltip } from '../components/QuickRefTooltip'
@@ -56,7 +56,7 @@ const SKILLS: { name: string; ability: Ability; key: SkillKey }[] = [
 export function CharacterSheetPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, setFightingStance, addEquipment, updateHitPoints, addSpell, useItemCharge, saveCharacter } = useCharacterStore()
+  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, changeEquipmentQuantity, setFightingStance, addEquipment, updateHitPoints, addSpell, useItemCharge, saveCharacter } = useCharacterStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
   const [activeTab, setActiveTab] = useState<'main' | 'spells' | 'inventory' | 'features' | 'loot'>('main')
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
@@ -131,6 +131,14 @@ export function CharacterSheetPage() {
     )
     if (equippedShield && isShield(equippedShield)) {
       baseAC += equippedShield.acBonus
+    }
+
+    // Check equipped cloak
+    const equippedCloak = character.equipment.find(
+      (e) => isCloak(e) && e.equipped
+    )
+    if (equippedCloak && isCloak(equippedCloak) && equippedCloak.acBonus) {
+      baseAC += equippedCloak.acBonus
     }
 
     // Apply fighting stance modifier for Fighters
@@ -692,7 +700,27 @@ export function CharacterSheetPage() {
 
           {/* All Equipment (Inventory) */}
           <div className="card bg-gray-800 border-gray-700 p-4">
-            <h3 className="text-lg font-bold text-white mb-4">Inventory</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-white">Inventory</h3>
+              <button
+                onClick={() => {
+                  setEditingLootItem({
+                    id: 'custom-item',
+                    name: 'New Item',
+                    description: 'Add item description',
+                    value: 0,
+                    rarity: 'common',
+                    category: 'treasure',
+                  })
+                  setShowEquipmentEditor(true)
+                }}
+                className="px-4 py-2 bg-dnd-gold hover:bg-yellow-600 text-gray-900 font-semibold rounded-lg transition-colors flex items-center gap-2"
+                title="Add custom item to inventory"
+              >
+                <span className="text-lg font-bold">+</span>
+                Add Item
+              </button>
+            </div>
             {character.equipment.length === 0 ? (
               <p className="text-gray-400 text-center py-4">No equipment.</p>
             ) : (
@@ -708,6 +736,10 @@ export function CharacterSheetPage() {
                     }}
                     onToggleEquip={() => {
                       toggleEquipment(item.id)
+                      saveCharacter()
+                    }}
+                    onChangeQuantity={(change) => {
+                      changeEquipmentQuantity(item.id, change)
                       saveCharacter()
                     }}
                   />
@@ -932,7 +964,8 @@ function EquippedGearSection({
   const equippedWeapons = equipment.filter((e) => isWeapon(e) && e.equipped) as Weapon[]
   const equippedArmor = equipment.find((e) => isArmor(e) && e.equipped) as Armor | undefined
   const equippedShield = equipment.find((e) => isShield(e) && e.equipped) as Shield | undefined
-  const equippedGeneric = equipment.filter((e) => !isWeapon(e) && !isArmor(e) && !isShield(e) && e.equipped)
+  const equippedCloak = equipment.find((e) => isCloak(e) && e.equipped) as Cloak | undefined
+  const equippedGeneric = equipment.filter((e) => !isWeapon(e) && !isArmor(e) && !isShield(e) && !isCloak(e) && e.equipped)
 
   const getAbilityMod = (ability: Ability): number => {
     return calculateModifier(character.abilityScores[ability])
@@ -947,7 +980,7 @@ function EquippedGearSection({
     return bonus
   }
 
-  const hasEquippedGear = equippedWeapons.length > 0 || equippedArmor || equippedShield || equippedGeneric.length > 0
+  const hasEquippedGear = equippedWeapons.length > 0 || equippedArmor || equippedShield || equippedCloak || equippedGeneric.length > 0
 
   return (
     <div className="card bg-gray-800 border-gray-700 p-4 border-l-4 border-l-dnd-gold">
@@ -1082,6 +1115,61 @@ function EquippedGearSection({
             </div>
           )}
 
+          {/* Equipped Cloak */}
+          {equippedCloak && (
+            <div className="p-3 bg-indigo-900/20 rounded-lg border border-indigo-600/50">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs text-indigo-400 uppercase font-medium">✨ Cloak</span>
+                <button
+                  onClick={() => onToggleEquip(equippedCloak.id)}
+                  className="text-xs text-gray-400 hover:text-red-400"
+                >
+                  Unequip
+                </button>
+              </div>
+              <div className="font-semibold text-white">{equippedCloak.name}</div>
+              {equippedCloak.description && (
+                <div className="text-sm text-gray-300 mt-1">{equippedCloak.description}</div>
+              )}
+              {equippedCloak.acBonus !== undefined && equippedCloak.acBonus > 0 && (
+                <div className="text-sm text-gray-300 mt-1">
+                  AC Bonus: <span className="text-indigo-400">+{equippedCloak.acBonus}</span>
+                </div>
+              )}
+              {equippedCloak.magicalEffect && (
+                <div className="text-sm text-indigo-300 mt-2 italic">
+                  {equippedCloak.magicalEffect}
+                </div>
+              )}
+              {equippedCloak.charges && (
+                <div className="mt-2 p-2 bg-purple-900/30 border border-purple-600/50 rounded">
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm">
+                      <div className="font-medium text-purple-300">{equippedCloak.charges.spellName}</div>
+                      <div className="text-xs text-purple-400">
+                        {equippedCloak.charges.damageDice} {equippedCloak.charges.damageType} damage
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-lg font-bold text-purple-300">
+                        {equippedCloak.charges.currentCharges}/{equippedCloak.charges.maxCharges}
+                      </div>
+                      <div className="text-xs text-purple-400">Charges</div>
+                    </div>
+                  </div>
+                  {equippedCloak.charges.currentCharges > 0 && (
+                    <button
+                      onClick={() => onUseCharge(equippedCloak.id)}
+                      className="w-full mt-2 px-2 py-1 bg-purple-700 hover:bg-purple-600 text-white text-xs rounded transition-colors"
+                    >
+                      Use 1 Charge
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Equipped Generic Items */}
           {equippedGeneric.map((item) => (
             <div key={item.id} className="p-3 bg-yellow-900/20 rounded-lg border border-yellow-600/50">
@@ -1143,7 +1231,7 @@ function EquippedGearSection({
 }
 
 // Equipment item component
-function EquipmentItem({ item, character, onRemove, onToggleEquip }: { item: Equipment; character: Character; onRemove: () => void; onToggleEquip: () => void }) {
+function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuantity }: { item: Equipment; character: Character; onRemove: () => void; onToggleEquip: () => void; onChangeQuantity: (change: number) => void }) {
   const getAbilityMod = (ability: Ability): number => {
     return calculateModifier(character.abilityScores[ability])
   }
@@ -1189,6 +1277,22 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip }: { item: Equ
             </div>
             <div className="text-xs text-gray-500">{weapon.weight} lb</div>
           </div>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => onChangeQuantity(-1)}
+              className="w-6 h-6 flex items-center justify-center bg-gray-700 hover:bg-gray-600 text-white rounded text-sm font-bold transition-colors"
+              title="Decrease quantity"
+            >
+              −
+            </button>
+            <button
+              onClick={() => onChangeQuantity(1)}
+              className="w-6 h-6 flex items-center justify-center bg-gray-700 hover:bg-gray-600 text-white rounded text-sm font-bold transition-colors"
+              title="Increase quantity"
+            >
+              +
+            </button>
+          </div>
           <TrashIcon onClick={onRemove} />
         </div>
       </div>
@@ -1216,6 +1320,22 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip }: { item: Equ
           <div className="text-right">
             <div className="text-xs text-gray-500">{item.weight} lb</div>
           </div>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => onChangeQuantity(-1)}
+              className="w-6 h-6 flex items-center justify-center bg-gray-700 hover:bg-gray-600 text-white rounded text-sm font-bold transition-colors"
+              title="Decrease quantity"
+            >
+              −
+            </button>
+            <button
+              onClick={() => onChangeQuantity(1)}
+              className="w-6 h-6 flex items-center justify-center bg-gray-700 hover:bg-gray-600 text-white rounded text-sm font-bold transition-colors"
+              title="Increase quantity"
+            >
+              +
+            </button>
+          </div>
           <TrashIcon onClick={onRemove} />
         </div>
       </div>
@@ -1242,6 +1362,70 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip }: { item: Equ
         <div className="flex items-center gap-3">
           <div className="text-right">
             <div className="text-xs text-gray-500">{item.weight} lb</div>
+          </div>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => onChangeQuantity(-1)}
+              className="w-6 h-6 flex items-center justify-center bg-gray-700 hover:bg-gray-600 text-white rounded text-sm font-bold transition-colors"
+              title="Decrease quantity"
+            >
+              −
+            </button>
+            <button
+              onClick={() => onChangeQuantity(1)}
+              className="w-6 h-6 flex items-center justify-center bg-gray-700 hover:bg-gray-600 text-white rounded text-sm font-bold transition-colors"
+              title="Increase quantity"
+            >
+              +
+            </button>
+          </div>
+          <TrashIcon onClick={onRemove} />
+        </div>
+      </div>
+    )
+  }
+
+  if (isCloak(item)) {
+    return (
+      <div className={`p-3 rounded-lg flex items-center justify-between group ${
+        isEquipped ? 'bg-indigo-900/30 border border-indigo-600/50' : 'bg-gray-900'
+      }`}>
+        <div className="flex items-center gap-3">
+          <EquipToggle equipped={!!isEquipped} onToggle={onToggleEquip} canEquip={canEquip} />
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-medium text-white">{item.name}</span>
+              {isEquipped && <span className="text-xs text-indigo-400 bg-indigo-900/50 px-1.5 py-0.5 rounded">Equipped</span>}
+            </div>
+            {item.description && (
+              <div className="text-sm text-gray-400">{item.description}</div>
+            )}
+            {item.acBonus && (
+              <div className="text-sm text-gray-400">
+                +{item.acBonus} AC
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="text-right">
+            <div className="text-xs text-gray-500">{item.weight} lb</div>
+          </div>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => onChangeQuantity(-1)}
+              className="w-6 h-6 flex items-center justify-center bg-gray-700 hover:bg-gray-600 text-white rounded text-sm font-bold transition-colors"
+              title="Decrease quantity"
+            >
+              −
+            </button>
+            <button
+              onClick={() => onChangeQuantity(1)}
+              className="w-6 h-6 flex items-center justify-center bg-gray-700 hover:bg-gray-600 text-white rounded text-sm font-bold transition-colors"
+              title="Increase quantity"
+            >
+              +
+            </button>
           </div>
           <TrashIcon onClick={onRemove} />
         </div>
@@ -1271,6 +1455,22 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip }: { item: Equ
       <div className="flex items-center gap-3">
         <div className="text-right">
           <div className="text-xs text-gray-500">{item.weight} lb</div>
+        </div>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => onChangeQuantity(-1)}
+            className="w-6 h-6 flex items-center justify-center bg-gray-700 hover:bg-gray-600 text-white rounded text-sm font-bold transition-colors"
+            title="Decrease quantity"
+          >
+            −
+          </button>
+          <button
+            onClick={() => onChangeQuantity(1)}
+            className="w-6 h-6 flex items-center justify-center bg-gray-700 hover:bg-gray-600 text-white rounded text-sm font-bold transition-colors"
+            title="Increase quantity"
+          >
+            +
+          </button>
         </div>
         <TrashIcon onClick={onRemove} />
       </div>

@@ -173,6 +173,7 @@ interface CharacterState {
   addEquipment: (item: Equipment) => void
   removeEquipment: (itemId: string) => void
   toggleEquipment: (itemId: string) => void
+  changeEquipmentQuantity: (itemId: string, change: number) => void
   useItemCharge: (itemId: string) => void
   updateCurrency: (currency: Partial<Currency>) => void
   setDailyIncome: (professionName: string, amount: number, currency: 'copper' | 'silver' | 'gold') => void
@@ -440,6 +441,7 @@ export const useCharacterStore = create<CharacterState>()(
 
           // For armor, unequip other armor when equipping this one
           // For shields, unequip other shields when equipping this one
+          // For cloaks, unequip other cloaks when equipping this one
           const equipment = currentCharacter.equipment.map((e) => {
             if (e.id === itemId) {
               return { ...e, equipped: !e.equipped }
@@ -451,6 +453,31 @@ export const useCharacterStore = create<CharacterState>()(
             // If equipping shield, unequip other shields
             if (item.category === 'shield' && e.category === 'shield' && !item.equipped) {
               return { ...e, equipped: false }
+            }
+            // If equipping cloak, unequip other cloaks
+            if (item.category === 'cloak' && e.category === 'cloak' && !item.equipped) {
+              return { ...e, equipped: false }
+            }
+            return e
+          })
+
+          set({
+            currentCharacter: {
+              ...currentCharacter,
+              equipment,
+            },
+            history: addToHistory(history, currentCharacter),
+          })
+        },
+
+        changeEquipmentQuantity: (itemId: string, change: number) => {
+          const { currentCharacter, history } = get()
+          if (!currentCharacter) return
+
+          const equipment = currentCharacter.equipment.map((e) => {
+            if (e.id === itemId) {
+              const newQuantity = Math.max(1, e.quantity + change)
+              return { ...e, quantity: newQuantity }
             }
             return e
           })

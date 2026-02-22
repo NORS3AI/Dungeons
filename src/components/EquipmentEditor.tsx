@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { Equipment, Weapon, Armor, Shield, GenericEquipment, Currency } from '../types'
+import type { Equipment, Weapon, Armor, Shield, Cloak, GenericEquipment, Currency } from '../types'
 import type { LootItem } from '../data/lootGenerator'
 
 interface EquipmentEditorProps {
@@ -12,7 +12,7 @@ interface EquipmentEditorProps {
  * Modal for editing and converting loot items to proper equipment
  */
 export function EquipmentEditor({ lootItem, onSave, onCancel }: EquipmentEditorProps) {
-  const [equipmentType, setEquipmentType] = useState<'weapon' | 'armor' | 'shield' | 'generic'>('generic')
+  const [equipmentType, setEquipmentType] = useState<'weapon' | 'armor' | 'shield' | 'cloak' | 'generic'>('generic')
   const [name, setName] = useState(lootItem.name)
   const [description, setDescription] = useState(lootItem.description)
   const [weight, setWeight] = useState(0)
@@ -35,6 +35,10 @@ export function EquipmentEditor({ lootItem, onSave, onCancel }: EquipmentEditorP
 
   // Shield-specific fields
   const [acBonus, setAcBonus] = useState(2)
+
+  // Cloak-specific fields
+  const [cloakACBonus, setCloakACBonus] = useState(0)
+  const [magicalEffect, setMagicalEffect] = useState('')
 
   // Generic equipment category
   const [genericCategory, setGenericCategory] = useState<GenericEquipment['category']>('treasure')
@@ -107,6 +111,7 @@ export function EquipmentEditor({ lootItem, onSave, onCancel }: EquipmentEditorP
         id: `${lootItem.id}-${Date.now()}`,
         name,
         category: 'shield',
+        description,
         acBonus,
         weight,
         cost,
@@ -114,6 +119,20 @@ export function EquipmentEditor({ lootItem, onSave, onCancel }: EquipmentEditorP
         quantity,
         charges,
       } as Shield
+    } else if (equipmentType === 'cloak') {
+      equipment = {
+        id: `${lootItem.id}-${Date.now()}`,
+        name,
+        category: 'cloak',
+        description,
+        acBonus: cloakACBonus > 0 ? cloakACBonus : undefined,
+        magicalEffect: magicalEffect || undefined,
+        weight,
+        cost,
+        equipped: false,
+        quantity,
+        charges,
+      } as Cloak
     } else {
       equipment = {
         id: `${lootItem.id}-${Date.now()}`,
@@ -149,8 +168,8 @@ export function EquipmentEditor({ lootItem, onSave, onCancel }: EquipmentEditorP
           {/* Equipment Type Selection */}
           <div>
             <label className="block text-sm font-medium text-gray-400 mb-2">Equipment Type</label>
-            <div className="grid grid-cols-4 gap-2">
-              {(['weapon', 'armor', 'shield', 'generic'] as const).map((type) => (
+            <div className="grid grid-cols-5 gap-2">
+              {(['weapon', 'armor', 'shield', 'cloak', 'generic'] as const).map((type) => (
                 <button
                   key={type}
                   onClick={() => setEquipmentType(type)}
@@ -398,6 +417,33 @@ export function EquipmentEditor({ lootItem, onSave, onCancel }: EquipmentEditorP
                 onChange={(e) => setAcBonus(parseInt(e.target.value) || 2)}
                 className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-dnd-gold focus:outline-none"
               />
+            </div>
+          )}
+
+          {equipmentType === 'cloak' && (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">AC Bonus (Optional)</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="3"
+                  value={cloakACBonus}
+                  onChange={(e) => setCloakACBonus(parseInt(e.target.value) || 0)}
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-dnd-gold focus:outline-none"
+                  placeholder="0 for no AC bonus"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">Magical Effect</label>
+                <textarea
+                  value={magicalEffect}
+                  onChange={(e) => setMagicalEffect(e.target.value)}
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-dnd-gold focus:outline-none"
+                  rows={3}
+                  placeholder="e.g., Grants invisibility for 1 hour per day"
+                />
+              </div>
             </div>
           )}
 
