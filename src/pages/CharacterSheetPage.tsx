@@ -11,6 +11,7 @@ import { QuickRefTooltip } from '../components/QuickRefTooltip'
 import { CharacterEditModal } from '../components/CharacterEditModal'
 import { FightingStanceSelector } from '../components/FightingStanceSelector'
 import { LootCache } from '../components/LootCache'
+import { HPEditor, HPEditorButton } from '../components/HPEditor'
 import { FIGHTING_STANCES } from '../data/fightingStances'
 import type { LootItem } from '../data/lootGenerator'
 
@@ -51,12 +52,13 @@ const SKILLS: { name: string; ability: Ability; key: SkillKey }[] = [
 export function CharacterSheetPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, setFightingStance, addEquipment, saveCharacter } = useCharacterStore()
+  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, setFightingStance, addEquipment, updateHitPoints, saveCharacter } = useCharacterStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
   const [activeTab, setActiveTab] = useState<'main' | 'spells' | 'inventory' | 'features' | 'loot'>('main')
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
   const [showIncomeRoller, setShowIncomeRoller] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
+  const [showHPEditor, setShowHPEditor] = useState(false)
   const [isExportingPDF, setIsExportingPDF] = useState(false)
 
   useEffect(() => {
@@ -207,6 +209,11 @@ export function CharacterSheetPage() {
       quantity: lootItem.quantity || 1,
     }
     addEquipment(equipment)
+    saveCharacter()
+  }
+
+  const handleUpdateHP = (hp: Partial<Character['hitPoints']>) => {
+    updateHitPoints(hp)
     saveCharacter()
   }
 
@@ -383,10 +390,18 @@ export function CharacterSheetPage() {
                   </div>
                 </div>
                 <div className="bg-gray-900 rounded-lg p-3 text-center border border-red-900/50">
-                  <div className="text-xs text-gray-500 uppercase mb-1">HP</div>
+                  <div className="text-xs text-gray-500 uppercase mb-1 flex items-center justify-center">
+                    HP
+                    <HPEditorButton onClick={() => setShowHPEditor(true)} />
+                  </div>
                   <div className="text-2xl font-bold text-red-400">
                     {character.hitPoints.current}/{character.hitPoints.maximum}
                   </div>
+                  {character.hitPoints.temporary > 0 && (
+                    <div className="text-xs text-blue-400 mt-1">
+                      +{character.hitPoints.temporary} temp
+                    </div>
+                  )}
                 </div>
                 <div className="bg-gray-900 rounded-lg p-3 text-center border border-gray-700">
                   <div className="text-xs text-gray-500 uppercase mb-1">Speed</div>
@@ -779,6 +794,15 @@ export function CharacterSheetPage() {
         onClose={() => setShowEditModal(false)}
         onSave={handleSaveDetails}
       />
+
+      {/* HP Editor Modal */}
+      {showHPEditor && (
+        <HPEditor
+          character={character}
+          onUpdateHP={handleUpdateHP}
+          onClose={() => setShowHPEditor(false)}
+        />
+      )}
     </div>
   )
 }
