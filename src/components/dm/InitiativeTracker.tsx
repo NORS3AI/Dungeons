@@ -3,6 +3,9 @@ import { useCampaignStore, type InitiativeEntry } from '../../stores/campaignSto
 import { useCharacterStore } from '../../stores/characterStore'
 import { calculateModifier } from '../../utils/calculations'
 import { rollDice } from '../../types/dice'
+import { ConditionManager } from '../ConditionManager'
+import type { Character, Condition } from '../../types'
+import { CONDITIONS } from '../../data/quickReference'
 
 export function InitiativeTracker() {
   const { characters } = useCharacterStore()
@@ -20,6 +23,8 @@ export function InitiativeTracker() {
     prevTurn,
     resetCombat,
     updateCombatantHP,
+    addCombatantCondition,
+    removeCombatantCondition,
   } = useCampaignStore()
 
   const [showAddModal, setShowAddModal] = useState(false)
@@ -28,6 +33,8 @@ export function InitiativeTracker() {
   const [customHP, setCustomHP] = useState('')
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editValue, setEditValue] = useState('')
+  const [showConditionManager, setShowConditionManager] = useState(false)
+  const [conditionCombatantId, setConditionCombatantId] = useState<string | null>(null)
 
   const partyCharacters = characters.filter((c) => partyCharacterIds.includes(c.id))
 
@@ -122,7 +129,35 @@ export function InitiativeTracker() {
     }
   }
 
+  const handleManageConditions = (combatantId: string) => {
+    setConditionCombatantId(combatantId)
+    setShowConditionManager(true)
+  }
+
+  const handleAddConditionToCombatant = (condition: Condition) => {
+    if (conditionCombatantId) {
+      addCombatantCondition(conditionCombatantId, condition)
+    }
+  }
+
+  const handleRemoveConditionFromCombatant = (condition: Condition) => {
+    if (conditionCombatantId) {
+      removeCombatantCondition(conditionCombatantId, condition)
+    }
+  }
+
   const currentCombatant = initiativeOrder[currentTurnIndex]
+  const conditionCombatant = conditionCombatantId
+    ? initiativeOrder.find((e) => e.id === conditionCombatantId)
+    : null
+
+  // Create a mock character object for condition manager (needed for UI)
+  const mockCharacterForConditions: Character | null = conditionCombatant
+    ? ({
+        name: conditionCombatant.name,
+        conditions: (conditionCombatant.conditions || []) as Condition[],
+      } as Character)
+    : null
 
   return (
     <div className="space-y-4">
@@ -205,6 +240,7 @@ export function InitiativeTracker() {
               onRemove={() => removeFromInitiative(entry.id)}
               onDamage={(amount) => handleDamage(entry, amount)}
               onHeal={(amount) => handleHeal(entry, amount)}
+              onManageConditions={() => handleManageConditions(entry.id)}
             />
           ))}
         </div>
@@ -322,6 +358,19 @@ export function InitiativeTracker() {
           </div>
         </div>
       )}
+
+      {/* Condition Manager Modal */}
+      {showConditionManager && mockCharacterForConditions && (
+        <ConditionManager
+          character={mockCharacterForConditions}
+          onAddCondition={handleAddConditionToCombatant}
+          onRemoveCondition={handleRemoveConditionFromCombatant}
+          onClose={() => {
+            setShowConditionManager(false)
+            setConditionCombatantId(null)
+          }}
+        />
+      )}
     </div>
   )
 }
@@ -337,6 +386,7 @@ interface InitiativeRowProps {
   onRemove: () => void
   onDamage: (amount: number) => void
   onHeal: (amount: number) => void
+  onManageConditions: () => void
 }
 
 function InitiativeRow({
@@ -350,8 +400,10 @@ function InitiativeRow({
   onRemove,
   onDamage,
   onHeal,
+  onManageConditions,
 }: InitiativeRowProps) {
   const [damageInput, setDamageInput] = useState('')
+  const activeConditions = entry.conditions || []
 
   const hpPercent = entry.maxHP && entry.currentHP !== undefined
     ? (entry.currentHP / entry.maxHP) * 100
@@ -408,7 +460,40 @@ function InitiativeRow({
         <div className="text-xs text-gray-500">
           {entry.isPlayer ? 'Player' : 'NPC/Enemy'}
         </div>
+        {/* Conditions */}
+        {activeConditions.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-2">
+            {activeConditions.slice(0, 3).map((condition) => (
+              <span
+                key={condition}
+                className="px-2 py-0.5 bg-red-900/50 border border-red-600 text-red-300 text-xs rounded"
+                title={CONDITIONS[condition as keyof typeof CONDITIONS]?.name || condition}
+              >
+                {(CONDITIONS[condition as keyof typeof CONDITIONS]?.name || condition).substring(0, 12)}
+              </span>
+            ))}
+            {activeConditions.length > 3 && (
+              <span className="px-2 py-0.5 bg-red-900/50 border border-red-600 text-red-300 text-xs rounded">
+                +{activeConditions.length - 3}
+              </span>
+            )}
+          </div>
+        )}
       </div>
+
+      {/* Conditions Button */}
+      <button
+        onClick={onManageConditions}
+        className="px-3 py-2 bg-red-900/50 hover:bg-red-800 border border-red-600 text-red-300 rounded transition-colors text-xs relative"
+        title="Manage conditions"
+      >
+        Conditions
+        {activeConditions.length > 0 && (
+          <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+            {activeConditions.length}
+          </span>
+        )}
+      </button>
 
       {/* HP */}
       {entry.currentHP !== undefined && entry.maxHP !== undefined && (
