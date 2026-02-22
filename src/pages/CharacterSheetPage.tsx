@@ -14,6 +14,7 @@ import { LootCache } from '../components/LootCache'
 import { HPEditor, HPEditorButton } from '../components/HPEditor'
 import { LevelUpSpellSelector } from '../components/LevelUpSpellSelector'
 import { ConditionManager, ConditionManagerButton } from '../components/ConditionManager'
+import { NinthLevelSpellSelector } from '../components/NinthLevelSpellSelector'
 import { FIGHTING_STANCES } from '../data/fightingStances'
 import type { LootItem } from '../data/lootGenerator'
 import type { Spell, Condition } from '../types'
@@ -64,6 +65,7 @@ export function CharacterSheetPage() {
   const [showHPEditor, setShowHPEditor] = useState(false)
   const [showSpellSelector, setShowSpellSelector] = useState(false)
   const [showConditionManager, setShowConditionManager] = useState(false)
+  const [showNinthLevelSpellSelector, setShowNinthLevelSpellSelector] = useState(false)
   const [levelingUpTo, setLevelingUpTo] = useState<number | null>(null)
   const [isExportingPDF, setIsExportingPDF] = useState(false)
 
@@ -187,6 +189,13 @@ export function CharacterSheetPage() {
   }
 
   const handleAddLootToInventory = (lootItem: LootItem) => {
+    // Check if this is a 9th level spell scroll
+    if (lootItem.id.startsWith('spell-scroll-9')) {
+      // Trigger the 9th level spell selection modal
+      setShowNinthLevelSpellSelector(true)
+      return
+    }
+
     // Convert LootItem to Equipment (generic item)
     // Map loot categories to GenericEquipment categories
     let category: GenericEquipment['category'] = 'treasure'
@@ -256,6 +265,12 @@ export function CharacterSheetPage() {
   const handleRemoveCondition = (condition: Condition) => {
     removeCondition(condition)
     saveCharacter()
+  }
+
+  const handleSelectNinthLevelSpell = (spell: Spell) => {
+    addSpell(spell)
+    saveCharacter()
+    setShowNinthLevelSpellSelector(false)
   }
 
   const tabs = [
@@ -863,6 +878,14 @@ export function CharacterSheetPage() {
             setLevelingUpTo(null)
             saveCharacter()
           }}
+        />
+      )}
+
+      {/* Ninth Level Spell Selector */}
+      {showNinthLevelSpellSelector && (
+        <NinthLevelSpellSelector
+          onSelectSpell={handleSelectNinthLevelSpell}
+          onClose={() => setShowNinthLevelSpellSelector(false)}
         />
       )}
 
