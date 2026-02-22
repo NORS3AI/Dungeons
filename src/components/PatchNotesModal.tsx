@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import patchNotesContent from '../../PATCH_NOTES.md?raw'
 
 interface PatchNotesModalProps {
   isOpen: boolean
@@ -6,24 +7,8 @@ interface PatchNotesModalProps {
 }
 
 export function PatchNotesModal({ isOpen, onClose }: PatchNotesModalProps) {
-  const [patchNotes, setPatchNotes] = useState<string>('')
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    if (isOpen) {
-      // Fetch patch notes
-      fetch('/PATCH_NOTES.md')
-        .then(res => res.text())
-        .then(text => {
-          setPatchNotes(text)
-          setIsLoading(false)
-        })
-        .catch(() => {
-          setPatchNotes('# Patch Notes\n\nUnable to load patch notes.')
-          setIsLoading(false)
-        })
-    }
-  }, [isOpen])
+  const [patchNotes] = useState<string>(patchNotesContent)
+  const isLoading = false
 
   if (!isOpen) return null
 
