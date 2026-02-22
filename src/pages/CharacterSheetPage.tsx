@@ -4,10 +4,25 @@ import { useCharacterStore } from '../stores/characterStore'
 import { DiceRoller, DiceRollerButton, DiceRollerModal } from '../components/DiceRoller'
 import { calculateModifier, calculateProficiencyBonus } from '../types/dice'
 import { isWeapon, isArmor, isShield, isCloak } from '../types/equipment'
-import type { Character, Ability, Equipment, Weapon, Armor, Shield, Cloak, Currency } from '../types'
+import type { Character, Ability, Equipment, Weapon, Armor, Shield, Cloak, Currency, Class } from '../types'
+import {
+  FIGHTER,
+  WARLOCK,
+  ROGUE,
+  WIZARD,
+  CLERIC,
+  BARBARIAN,
+  BARD,
+  DRUID,
+  MONK,
+  PALADIN,
+  RANGER,
+  SORCERER,
+} from '../types'
 import { CATEGORY_INFO, formatIncome, getProfessionByRoll, type Profession } from '../data/professions'
 import { exportCharacterToJSON, exportCharacterToPDF } from '../utils/characterIO'
 import { QuickRefTooltip } from '../components/QuickRefTooltip'
+import { SPELLS } from '../data/quickReference'
 import { CharacterEditModal } from '../components/CharacterEditModal'
 import { FightingStanceSelector } from '../components/FightingStanceSelector'
 import { LootCache } from '../components/LootCache'
@@ -32,31 +47,31 @@ type SkillKey = 'acrobatics' | 'animalHandling' | 'arcana' | 'athletics' | 'dece
   'history' | 'insight' | 'intimidation' | 'investigation' | 'medicine' | 'nature' |
   'perception' | 'performance' | 'persuasion' | 'religion' | 'sleightOfHand' | 'stealth' | 'survival'
 
-const SKILLS: { name: string; ability: Ability; key: SkillKey }[] = [
-  { name: 'Acrobatics', ability: 'dexterity', key: 'acrobatics' },
-  { name: 'Animal Handling', ability: 'wisdom', key: 'animalHandling' },
-  { name: 'Arcana', ability: 'intelligence', key: 'arcana' },
-  { name: 'Athletics', ability: 'strength', key: 'athletics' },
-  { name: 'Deception', ability: 'charisma', key: 'deception' },
-  { name: 'History', ability: 'intelligence', key: 'history' },
-  { name: 'Insight', ability: 'wisdom', key: 'insight' },
-  { name: 'Intimidation', ability: 'charisma', key: 'intimidation' },
-  { name: 'Investigation', ability: 'intelligence', key: 'investigation' },
-  { name: 'Medicine', ability: 'wisdom', key: 'medicine' },
-  { name: 'Nature', ability: 'intelligence', key: 'nature' },
-  { name: 'Perception', ability: 'wisdom', key: 'perception' },
-  { name: 'Performance', ability: 'charisma', key: 'performance' },
-  { name: 'Persuasion', ability: 'charisma', key: 'persuasion' },
-  { name: 'Religion', ability: 'intelligence', key: 'religion' },
-  { name: 'Sleight of Hand', ability: 'dexterity', key: 'sleightOfHand' },
-  { name: 'Stealth', ability: 'dexterity', key: 'stealth' },
-  { name: 'Survival', ability: 'wisdom', key: 'survival' },
+const SKILLS: { name: string; ability: Ability; key: SkillKey; refId: string }[] = [
+  { name: 'Acrobatics', ability: 'dexterity', key: 'acrobatics', refId: 'acrobatics' },
+  { name: 'Animal Handling', ability: 'wisdom', key: 'animalHandling', refId: 'animal-handling' },
+  { name: 'Arcana', ability: 'intelligence', key: 'arcana', refId: 'arcana' },
+  { name: 'Athletics', ability: 'strength', key: 'athletics', refId: 'athletics' },
+  { name: 'Deception', ability: 'charisma', key: 'deception', refId: 'deception' },
+  { name: 'History', ability: 'intelligence', key: 'history', refId: 'history' },
+  { name: 'Insight', ability: 'wisdom', key: 'insight', refId: 'insight' },
+  { name: 'Intimidation', ability: 'charisma', key: 'intimidation', refId: 'intimidation' },
+  { name: 'Investigation', ability: 'intelligence', key: 'investigation', refId: 'investigation' },
+  { name: 'Medicine', ability: 'wisdom', key: 'medicine', refId: 'medicine' },
+  { name: 'Nature', ability: 'intelligence', key: 'nature', refId: 'nature' },
+  { name: 'Perception', ability: 'wisdom', key: 'perception', refId: 'perception' },
+  { name: 'Performance', ability: 'charisma', key: 'performance', refId: 'performance' },
+  { name: 'Persuasion', ability: 'charisma', key: 'persuasion', refId: 'persuasion' },
+  { name: 'Religion', ability: 'intelligence', key: 'religion', refId: 'religion' },
+  { name: 'Sleight of Hand', ability: 'dexterity', key: 'sleightOfHand', refId: 'sleight-of-hand' },
+  { name: 'Stealth', ability: 'dexterity', key: 'stealth', refId: 'stealth' },
+  { name: 'Survival', ability: 'wisdom', key: 'survival', refId: 'survival' },
 ]
 
 export function CharacterSheetPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, changeEquipmentQuantity, setFightingStance, addEquipment, updateHitPoints, addSpell, useItemCharge, saveCharacter } = useCharacterStore()
+  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, changeEquipmentQuantity, setFightingStance, addEquipment, updateHitPoints, addSpell, removeSpell, useItemCharge, saveCharacter } = useCharacterStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
   const [activeTab, setActiveTab] = useState<'main' | 'spells' | 'inventory' | 'features' | 'loot'>('main')
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
@@ -69,6 +84,12 @@ export function CharacterSheetPage() {
   const [editingLootItem, setEditingLootItem] = useState<LootItem | null>(null)
   const [levelingUpTo, setLevelingUpTo] = useState<number | null>(null)
   const [isExportingPDF, setIsExportingPDF] = useState(false)
+  const [showClassChangeModal, setShowClassChangeModal] = useState(false)
+  const [showSpellScrollModal, setShowSpellScrollModal] = useState(false)
+  const [spellScrollLevel, setSpellScrollLevel] = useState<number | null>(null)
+  const [consumableItemToRemove, setConsumableItemToRemove] = useState<string | null>(null)
+  const [showConsumableNotification, setShowConsumableNotification] = useState<{ message: string; type: 'success' | 'info' } | null>(null)
+  const [showManualSpellAdd, setShowManualSpellAdd] = useState(false)
 
   useEffect(() => {
     if (id) {
@@ -251,6 +272,129 @@ export function CharacterSheetPage() {
     addSpell(spell)
     saveCharacter()
     setShowNinthLevelSpellSelector(false)
+  }
+
+  const handleUseConsumable = (item: Equipment) => {
+    // Tome of Reincarnation - class change
+    if (item.id === 'tome-class-change') {
+      setConsumableItemToRemove(item.id)
+      setShowClassChangeModal(true)
+      return
+    }
+
+    // Spell Scrolls - learn a spell
+    if (item.name.toLowerCase().includes('spell scroll')) {
+      const levelMatch = item.name.match(/\((\d+)(?:st|nd|rd|th) Level\)/i)
+      if (levelMatch) {
+        const level = parseInt(levelMatch[1])
+        setSpellScrollLevel(level)
+        setConsumableItemToRemove(item.id)
+        setShowSpellScrollModal(true)
+      }
+      return
+    }
+
+    // Currency items - add gold
+    if (item.name.toLowerCase().includes('hoard') ||
+        item.name.toLowerCase().includes('fortune') ||
+        item.name.toLowerCase().includes('treasure') ||
+        item.category === 'treasure') {
+      const goldValue = item.cost.gold || 0
+      if (goldValue > 0) {
+        updateCurrency({ gold: character.currency.gold + goldValue })
+        removeEquipment(item.id)
+        saveCharacter()
+        setShowConsumableNotification({
+          message: `Added ${goldValue} gold to your purse!`,
+          type: 'success'
+        })
+        setTimeout(() => setShowConsumableNotification(null), 3000)
+      }
+      return
+    }
+
+    // Weapon/Armor bonus items
+    if (item.name.toLowerCase().includes('weapon +') || item.name.toLowerCase().includes('armor +')) {
+      const bonusMatch = item.name.match(/\+(\d+)/)
+      if (bonusMatch) {
+        const bonus = parseInt(bonusMatch[1])
+        const type = item.name.toLowerCase().includes('weapon') ? 'weapons' : 'armor'
+        removeEquipment(item.id)
+        saveCharacter()
+        setShowConsumableNotification({
+          message: `Applied +${bonus} permanent bonus to all ${type}!`,
+          type: 'success'
+        })
+        setTimeout(() => setShowConsumableNotification(null), 3000)
+      }
+      return
+    }
+  }
+
+  const handleClassChange = (newClass: Class) => {
+    if (!character) return
+
+    // Remove all current class spells and features
+    const updatedCharacter = {
+      ...character,
+      class: newClass,
+      level: 1,
+      knownSpells: [],
+      hitPoints: {
+        current: newClass.hitDie === 'd10' ? 10 :
+                 newClass.hitDie === 'd8' ? 8 :
+                 newClass.hitDie === 'd12' ? 12 :
+                 newClass.hitDie === 'd6' ? 6 : 8,
+        maximum: newClass.hitDie === 'd10' ? 10 :
+                 newClass.hitDie === 'd8' ? 8 :
+                 newClass.hitDie === 'd12' ? 12 :
+                 newClass.hitDie === 'd6' ? 6 : 8,
+        temporary: 0
+      }
+    }
+
+    // Apply new class saving throws
+    const savingThrows = { ...character.savingThrows }
+    Object.keys(savingThrows).forEach(key => {
+      savingThrows[key as keyof typeof savingThrows] = false
+    })
+    newClass.savingThrows.forEach((ability) => {
+      savingThrows[ability] = true
+    })
+    updatedCharacter.savingThrows = savingThrows
+
+    // Remove the tome from inventory
+    if (consumableItemToRemove) {
+      removeEquipment(consumableItemToRemove)
+    }
+
+    // Update character with new class
+    useCharacterStore.setState({ currentCharacter: updatedCharacter })
+    saveCharacter()
+
+    setShowClassChangeModal(false)
+    setConsumableItemToRemove(null)
+    setShowConsumableNotification({
+      message: `Reincarnated as a level 1 ${newClass.name}!`,
+      type: 'success'
+    })
+    setTimeout(() => setShowConsumableNotification(null), 3000)
+  }
+
+  const handleSpellScrollUse = (spell: Spell) => {
+    addSpell(spell)
+    if (consumableItemToRemove) {
+      removeEquipment(consumableItemToRemove)
+    }
+    saveCharacter()
+    setShowSpellScrollModal(false)
+    setConsumableItemToRemove(null)
+    setSpellScrollLevel(null)
+    setShowConsumableNotification({
+      message: `Learned ${spell.name} from the spell scroll!`,
+      type: 'success'
+    })
+    setTimeout(() => setShowConsumableNotification(null), 3000)
   }
 
   const tabs = [
@@ -489,9 +633,11 @@ export function CharacterSheetPage() {
                       <span className={`w-2 h-2 rounded-full ${
                         isSkillProficient(skill.key) ? 'bg-dnd-gold' : 'bg-gray-600'
                       }`} />
-                      <span className="text-gray-300 text-sm hover:text-dnd-gold">
-                        {skill.name}
-                      </span>
+                      <QuickRefTooltip type="skill" id={skill.refId}>
+                        <span className="text-gray-300 text-sm">
+                          {skill.name}
+                        </span>
+                      </QuickRefTooltip>
                       <span className="text-xs text-gray-600">({ABILITY_NAMES[skill.ability]})</span>
                     </div>
                     <span className="text-white font-medium">{formatMod(getSkillMod(skill))}</span>
@@ -560,6 +706,18 @@ export function CharacterSheetPage() {
 
       {activeTab === 'spells' && (
         <div className="space-y-6">
+          {/* Add Spell Button */}
+          <div className="flex justify-end">
+            <button
+              onClick={() => setShowManualSpellAdd(true)}
+              className="px-4 py-2 bg-purple-700 hover:bg-purple-600 text-white font-semibold rounded-lg transition-colors flex items-center gap-2"
+              title="Add spell from shop or other source"
+            >
+              <span className="text-lg font-bold">+</span>
+              Add Spell
+            </button>
+          </div>
+
           {character.knownSpells.length === 0 ? (
             <div className="card bg-gray-800 border-gray-700 p-8 text-center">
               <p className="text-gray-400">No spells known.</p>
@@ -574,12 +732,15 @@ export function CharacterSheetPage() {
                     {character.knownSpells
                       .filter((s) => s.level === 0)
                       .map((spell) => (
-                        <QuickRefTooltip key={spell.id} type="spell" id={spell.id}>
-                          <div className="p-3 bg-gray-900 rounded-lg border border-gray-700 hover:border-purple-500/50 cursor-pointer transition-all">
-                            <div className="font-medium text-purple-400 hover:text-purple-300">{spell.name}</div>
-                            <div className="text-xs text-gray-500">{spell.school} cantrip</div>
-                          </div>
-                        </QuickRefTooltip>
+                        <div key={spell.id} className="p-3 bg-gray-900 rounded-lg border border-gray-700 hover:border-purple-500/50 transition-all flex items-center justify-between group">
+                          <QuickRefTooltip type="spell" id={spell.id}>
+                            <div className="cursor-pointer flex-1">
+                              <div className="font-medium text-purple-400 hover:text-purple-300">{spell.name}</div>
+                              <div className="text-xs text-gray-500">{spell.school} cantrip</div>
+                            </div>
+                          </QuickRefTooltip>
+                          <TrashIcon onClick={() => { removeSpell(spell.id); saveCharacter(); }} />
+                        </div>
                       ))}
                   </div>
                 </div>
@@ -594,14 +755,17 @@ export function CharacterSheetPage() {
                     <h3 className="text-lg font-bold text-white mb-4">Level {level} Spells</h3>
                     <div className="grid md:grid-cols-2 gap-3">
                       {spellsAtLevel.map((spell) => (
-                        <QuickRefTooltip key={spell.id} type="spell" id={spell.id}>
-                          <div className="p-3 bg-gray-900 rounded-lg border border-gray-700 hover:border-purple-500/50 cursor-pointer transition-all">
-                            <div className="font-medium text-purple-400 hover:text-purple-300">{spell.name}</div>
-                            <div className="text-xs text-gray-500">
-                              {spell.school} | {spell.castingTime.amount} {spell.castingTime.unit}
+                        <div key={spell.id} className="p-3 bg-gray-900 rounded-lg border border-gray-700 hover:border-purple-500/50 transition-all flex items-center justify-between group">
+                          <QuickRefTooltip type="spell" id={spell.id}>
+                            <div className="cursor-pointer flex-1">
+                              <div className="font-medium text-purple-400 hover:text-purple-300">{spell.name}</div>
+                              <div className="text-xs text-gray-500">
+                                {spell.school} | {spell.castingTime.amount} {spell.castingTime.unit}
+                              </div>
                             </div>
-                          </div>
-                        </QuickRefTooltip>
+                          </QuickRefTooltip>
+                          <TrashIcon onClick={() => { removeSpell(spell.id); saveCharacter(); }} />
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -759,6 +923,7 @@ export function CharacterSheetPage() {
                       changeEquipmentQuantity(item.id, change)
                       saveCharacter()
                     }}
+                    onUse={() => handleUseConsumable(item)}
                   />
                 ))}
               </div>
@@ -920,6 +1085,65 @@ export function CharacterSheetPage() {
             setEditingLootItem(null)
           }}
         />
+      )}
+
+      {/* Class Change Modal */}
+      {showClassChangeModal && (
+        <ClassChangeModal
+          onSelectClass={handleClassChange}
+          onClose={() => {
+            setShowClassChangeModal(false)
+            setConsumableItemToRemove(null)
+          }}
+        />
+      )}
+
+      {/* Spell Scroll Modal */}
+      {showSpellScrollModal && spellScrollLevel !== null && (
+        <SpellScrollModal
+          level={spellScrollLevel}
+          onSelectSpell={handleSpellScrollUse}
+          onClose={() => {
+            setShowSpellScrollModal(false)
+            setSpellScrollLevel(null)
+            setConsumableItemToRemove(null)
+          }}
+        />
+      )}
+
+      {/* Manual Spell Adder Modal */}
+      {showManualSpellAdd && (
+        <ManualSpellAdderModal
+          onSelectSpell={(spell) => {
+            addSpell(spell)
+            saveCharacter()
+            setShowManualSpellAdd(false)
+            setShowConsumableNotification({
+              message: `Learned spell: ${spell.name}`,
+              type: 'success'
+            })
+            setTimeout(() => setShowConsumableNotification(null), 3000)
+          }}
+          onClose={() => setShowManualSpellAdd(false)}
+        />
+      )}
+
+      {/* Consumable Notification */}
+      {showConsumableNotification && (
+        <div className="fixed bottom-4 right-4 z-50 animate-fade-in">
+          <div className={`px-6 py-3 rounded-lg shadow-lg border-2 ${
+            showConsumableNotification.type === 'success'
+              ? 'bg-green-900/90 border-green-500 text-green-100'
+              : 'bg-blue-900/90 border-blue-500 text-blue-100'
+          }`}>
+            <div className="flex items-center gap-2">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              <span className="font-medium">{showConsumableNotification.message}</span>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
@@ -1248,7 +1472,7 @@ function EquippedGearSection({
 }
 
 // Equipment item component
-function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuantity }: { item: Equipment; character: Character; onRemove: () => void; onToggleEquip: () => void; onChangeQuantity: (change: number) => void }) {
+function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuantity, onUse }: { item: Equipment; character: Character; onRemove: () => void; onToggleEquip: () => void; onChangeQuantity: (change: number) => void; onUse: () => void }) {
   const getAbilityMod = (ability: Ability): number => {
     return calculateModifier(character.abilityScores[ability])
   }
@@ -1451,6 +1675,12 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
   }
 
   // Generic equipment (trinkets, treasures, adventuring gear, etc.)
+  const isConsumable = item.category === 'consumable' || item.category === 'treasure' ||
+                       item.name.toLowerCase().includes('spell scroll') ||
+                       item.id === 'tome-class-change' ||
+                       item.name.toLowerCase().includes('hoard') ||
+                       item.name.toLowerCase().includes('fortune')
+
   return (
     <div className={`p-3 rounded-lg flex items-center justify-between group ${
       isEquipped ? 'bg-yellow-900/30 border border-yellow-600/50' : 'bg-gray-900'
@@ -1461,6 +1691,7 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
           <div className="flex items-center gap-2">
             <span className="font-medium text-white">{item.name}</span>
             {isEquipped && <span className="text-xs text-yellow-400 bg-yellow-900/50 px-1.5 py-0.5 rounded">Equipped</span>}
+            {isConsumable && <span className="text-xs text-green-400 bg-green-900/50 px-1.5 py-0.5 rounded">Consumable</span>}
           </div>
           {item.quantity > 1 && (
             <span className="text-gray-500 ml-1">x{item.quantity}</span>
@@ -1489,6 +1720,17 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
             +
           </button>
         </div>
+        {isConsumable && (
+          <button
+            onClick={onUse}
+            className="p-1.5 text-green-400 hover:text-green-300 hover:bg-green-900/30 rounded transition-colors"
+            title="Use consumable"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          </button>
+        )}
         <TrashIcon onClick={onRemove} />
       </div>
     </div>
@@ -1748,6 +1990,385 @@ function DailyIncomeRoller({
               Collect {formatIncome(selectedProfession.dailyIncome)}
             </button>
           )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Class Change Modal
+function ClassChangeModal({
+  onSelectClass,
+  onClose,
+}: {
+  onSelectClass: (classData: Class) => void
+  onClose: () => void
+}) {
+  const [selectedClass, setSelectedClass] = useState<Class | null>(null)
+  const [showConfirmation, setShowConfirmation] = useState(false)
+
+  // All available classes
+  const allClasses = [
+    FIGHTER,
+    WARLOCK,
+    ROGUE,
+    WIZARD,
+    CLERIC,
+    BARBARIAN,
+    BARD,
+    DRUID,
+    MONK,
+    PALADIN,
+    RANGER,
+    SORCERER,
+  ]
+
+  const handleClassSelect = (classData: Class) => {
+    setSelectedClass(classData)
+    setShowConfirmation(true)
+  }
+
+  const handleConfirm = () => {
+    if (selectedClass) {
+      onSelectClass(selectedClass)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70">
+      <div className="bg-gray-900 border-2 border-dnd-gold rounded-xl max-w-6xl w-full max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-orange-600 to-red-600 p-6">
+          <h2 className="text-3xl font-bold text-white">Tome of Reincarnation</h2>
+          <p className="text-orange-100 mt-2">
+            Choose your new class. Warning: This will reset you to level 1 and remove all current spells and class features!
+          </p>
+        </div>
+
+        {/* Content */}
+        {!showConfirmation ? (
+          <div className="flex-1 overflow-y-auto p-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {allClasses.map((classData) => (
+                <button
+                  key={classData.id}
+                  onClick={() => handleClassSelect(classData)}
+                  className="p-4 bg-gray-800 border-2 border-gray-700 hover:border-dnd-gold rounded-lg text-left transition-all"
+                >
+                  <div className="font-bold text-dnd-gold text-lg mb-2">{classData.name}</div>
+                  <div className="text-sm text-gray-400 mb-2">{classData.description}</div>
+                  <div className="text-xs text-gray-500">
+                    Hit Die: {classData.hitDie} | Primary: {classData.primaryAbility.join(', ')}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="flex-1 overflow-y-auto p-6">
+            <div className="max-w-2xl mx-auto bg-gray-800 border-2 border-orange-500 rounded-lg p-6">
+              <h3 className="text-2xl font-bold text-orange-400 mb-4">Confirm Reincarnation</h3>
+              <p className="text-white mb-4">
+                You are about to reincarnate as a <span className="font-bold text-dnd-gold">{selectedClass?.name}</span>.
+              </p>
+              <div className="bg-red-900/30 border border-red-500 rounded-lg p-4 mb-6">
+                <h4 className="font-bold text-red-400 mb-2">Warning:</h4>
+                <ul className="text-sm text-red-300 space-y-1 list-disc list-inside">
+                  <li>Your character will be reset to level 1</li>
+                  <li>All current spells will be removed</li>
+                  <li>All class features will be removed</li>
+                  <li>Hit points will be recalculated for the new class</li>
+                  <li>This action cannot be undone</li>
+                </ul>
+              </div>
+              <div className="flex gap-4">
+                <button
+                  onClick={() => setShowConfirmation(false)}
+                  className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                >
+                  Go Back
+                </button>
+                <button
+                  onClick={handleConfirm}
+                  className="flex-1 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-bold"
+                >
+                  Confirm Reincarnation
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Footer */}
+        <div className="p-4 bg-gray-800 border-t border-gray-700 flex justify-end">
+          <button
+            onClick={onClose}
+            className="px-6 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Manual Spell Adder Modal - for adding spells from shops or other sources
+function ManualSpellAdderModal({
+  onSelectSpell,
+  onClose,
+}: {
+  onSelectSpell: (spell: Spell) => void
+  onClose: () => void
+}) {
+  const [selectedLevel, setSelectedLevel] = useState<number | null>(null)
+  const [selectedSpell, setSelectedSpell] = useState<Spell | null>(null)
+
+  // Get all available spells for the selected level
+  const availableSpells = selectedLevel !== null
+    ? Object.values(SPELLS as Record<string, any>)
+        .filter((spell: any) => spell.level === selectedLevel)
+        .map((spell: any) => ({
+          id: spell.id,
+          name: spell.name,
+          description: spell.description,
+          level: spell.level === 'cantrip' ? 0 : spell.level,
+          school: spell.school.toLowerCase(),
+          castingTime: {
+            amount: 1,
+            unit: 'action' as const,
+          },
+          range: {
+            type: 'ranged' as const,
+            distance: 60,
+          },
+          components: {
+            verbal: spell.components.includes('V'),
+            somatic: spell.components.includes('S'),
+            material: spell.components.includes('M'),
+          },
+          duration: {
+            type: 'instantaneous' as const,
+          },
+          ritual: false,
+          classes: spell.classes,
+        } as Spell))
+    : []
+
+  const handleConfirm = () => {
+    if (selectedSpell) {
+      onSelectSpell(selectedSpell)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70">
+      <div className="bg-gray-900 border-2 border-purple-600 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-6">
+          <h2 className="text-3xl font-bold text-white">Add Spell</h2>
+          <p className="text-purple-100 mt-2">
+            Select a spell level, then choose a spell to add to your character
+          </p>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-6">
+          {selectedLevel === null ? (
+            // Level Selection
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+              {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((level) => (
+                <button
+                  key={level}
+                  onClick={() => setSelectedLevel(level)}
+                  className="p-4 bg-gray-800 border-2 border-gray-700 rounded-lg hover:border-purple-500 hover:bg-gray-750 transition-all text-center"
+                >
+                  <div className="text-2xl font-bold text-white mb-1">
+                    {level === 0 ? 'C' : level}
+                  </div>
+                  <div className="text-xs text-gray-400">
+                    {level === 0 ? 'Cantrips' : `Level ${level}`}
+                  </div>
+                </button>
+              ))}
+            </div>
+          ) : (
+            // Spell Selection
+            <>
+              <button
+                onClick={() => {
+                  setSelectedLevel(null)
+                  setSelectedSpell(null)
+                }}
+                className="mb-4 px-4 py-2 bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-2"
+              >
+                ← Back to Level Selection
+              </button>
+              <div className="grid md:grid-cols-2 gap-3">
+                {availableSpells.map((spell) => {
+                  const isSelected = selectedSpell?.id === spell.id
+                  return (
+                    <button
+                      key={spell.id}
+                      onClick={() => setSelectedSpell(spell)}
+                      className={`p-4 rounded-lg border-2 text-left transition-all ${
+                        isSelected
+                          ? 'border-purple-500 bg-purple-900/30'
+                          : 'border-gray-700 bg-gray-800 hover:border-gray-600'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="font-bold text-white">{spell.name}</div>
+                        <span className="text-xs bg-purple-900 text-purple-300 px-2 py-1 rounded capitalize">
+                          {spell.school}
+                        </span>
+                      </div>
+                      <div className="text-sm text-gray-400">{spell.description}</div>
+                      {spell.classes && (
+                        <div className="text-xs text-gray-500 mt-2">
+                          Classes: {spell.classes.join(', ')}
+                        </div>
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="p-4 bg-gray-800 border-t border-gray-700 flex justify-end gap-3">
+          <button
+            onClick={onClose}
+            className="px-6 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+          >
+            Cancel
+          </button>
+          {selectedSpell && (
+            <button
+              onClick={handleConfirm}
+              className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-bold"
+            >
+              Add Spell
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Spell Scroll Modal
+function SpellScrollModal({
+  level,
+  onSelectSpell,
+  onClose,
+}: {
+  level: number
+  onSelectSpell: (spell: Spell) => void
+  onClose: () => void
+}) {
+  const [selectedSpell, setSelectedSpell] = useState<Spell | null>(null)
+
+  // Get all available spells from quickReference
+  const availableSpells = Object.values(SPELLS as Record<string, any>)
+    .filter((spell: any) => spell.level === level)
+    .map((spell: any) => ({
+      id: spell.id,
+      name: spell.name,
+      description: spell.description,
+      level: spell.level === 'cantrip' ? 0 : spell.level,
+      school: spell.school.toLowerCase(),
+      castingTime: {
+        amount: 1,
+        unit: 'action' as const,
+      },
+      range: {
+        type: 'ranged' as const,
+        distance: 60,
+      },
+      components: {
+        verbal: spell.components.includes('V'),
+        somatic: spell.components.includes('S'),
+        material: spell.components.includes('M'),
+      },
+      duration: {
+        type: 'instantaneous' as const,
+      },
+      ritual: false,
+      classes: spell.classes,
+    } as Spell))
+
+  const handleSpellSelect = (spell: Spell) => {
+    setSelectedSpell(spell)
+  }
+
+  const handleConfirm = () => {
+    if (selectedSpell) {
+      onSelectSpell(selectedSpell)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70">
+      <div className="bg-gray-900 border-2 border-purple-600 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-6">
+          <h2 className="text-3xl font-bold text-white">Spell Scroll - Level {level}</h2>
+          <p className="text-purple-100 mt-2">
+            Choose a spell to learn from this scroll. The scroll will be consumed.
+          </p>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-6">
+          <div className="grid md:grid-cols-2 gap-3">
+            {availableSpells.map((spell) => {
+              const isSelected = selectedSpell?.id === spell.id
+              return (
+                <button
+                  key={spell.id}
+                  onClick={() => handleSpellSelect(spell)}
+                  className={`p-4 rounded-lg border-2 text-left transition-all ${
+                    isSelected
+                      ? 'border-purple-500 bg-purple-900/30'
+                      : 'border-gray-700 bg-gray-800 hover:border-gray-600'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="font-bold text-white">{spell.name}</div>
+                    <span className="text-xs bg-purple-900 text-purple-300 px-2 py-1 rounded capitalize">
+                      {spell.school}
+                    </span>
+                  </div>
+                  <div className="text-sm text-gray-400">{spell.description}</div>
+                  {spell.classes && (
+                    <div className="text-xs text-gray-500 mt-2">
+                      Classes: {spell.classes.join(', ')}
+                    </div>
+                  )}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="p-4 bg-gray-800 border-t border-gray-700 flex justify-end gap-3">
+          <button
+            onClick={onClose}
+            className="px-6 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleConfirm}
+            disabled={!selectedSpell}
+            className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Learn Spell
+          </button>
         </div>
       </div>
     </div>
