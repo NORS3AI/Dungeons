@@ -9,6 +9,8 @@ import { CATEGORY_INFO, formatIncome, getProfessionByRoll, type Profession } fro
 import { exportCharacterToJSON, exportCharacterToPDF } from '../utils/characterIO'
 import { QuickRefTooltip } from '../components/QuickRefTooltip'
 import { CharacterEditModal } from '../components/CharacterEditModal'
+import { FightingStanceSelector } from '../components/FightingStanceSelector'
+import { FIGHTING_STANCES } from '../data/fightingStances'
 
 const ABILITY_NAMES: Record<Ability, string> = {
   strength: 'STR',
@@ -47,7 +49,7 @@ const SKILLS: { name: string; ability: Ability; key: SkillKey }[] = [
 export function CharacterSheetPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, saveCharacter } = useCharacterStore()
+  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, setFightingStance, saveCharacter } = useCharacterStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
   const [activeTab, setActiveTab] = useState<'main' | 'spells' | 'inventory' | 'features'>('main')
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
@@ -116,6 +118,14 @@ export function CharacterSheetPage() {
     )
     if (equippedShield && isShield(equippedShield)) {
       baseAC += equippedShield.acBonus
+    }
+
+    // Apply fighting stance modifier for Fighters
+    if (character.class?.name.toLowerCase().includes('fighter') && character.fightingStance) {
+      const stance = FIGHTING_STANCES[character.fightingStance]
+      if (stance) {
+        baseAC += stance.acModifier
+      }
     }
 
     return baseAC
@@ -355,6 +365,17 @@ export function CharacterSheetPage() {
                 </div>
               </div>
             </div>
+
+            {/* Fighting Stance (Fighter only) */}
+            {character.class?.name.toLowerCase().includes('fighter') && (
+              <FightingStanceSelector
+                currentStance={character.fightingStance}
+                onChange={(stance) => {
+                  setFightingStance(stance)
+                  saveCharacter()
+                }}
+              />
+            )}
 
             {/* Skills */}
             <div className="card bg-gray-800 border-gray-700 p-4">

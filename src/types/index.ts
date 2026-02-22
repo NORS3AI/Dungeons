@@ -9,6 +9,8 @@ export type {
   SpellSlots,
   FeatureCharge,
   Condition,
+  FightingStance,
+  FightingStanceInfo,
   Character,
 } from './character'
 

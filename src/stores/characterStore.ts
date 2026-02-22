@@ -11,6 +11,7 @@ import type {
   Currency,
   Spell,
   Condition,
+  FightingStance,
 } from '../types'
 import { DEFAULT_ABILITY_SCORES, EMPTY_CURRENCY } from '../types'
 
@@ -174,6 +175,7 @@ interface CharacterState {
   toggleEquipment: (itemId: string) => void
   updateCurrency: (currency: Partial<Currency>) => void
   setDailyIncome: (professionName: string, amount: number, currency: 'copper' | 'silver' | 'gold') => void
+  setFightingStance: (stance: FightingStance) => void
 
   // Combat/Session updates
   updateHitPoints: (hp: Partial<Character['hitPoints']>) => void
@@ -482,6 +484,19 @@ export const useCharacterStore = create<CharacterState>()(
             currentCharacter: {
               ...currentCharacter,
               dailyIncome: { professionName, amount, currency },
+            },
+            history: addToHistory(history, currentCharacter),
+          })
+        },
+
+        setFightingStance: (stance: FightingStance) => {
+          const { currentCharacter, history } = get()
+          if (!currentCharacter) return
+
+          set({
+            currentCharacter: {
+              ...currentCharacter,
+              fightingStance: stance,
             },
             history: addToHistory(history, currentCharacter),
           })

@@ -131,6 +131,22 @@ export type Condition =
   | 'exhaustion6'
 
 /**
+ * Fighter fighting stance options (homebrew)
+ */
+export type FightingStance = 'two-handed' | 'dual-two-handed' | 'sword-and-board'
+
+/**
+ * Fighting stance configuration details
+ */
+export interface FightingStanceInfo {
+  id: FightingStance
+  name: string
+  description: string
+  damage: string
+  acModifier: number
+}
+
+/**
  * Complete D&D Character
  */
 export interface Character {
@@ -185,6 +201,9 @@ export interface Character {
     amount: number
     currency: 'copper' | 'silver' | 'gold'
   }
+
+  // Fighter-specific
+  fightingStance?: FightingStance
 
   // Meta
   createdAt: string
