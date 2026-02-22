@@ -60,6 +60,12 @@ export function EquipmentSelector({ characterClass, onSubmit, onBack }: Equipmen
     return armor
   }, [characterClass])
 
+  // Check if class can use shields
+  const canUseShields = useMemo(() => {
+    if (!characterClass) return true
+    return characterClass.armorProficiencies.includes('shields')
+  }, [characterClass])
+
   // Count selected weapons
   const selectedWeaponCount = selectedEquipment.filter(
     (e) => 'weaponType' in e && (e.weaponType === 'simple' || e.weaponType === 'martial')
@@ -277,14 +283,18 @@ export function EquipmentSelector({ characterClass, onSubmit, onBack }: Equipmen
         {activeTab === 'armor' && (
           <div>
             <div className="mb-4 flex justify-between items-center">
-              <span className="text-sm text-gray-400">Select up to {MAX_ARMOR} armor and {MAX_SHIELDS} shield</span>
+              <span className="text-sm text-gray-400">
+                Select up to {MAX_ARMOR} armor{canUseShields && ` and ${MAX_SHIELDS} shield`}
+              </span>
               <div className="flex gap-4">
                 <span className={`text-sm font-medium ${selectedArmorCount >= MAX_ARMOR ? 'text-green-400' : 'text-dnd-gold'}`}>
                   Armor: {selectedArmorCount} / {MAX_ARMOR}
                 </span>
-                <span className={`text-sm font-medium ${selectedShieldCount >= MAX_SHIELDS ? 'text-green-400' : 'text-dnd-gold'}`}>
-                  Shield: {selectedShieldCount} / {MAX_SHIELDS}
-                </span>
+                {canUseShields && (
+                  <span className={`text-sm font-medium ${selectedShieldCount >= MAX_SHIELDS ? 'text-green-400' : 'text-dnd-gold'}`}>
+                    Shield: {selectedShieldCount} / {MAX_SHIELDS}
+                  </span>
+                )}
               </div>
             </div>
             <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2">
