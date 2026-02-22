@@ -4657,6 +4657,15 @@ export const CONDITIONS: Record<string, ConditionRef> = {
       'Any attack that hits the creature is a critical hit if the attacker is within 5 feet.',
     ],
   },
+  'enraged': {
+    id: 'enraged',
+    name: 'Enraged',
+    effects: [
+      'An enraged creature deals +1 damage on all successful attacks.',
+      'The creature\'s AC is reduced by 1 due to reckless aggression.',
+      'The creature prioritizes offensive actions over defensive maneuvers.',
+    ],
+  },
 }
 
 // RACIAL/CLASS TRAITS DATA

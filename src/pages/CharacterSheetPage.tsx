@@ -9,6 +9,8 @@ import { CATEGORY_INFO, formatIncome, getProfessionByRoll, type Profession } fro
 import { exportCharacterToJSON, exportCharacterToPDF } from '../utils/characterIO'
 import { QuickRefTooltip } from '../components/QuickRefTooltip'
 import { CharacterEditModal } from '../components/CharacterEditModal'
+import { FightingStanceSelector } from '../components/FightingStanceSelector'
+import { FIGHTING_STANCES } from '../data/fightingStances'
 
 const ABILITY_NAMES: Record<Ability, string> = {
   strength: 'STR',
@@ -47,7 +49,7 @@ const SKILLS: { name: string; ability: Ability; key: SkillKey }[] = [
 export function CharacterSheetPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, saveCharacter } = useCharacterStore()
+  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, setFightingStance, saveCharacter } = useCharacterStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
   const [activeTab, setActiveTab] = useState<'main' | 'spells' | 'inventory' | 'features'>('main')
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
@@ -116,6 +118,19 @@ export function CharacterSheetPage() {
     )
     if (equippedShield && isShield(equippedShield)) {
       baseAC += equippedShield.acBonus
+    }
+
+    // Apply fighting stance modifier for Fighters
+    if (character.class?.name.toLowerCase().includes('fighter') && character.fightingStance) {
+      const stance = FIGHTING_STANCES[character.fightingStance]
+      if (stance) {
+        baseAC += stance.acModifier
+      }
+    }
+
+    // Apply enraged condition penalty
+    if (character.conditions.includes('enraged')) {
+      baseAC -= 1
     }
 
     return baseAC
@@ -325,7 +340,12 @@ export function CharacterSheetPage() {
               <div className="grid grid-cols-3 gap-4 mb-4">
                 <div className="bg-gray-900 rounded-lg p-3 text-center border border-gray-700">
                   <div className="text-xs text-gray-500 uppercase mb-1">AC</div>
-                  <div className="text-2xl font-bold text-white">{calculateAC()}</div>
+                  <div className="text-2xl font-bold text-white">
+                    {calculateAC()}
+                    {character.conditions.includes('enraged') && (
+                      <span className="text-xs text-orange-400 ml-1">(-1)</span>
+                    )}
+                  </div>
                 </div>
                 <div className="bg-gray-900 rounded-lg p-3 text-center border border-red-900/50">
                   <div className="text-xs text-gray-500 uppercase mb-1">HP</div>
@@ -355,6 +375,17 @@ export function CharacterSheetPage() {
                 </div>
               </div>
             </div>
+
+            {/* Fighting Stance (Fighter only) */}
+            {character.class?.name.toLowerCase().includes('fighter') && (
+              <FightingStanceSelector
+                currentStance={character.fightingStance}
+                onChange={(stance) => {
+                  setFightingStance(stance)
+                  saveCharacter()
+                }}
+              />
+            )}
 
             {/* Skills */}
             <div className="card bg-gray-800 border-gray-700 p-4">
@@ -770,6 +801,14 @@ function EquippedGearSection({
   }
   const profBonus = calculateProficiencyBonus(character.level)
 
+  const getConditionDamageBonus = (): number => {
+    let bonus = 0
+    if (character.conditions.includes('enraged')) {
+      bonus += 1
+    }
+    return bonus
+  }
+
   const hasEquippedGear = equippedWeapons.length > 0 || equippedArmor || equippedShield
 
   return (
@@ -795,7 +834,9 @@ function EquippedGearSection({
               ? getAbilityMod('dexterity')
               : getAbilityMod('strength')
             const attackBonus = attackMod + profBonus
+            const conditionDamageBonus = getConditionDamageBonus()
             const damageMod = attackMod
+            const totalDamageMod = damageMod + conditionDamageBonus
 
             return (
               <div key={weapon.id} className="p-3 bg-green-900/20 rounded-lg border border-green-600/50">
@@ -811,7 +852,10 @@ function EquippedGearSection({
                 <div className="font-semibold text-white">{weapon.name}</div>
                 <div className="text-sm text-gray-300">
                   <span className="text-dnd-gold">+{attackBonus}</span> to hit |{' '}
-                  <span className="text-red-400">{weapon.damage.dice}{damageMod >= 0 ? '+' : ''}{damageMod}</span> {weapon.damage.type}
+                  <span className="text-red-400">{weapon.damage.dice}{totalDamageMod >= 0 ? '+' : ''}{totalDamageMod}</span> {weapon.damage.type}
+                  {conditionDamageBonus > 0 && (
+                    <span className="text-orange-400 ml-1">(+{conditionDamageBonus} enraged)</span>
+                  )}
                 </div>
                 {weapon.properties.length > 0 && (
                   <div className="text-xs text-gray-500 mt-1">

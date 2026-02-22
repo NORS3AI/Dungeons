@@ -3,12 +3,14 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useCharacterStore } from '../stores/characterStore'
 import { exportCharacterToJSON, importCharacterFromJSON, exportAllCharactersToJSON } from '../utils/characterIO'
 import { ContentReferenceModal } from '../components/ContentReferenceModal'
+import { QuickDiceRoller, QuickDiceRollerButton } from '../components/QuickDiceRoller'
 
 export function HomePage() {
   const navigate = useNavigate()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [importError, setImportError] = useState<string | null>(null)
   const [showFullContent, setShowFullContent] = useState(false)
+  const [showDiceRoller, setShowDiceRoller] = useState(false)
   const [referenceModal, setReferenceModal] = useState<{ type: 'class' | 'race' | null; name: string | null }>({ type: null, name: null })
   const { characters, loadCharacter, deleteCharacter, importCharacter } = useCharacterStore()
 
@@ -441,6 +443,10 @@ export function HomePage() {
         type={referenceModal.type}
         name={referenceModal.name}
       />
+
+      {/* Quick Dice Roller */}
+      {showDiceRoller && <QuickDiceRoller onClose={() => setShowDiceRoller(false)} />}
+      <QuickDiceRollerButton onClick={() => setShowDiceRoller(true)} />
     </div>
   )
 }
