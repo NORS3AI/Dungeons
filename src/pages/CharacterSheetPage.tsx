@@ -57,7 +57,7 @@ const SKILLS: { name: string; ability: Ability; key: SkillKey }[] = [
 export function CharacterSheetPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, setFightingStance, addEquipment, updateHitPoints, addSpell, addCondition, removeCondition, saveCharacter } = useCharacterStore()
+  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, setFightingStance, addEquipment, updateHitPoints, addSpell, addCondition, removeCondition, useItemCharge, saveCharacter } = useCharacterStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
   const [activeTab, setActiveTab] = useState<'main' | 'spells' | 'inventory' | 'features' | 'loot'>('main')
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
@@ -630,6 +630,10 @@ export function CharacterSheetPage() {
               toggleEquipment(itemId)
               saveCharacter()
             }}
+            onUseCharge={(itemId) => {
+              useItemCharge(itemId)
+              saveCharacter()
+            }}
             calculateAC={calculateAC}
           />
 
@@ -942,11 +946,13 @@ function EquippedGearSection({
   equipment,
   character,
   onToggleEquip,
+  onUseCharge,
   calculateAC,
 }: {
   equipment: Equipment[]
   character: Character
   onToggleEquip: (itemId: string) => void
+  onUseCharge: (itemId: string) => void
   calculateAC: () => number
 }) {
   const equippedWeapons = equipment.filter((e) => isWeapon(e) && e.equipped) as Weapon[]
@@ -998,7 +1004,9 @@ function EquippedGearSection({
             return (
               <div key={weapon.id} className="p-3 bg-green-900/20 rounded-lg border border-green-600/50">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-green-400 uppercase font-medium">Weapon</span>
+                  <span className="text-xs text-green-400 uppercase font-medium">
+                    {weapon.charges ? '✨ Magical Weapon' : 'Weapon'}
+                  </span>
                   <button
                     onClick={() => onToggleEquip(weapon.id)}
                     className="text-xs text-gray-400 hover:text-red-400"
@@ -1014,6 +1022,40 @@ function EquippedGearSection({
                     <span className="text-orange-400 ml-1">(+{conditionDamageBonus} enraged)</span>
                   )}
                 </div>
+                {weapon.charges && (
+                  <div className="mt-2 p-2 bg-purple-900/30 border border-purple-600/50 rounded">
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm">
+                        <div className="font-medium text-purple-300">{weapon.charges.spellName}</div>
+                        <div className="text-xs text-purple-400">
+                          {weapon.charges.damageDice} {weapon.charges.damageType} damage
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-purple-300">
+                          {weapon.charges.currentCharges}/{weapon.charges.maxCharges}
+                        </div>
+                        <div className="text-xs text-purple-400">charges</div>
+                      </div>
+                    </div>
+                    {weapon.charges.currentCharges > 0 && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onUseCharge(weapon.id)
+                        }}
+                        className="mt-2 w-full px-2 py-1 bg-purple-600 hover:bg-purple-700 text-white text-xs rounded transition-all"
+                      >
+                        Use 1 Charge
+                      </button>
+                    )}
+                    {weapon.charges.rechargeRate && (
+                      <div className="text-xs text-gray-500 mt-1">
+                        Recharges: {weapon.charges.rechargeRate}
+                      </div>
+                    )}
+                  </div>
+                )}
                 {weapon.properties.length > 0 && (
                   <div className="text-xs text-gray-500 mt-1">
                     {weapon.properties.join(', ')}
