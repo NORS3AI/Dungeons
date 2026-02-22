@@ -128,6 +128,11 @@ export function CharacterSheetPage() {
       }
     }
 
+    // Apply enraged condition penalty
+    if (character.conditions.includes('enraged')) {
+      baseAC -= 1
+    }
+
     return baseAC
   }
 
@@ -335,7 +340,12 @@ export function CharacterSheetPage() {
               <div className="grid grid-cols-3 gap-4 mb-4">
                 <div className="bg-gray-900 rounded-lg p-3 text-center border border-gray-700">
                   <div className="text-xs text-gray-500 uppercase mb-1">AC</div>
-                  <div className="text-2xl font-bold text-white">{calculateAC()}</div>
+                  <div className="text-2xl font-bold text-white">
+                    {calculateAC()}
+                    {character.conditions.includes('enraged') && (
+                      <span className="text-xs text-orange-400 ml-1">(-1)</span>
+                    )}
+                  </div>
                 </div>
                 <div className="bg-gray-900 rounded-lg p-3 text-center border border-red-900/50">
                   <div className="text-xs text-gray-500 uppercase mb-1">HP</div>
@@ -791,6 +801,14 @@ function EquippedGearSection({
   }
   const profBonus = calculateProficiencyBonus(character.level)
 
+  const getConditionDamageBonus = (): number => {
+    let bonus = 0
+    if (character.conditions.includes('enraged')) {
+      bonus += 1
+    }
+    return bonus
+  }
+
   const hasEquippedGear = equippedWeapons.length > 0 || equippedArmor || equippedShield
 
   return (
@@ -816,7 +834,9 @@ function EquippedGearSection({
               ? getAbilityMod('dexterity')
               : getAbilityMod('strength')
             const attackBonus = attackMod + profBonus
+            const conditionDamageBonus = getConditionDamageBonus()
             const damageMod = attackMod
+            const totalDamageMod = damageMod + conditionDamageBonus
 
             return (
               <div key={weapon.id} className="p-3 bg-green-900/20 rounded-lg border border-green-600/50">
@@ -832,7 +852,10 @@ function EquippedGearSection({
                 <div className="font-semibold text-white">{weapon.name}</div>
                 <div className="text-sm text-gray-300">
                   <span className="text-dnd-gold">+{attackBonus}</span> to hit |{' '}
-                  <span className="text-red-400">{weapon.damage.dice}{damageMod >= 0 ? '+' : ''}{damageMod}</span> {weapon.damage.type}
+                  <span className="text-red-400">{weapon.damage.dice}{totalDamageMod >= 0 ? '+' : ''}{totalDamageMod}</span> {weapon.damage.type}
+                  {conditionDamageBonus > 0 && (
+                    <span className="text-orange-400 ml-1">(+{conditionDamageBonus} enraged)</span>
+                  )}
                 </div>
                 {weapon.properties.length > 0 && (
                   <div className="text-xs text-gray-500 mt-1">

@@ -123,6 +123,7 @@ export type Condition =
   | 'restrained'
   | 'stunned'
   | 'unconscious'
+  | 'enraged'
   | 'exhaustion1'
   | 'exhaustion2'
   | 'exhaustion3'
