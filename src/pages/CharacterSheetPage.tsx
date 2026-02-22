@@ -13,12 +13,11 @@ import { FightingStanceSelector } from '../components/FightingStanceSelector'
 import { LootCache } from '../components/LootCache'
 import { HPEditor, HPEditorButton } from '../components/HPEditor'
 import { LevelUpSpellSelector } from '../components/LevelUpSpellSelector'
-import { ConditionManager, ConditionManagerButton } from '../components/ConditionManager'
 import { NinthLevelSpellSelector } from '../components/NinthLevelSpellSelector'
 import { EquipmentEditor } from '../components/EquipmentEditor'
 import { FIGHTING_STANCES } from '../data/fightingStances'
 import type { LootItem } from '../data/lootGenerator'
-import type { Spell, Condition } from '../types'
+import type { Spell } from '../types'
 
 const ABILITY_NAMES: Record<Ability, string> = {
   strength: 'STR',
@@ -57,7 +56,7 @@ const SKILLS: { name: string; ability: Ability; key: SkillKey }[] = [
 export function CharacterSheetPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, setFightingStance, addEquipment, updateHitPoints, addSpell, addCondition, removeCondition, useItemCharge, saveCharacter } = useCharacterStore()
+  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, setFightingStance, addEquipment, updateHitPoints, addSpell, useItemCharge, saveCharacter } = useCharacterStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
   const [activeTab, setActiveTab] = useState<'main' | 'spells' | 'inventory' | 'features' | 'loot'>('main')
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
@@ -65,7 +64,6 @@ export function CharacterSheetPage() {
   const [showEditModal, setShowEditModal] = useState(false)
   const [showHPEditor, setShowHPEditor] = useState(false)
   const [showSpellSelector, setShowSpellSelector] = useState(false)
-  const [showConditionManager, setShowConditionManager] = useState(false)
   const [showNinthLevelSpellSelector, setShowNinthLevelSpellSelector] = useState(false)
   const [showEquipmentEditor, setShowEquipmentEditor] = useState(false)
   const [editingLootItem, setEditingLootItem] = useState<LootItem | null>(null)
@@ -241,16 +239,6 @@ export function CharacterSheetPage() {
     setLevelingUpTo(null)
   }
 
-  const handleAddCondition = (condition: Condition) => {
-    addCondition(condition)
-    saveCharacter()
-  }
-
-  const handleRemoveCondition = (condition: Condition) => {
-    removeCondition(condition)
-    saveCharacter()
-  }
-
   const handleSelectNinthLevelSpell = (spell: Spell) => {
     addSpell(spell)
     saveCharacter()
@@ -340,10 +328,6 @@ export function CharacterSheetPage() {
           >
             Edit Details
           </button>
-          <ConditionManagerButton
-            onClick={() => setShowConditionManager(true)}
-            activeCount={character.conditions.length}
-          />
         </div>
       </div>
 
@@ -877,16 +861,6 @@ export function CharacterSheetPage() {
         />
       )}
 
-      {/* Condition Manager */}
-      {showConditionManager && (
-        <ConditionManager
-          character={character}
-          onAddCondition={handleAddCondition}
-          onRemoveCondition={handleRemoveCondition}
-          onClose={() => setShowConditionManager(false)}
-        />
-      )}
-
       {/* Equipment Editor */}
       {showEquipmentEditor && editingLootItem && (
         <EquipmentEditor
@@ -958,6 +932,7 @@ function EquippedGearSection({
   const equippedWeapons = equipment.filter((e) => isWeapon(e) && e.equipped) as Weapon[]
   const equippedArmor = equipment.find((e) => isArmor(e) && e.equipped) as Armor | undefined
   const equippedShield = equipment.find((e) => isShield(e) && e.equipped) as Shield | undefined
+  const equippedGeneric = equipment.filter((e) => !isWeapon(e) && !isArmor(e) && !isShield(e) && e.equipped)
 
   const getAbilityMod = (ability: Ability): number => {
     return calculateModifier(character.abilityScores[ability])
@@ -972,7 +947,7 @@ function EquippedGearSection({
     return bonus
   }
 
-  const hasEquippedGear = equippedWeapons.length > 0 || equippedArmor || equippedShield
+  const hasEquippedGear = equippedWeapons.length > 0 || equippedArmor || equippedShield || equippedGeneric.length > 0
 
   return (
     <div className="card bg-gray-800 border-gray-700 p-4 border-l-4 border-l-dnd-gold">
@@ -1106,6 +1081,61 @@ function EquippedGearSection({
               </div>
             </div>
           )}
+
+          {/* Equipped Generic Items */}
+          {equippedGeneric.map((item) => (
+            <div key={item.id} className="p-3 bg-yellow-900/20 rounded-lg border border-yellow-600/50">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs text-yellow-400 uppercase font-medium capitalize">
+                  {item.charges ? '✨ Magical ' : ''}{item.category.replace(/([A-Z])/g, ' $1').trim()}
+                </span>
+                <button
+                  onClick={() => onToggleEquip(item.id)}
+                  className="text-xs text-gray-400 hover:text-red-400"
+                >
+                  Unequip
+                </button>
+              </div>
+              <div className="font-semibold text-white">{item.name}</div>
+              {item.description && (
+                <div className="text-sm text-gray-300 mt-1">{item.description}</div>
+              )}
+              {item.charges && (
+                <div className="mt-2 p-2 bg-purple-900/30 border border-purple-600/50 rounded">
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm">
+                      <div className="font-medium text-purple-300">{item.charges.spellName}</div>
+                      <div className="text-xs text-purple-400">
+                        {item.charges.damageDice} {item.charges.damageType} damage
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-lg font-bold text-purple-300">
+                        {item.charges.currentCharges}/{item.charges.maxCharges}
+                      </div>
+                      <div className="text-xs text-purple-400">charges</div>
+                    </div>
+                  </div>
+                  {item.charges.currentCharges > 0 && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onUseCharge(item.id)
+                      }}
+                      className="mt-2 w-full px-2 py-1 bg-purple-600 hover:bg-purple-700 text-white text-xs rounded transition-all"
+                    >
+                      Use 1 Charge
+                    </button>
+                  )}
+                  {item.charges.rechargeRate && (
+                    <div className="text-xs text-gray-500 mt-1">
+                      Recharges: {item.charges.rechargeRate}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       )}
     </div>
@@ -1118,7 +1148,7 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip }: { item: Equ
     return calculateModifier(character.abilityScores[ability])
   }
   const profBonus = calculateProficiencyBonus(character.level)
-  const canEquip = isWeapon(item) || isArmor(item) || isShield(item)
+  const canEquip = true // All items can be equipped
   const isEquipped = item.equipped
 
   if (isWeapon(item)) {
@@ -1219,17 +1249,29 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip }: { item: Equ
     )
   }
 
+  // Generic equipment (trinkets, treasures, adventuring gear, etc.)
   return (
-    <div className="p-3 bg-gray-900 rounded-lg flex items-center justify-between group">
-      <div>
-        <span className="font-medium text-white">{item.name}</span>
-        {item.quantity > 1 && (
-          <span className="text-gray-500 ml-1">x{item.quantity}</span>
-        )}
-        <div className="text-sm text-gray-400">{item.description}</div>
+    <div className={`p-3 rounded-lg flex items-center justify-between group ${
+      isEquipped ? 'bg-yellow-900/30 border border-yellow-600/50' : 'bg-gray-900'
+    }`}>
+      <div className="flex items-center gap-3">
+        <EquipToggle equipped={!!isEquipped} onToggle={onToggleEquip} canEquip={canEquip} />
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-white">{item.name}</span>
+            {isEquipped && <span className="text-xs text-yellow-400 bg-yellow-900/50 px-1.5 py-0.5 rounded">Equipped</span>}
+          </div>
+          {item.quantity > 1 && (
+            <span className="text-gray-500 ml-1">x{item.quantity}</span>
+          )}
+          <div className="text-sm text-gray-400">{item.description}</div>
+          <div className="text-xs text-gray-500 mt-1 capitalize">{item.category.replace(/([A-Z])/g, ' $1').trim()}</div>
+        </div>
       </div>
       <div className="flex items-center gap-3">
-        <div className="text-xs text-gray-500">{item.weight} lb</div>
+        <div className="text-right">
+          <div className="text-xs text-gray-500">{item.weight} lb</div>
+        </div>
         <TrashIcon onClick={onRemove} />
       </div>
     </div>

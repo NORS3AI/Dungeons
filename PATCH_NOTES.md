@@ -1,5 +1,35 @@
 # Dungeons - Patch Notes
 
+## Version 0.2.1 - February 22, 2026
+
+### 🎯 Major Changes
+
+#### **Condition Management Moved to DM Initiative Tracker**
+- **DM-Controlled Conditions**: Condition management has been moved from individual character sheets to the DM's initiative tracker
+- **Per-Combatant Conditions**: Each combatant in the initiative order can have conditions applied and removed during combat
+- **Condition Display**: Active conditions are shown as badges on each combatant's initiative row
+- **Condition Count Badge**: "Conditions" button shows number of active conditions
+- **Full Condition Manager**: DM can open the full condition manager for any combatant during encounters
+- **All Condition Types**: Supports injury, standard, combat, and exhaustion conditions
+- **Centralized Control**: DM has full control over all combatants' status effects from one location
+
+### 🛠️ Technical Improvements
+
+#### **Campaign Store Enhancements**
+- **conditions Array**: Added `conditions?: string[]` to InitiativeEntry type
+- **addCombatantCondition()**: Add conditions to combatants in initiative order
+- **removeCombatantCondition()**: Remove conditions from combatants in initiative order
+- **Persistent Tracking**: Conditions persist in campaign store with automatic save
+
+#### **UI/UX Improvements**
+- **Condition Badges**: Up to 3 conditions shown directly on initiative rows
+- **Overflow Indicator**: "+N" badge when more than 3 conditions are active
+- **Color-Coded Buttons**: Red-themed condition management buttons for easy identification
+- **Integrated Modal**: ConditionManager modal opens for selected combatant
+- **Character Sheet Cleanup**: Removed condition management from character sheets to reduce clutter
+
+---
+
 ## Version 0.2.0 - February 22, 2026
 
 ### 🆕 New Features

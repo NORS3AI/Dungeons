@@ -102,6 +102,7 @@ export interface InitiativeEntry {
   npcId?: string
   currentHP?: number
   maxHP?: number
+  conditions?: string[] // Condition IDs for combatant
 }
 
 /**
@@ -147,6 +148,8 @@ interface CampaignState {
   prevTurn: () => void
   resetCombat: () => void
   updateCombatantHP: (id: string, hp: number) => void
+  addCombatantCondition: (combatantId: string, condition: string) => void
+  removeCombatantCondition: (combatantId: string, condition: string) => void
 }
 
 /**
@@ -317,6 +320,34 @@ export const useCampaignStore = create<CampaignState>()(
             initiativeOrder: state.initiativeOrder.map((e) =>
               e.id === id ? { ...e, currentHP: hp } : e
             ),
+          }))
+        },
+
+        addCombatantCondition: (combatantId: string, condition: string) => {
+          set((state) => ({
+            initiativeOrder: state.initiativeOrder.map((e) => {
+              if (e.id === combatantId) {
+                const conditions = e.conditions || []
+                if (!conditions.includes(condition)) {
+                  return { ...e, conditions: [...conditions, condition] }
+                }
+              }
+              return e
+            }),
+          }))
+        },
+
+        removeCombatantCondition: (combatantId: string, condition: string) => {
+          set((state) => ({
+            initiativeOrder: state.initiativeOrder.map((e) => {
+              if (e.id === combatantId && e.conditions) {
+                return {
+                  ...e,
+                  conditions: e.conditions.filter((c) => c !== condition),
+                }
+              }
+              return e
+            }),
           }))
         },
       }),
