@@ -4,7 +4,7 @@ import { useCharacterStore } from '../stores/characterStore'
 import { DiceRoller, DiceRollerButton, DiceRollerModal } from '../components/DiceRoller'
 import { calculateModifier, calculateProficiencyBonus } from '../types/dice'
 import { isWeapon, isArmor, isShield } from '../types/equipment'
-import type { Character, Ability, Equipment, Weapon, Armor, Shield, Currency, GenericEquipment } from '../types'
+import type { Character, Ability, Equipment, Weapon, Armor, Shield, Currency } from '../types'
 import { CATEGORY_INFO, formatIncome, getProfessionByRoll, type Profession } from '../data/professions'
 import { exportCharacterToJSON, exportCharacterToPDF } from '../utils/characterIO'
 import { QuickRefTooltip } from '../components/QuickRefTooltip'
@@ -15,6 +15,7 @@ import { HPEditor, HPEditorButton } from '../components/HPEditor'
 import { LevelUpSpellSelector } from '../components/LevelUpSpellSelector'
 import { ConditionManager, ConditionManagerButton } from '../components/ConditionManager'
 import { NinthLevelSpellSelector } from '../components/NinthLevelSpellSelector'
+import { EquipmentEditor } from '../components/EquipmentEditor'
 import { FIGHTING_STANCES } from '../data/fightingStances'
 import type { LootItem } from '../data/lootGenerator'
 import type { Spell, Condition } from '../types'
@@ -66,6 +67,8 @@ export function CharacterSheetPage() {
   const [showSpellSelector, setShowSpellSelector] = useState(false)
   const [showConditionManager, setShowConditionManager] = useState(false)
   const [showNinthLevelSpellSelector, setShowNinthLevelSpellSelector] = useState(false)
+  const [showEquipmentEditor, setShowEquipmentEditor] = useState(false)
+  const [editingLootItem, setEditingLootItem] = useState<LootItem | null>(null)
   const [levelingUpTo, setLevelingUpTo] = useState<number | null>(null)
   const [isExportingPDF, setIsExportingPDF] = useState(false)
 
@@ -196,35 +199,16 @@ export function CharacterSheetPage() {
       return
     }
 
-    // Convert LootItem to Equipment (generic item)
-    // Map loot categories to GenericEquipment categories
-    let category: GenericEquipment['category'] = 'treasure'
-    if (lootItem.category === 'Consumable') category = 'consumable'
-    else if (lootItem.category === 'Gear' || lootItem.category === 'Ammunition') category = 'adventuringGear'
-    else if (lootItem.category === 'Weapon' || lootItem.category === 'Armor') category = 'trinket'
-    else category = 'treasure' // Wondrous, Currency, etc.
+    // Open equipment editor for all other items
+    setEditingLootItem(lootItem)
+    setShowEquipmentEditor(true)
+  }
 
-    // Convert gold value to Currency object
-    const cost: Currency = {
-      copper: 0,
-      silver: 0,
-      electrum: 0,
-      gold: lootItem.value,
-      platinum: 0,
-    }
-
-    const equipment: GenericEquipment = {
-      id: lootItem.id,
-      name: lootItem.name,
-      category: category,
-      description: lootItem.description,
-      weight: 0,
-      cost: cost,
-      equipped: false,
-      quantity: lootItem.quantity || 1,
-    }
+  const handleSaveEquipment = (equipment: Equipment) => {
     addEquipment(equipment)
     saveCharacter()
+    setShowEquipmentEditor(false)
+    setEditingLootItem(null)
   }
 
   const handleUpdateHP = (hp: Partial<Character['hitPoints']>) => {
@@ -896,6 +880,18 @@ export function CharacterSheetPage() {
           onAddCondition={handleAddCondition}
           onRemoveCondition={handleRemoveCondition}
           onClose={() => setShowConditionManager(false)}
+        />
+      )}
+
+      {/* Equipment Editor */}
+      {showEquipmentEditor && editingLootItem && (
+        <EquipmentEditor
+          lootItem={editingLootItem}
+          onSave={handleSaveEquipment}
+          onCancel={() => {
+            setShowEquipmentEditor(false)
+            setEditingLootItem(null)
+          }}
         />
       )}
     </div>
