@@ -224,18 +224,19 @@ export function CharacterSheetPage() {
   const handleLevelUp = () => {
     const newLevel = character.level + 1
 
+    // Level up the character
+    levelUp()
+
+    // Save immediately to persist the level change
+    saveCharacter()
+
     // Check if this is a spellcaster and if they gain spells
     const isSpellcaster = character.class?.spellcasting !== undefined
 
     if (isSpellcaster) {
       // Set the level they're leveling up to and show spell selector
       setLevelingUpTo(newLevel)
-      levelUp()
       setShowSpellSelector(true)
-    } else {
-      // Just level up normally
-      levelUp()
-      saveCharacter()
     }
   }
 
@@ -282,7 +283,10 @@ export function CharacterSheetPage() {
             Level Up
           </button>
           <button
-            onClick={() => levelDown()}
+            onClick={() => {
+              levelDown()
+              saveCharacter()
+            }}
             disabled={character.level <= 1}
             className="px-4 py-2 bg-red-700 hover:bg-red-600 text-white rounded-lg
                      transition-colors focus:outline-none focus:ring-2 focus:ring-red-500
