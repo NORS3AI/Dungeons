@@ -702,24 +702,41 @@ export function CharacterSheetPage() {
           <div className="card bg-gray-800 border-gray-700 p-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold text-white">Inventory</h3>
-              <button
-                onClick={() => {
-                  setEditingLootItem({
-                    id: 'custom-item',
-                    name: 'New Item',
-                    description: 'Add item description',
-                    value: 0,
-                    rarity: 'common',
-                    category: 'treasure',
-                  })
-                  setShowEquipmentEditor(true)
-                }}
-                className="px-4 py-2 bg-dnd-gold hover:bg-yellow-600 text-gray-900 font-semibold rounded-lg transition-colors flex items-center gap-2"
-                title="Add custom item to inventory"
-              >
-                <span className="text-lg font-bold">+</span>
-                Add Item
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    // Equip all items
+                    character.equipment.forEach((item) => {
+                      if (!item.equipped) {
+                        toggleEquipment(item.id)
+                      }
+                    })
+                    saveCharacter()
+                  }}
+                  className="px-4 py-2 bg-blue-700 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors flex items-center gap-2"
+                  title="Equip all items in inventory"
+                >
+                  ⚔️ Equip All
+                </button>
+                <button
+                  onClick={() => {
+                    setEditingLootItem({
+                      id: 'custom-item',
+                      name: 'New Item',
+                      description: 'Add item description',
+                      value: 0,
+                      rarity: 'common',
+                      category: 'treasure',
+                    })
+                    setShowEquipmentEditor(true)
+                  }}
+                  className="px-4 py-2 bg-dnd-gold hover:bg-yellow-600 text-gray-900 font-semibold rounded-lg transition-colors flex items-center gap-2"
+                  title="Add custom item to inventory"
+                >
+                  <span className="text-lg font-bold">+</span>
+                  Add Item
+                </button>
+              </div>
             </div>
             {character.equipment.length === 0 ? (
               <p className="text-gray-400 text-center py-4">No equipment.</p>

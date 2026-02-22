@@ -1,7 +1,20 @@
 /**
  * Loot rarity levels
  */
-export type LootRarity = 'common' | 'uncommon' | 'rare' | 'very-rare' | 'legendary'
+export type LootRarity = 'trash' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'artifact'
+
+/**
+ * Rarity color coding
+ */
+export const RARITY_COLORS: Record<LootRarity, { text: string; bg: string; border: string; glow: string }> = {
+  trash: { text: 'text-gray-500', bg: 'bg-gray-900', border: 'border-gray-700', glow: '' },
+  common: { text: 'text-white', bg: 'bg-gray-800', border: 'border-gray-600', glow: '' },
+  uncommon: { text: 'text-green-400', bg: 'bg-green-900/20', border: 'border-green-600', glow: 'shadow-green-500/20' },
+  rare: { text: 'text-blue-400', bg: 'bg-blue-900/20', border: 'border-blue-600', glow: 'shadow-blue-500/30' },
+  epic: { text: 'text-purple-400', bg: 'bg-purple-900/20', border: 'border-purple-600', glow: 'shadow-purple-500/40' },
+  legendary: { text: 'text-yellow-400', bg: 'bg-yellow-900/20', border: 'border-yellow-600', glow: 'shadow-yellow-500/50' },
+  artifact: { text: 'text-red-400', bg: 'bg-red-900/30', border: 'border-red-600', glow: 'shadow-red-500/60 shadow-2xl' },
+}
 
 /**
  * Generated loot item
@@ -89,6 +102,18 @@ const RACE_LOOT_PREFERENCES: Record<string, string[]> = {
 }
 
 /**
+ * Trash loot pool - worthless or nearly worthless items
+ */
+const TRASH_LOOT: LootItem[] = [
+  { id: 'trash-copper', name: 'Few Copper Coins', category: 'Currency', description: '1-5 copper pieces', rarity: 'trash', value: 0.03 },
+  { id: 'trash-stick', name: 'Broken Stick', category: 'Gear', description: 'A useless broken branch', rarity: 'trash', value: 0 },
+  { id: 'trash-rag', name: 'Dirty Rag', category: 'Gear', description: 'Torn and filthy cloth', rarity: 'trash', value: 0 },
+  { id: 'trash-pebble', name: 'Smooth Pebble', category: 'Trinket', description: 'A worthless stone', rarity: 'trash', value: 0 },
+  { id: 'trash-bone', name: 'Old Bone', category: 'Trinket', description: 'Gnawed animal bone', rarity: 'trash', value: 0 },
+  { id: 'trash-button', name: 'Tarnished Button', category: 'Trinket', description: 'Worthless button', rarity: 'trash', value: 0 },
+]
+
+/**
  * Common loot pool
  */
 const COMMON_LOOT: LootItem[] = [
@@ -129,15 +154,29 @@ const RARE_LOOT: LootItem[] = [
 ]
 
 /**
- * Very rare loot pool
+ * More Epic loot - moved from old very-rare tier
  */
-const VERY_RARE_LOOT: LootItem[] = [
-  { id: 'platinum-hoard', name: 'Platinum Hoard', category: 'Currency', description: '100-200 platinum pieces (1000-2000 gp)', rarity: 'very-rare', value: 1500 },
-  { id: 'spell-scroll-5', name: 'Spell Scroll (5th Level)', category: 'Consumable', description: 'Contains a 5th level spell', rarity: 'very-rare', value: 800 },
-  { id: 'weapon-plus-3', name: 'Weapon +3', category: 'Weapon', description: '+3 to attack and damage rolls', rarity: 'very-rare', value: 3000 },
-  { id: 'armor-plus-3', name: 'Armor +3', category: 'Armor', description: '+3 to AC', rarity: 'very-rare', value: 3500 },
-  { id: 'cloak-invisibility', name: 'Cloak of Invisibility', category: 'Wondrous', description: 'Become invisible at will', rarity: 'very-rare', value: 5000 },
-  { id: 'belt-giant-strength', name: 'Belt of Giant Strength', category: 'Wondrous', description: 'Set Strength to 23', rarity: 'very-rare', value: 4000 },
+const MORE_EPIC_LOOT: LootItem[] = [
+  { id: 'platinum-hoard', name: 'Platinum Hoard', category: 'Currency', description: '100-200 platinum pieces (1000-2000 gp)', rarity: 'epic', value: 1500 },
+  { id: 'spell-scroll-5', name: 'Spell Scroll (5th Level)', category: 'Consumable', description: 'Contains a 5th level spell', rarity: 'epic', value: 800 },
+  { id: 'weapon-plus-3', name: 'Weapon +3', category: 'Weapon', description: '+3 to attack and damage rolls', rarity: 'epic', value: 3000 },
+  { id: 'armor-plus-3', name: 'Armor +3', category: 'Armor', description: '+3 to AC', rarity: 'epic', value: 3500 },
+  { id: 'cloak-invisibility', name: 'Cloak of Invisibility', category: 'Wondrous', description: 'Become invisible at will', rarity: 'epic', value: 5000 },
+  { id: 'belt-giant-strength', name: 'Belt of Giant Strength', category: 'Wondrous', description: 'Set Strength to 23', rarity: 'epic', value: 4000 },
+]
+
+/**
+ * Epic loot pool - extremely powerful items
+ */
+const EPIC_LOOT: LootItem[] = [
+  { id: 'epic-fortune', name: 'Dragon\'s Fortune', category: 'Currency', description: '2000-5000 gold pieces', rarity: 'epic', value: 3500 },
+  { id: 'spell-scroll-7', name: 'Spell Scroll (7th Level)', category: 'Consumable', description: 'Contains a 7th level spell', rarity: 'epic', value: 2000 },
+  { id: 'dragonslayer-greatsword', name: 'Dragonslayer Greatsword', category: 'Weapon', description: '+3 greatsword, deals 3d6 extra damage to dragons', rarity: 'epic', value: 6000 },
+  { id: 'plate-ethereal', name: 'Ethereal Plate Armor', category: 'Armor', description: '+3 plate, can phase through objects once per day', rarity: 'epic', value: 7000 },
+  { id: 'shield-lion', name: 'Shield of the Lion', category: 'Shield', description: '+3 shield, grants immunity to fear and advantage on saves', rarity: 'epic', value: 5500 },
+  { id: 'ring-three-wishes', name: 'Ring of Three Wishes', category: 'Wondrous', description: 'Grants 3 wishes (weaker than spell)', rarity: 'epic', value: 8000 },
+  { id: 'boots-seven-leagues', name: 'Boots of Seven Leagues', category: 'Wondrous', description: 'Teleport up to 1 mile once per day', rarity: 'epic', value: 6500 },
+  { id: 'amulet-planes', name: 'Amulet of the Planes', category: 'Wondrous', description: 'Travel to other planes of existence', rarity: 'epic', value: 7500 },
 ]
 
 /**
@@ -153,6 +192,22 @@ const LEGENDARY_LOOT: LootItem[] = [
 ]
 
 /**
+ * Artifact loot pool - game-breaking items (0.5% chance)
+ */
+const ARTIFACT_LOOT: LootItem[] = [
+  { id: 'artifact-godslayer', name: 'Godslayer Blade', category: 'Weapon', description: '+5 weapon that can kill gods. Deals 6d12 extra radiant damage. Crits on 15-20. Grants immunity to death.', rarity: 'artifact', value: 100000 },
+  { id: 'artifact-immortal-plate', name: 'Armor of Immortality', category: 'Armor', description: '+5 plate armor that grants true immortality. Regenerate 50 HP per turn. Cannot be killed by any means.', rarity: 'artifact', value: 120000 },
+  { id: 'artifact-shield-cosmos', name: 'Shield of the Cosmos', category: 'Shield', description: '+5 shield that reflects all spells and attacks. Grants immunity to all damage types. Can absorb one Wish spell per day.', rarity: 'artifact', value: 110000 },
+  { id: 'artifact-crown-dominion', name: 'Crown of Absolute Dominion', category: 'Wondrous', description: 'Control the minds of any number of creatures. Cast Dominate Monster at will. Immunity to all mind effects.', rarity: 'artifact', value: 150000 },
+  { id: 'artifact-orb-omniscience', name: 'Orb of Omniscience', category: 'Wondrous', description: 'Know everything that has happened or will happen. Automatic success on all Knowledge checks. See invisible and through all illusions.', rarity: 'artifact', value: 140000 },
+  { id: 'artifact-boots-infinity', name: 'Boots of Infinite Speed', category: 'Wondrous', description: 'Move at the speed of light. Take 10 actions per turn. Cannot be hit by attacks or spells.', rarity: 'artifact', value: 130000 },
+  { id: 'artifact-ring-god', name: 'Ring of the God-King', category: 'Wondrous', description: 'Become a deity. All stats become 30. Cast any spell at will. Reshape reality once per day.', rarity: 'artifact', value: 200000 },
+  { id: 'artifact-tome-eternity', name: 'Tome of Eternity', category: 'Wondrous', description: 'Contains all knowledge in the universe. Learn any spell instantly. Gain proficiency in all skills. +10 to all stats.', rarity: 'artifact', value: 180000 },
+  { id: 'artifact-cloak-void', name: 'Cloak of the Void', category: 'Armor', description: 'Become intangible at will. Teleport anywhere in the multiverse. Erase enemies from existence with a touch.', rarity: 'artifact', value: 160000 },
+  { id: 'artifact-gauntlet-creation', name: 'Gauntlet of Creation', category: 'Wondrous', description: 'Create any object or creature from nothing. Reshape terrain at will. Grant or remove life force.', rarity: 'artifact', value: 170000 },
+]
+
+/**
  * Roll for loot rarity based on character level
  */
 export function rollLootRarity(characterLevel: number): LootRarity {
@@ -163,28 +218,28 @@ export function rollLootRarity(characterLevel: number): LootRarity {
     if (roll < 20) return 'common'
     if (roll < 40) return 'uncommon'
     if (roll < 65) return 'rare'
-    if (roll < 85) return 'very-rare'
+    if (roll < 85) return 'epic'
     return 'legendary'
   } else if (characterLevel >= 11) {
     // Mid-high level
     if (roll < 25) return 'common'
     if (roll < 50) return 'uncommon'
     if (roll < 80) return 'rare'
-    if (roll < 95) return 'very-rare'
+    if (roll < 95) return 'epic'
     return 'legendary'
   } else if (characterLevel >= 5) {
     // Mid level
     if (roll < 35) return 'common'
     if (roll < 70) return 'uncommon'
     if (roll < 90) return 'rare'
-    if (roll < 99) return 'very-rare'
+    if (roll < 99) return 'epic'
     return 'legendary'
   } else {
     // Low level
     if (roll < 60) return 'common'
     if (roll < 85) return 'uncommon'
     if (roll < 97) return 'rare'
-    if (roll < 99.5) return 'very-rare'
+    if (roll < 99.5) return 'epic'
     return 'legendary'
   }
 }
@@ -194,17 +249,42 @@ export function rollLootRarity(characterLevel: number): LootRarity {
  */
 function getLootPool(rarity: LootRarity): LootItem[] {
   switch (rarity) {
+    case 'trash':
+      return TRASH_LOOT
     case 'common':
       return COMMON_LOOT
     case 'uncommon':
       return UNCOMMON_LOOT
     case 'rare':
       return RARE_LOOT
-    case 'very-rare':
-      return VERY_RARE_LOOT
+    case 'epic':
+      return [...EPIC_LOOT, ...MORE_EPIC_LOOT]
     case 'legendary':
       return LEGENDARY_LOOT
+    case 'artifact':
+      return ARTIFACT_LOOT
+    default:
+      return COMMON_LOOT
   }
+}
+
+/**
+ * Generate legendary loot with specific rarity quantities
+ * For DM weekly session rewards
+ */
+export function generateLegendaryLoot(rarity: LootRarity, quantity: number): LootItem[] {
+  const pool = getLootPool(rarity)
+  const loot: LootItem[] = []
+
+  for (let i = 0; i < quantity; i++) {
+    const randomItem = pool[Math.floor(Math.random() * pool.length)]
+    loot.push({
+      ...randomItem,
+      id: `${randomItem.id}-${Date.now()}-${i}`,
+    })
+  }
+
+  return loot
 }
 
 /**

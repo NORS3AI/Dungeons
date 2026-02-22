@@ -49,10 +49,10 @@ export function NinthLevelSpellSelector({ onSelectSpell, onClose }: NinthLevelSp
         </div>
 
         {/* Content */}
-        <div className="grid grid-cols-2 gap-6 p-6 overflow-auto max-h-[calc(90vh-200px)]">
+        <div className="grid grid-cols-2 gap-6 p-6 max-h-[calc(90vh-200px)]">
           {/* Spell List */}
-          <div className="space-y-2">
-            <h3 className="text-xl font-semibold text-purple-400 mb-4 sticky top-0 bg-gray-900 py-2">
+          <div className="overflow-auto pr-2">
+            <h3 className="text-xl font-semibold text-purple-400 mb-4 sticky top-0 bg-gray-900 py-2 z-10">
               Available Spells ({ninthLevelSpells.length})
             </h3>
             <div className="space-y-2">
@@ -84,7 +84,7 @@ export function NinthLevelSpellSelector({ onSelectSpell, onClose }: NinthLevelSp
           </div>
 
           {/* Spell Details */}
-          <div className="bg-gray-800 border border-gray-700 rounded-lg p-6 sticky top-0 h-fit">
+          <div className="bg-gray-800 border border-gray-700 rounded-lg p-6 overflow-auto">
             {selectedSpell ? (
               <div className="space-y-4">
                 <div>

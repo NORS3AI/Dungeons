@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { generateLoot, getClassLootSuggestions, getRaceLootSuggestions, type LootItem, type LootRarity } from '../data/lootGenerator'
+import { generateLoot, generateLegendaryLoot, getClassLootSuggestions, getRaceLootSuggestions, RARITY_COLORS, type LootItem, type LootRarity } from '../data/lootGenerator'
 import type { Character } from '../types'
 
 interface LootCacheProps {
@@ -7,26 +7,12 @@ interface LootCacheProps {
   onAddToInventory?: (item: LootItem) => void
 }
 
-const RARITY_COLORS: Record<LootRarity, string> = {
-  common: 'text-gray-400 border-gray-600',
-  uncommon: 'text-green-400 border-green-600',
-  rare: 'text-blue-400 border-blue-600',
-  'very-rare': 'text-purple-400 border-purple-600',
-  legendary: 'text-orange-400 border-orange-600',
-}
-
-const RARITY_BG: Record<LootRarity, string> = {
-  common: 'bg-gray-900/50',
-  uncommon: 'bg-green-900/20',
-  rare: 'bg-blue-900/20',
-  'very-rare': 'bg-purple-900/20',
-  legendary: 'bg-orange-900/30',
-}
-
 export function LootCache({ character, onAddToInventory }: LootCacheProps) {
   const [generatedLoot, setGeneratedLoot] = useState<LootItem[]>([])
   const [lootCount, setLootCount] = useState(3)
   const [isGenerating, setIsGenerating] = useState(false)
+  const [legendaryLoot, setLegendaryLoot] = useState<LootItem[]>([])
+  const [isGeneratingLegendary, setIsGeneratingLegendary] = useState(false)
 
   const handleGenerateLoot = () => {
     setIsGenerating(true)
@@ -51,14 +37,179 @@ export function LootCache({ character, onAddToInventory }: LootCacheProps) {
     setGeneratedLoot((prev) => prev.filter((i) => i.id !== item.id))
   }
 
+  const handleAddLegendaryToInventory = (item: LootItem) => {
+    if (onAddToInventory) {
+      onAddToInventory(item)
+    }
+    // Remove from legendary loot
+    setLegendaryLoot((prev) => prev.filter((i) => i.id !== item.id))
+  }
+
+  const handleGenerateLegendaryLoot = (rarity: LootRarity, quantity: number) => {
+    setIsGeneratingLegendary(true)
+
+    setTimeout(() => {
+      const loot = generateLegendaryLoot(rarity, quantity)
+      setLegendaryLoot((prev) => [...prev, ...loot])
+      setIsGeneratingLegendary(false)
+    }, 500)
+  }
+
   const classSuggestions = getClassLootSuggestions(character.class?.name)
   const raceSuggestions = getRaceLootSuggestions(character.race?.name)
 
   return (
     <div className="space-y-6">
+      {/* Legendary Loot Generator (DM Only) */}
+      <div className="card bg-gradient-to-br from-purple-900/30 to-red-900/30 border-2 border-dnd-gold p-6">
+        <h2 className="text-3xl font-bold text-dnd-gold mb-2">✨ Legendary Loot Generator</h2>
+        <p className="text-gray-300 mb-4">
+          <strong>Weekly Session Rewards</strong> - Generate legendary items for special occasions.
+          Artifact items are extremely rare (0.5% chance) and game-breaking!
+        </p>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2 mb-4">
+          {/* Artifact - 10 items */}
+          <button
+            onClick={() => handleGenerateLegendaryLoot('artifact', 10)}
+            disabled={isGeneratingLegendary}
+            className={`p-3 rounded-lg border-2 ${RARITY_COLORS.artifact.border} ${RARITY_COLORS.artifact.bg} ${RARITY_COLORS.artifact.glow} transition-all hover:scale-105 disabled:opacity-50`}
+          >
+            <div className={`text-sm font-bold ${RARITY_COLORS.artifact.text}`}>ARTIFACT</div>
+            <div className="text-xs text-gray-400 mt-1">10 items</div>
+            <div className="text-xs text-gray-500">0.5% chance</div>
+          </button>
+
+          {/* Legendary - 5 items */}
+          <button
+            onClick={() => handleGenerateLegendaryLoot('legendary', 5)}
+            disabled={isGeneratingLegendary}
+            className={`p-3 rounded-lg border-2 ${RARITY_COLORS.legendary.border} ${RARITY_COLORS.legendary.bg} ${RARITY_COLORS.legendary.glow} transition-all hover:scale-105 disabled:opacity-50`}
+          >
+            <div className={`text-sm font-bold ${RARITY_COLORS.legendary.text}`}>LEGENDARY</div>
+            <div className="text-xs text-gray-400 mt-1">5 items</div>
+            <div className="text-xs text-gray-500">Very rare</div>
+          </button>
+
+          {/* Epic - 3 items */}
+          <button
+            onClick={() => handleGenerateLegendaryLoot('epic', 3)}
+            disabled={isGeneratingLegendary}
+            className={`p-3 rounded-lg border-2 ${RARITY_COLORS.epic.border} ${RARITY_COLORS.epic.bg} ${RARITY_COLORS.epic.glow} transition-all hover:scale-105 disabled:opacity-50`}
+          >
+            <div className={`text-sm font-bold ${RARITY_COLORS.epic.text}`}>EPIC</div>
+            <div className="text-xs text-gray-400 mt-1">3 items</div>
+            <div className="text-xs text-gray-500">Very rare</div>
+          </button>
+
+          {/* Rare - 1 item */}
+          <button
+            onClick={() => handleGenerateLegendaryLoot('rare', 1)}
+            disabled={isGeneratingLegendary}
+            className={`p-3 rounded-lg border-2 ${RARITY_COLORS.rare.border} ${RARITY_COLORS.rare.bg} ${RARITY_COLORS.rare.glow} transition-all hover:scale-105 disabled:opacity-50`}
+          >
+            <div className={`text-sm font-bold ${RARITY_COLORS.rare.text}`}>RARE</div>
+            <div className="text-xs text-gray-400 mt-1">1 item</div>
+            <div className="text-xs text-gray-500">Rare</div>
+          </button>
+
+          {/* Uncommon */}
+          <button
+            onClick={() => handleGenerateLegendaryLoot('uncommon', 1)}
+            disabled={isGeneratingLegendary}
+            className={`p-3 rounded-lg border-2 ${RARITY_COLORS.uncommon.border} ${RARITY_COLORS.uncommon.bg} ${RARITY_COLORS.uncommon.glow} transition-all hover:scale-105 disabled:opacity-50`}
+          >
+            <div className={`text-sm font-bold ${RARITY_COLORS.uncommon.text}`}>UNCOMMON</div>
+            <div className="text-xs text-gray-400 mt-1">1 item</div>
+            <div className="text-xs text-gray-500">Common</div>
+          </button>
+
+          {/* Common */}
+          <button
+            onClick={() => handleGenerateLegendaryLoot('common', 1)}
+            disabled={isGeneratingLegendary}
+            className={`p-3 rounded-lg border-2 ${RARITY_COLORS.common.border} ${RARITY_COLORS.common.bg} transition-all hover:scale-105 disabled:opacity-50`}
+          >
+            <div className={`text-sm font-bold ${RARITY_COLORS.common.text}`}>COMMON</div>
+            <div className="text-xs text-gray-400 mt-1">1 item</div>
+            <div className="text-xs text-gray-500">Common</div>
+          </button>
+
+          {/* Trash */}
+          <button
+            onClick={() => handleGenerateLegendaryLoot('trash', 1)}
+            disabled={isGeneratingLegendary}
+            className={`p-3 rounded-lg border-2 ${RARITY_COLORS.trash.border} ${RARITY_COLORS.trash.bg} transition-all hover:scale-105 disabled:opacity-50`}
+          >
+            <div className={`text-sm font-bold ${RARITY_COLORS.trash.text}`}>TRASH</div>
+            <div className="text-xs text-gray-400 mt-1">1 item</div>
+            <div className="text-xs text-gray-500">Worthless</div>
+          </button>
+        </div>
+
+        {isGeneratingLegendary && (
+          <div className="text-center text-dnd-gold animate-pulse">
+            ✨ Generating legendary loot...
+          </div>
+        )}
+      </div>
+
+      {/* Legendary Loot Display */}
+      {legendaryLoot.length > 0 && (
+        <div className="card bg-gray-800 border-2 border-dnd-gold p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-2xl font-bold text-dnd-gold">⚡ Legendary Loot</h3>
+            <button
+              onClick={() => setLegendaryLoot([])}
+              className="px-3 py-1 bg-red-700 hover:bg-red-600 text-white text-sm rounded transition-all"
+            >
+              Clear All
+            </button>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {legendaryLoot.map((item) => (
+              <div
+                key={item.id}
+                className={`p-4 rounded-lg border-2 ${RARITY_COLORS[item.rarity].border} ${RARITY_COLORS[item.rarity].bg} ${RARITY_COLORS[item.rarity].glow} transition-all hover:scale-105`}
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex-1">
+                    <div className={`font-bold ${RARITY_COLORS[item.rarity].text}`}>{item.name}</div>
+                    <div className={`text-xs uppercase font-bold mt-1 ${RARITY_COLORS[item.rarity].text}`}>
+                      {item.rarity}
+                    </div>
+                  </div>
+                  <span className="text-xs bg-gray-900 px-2 py-1 rounded text-gray-400">
+                    {item.category}
+                  </span>
+                </div>
+
+                <p className="text-sm text-gray-300 mb-3">{item.description}</p>
+
+                <div className="flex items-center justify-between">
+                  <div className="text-sm">
+                    <span className="text-yellow-500 font-medium">{item.value} gp</span>
+                    {item.quantity && (
+                      <span className="text-gray-400 ml-2">x{item.quantity}</span>
+                    )}
+                  </div>
+
+                  <button
+                    onClick={() => handleAddLegendaryToInventory(item)}
+                    className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded transition-all"
+                  >
+                    + Add
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Header and Info */}
       <div className="card bg-gray-800 border-gray-700 p-6">
-        <h2 className="text-2xl font-bold text-dnd-gold mb-4">Loot Cache</h2>
+        <h2 className="text-2xl font-bold text-dnd-gold mb-4">Standard Loot Cache</h2>
         <p className="text-gray-300 mb-4">
           Generate random loot appropriate for your character's level, class, and race.
           Higher levels increase chances of rare items.
@@ -147,42 +298,46 @@ export function LootCache({ character, onAddToInventory }: LootCacheProps) {
         <div className="card bg-gray-800 border-gray-700 p-6">
           <h3 className="text-xl font-bold text-white mb-4">Generated Loot</h3>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {generatedLoot.map((item) => (
-              <div
-                key={item.id}
-                className={`p-4 rounded-lg border-2 ${RARITY_BG[item.rarity]} ${RARITY_COLORS[item.rarity]} transition-all hover:scale-105`}
-              >
-                <div className="flex items-start justify-between mb-2">
-                  <div>
-                    <div className="font-semibold text-white">{item.name}</div>
-                    <div className="text-xs uppercase font-medium mt-1">
-                      {item.rarity}
+            {generatedLoot.map((item) => {
+              // Handle old rarities that don't exist in new system
+              const rarityColors = RARITY_COLORS[item.rarity] || RARITY_COLORS.common
+              return (
+                <div
+                  key={item.id}
+                  className={`p-4 rounded-lg border-2 ${rarityColors.border} ${rarityColors.bg} ${rarityColors.glow} transition-all hover:scale-105`}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <div className={`font-semibold ${rarityColors.text}`}>{item.name}</div>
+                      <div className={`text-xs uppercase font-medium mt-1 ${rarityColors.text}`}>
+                        {item.rarity}
+                      </div>
                     </div>
-                  </div>
-                  <span className="text-xs bg-gray-900 px-2 py-1 rounded text-gray-400">
-                    {item.category}
-                  </span>
-                </div>
-
-                <p className="text-sm text-gray-300 mb-3">{item.description}</p>
-
-                <div className="flex items-center justify-between">
-                  <div className="text-sm">
-                    <span className="text-yellow-500 font-medium">{item.value} gp</span>
-                    {item.quantity && (
-                      <span className="text-gray-400 ml-2">x{item.quantity}</span>
-                    )}
+                    <span className="text-xs bg-gray-900 px-2 py-1 rounded text-gray-400">
+                      {item.category}
+                    </span>
                   </div>
 
-                  <button
-                    onClick={() => handleAddToInventory(item)}
-                    className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-xs rounded transition-all"
-                  >
-                    + Add
-                  </button>
+                  <p className="text-sm text-gray-300 mb-3">{item.description}</p>
+
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm">
+                      <span className="text-yellow-500 font-medium">{item.value} gp</span>
+                      {item.quantity && (
+                        <span className="text-gray-400 ml-2">x{item.quantity}</span>
+                      )}
+                    </div>
+
+                    <button
+                      onClick={() => handleAddToInventory(item)}
+                      className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-xs rounded transition-all"
+                    >
+                      + Add
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
 
           <div className="mt-4 p-3 bg-blue-900/20 border border-blue-700/50 rounded text-sm text-blue-300">
