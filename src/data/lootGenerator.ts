@@ -161,7 +161,7 @@ const MORE_EPIC_LOOT: LootItem[] = [
   { id: 'spell-scroll-5', name: 'Spell Scroll (5th Level)', category: 'Consumable', description: 'Contains a 5th level spell', rarity: 'epic', value: 800 },
   { id: 'weapon-plus-3', name: 'Weapon +3', category: 'Weapon', description: '+3 to attack and damage rolls', rarity: 'epic', value: 3000 },
   { id: 'armor-plus-3', name: 'Armor +3', category: 'Armor', description: '+3 to AC', rarity: 'epic', value: 3500 },
-  { id: 'cloak-invisibility', name: 'Cloak of Invisibility', category: 'Wondrous', description: 'Become invisible at will', rarity: 'epic', value: 5000 },
+  { id: 'cloak-invisibility', name: 'Cloak of Invisibility', category: 'Cloak', description: 'Become invisible at will', rarity: 'epic', value: 5000 },
   { id: 'belt-giant-strength', name: 'Belt of Giant Strength', category: 'Wondrous', description: 'Set Strength to 23', rarity: 'epic', value: 4000 },
 ]
 
@@ -185,6 +185,7 @@ const EPIC_LOOT: LootItem[] = [
 const LEGENDARY_LOOT: LootItem[] = [
   { id: 'ancient-treasure', name: 'Ancient Treasure Hoard', category: 'Currency', description: '5000-10000 gold pieces', rarity: 'legendary', value: 7500 },
   { id: 'spell-scroll-9', name: 'Spell Scroll (9th Level)', category: 'Consumable', description: 'Contains a 9th level spell', rarity: 'legendary', value: 5000 },
+  { id: 'tome-class-change', name: 'Tome of Reincarnation', category: 'Consumable', description: 'Allows you to completely change your class. All old class features, spells, and abilities are lost and replaced with your new class.', rarity: 'legendary', value: 25000 },
   { id: 'holy-avenger', name: 'Holy Avenger', category: 'Weapon', description: '+3 longsword with divine powers', rarity: 'legendary', value: 10000 },
   { id: 'armor-invulnerability', name: 'Armor of Invulnerability', category: 'Armor', description: 'Resistance to nonmagical damage', rarity: 'legendary', value: 12000 },
   { id: 'vorpal-sword', name: 'Vorpal Sword', category: 'Weapon', description: 'Decapitates on critical hit', rarity: 'legendary', value: 15000 },
