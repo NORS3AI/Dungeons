@@ -1,5 +1,70 @@
 # Dungeons - Patch Notes
 
+## Version 0.2.3 - February 22, 2026
+
+### 💰 Currency System Overhaul
+
+#### **Removed Electrum (EP)**
+- **Simplified Currency**: Removed electrum pieces from the game entirely
+- **Four Denominations**: Now only copper, silver, gold, and platinum
+- **Updated UI**: Currency displays and editors no longer show electrum
+- **Cleaner System**: Easier for new players to understand
+
+#### **Auto-Conversion System**
+- **Automatic Upgrades**: Currency automatically converts to higher denominations
+- **Conversion Rates**: 100 copper = 1 silver, 100 silver = 1 gold, 100 gold = 1 platinum
+- **Smart Calculations**: When you get 150 gold, it becomes 1 platinum + 50 gold
+- **Always Applied**: Happens automatically on all currency updates
+- **No Manual Work**: Never need to manually exchange coins
+
+#### **Loot Generator Currency Limits**
+- **Legendary Loot**: Max 10 platinum pieces (down from 5000-10000 gp)
+- **Epic Loot**: Max 10 platinum pieces
+- **Rare/Uncommon/Common**: Max 75 gold pieces
+- **Trash Loot**: Max 75 copper pieces
+- **Balanced Rewards**: More reasonable treasure amounts for weekly sessions
+
+### 🐛 Bug Fixes
+
+#### **Fixed Patch Notes Loading**
+- **Issue**: Patch notes showed 404 HTML page instead of markdown content
+- **Solution**: Bundle PATCH_NOTES.md directly into the app using raw import
+- **Benefit**: Patch notes always available, no network errors
+- **Fast Loading**: Instant display, no fetching required
+
+#### **Fixed React Error #185 (Infinite Loop)**
+- **Issue**: LanguageSelector caused infinite render loop during character creation
+- **Error**: "Cannot update a component while rendering a different component"
+- **Root Cause**: `onChange` callback in useEffect dependency array
+- **Solution**: Removed `onChange` from dependencies, only fire on `selectedLanguages` change
+- **Result**: Character creation works smoothly without crashes
+
+#### **Fixed Spell Scroll Selector Scrolling**
+- **Issue**: 9th level spell scroll selector list was unscrollable
+- **Problem**: Parent container didn't have proper overflow settings
+- **Solution**: Added `overflow-hidden` to parent, changed child to `overflow-y-auto`
+- **Result**: Can now scroll through all 9th level spells when finding scrolls
+- **Also Fixed**: Applies to all spell level scroll selectors
+
+### 🛠️ Technical Improvements
+
+#### **Currency Type Updates**
+- **Currency Interface**: Removed `electrum` property from all Currency objects
+- **Type Safety**: TypeScript enforces new 4-denomination system
+- **Conversion Rates**: Updated CURRENCY_TO_COPPER with 100:1 ratios
+- **Helper Function**: New `autoConvertCurrency()` utility function
+
+#### **Files Updated**
+- `src/types/equipment.ts` - Currency interface and auto-conversion logic
+- `src/stores/characterStore.ts` - Integrated auto-conversion
+- `src/data/lootGenerator.ts` - Updated all currency loot limits
+- `src/pages/CharacterSheetPage.tsx` - Removed electrum from displays
+- `src/components/EquipmentEditor.tsx` - Removed electrum from editor
+- `src/components/NinthLevelSpellSelector.tsx` - Fixed scrolling
+- `src/components/LanguageSelector.tsx` - Fixed infinite loop
+
+---
+
 ## Version 0.2.2 - February 22, 2026
 
 ### 🆕 New Features
