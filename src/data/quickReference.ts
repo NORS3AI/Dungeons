@@ -4666,6 +4666,63 @@ export const CONDITIONS: Record<string, ConditionRef> = {
       'The creature prioritizes offensive actions over defensive maneuvers.',
     ],
   },
+  'bleeding-minor': {
+    id: 'bleeding-minor',
+    name: 'Bleeding (Minor)',
+    effects: [
+      'The creature takes 1 damage at the start of each of its turns.',
+      'A creature can use an action to staunch the bleeding with a DC 10 Wisdom (Medicine) check.',
+      'The bleeding stops if the creature receives magical healing.',
+    ],
+  },
+  'bleeding-moderate': {
+    id: 'bleeding-moderate',
+    name: 'Bleeding (Moderate)',
+    effects: [
+      'The creature takes 1d4 damage at the start of each of its turns.',
+      'A creature can use an action to staunch the bleeding with a DC 12 Wisdom (Medicine) check.',
+      'The bleeding stops if the creature receives magical healing.',
+    ],
+  },
+  'bleeding-severe': {
+    id: 'bleeding-severe',
+    name: 'Bleeding (Severe)',
+    effects: [
+      'The creature takes 1d6 damage at the start of each of its turns.',
+      'A creature can use an action to staunch the bleeding with a DC 15 Wisdom (Medicine) check.',
+      'The bleeding stops if the creature receives magical healing of 5 or more hit points.',
+    ],
+  },
+  'broken-bone': {
+    id: 'broken-bone',
+    name: 'Broken Bone',
+    effects: [
+      'The creature has disadvantage on all ability checks and attack rolls using the affected limb.',
+      'Movement speed is reduced by 10 feet if a leg is broken.',
+      'Cannot hold items with both hands if an arm is broken.',
+      'Requires medical treatment or magical healing to remove this condition.',
+    ],
+  },
+  'concussed': {
+    id: 'concussed',
+    name: 'Concussed',
+    effects: [
+      'The creature has disadvantage on Intelligence checks and concentration saves.',
+      'The creature cannot take reactions.',
+      'The creature has a -2 penalty to AC.',
+      'This condition ends after a short or long rest, or with magical healing.',
+    ],
+  },
+  'infected': {
+    id: 'infected',
+    name: 'Infected',
+    effects: [
+      'The creature\'s maximum hit points are reduced by 1d4 per day.',
+      'The creature has disadvantage on Constitution saving throws.',
+      'Requires medical treatment (DC 15 Medicine check) or magical healing to cure.',
+      'If maximum HP reaches 0, the creature dies.',
+    ],
+  },
 }
 
 // RACIAL/CLASS TRAITS DATA

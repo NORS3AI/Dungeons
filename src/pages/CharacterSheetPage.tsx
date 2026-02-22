@@ -13,9 +13,10 @@ import { FightingStanceSelector } from '../components/FightingStanceSelector'
 import { LootCache } from '../components/LootCache'
 import { HPEditor, HPEditorButton } from '../components/HPEditor'
 import { LevelUpSpellSelector } from '../components/LevelUpSpellSelector'
+import { ConditionManager, ConditionManagerButton } from '../components/ConditionManager'
 import { FIGHTING_STANCES } from '../data/fightingStances'
 import type { LootItem } from '../data/lootGenerator'
-import type { Spell } from '../types'
+import type { Spell, Condition } from '../types'
 
 const ABILITY_NAMES: Record<Ability, string> = {
   strength: 'STR',
@@ -54,7 +55,7 @@ const SKILLS: { name: string; ability: Ability; key: SkillKey }[] = [
 export function CharacterSheetPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, setFightingStance, addEquipment, updateHitPoints, addSpell, saveCharacter } = useCharacterStore()
+  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, setFightingStance, addEquipment, updateHitPoints, addSpell, addCondition, removeCondition, saveCharacter } = useCharacterStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
   const [activeTab, setActiveTab] = useState<'main' | 'spells' | 'inventory' | 'features' | 'loot'>('main')
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
@@ -62,6 +63,7 @@ export function CharacterSheetPage() {
   const [showEditModal, setShowEditModal] = useState(false)
   const [showHPEditor, setShowHPEditor] = useState(false)
   const [showSpellSelector, setShowSpellSelector] = useState(false)
+  const [showConditionManager, setShowConditionManager] = useState(false)
   const [levelingUpTo, setLevelingUpTo] = useState<number | null>(null)
   const [isExportingPDF, setIsExportingPDF] = useState(false)
 
@@ -246,6 +248,16 @@ export function CharacterSheetPage() {
     setLevelingUpTo(null)
   }
 
+  const handleAddCondition = (condition: Condition) => {
+    addCondition(condition)
+    saveCharacter()
+  }
+
+  const handleRemoveCondition = (condition: Condition) => {
+    removeCondition(condition)
+    saveCharacter()
+  }
+
   const tabs = [
     { id: 'main', label: 'Overview' },
     { id: 'spells', label: 'Spells' },
@@ -329,6 +341,10 @@ export function CharacterSheetPage() {
           >
             Edit Details
           </button>
+          <ConditionManagerButton
+            onClick={() => setShowConditionManager(true)}
+            activeCount={character.conditions.length}
+          />
         </div>
       </div>
 
@@ -847,6 +863,16 @@ export function CharacterSheetPage() {
             setLevelingUpTo(null)
             saveCharacter()
           }}
+        />
+      )}
+
+      {/* Condition Manager */}
+      {showConditionManager && (
+        <ConditionManager
+          character={character}
+          onAddCondition={handleAddCondition}
+          onRemoveCondition={handleRemoveCondition}
+          onClose={() => setShowConditionManager(false)}
         />
       )}
     </div>
