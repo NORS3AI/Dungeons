@@ -348,8 +348,62 @@ export const useCharacterStore = create<CharacterState>()(
           const { currentCharacter, history } = get()
           if (!currentCharacter) return
 
+          // Apply skill proficiencies from background
+          const updatedSkills = { ...currentCharacter.skills }
+          const skillMapping: Record<string, keyof typeof updatedSkills> = {
+            'athletics': 'athletics',
+            'acrobatics': 'acrobatics',
+            'sleight-of-hand': 'sleightOfHand',
+            'stealth': 'stealth',
+            'arcana': 'arcana',
+            'history': 'history',
+            'investigation': 'investigation',
+            'nature': 'nature',
+            'religion': 'religion',
+            'animal-handling': 'animalHandling',
+            'insight': 'insight',
+            'medicine': 'medicine',
+            'perception': 'perception',
+            'survival': 'survival',
+            'deception': 'deception',
+            'intimidation': 'intimidation',
+            'performance': 'performance',
+            'persuasion': 'persuasion',
+          }
+
+          background.skillProficiencies.forEach((skill) => {
+            const skillKey = skillMapping[skill]
+            if (skillKey && updatedSkills[skillKey] === 'none') {
+              updatedSkills[skillKey] = 'proficient'
+            }
+          })
+
+          // Add starting gold from background
+          const updatedCurrency = {
+            ...currentCharacter.currency,
+            gold: currentCharacter.currency.gold + background.startingGold,
+          }
+
+          // Convert starting equipment to Equipment items
+          const startingEquipment: Equipment[] = background.startingEquipment.map((item, idx) => ({
+            id: `${background.id}-equipment-${idx}`,
+            name: item,
+            description: `Starting equipment from ${background.name} background`,
+            category: 'adventuringGear' as const,
+            weight: 1,
+            cost: { copper: 0, silver: 0, electrum: 0, gold: 0, platinum: 0 },
+            quantity: 1,
+            equipped: false,
+          }))
+
           set({
-            currentCharacter: { ...currentCharacter, background },
+            currentCharacter: {
+              ...currentCharacter,
+              background,
+              skills: updatedSkills,
+              currency: updatedCurrency,
+              equipment: [...currentCharacter.equipment, ...startingEquipment],
+            },
             history: addToHistory(history, currentCharacter),
           })
         },
