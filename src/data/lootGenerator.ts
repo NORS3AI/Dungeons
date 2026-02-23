@@ -131,6 +131,11 @@ const COMMON_LOOT: LootItem[] = [
   { id: 'torch', name: 'Torches', category: 'Gear', description: 'Light source', rarity: 'common', value: 1, quantity: 10 },
   { id: 'arrows', name: 'Arrows', category: 'Ammunition', description: 'Standard arrows', rarity: 'common', value: 1, quantity: 20 },
   { id: 'bolts', name: 'Crossbow Bolts', category: 'Ammunition', description: 'Standard bolts', rarity: 'common', value: 1, quantity: 20 },
+  // Crafting Materials
+  { id: 'iron-ore', name: 'Iron Ore Clump', category: 'Crafting Material', description: 'Raw iron ore for blacksmithing', rarity: 'common', value: 5, quantity: 3 },
+  { id: 'copper-ore', name: 'Copper Ore Clump', category: 'Crafting Material', description: 'Raw copper ore for blacksmithing', rarity: 'common', value: 3, quantity: 3 },
+  { id: 'common-herb-lavender', name: 'Lavender', category: 'Crafting Material', description: 'Common herb for alchemy and healing salves', rarity: 'common', value: 2, quantity: 5 },
+  { id: 'common-herb-mint', name: 'Mint Leaves', category: 'Crafting Material', description: 'Common herb for alchemy and potions', rarity: 'common', value: 2, quantity: 5 },
 ]
 
 /**
@@ -145,6 +150,11 @@ const UNCOMMON_LOOT: LootItem[] = [
   { id: 'cloak-protection', name: 'Cloak of Protection', category: 'Armor', description: '+1 to AC and saving throws', rarity: 'uncommon', value: 250 },
   { id: 'bag-holding', name: 'Bag of Holding', category: 'Wondrous', description: 'Holds up to 500 lbs', rarity: 'uncommon', value: 400 },
   { id: 'boots-speed', name: 'Boots of Speed', category: 'Wondrous', description: 'Double movement speed for 1 minute', rarity: 'uncommon', value: 350 },
+  // Crafting Materials
+  { id: 'iron-ore-unc', name: 'Quality Iron Ore', category: 'Crafting Material', description: 'Higher quality iron ore for blacksmithing', rarity: 'uncommon', value: 10, quantity: 5 },
+  { id: 'copper-ore-unc', name: 'Quality Copper Ore', category: 'Crafting Material', description: 'Higher quality copper ore for blacksmithing', rarity: 'uncommon', value: 8, quantity: 5 },
+  { id: 'uncommon-herb-foxglove', name: 'Foxglove', category: 'Crafting Material', description: 'Uncommon herb for potent potions and antidotes', rarity: 'uncommon', value: 15, quantity: 3 },
+  { id: 'uncommon-herb-wolfsbane', name: 'Wolfsbane', category: 'Crafting Material', description: 'Uncommon herb for alchemy, effective against lycanthropes', rarity: 'uncommon', value: 18, quantity: 3 },
 ]
 
 /**
@@ -160,6 +170,11 @@ const RARE_LOOT: LootItem[] = [
   { id: 'armor-plus-2', name: 'Armor +2', category: 'Armor', description: '+2 to AC', rarity: 'rare', value: 1200 },
   { id: 'ring-protection', name: 'Ring of Protection', category: 'Wondrous', description: '+1 to AC and saving throws', rarity: 'rare', value: 800 },
   { id: 'wand-fireballs', name: 'Wand of Fireballs', category: 'Wondrous', description: '7 charges, cast fireball', rarity: 'rare', value: 1500 },
+  // Crafting Materials
+  { id: 'silver-ore', name: 'Silver Ore Clump', category: 'Crafting Material', description: 'Pure silver ore for fine jewelry and silver weapons', rarity: 'rare', value: 50, quantity: 3 },
+  { id: 'gold-ore', name: 'Gold Ore Clump', category: 'Crafting Material', description: 'Pure gold ore for jewelry and valuable items', rarity: 'rare', value: 100, quantity: 2 },
+  { id: 'rare-herb-mandrake', name: 'Mandrake Root', category: 'Crafting Material', description: 'Rare herb for powerful alchemical concoctions', rarity: 'rare', value: 75, quantity: 2 },
+  { id: 'rare-herb-bloodthorn', name: 'Bloodthorn', category: 'Crafting Material', description: 'Rare herb for healing potions and resurrection elixirs', rarity: 'rare', value: 80, quantity: 2 },
 ]
 
 /**
@@ -172,6 +187,11 @@ const MORE_EPIC_LOOT: LootItem[] = [
   { id: 'armor-plus-3', name: 'Armor +3', category: 'Armor', description: '+3 to AC', rarity: 'epic', value: 3500 },
   { id: 'cloak-invisibility', name: 'Cloak of Invisibility', category: 'Cloak', description: 'Become invisible at will', rarity: 'epic', value: 5000 },
   { id: 'belt-giant-strength', name: 'Belt of Giant Strength', category: 'Wondrous', description: 'Set Strength to 23', rarity: 'epic', value: 4000 },
+  // Crafting Materials
+  { id: 'mithril-ore', name: 'Mithril Ore Clump', category: 'Crafting Material', description: 'Legendary lightweight metal for superior armor and weapons', rarity: 'epic', value: 500, quantity: 2 },
+  { id: 'adamantite-ore', name: 'Adamantite Ore Clump', category: 'Crafting Material', description: 'Incredibly hard metal for indestructible equipment', rarity: 'epic', value: 600, quantity: 2 },
+  { id: 'rare-herb-nightshade', name: 'Arcane Nightshade', category: 'Crafting Material', description: 'Extremely rare herb for legendary potions and elixirs', rarity: 'epic', value: 400, quantity: 1 },
+  { id: 'rare-herb-phoenix', name: 'Phoenix Feather Grass', category: 'Crafting Material', description: 'Extremely rare herb for resurrection and immortality elixirs', rarity: 'epic', value: 450, quantity: 1 },
 ]
 
 /**
@@ -186,6 +206,9 @@ const EPIC_LOOT: LootItem[] = [
   { id: 'ring-three-wishes', name: 'Ring of Three Wishes', category: 'Wondrous', description: 'Grants 3 wishes (weaker than spell)', rarity: 'epic', value: 8000 },
   { id: 'boots-seven-leagues', name: 'Boots of Seven Leagues', category: 'Wondrous', description: 'Teleport up to 1 mile once per day', rarity: 'epic', value: 6500 },
   { id: 'amulet-planes', name: 'Amulet of the Planes', category: 'Wondrous', description: 'Travel to other planes of existence', rarity: 'epic', value: 7500 },
+  // Additional Crafting Materials
+  { id: 'mithril-ore-epic', name: 'Pure Mithril Ore', category: 'Crafting Material', description: 'The purest mithril for masterwork equipment', rarity: 'epic', value: 800, quantity: 3 },
+  { id: 'adamantite-ore-epic', name: 'Pure Adamantite Ore', category: 'Crafting Material', description: 'The purest adamantite for legendary weapons', rarity: 'epic', value: 900, quantity: 3 },
 ]
 
 /**
@@ -199,6 +222,9 @@ const LEGENDARY_LOOT: LootItem[] = [
   { id: 'armor-invulnerability', name: 'Armor of Invulnerability', category: 'Armor', description: 'Resistance to nonmagical damage', rarity: 'legendary', value: 12000 },
   { id: 'vorpal-sword', name: 'Vorpal Sword', category: 'Weapon', description: 'Decapitates on critical hit', rarity: 'legendary', value: 15000 },
   { id: 'staff-magi', name: 'Staff of the Magi', category: 'Wondrous', description: 'Ultimate spellcasting focus', rarity: 'legendary', value: 20000 },
+  // Crafting Materials
+  { id: 'dragonscale-leather', name: 'Dragonscale Leather Hide', category: 'Crafting Material', description: 'Ancient dragon hide for legendary armor and accessories', rarity: 'legendary', value: 2000, quantity: 2 },
+  { id: 'obsidian-steel-ore', name: 'Obsidian-Steel Ore Clump', category: 'Crafting Material', description: 'Mythical volcanic metal forged in dragon fire', rarity: 'legendary', value: 2500, quantity: 2 },
 ]
 
 /**
@@ -215,6 +241,12 @@ const ARTIFACT_LOOT: LootItem[] = [
   { id: 'artifact-tome-eternity', name: 'Tome of Eternity', category: 'Wondrous', description: 'Contains all knowledge in the universe. Learn any spell instantly. Gain proficiency in all skills. +10 to all stats.', rarity: 'artifact', value: 180000 },
   { id: 'artifact-cloak-void', name: 'Cloak of the Void', category: 'Armor', description: 'Become intangible at will. Teleport anywhere in the multiverse. Erase enemies from existence with a touch.', rarity: 'artifact', value: 160000 },
   { id: 'artifact-gauntlet-creation', name: 'Gauntlet of Creation', category: 'Wondrous', description: 'Create any object or creature from nothing. Reshape terrain at will. Grant or remove life force.', rarity: 'artifact', value: 170000 },
+  // Precious Gems for Crafting
+  { id: 'gem-diamond', name: 'Flawless Diamond', category: 'Crafting Material', description: 'Perfect diamond for the most powerful enchantments and jewelry', rarity: 'artifact', value: 5000, quantity: 1 },
+  { id: 'gem-emerald', name: 'Flawless Emerald', category: 'Crafting Material', description: 'Perfect emerald for nature-based enchantments and artifacts', rarity: 'artifact', value: 4500, quantity: 1 },
+  { id: 'gem-ruby', name: 'Flawless Ruby', category: 'Crafting Material', description: 'Perfect ruby for fire-based enchantments and artifacts', rarity: 'artifact', value: 4800, quantity: 1 },
+  { id: 'gem-sapphire', name: 'Flawless Sapphire', category: 'Crafting Material', description: 'Perfect sapphire for ice and arcane enchantments', rarity: 'artifact', value: 4600, quantity: 1 },
+  { id: 'gem-amethyst', name: 'Flawless Amethyst', category: 'Crafting Material', description: 'Perfect amethyst for divine and psychic enchantments', rarity: 'artifact', value: 4400, quantity: 1 },
 ]
 
 /**
