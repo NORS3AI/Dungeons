@@ -146,7 +146,7 @@ export function AlignmentSelector({ initialAlignment, onSelect, onBack }: Alignm
       {/* Alignment Grid */}
       <div className="mb-8">
         <div className="grid grid-cols-3 gap-4 mb-6">
-          {ALIGNMENT_GRID.map((row, rowIdx) => (
+          {ALIGNMENT_GRID.map((row, _rowIdx) => (
             row.map((alignment) => {
               const config = ALIGNMENT_CONFIG[alignment]
               const isSelected = selectedAlignment === alignment

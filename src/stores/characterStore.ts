@@ -13,6 +13,7 @@ import type {
   Spell,
   Condition,
   FightingStance,
+  ClassFeature,
 } from '../types'
 import { DEFAULT_ABILITY_SCORES, EMPTY_CURRENCY, autoConvertCurrency } from '../types'
 
@@ -86,6 +87,7 @@ function createEmptyCharacter(): Character {
     deathSaves: { successes: 0, failures: 0 },
     conditions: [],
     featureCharges: [],
+    itemFeatures: [],
     spellSlots: {
       level1: { used: 0, max: 0 },
       level2: { used: 0, max: 0 },
@@ -101,6 +103,12 @@ function createEmptyCharacter(): Character {
     preparedSpells: [],
     equipment: [],
     currency: { ...EMPTY_CURRENCY },
+    carryingCapacity: {
+      current: 0,
+      maximum: 150, // Will be updated when STR is set
+    },
+    foodRations: 0,
+    waterSupply: 0,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   }
@@ -183,12 +191,21 @@ interface CharacterState {
   setDailyIncome: (professionName: string, amount: number, currency: 'copper' | 'silver' | 'gold') => void
   setFightingStance: (stance: FightingStance) => void
 
+  // Carrying Capacity & Supplies
+  updateCarryingCapacity: () => void // Recalculate based on STR and equipment weight
+  addFoodRations: (days: number) => void
+  consumeFoodRations: (days: number) => void
+  addWaterSupply: (days: number) => void
+  consumeWaterSupply: (days: number) => void
+
   // Combat/Session updates
   updateHitPoints: (hp: Partial<Character['hitPoints']>) => void
   addCondition: (condition: Condition) => void
   removeCondition: (condition: Condition) => void
   useFeatureCharge: (featureId: string) => void
   restoreFeatureCharge: (featureId: string, amount?: number) => void
+  addItemFeature: (feature: ClassFeature) => void
+  removeItemFeature: (featureId: string) => void
   useSpellSlot: (level: number) => void
   shortRest: () => void
   longRest: () => void
@@ -630,6 +647,75 @@ export const useCharacterStore = create<CharacterState>()(
           })
         },
 
+        updateCarryingCapacity: () => {
+          const { currentCharacter } = get()
+          if (!currentCharacter) return
+
+          const strength = currentCharacter.abilityScores.strength
+          const totalWeight = currentCharacter.equipment.reduce(
+            (total, item) => total + (item.weight * item.quantity),
+            0
+          )
+
+          set({
+            currentCharacter: {
+              ...currentCharacter,
+              carryingCapacity: {
+                current: totalWeight,
+                maximum: strength * 15,
+              },
+            },
+          })
+        },
+
+        addFoodRations: (days: number) => {
+          const { currentCharacter } = get()
+          if (!currentCharacter) return
+
+          set({
+            currentCharacter: {
+              ...currentCharacter,
+              foodRations: currentCharacter.foodRations + days,
+            },
+          })
+        },
+
+        consumeFoodRations: (days: number) => {
+          const { currentCharacter } = get()
+          if (!currentCharacter) return
+
+          set({
+            currentCharacter: {
+              ...currentCharacter,
+              foodRations: Math.max(0, currentCharacter.foodRations - days),
+            },
+          })
+        },
+
+        addWaterSupply: (days: number) => {
+          const { currentCharacter } = get()
+          if (!currentCharacter) return
+
+          set({
+            currentCharacter: {
+              ...currentCharacter,
+              waterSupply: currentCharacter.waterSupply + days,
+            },
+          })
+        },
+
+        consumeWaterSupply: (days: number) => {
+          const { currentCharacter } = get()
+          if (!currentCharacter) return
+
+          set({
+            currentCharacter: {
+              ...currentCharacter,
+              waterSupply: Math.max(0, currentCharacter.waterSupply - days),
+            },
+          })
+        },
+
         updateHitPoints: (hp) => {
           const { currentCharacter } = get()
           if (!currentCharacter) return
@@ -694,6 +780,34 @@ export const useCharacterStore = create<CharacterState>()(
                   ? { ...f, current: Math.min(f.current + amount, f.maximum) }
                   : f
               ),
+            },
+          })
+        },
+
+        addItemFeature: (feature: ClassFeature) => {
+          const { currentCharacter } = get()
+          if (!currentCharacter) return
+
+          // Check if feature already exists (don't add duplicates)
+          const exists = currentCharacter.itemFeatures.some(f => f.id === feature.id)
+          if (exists) return
+
+          set({
+            currentCharacter: {
+              ...currentCharacter,
+              itemFeatures: [...currentCharacter.itemFeatures, feature],
+            },
+          })
+        },
+
+        removeItemFeature: (featureId: string) => {
+          const { currentCharacter } = get()
+          if (!currentCharacter) return
+
+          set({
+            currentCharacter: {
+              ...currentCharacter,
+              itemFeatures: currentCharacter.itemFeatures.filter(f => f.id !== featureId),
             },
           })
         },

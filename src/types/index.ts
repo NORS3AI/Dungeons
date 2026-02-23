@@ -8,6 +8,7 @@ export type {
   DeathSaves,
   SpellSlots,
   FeatureCharge,
+  Alignment,
   Condition,
   FightingStance,
   FightingStanceInfo,
@@ -20,6 +21,9 @@ export {
   POINT_BUY_COSTS,
   POINT_BUY_TOTAL,
   calculateTotalAbilityScores,
+  calculateCarryingCapacity,
+  calculateEncumbranceThreshold,
+  calculateTotalWeight,
 } from './character'
 
 // Race types

@@ -71,7 +71,7 @@ const SKILLS: { name: string; ability: Ability; key: SkillKey; refId: string }[]
 export function CharacterSheetPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, changeEquipmentQuantity, setFightingStance, addEquipment, updateHitPoints, addSpell, removeSpell, useItemCharge, saveCharacter } = useCharacterStore()
+  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, changeEquipmentQuantity, setFightingStance, addEquipment, updateHitPoints, addSpell, removeSpell, useItemCharge, saveCharacter, addFoodRations, addWaterSupply, addItemFeature } = useCharacterStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
   const [activeTab, setActiveTab] = useState<'main' | 'spells' | 'inventory' | 'features' | 'loot'>('main')
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
@@ -230,6 +230,29 @@ export function CharacterSheetPage() {
     if (lootItem.id.startsWith('spell-scroll-9')) {
       // Trigger the 9th level spell selection modal
       setShowNinthLevelSpellSelector(true)
+      return
+    }
+
+    // Auto-store food items to foodRations
+    if (lootItem.category === 'Food' && lootItem.foodDays) {
+      addFoodRations(lootItem.foodDays)
+      saveCharacter()
+      return
+    }
+
+    // Auto-store water items to waterSupply
+    if (lootItem.category === 'Water' && lootItem.waterDays) {
+      addWaterSupply(lootItem.waterDays)
+      saveCharacter()
+      return
+    }
+
+    // Items with special abilities (like invisibility cloak) -> add to Features
+    if (lootItem.feature) {
+      addItemFeature(lootItem.feature)
+      // Still add to inventory so player can see they have it
+      setEditingLootItem(lootItem)
+      setShowEquipmentEditor(true)
       return
     }
 
