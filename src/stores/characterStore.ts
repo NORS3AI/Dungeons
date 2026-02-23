@@ -10,6 +10,7 @@ import type {
   Alignment,
   Equipment,
   Currency,
+  Material,
   Spell,
   Condition,
   FightingStance,
@@ -103,6 +104,7 @@ function createEmptyCharacter(): Character {
     preparedSpells: [],
     equipment: [],
     currency: { ...EMPTY_CURRENCY },
+    materials: [],
     carryingCapacity: {
       current: 0,
       maximum: 150, // Will be updated when STR is set
@@ -190,6 +192,9 @@ interface CharacterState {
   changeEquipmentQuantity: (itemId: string, change: number) => void
   useItemCharge: (itemId: string) => void
   updateCurrency: (currency: Partial<Currency>) => void
+  addMaterial: (material: Material) => void // Auto-consolidates if material already exists
+  removeMaterial: (materialId: string) => void
+  changeMaterialQuantity: (materialId: string, change: number) => void
   setDailyIncome: (professionName: string, amount: number, currency: 'copper' | 'silver' | 'gold') => void
   setFightingStance: (stance: FightingStance) => void
 
@@ -684,6 +689,71 @@ export const useCharacterStore = create<CharacterState>()(
             currentCharacter: {
               ...currentCharacter,
               currency: updatedCurrency,
+            },
+            history: addToHistory(history, currentCharacter),
+          })
+        },
+
+        addMaterial: (material: Material) => {
+          const { currentCharacter, history } = get()
+          if (!currentCharacter) return
+
+          // Check if material already exists - consolidate by ID
+          const existingIndex = currentCharacter.materials.findIndex((m) => m.id === material.id)
+
+          let materials: Material[]
+          if (existingIndex >= 0) {
+            // Material exists - add to quantity
+            materials = currentCharacter.materials.map((m, index) =>
+              index === existingIndex ? { ...m, quantity: m.quantity + material.quantity } : m
+            )
+          } else {
+            // New material - add to array
+            materials = [...currentCharacter.materials, material]
+          }
+
+          set({
+            currentCharacter: {
+              ...currentCharacter,
+              materials,
+            },
+            history: addToHistory(history, currentCharacter),
+          })
+        },
+
+        removeMaterial: (materialId: string) => {
+          const { currentCharacter, history } = get()
+          if (!currentCharacter) return
+
+          const materials = currentCharacter.materials.filter((m) => m.id !== materialId)
+
+          set({
+            currentCharacter: {
+              ...currentCharacter,
+              materials,
+            },
+            history: addToHistory(history, currentCharacter),
+          })
+        },
+
+        changeMaterialQuantity: (materialId: string, change: number) => {
+          const { currentCharacter, history } = get()
+          if (!currentCharacter) return
+
+          const materials = currentCharacter.materials
+            .map((m) => {
+              if (m.id === materialId) {
+                const newQuantity = m.quantity + change
+                return newQuantity > 0 ? { ...m, quantity: newQuantity } : null
+              }
+              return m
+            })
+            .filter((m): m is Material => m !== null)
+
+          set({
+            currentCharacter: {
+              ...currentCharacter,
+              materials,
             },
             history: addToHistory(history, currentCharacter),
           })

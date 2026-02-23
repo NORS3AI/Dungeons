@@ -2,7 +2,7 @@ import type { Race } from './race'
 import type { Class, Subclass, ClassFeature } from './class'
 import type { Background } from './background'
 import type { Spell } from './spell'
-import type { Equipment, Currency } from './equipment'
+import type { Equipment, Currency, Material } from './equipment'
 
 /**
  * Ability scores for a D&D character
@@ -217,6 +217,7 @@ export interface Character {
   // Equipment
   equipment: Equipment[]
   currency: Currency
+  materials: Material[] // Crafting materials (herbs, ores, leathers, hides) - auto-consolidates
 
   // Carrying Capacity & Supplies
   carryingCapacity: {
