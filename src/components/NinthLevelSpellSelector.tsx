@@ -37,7 +37,7 @@ export function NinthLevelSpellSelector({ onSelectSpell, onClose }: NinthLevelSp
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-900 border-2 border-purple-600 rounded-lg max-w-6xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
+      <div className="bg-gray-900 border-2 border-purple-600 rounded-lg max-w-6xl w-full max-h-[90vh] flex flex-col shadow-2xl">
         {/* Header */}
         <div className="bg-gradient-to-r from-purple-900 to-pink-900 p-6 border-b border-purple-600">
           <h2 className="text-3xl font-bold text-white mb-2">
@@ -49,9 +49,9 @@ export function NinthLevelSpellSelector({ onSelectSpell, onClose }: NinthLevelSp
         </div>
 
         {/* Content */}
-        <div className="grid grid-cols-2 gap-6 p-6 max-h-[calc(90vh-200px)] overflow-hidden">
+        <div className="flex gap-6 p-6 flex-1 min-h-0">
           {/* Spell List */}
-          <div className="overflow-y-auto pr-2">
+          <div className="flex-1 overflow-y-auto pr-2">
             <h3 className="text-xl font-semibold text-purple-400 mb-4 sticky top-0 bg-gray-900 py-2 z-10">
               Available Spells ({ninthLevelSpells.length})
             </h3>
@@ -84,7 +84,7 @@ export function NinthLevelSpellSelector({ onSelectSpell, onClose }: NinthLevelSp
           </div>
 
           {/* Spell Details */}
-          <div className="bg-gray-800 border border-gray-700 rounded-lg p-6 overflow-y-auto">
+          <div className="flex-1 bg-gray-800 border border-gray-700 rounded-lg p-6 overflow-y-auto">
             {selectedSpell ? (
               <div className="space-y-4">
                 <div>
