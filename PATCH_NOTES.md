@@ -1,5 +1,68 @@
 # Dungeons - Patch Notes
 
+## Version 0.2.7 - February 23, 2026
+
+### 🎒 Inventory Organization Overhaul
+
+The inventory tab has been completely reorganized for better clarity and easier item management.
+
+#### **Organized Inventory Sections**
+
+**Equipped Items** (separated by type):
+- ⚔️ **Equipped Weapons** - All equipped weapons in dedicated section
+- 🛡️ **Equipped Armor** - All equipped armor pieces
+- ✨ **Equipped Accessories** - Shields, cloaks, and jewelry together
+
+**Crafting Materials** (new dedicated section):
+- 🔨 **Crafting Materials** - All ores, herbs, and materials separated from regular inventory
+- Easy to see what you have for blacksmithing, alchemy, and tailoring
+- Quantity clearly displayed for stackable materials
+
+**Backpack & Misc Items**:
+- 🎒 **Backpack** - Everything else (potions, scrolls, food, tools, etc.)
+- No more mixing equipped gear with backpack items
+
+#### **Benefits**
+- **Quick Equipment Reference**: See exactly what you're wearing at a glance
+- **Material Management**: Track crafting resources separately
+- **Cleaner Interface**: No more scrolling through mixed lists
+- **Better Organization**: Logical grouping by function
+
+### 🪄 Spell Selector Improvements
+
+Fixed button text in spell selector when used after character creation.
+
+#### **Button Text Context**
+- **During Character Creation**: Shows "Next: Equipment" (continues to next step)
+- **After Character Creation**: Shows "Done" (returns to character sheet)
+- **Applies to both**: Regular spell selection and "Skip for Now" buttons
+
+#### **Technical Changes**
+- Added `isCharacterCreation` prop to SpellSelector component
+- Defaults to `true` for backward compatibility
+- Set to `false` when used from character sheet "Choose Class Spells" button
+
+### ⚖️ Alignment Selection (Already Working)
+
+Alignment selector is already functional on the Overview tab:
+- Shows "Not Selected" in red if alignment is missing
+- Edit button (✏️) for existing alignment
+- Add button (➕) when no alignment chosen
+- Full alignment grid modal for selection
+
+### 🛠️ Technical Changes
+
+#### **Modified Files**
+- `src/components/SpellSelector.tsx` - Added isCharacterCreation prop for context-aware button text
+- `src/pages/CharacterSheetPage.tsx` - Reorganized inventory tab with 5 distinct sections
+
+#### **New Features**
+- Inventory sections: Weapons, Armor, Accessories, Crafting Materials, Backpack
+- Conditional rendering of sections (only show if items exist)
+- Type guards used for proper TypeScript filtering
+
+---
+
 ## Version 0.2.6 - February 23, 2026
 
 ### 🔨 Crafting Materials System

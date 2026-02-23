@@ -935,26 +935,141 @@ export function CharacterSheetPage() {
             )}
           </div>
 
-          {/* All Equipment (Inventory) */}
+          {/* Equipped Weapons */}
+          {character.equipment.filter(item => isWeapon(item) && item.equipped).length > 0 && (
+            <div className="card bg-gray-800 border-gray-700 p-4">
+              <h3 className="text-lg font-bold text-white mb-4">⚔️ Equipped Weapons</h3>
+              <div className="space-y-2">
+                {character.equipment
+                  .filter((item): item is Weapon => isWeapon(item) && item.equipped === true)
+                  .map((item) => (
+                    <EquipmentItem
+                      key={item.id}
+                      item={item}
+                      character={character}
+                      onRemove={() => {
+                        removeEquipment(item.id)
+                        saveCharacter()
+                      }}
+                      onToggleEquip={() => {
+                        toggleEquipment(item.id)
+                        saveCharacter()
+                      }}
+                      onChangeQuantity={(change) => {
+                        changeEquipmentQuantity(item.id, change)
+                        saveCharacter()
+                      }}
+                      onUse={() => handleUseConsumable(item)}
+                    />
+                  ))}
+              </div>
+            </div>
+          )}
+
+          {/* Equipped Armor */}
+          {character.equipment.filter(item => isArmor(item) && item.equipped).length > 0 && (
+            <div className="card bg-gray-800 border-gray-700 p-4">
+              <h3 className="text-lg font-bold text-white mb-4">🛡️ Equipped Armor</h3>
+              <div className="space-y-2">
+                {character.equipment
+                  .filter((item): item is Armor => isArmor(item) && item.equipped === true)
+                  .map((item) => (
+                    <EquipmentItem
+                      key={item.id}
+                      item={item}
+                      character={character}
+                      onRemove={() => {
+                        removeEquipment(item.id)
+                        saveCharacter()
+                      }}
+                      onToggleEquip={() => {
+                        toggleEquipment(item.id)
+                        saveCharacter()
+                      }}
+                      onChangeQuantity={(change) => {
+                        changeEquipmentQuantity(item.id, change)
+                        saveCharacter()
+                      }}
+                      onUse={() => handleUseConsumable(item)}
+                    />
+                  ))}
+              </div>
+            </div>
+          )}
+
+          {/* Equipped Shields, Cloaks & Jewelry */}
+          {character.equipment.filter(item =>
+            item.equipped &&
+            (item.category === 'shield' || item.category === 'cloak' || item.category === 'jewelry')
+          ).length > 0 && (
+            <div className="card bg-gray-800 border-gray-700 p-4">
+              <h3 className="text-lg font-bold text-white mb-4">✨ Equipped Accessories</h3>
+              <div className="space-y-2">
+                {character.equipment
+                  .filter(item =>
+                    item.equipped &&
+                    (item.category === 'shield' || item.category === 'cloak' || item.category === 'jewelry')
+                  )
+                  .map((item) => (
+                    <EquipmentItem
+                      key={item.id}
+                      item={item}
+                      character={character}
+                      onRemove={() => {
+                        removeEquipment(item.id)
+                        saveCharacter()
+                      }}
+                      onToggleEquip={() => {
+                        toggleEquipment(item.id)
+                        saveCharacter()
+                      }}
+                      onChangeQuantity={(change) => {
+                        changeEquipmentQuantity(item.id, change)
+                        saveCharacter()
+                      }}
+                      onUse={() => handleUseConsumable(item)}
+                    />
+                  ))}
+              </div>
+            </div>
+          )}
+
+          {/* Crafting Materials */}
+          {character.equipment.filter(item => item.category === 'Crafting Material').length > 0 && (
+            <div className="card bg-gray-800 border-gray-700 p-4">
+              <h3 className="text-lg font-bold text-white mb-4">🔨 Crafting Materials</h3>
+              <div className="space-y-2">
+                {character.equipment
+                  .filter(item => item.category === 'Crafting Material')
+                  .map((item) => (
+                    <EquipmentItem
+                      key={item.id}
+                      item={item}
+                      character={character}
+                      onRemove={() => {
+                        removeEquipment(item.id)
+                        saveCharacter()
+                      }}
+                      onToggleEquip={() => {
+                        toggleEquipment(item.id)
+                        saveCharacter()
+                      }}
+                      onChangeQuantity={(change) => {
+                        changeEquipmentQuantity(item.id, change)
+                        saveCharacter()
+                      }}
+                      onUse={() => handleUseConsumable(item)}
+                    />
+                  ))}
+              </div>
+            </div>
+          )}
+
+          {/* Backpack (Everything Else) */}
           <div className="card bg-gray-800 border-gray-700 p-4">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-white">Inventory</h3>
+              <h3 className="text-lg font-bold text-white">🎒 Backpack & Misc Items</h3>
               <div className="flex gap-2">
-                <button
-                  onClick={() => {
-                    // Equip all items
-                    character.equipment.forEach((item) => {
-                      if (!item.equipped) {
-                        toggleEquipment(item.id)
-                      }
-                    })
-                    saveCharacter()
-                  }}
-                  className="px-4 py-2 bg-blue-700 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors flex items-center gap-2"
-                  title="Equip all items in inventory"
-                >
-                  ⚔️ Equip All
-                </button>
                 <button
                   onClick={() => {
                     setEditingLootItem({
@@ -975,30 +1090,46 @@ export function CharacterSheetPage() {
                 </button>
               </div>
             </div>
-            {character.equipment.length === 0 ? (
-              <p className="text-gray-400 text-center py-4">No equipment.</p>
+            {character.equipment.filter(item =>
+              !isWeapon(item) &&
+              !isArmor(item) &&
+              item.category !== 'shield' &&
+              item.category !== 'cloak' &&
+              item.category !== 'jewelry' &&
+              item.category !== 'Crafting Material'
+            ).length === 0 ? (
+              <p className="text-gray-400 text-center py-4">Backpack is empty.</p>
             ) : (
               <div className="space-y-2">
-                {character.equipment.map((item) => (
-                  <EquipmentItem
-                    key={item.id}
-                    item={item}
-                    character={character}
-                    onRemove={() => {
-                      removeEquipment(item.id)
-                      saveCharacter()
-                    }}
-                    onToggleEquip={() => {
-                      toggleEquipment(item.id)
-                      saveCharacter()
-                    }}
-                    onChangeQuantity={(change) => {
-                      changeEquipmentQuantity(item.id, change)
-                      saveCharacter()
-                    }}
-                    onUse={() => handleUseConsumable(item)}
-                  />
-                ))}
+                {character.equipment
+                  .filter(item =>
+                    !isWeapon(item) &&
+                    !isArmor(item) &&
+                    item.category !== 'shield' &&
+                    item.category !== 'cloak' &&
+                    item.category !== 'jewelry' &&
+                    item.category !== 'Crafting Material'
+                  )
+                  .map((item) => (
+                    <EquipmentItem
+                      key={item.id}
+                      item={item}
+                      character={character}
+                      onRemove={() => {
+                        removeEquipment(item.id)
+                        saveCharacter()
+                      }}
+                      onToggleEquip={() => {
+                        toggleEquipment(item.id)
+                        saveCharacter()
+                      }}
+                      onChangeQuantity={(change) => {
+                        changeEquipmentQuantity(item.id, change)
+                        saveCharacter()
+                      }}
+                      onUse={() => handleUseConsumable(item)}
+                    />
+                  ))}
               </div>
             )}
           </div>
@@ -1510,6 +1641,7 @@ export function CharacterSheetPage() {
                 characterClass={character.class}
                 subclass={character.subclass}
                 level={character.level}
+                isCharacterCreation={false}
                 onSubmit={(cantrips, spells) => {
                   // Add all selected spells
                   cantrips.forEach((spell) => addSpell(spell))
