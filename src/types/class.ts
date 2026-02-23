@@ -2120,19 +2120,19 @@ export const SORCERER: Class = {
     {
       id: 'spellcasting',
       name: 'Spellcasting',
-      description: 'You can cast sorcerer spells using Charisma as your spellcasting ability.',
+      description: 'You can cast sorcerer spells using Charisma as your spellcasting ability. <ref type="trait" id="spellcasting">Full Details</ref>',
       level: 1,
     },
     {
       id: 'font-of-magic',
       name: 'Font of Magic',
-      description: 'You tap into a deep wellspring of magic within yourself. You have sorcery points equal to your sorcerer level.',
+      description: 'You tap into a deep wellspring of magic within yourself. You have sorcery points equal to your sorcerer level. <ref type="trait" id="font-of-magic">Full Details</ref>',
       level: 2,
     },
     {
       id: 'metamagic',
       name: 'Metamagic',
-      description: 'You gain the ability to twist your spells to suit your needs. You learn two Metamagic options of your choice.',
+      description: 'You gain the ability to twist your spells to suit your needs. You learn two Metamagic options of your choice. <ref type="trait" id="metamagic">Full Details</ref>',
       level: 3,
     },
     {

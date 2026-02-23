@@ -5760,6 +5760,34 @@ export const TRAITS: Record<string, TraitRef> = {
     description: 'You can channel the dread presence of your dragon ancestor, causing those around you to become awestruck or frightened. As an action, you can spend 5 sorcery points to draw on this power and exude an aura of awe or fear (your choice) to a distance of 60 feet. For 1 minute or until you lose your concentration, each hostile creature that starts its turn in this aura must succeed on a Wisdom saving throw or be charmed (if you chose awe) or frightened (if you chose fear) until the aura ends. A creature that succeeds on this saving throw is immune to your aura for 24 hours.',
     mechanics: 'Action. Cost: 5 sorcery points. 60 ft aura for 1 minute (concentration). Hostile creatures: WIS save or charmed/frightened until aura ends. Success = immune 24 hours.',
   },
+  'lightning-breath': {
+    id: 'lightning-breath',
+    name: 'Lightning Breath',
+    source: 'Dragonborn (Blue/Bronze)',
+    description: 'You can use your action to exhale destructive energy. Your draconic ancestry determines the size, shape, and damage type of the exhalation. When you use your breath weapon, each creature in the area of the exhalation must make a Dexterity saving throw. The DC for this saving throw equals 8 + your Constitution modifier + your proficiency bonus. A creature takes 2d6 lightning damage on a failed save, and half as much damage on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th level, and 5d6 at 16th level. After you use your breath weapon, you can\'t use it again until you complete a short or long rest.',
+    mechanics: 'Action. 5 by 30 ft. line. DEX save (DC = 8 + CON mod + prof bonus). 2d6 lightning damage (half on success). Damage increases with level. Recharge: Short or long rest.',
+  },
+  'spellcasting': {
+    id: 'spellcasting',
+    name: 'Spellcasting',
+    source: 'Multiple Classes (Level 1)',
+    description: 'You have learned to cast spells. You can prepare and cast spells from your class spell list using your spellcasting ability (Intelligence for Wizards, Wisdom for Clerics and Druids, Charisma for Bards, Sorcerers, and Warlocks). You know cantrips (0-level spells) that can be cast at will without expending spell slots. For leveled spells, you must expend a spell slot of the appropriate level. You regain all expended spell slots when you finish a long rest. See the full spellcasting rules for details on preparing spells, spell attack rolls, spell save DCs, and casting spells at higher levels.',
+    mechanics: 'Spell save DC = 8 + proficiency bonus + spellcasting ability modifier. Spell attack bonus = proficiency bonus + spellcasting ability modifier. Cantrips at will. Spell slots regain on long rest.',
+  },
+  'font-of-magic': {
+    id: 'font-of-magic',
+    name: 'Font of Magic',
+    source: 'Sorcerer (Level 2)',
+    description: 'You tap into a deep wellspring of magic within yourself. You have a number of sorcery points equal to your sorcerer level. You can use sorcery points to create spell slots as a bonus action, or convert spell slots into sorcery points as a bonus action. Creating Spell Slots: You can transform sorcery points into one spell slot as a bonus action. The cost is: 1st-level (2 points), 2nd-level (3 points), 3rd-level (5 points), 4th-level (6 points), 5th-level (7 points). Converting Spell Slots: As a bonus action, you can expend one spell slot and gain a number of sorcery points equal to the slot\'s level. You regain all spent sorcery points when you finish a long rest.',
+    mechanics: 'Sorcery points = sorcerer level. Bonus action: Convert slots ↔ points. Spell slot cost: 1st=2pts, 2nd=3pts, 3rd=5pts, 4th=6pts, 5th=7pts. Regain all points on long rest.',
+  },
+  'metamagic': {
+    id: 'metamagic',
+    name: 'Metamagic',
+    source: 'Sorcerer (Level 3)',
+    description: 'You gain the ability to twist your spells to suit your needs. You learn two Metamagic options of your choice from the Metamagic Options list. You can use only one Metamagic option on a spell when you cast it, unless otherwise noted. Common Metamagic options include: Careful Spell (spend 1 sorcery point to protect allies from your spell\'s area), Distant Spell (spend 1 point to double spell range), Empowered Spell (spend 1 point to reroll damage dice), Extended Spell (spend 1 point to double duration), Heightened Spell (spend 3 points to give one target disadvantage on first save), Quickened Spell (spend 2 points to cast 1 action spell as bonus action), Subtle Spell (spend 1 point to cast without verbal/somatic components), and Twinned Spell (spend points equal to spell level to target second creature). You learn one additional Metamagic option at 10th level and another at 17th level.',
+    mechanics: 'Learn 2 options at level 3 (+ 1 at 10th, +1 at 17th). Spend sorcery points to modify spells. Only one option per spell (unless specified).',
+  },
 }
 
 // RULES DATA - Game mechanics explanations for new players

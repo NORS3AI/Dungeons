@@ -10,6 +10,8 @@ import {
   WIZARD_LEVEL_1_SPELLS,
   CLERIC_CANTRIPS,
   CLERIC_LEVEL_1_SPELLS,
+  SORCERER_CANTRIPS,
+  SORCERER_LEVEL_1_SPELLS,
   GOO_EXPANDED_SPELLS,
 } from '../data/spells'
 
@@ -41,6 +43,7 @@ export function SpellSelector({
     if (characterClass?.id === 'necromancer') return NECROMANCER_CANTRIPS
     if (characterClass?.id === 'wizard') return WIZARD_CANTRIPS
     if (characterClass?.id === 'cleric') return CLERIC_CANTRIPS
+    if (characterClass?.id === 'sorcerer') return SORCERER_CANTRIPS
     return []
   }, [characterClass])
 
@@ -61,6 +64,9 @@ export function SpellSelector({
     }
     if (characterClass?.id === 'cleric') {
       return [...CLERIC_LEVEL_1_SPELLS]
+    }
+    if (characterClass?.id === 'sorcerer') {
+      return [...SORCERER_LEVEL_1_SPELLS]
     }
     return []
   }, [characterClass, subclass])

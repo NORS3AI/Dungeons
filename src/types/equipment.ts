@@ -134,6 +134,18 @@ export interface MagicalItemCharges {
 }
 
 /**
+ * Ability score modifiers that equipment can provide
+ */
+export interface AbilityScoreModifiers {
+  strength?: number
+  dexterity?: number
+  constitution?: number
+  intelligence?: number
+  wisdom?: number
+  charisma?: number
+}
+
+/**
  * Base equipment item
  */
 export interface BaseEquipment {
@@ -146,6 +158,7 @@ export interface BaseEquipment {
   quantity: number
   equipped?: boolean
   charges?: MagicalItemCharges // For magical items with limited uses
+  abilityScoreModifiers?: AbilityScoreModifiers // e.g., Belt of Giant Strength (+2 STR)
 }
 
 /**
