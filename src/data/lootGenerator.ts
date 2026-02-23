@@ -1,3 +1,5 @@
+import type { ClassFeature } from '../types/class'
+
 /**
  * Loot rarity levels
  */
@@ -25,8 +27,11 @@ export interface LootItem {
   category: string
   description: string
   rarity: LootRarity
-  value: number // in gold pieces
+  value: number // in gold pieces (MUST be whole number, never decimal)
   quantity?: number
+  foodDays?: number // Days of food (for Food category)
+  waterDays?: number // Days of water (for Water category)
+  feature?: ClassFeature // Special ability granted by this item (for Ability category)
 }
 
 /**
@@ -105,7 +110,7 @@ const RACE_LOOT_PREFERENCES: Record<string, string[]> = {
  * Trash loot pool - worthless or nearly worthless items
  */
 const TRASH_LOOT: LootItem[] = [
-  { id: 'trash-copper', name: 'Few Copper Coins', category: 'Currency', description: '1-5 copper pieces (max 75 cp)', rarity: 'trash', value: 0.03 },
+  { id: 'trash-copper', name: 'Few Copper Coins', category: 'Currency', description: '1-10 copper pieces', rarity: 'trash', value: 5 }, // 5 copper (midpoint of 1-10)
   { id: 'trash-stick', name: 'Broken Stick', category: 'Gear', description: 'A useless broken branch', rarity: 'trash', value: 0 },
   { id: 'trash-rag', name: 'Dirty Rag', category: 'Gear', description: 'Torn and filthy cloth', rarity: 'trash', value: 0 },
   { id: 'trash-pebble', name: 'Smooth Pebble', category: 'Trinket', description: 'A worthless stone', rarity: 'trash', value: 0 },
@@ -117,10 +122,11 @@ const TRASH_LOOT: LootItem[] = [
  * Common loot pool
  */
 const COMMON_LOOT: LootItem[] = [
-  { id: 'gp-small', name: 'Small Coin Purse', category: 'Currency', description: '10-50 gold pieces (max 75 gp)', rarity: 'common', value: 30 },
-  { id: 'gp-medium', name: 'Medium Coin Purse', category: 'Currency', description: '50-75 gold pieces (max 75 gp)', rarity: 'common', value: 62.5 },
+  { id: 'gp-small', name: 'Small Coin Purse', category: 'Currency', description: '30-50 copper pieces', rarity: 'common', value: 40 }, // 40 copper
+  { id: 'gp-medium', name: 'Medium Coin Purse', category: 'Currency', description: '50-70 copper pieces', rarity: 'common', value: 60 }, // 60 copper
   { id: 'healing-potion', name: 'Potion of Healing', category: 'Consumable', description: 'Restores 2d4+2 hit points', rarity: 'common', value: 50 },
-  { id: 'rations', name: 'Travel Rations', category: 'Consumable', description: '5 days of food', rarity: 'common', value: 5, quantity: 5 },
+  { id: 'rations', name: 'Travel Rations', category: 'Food', description: '5 days of food', rarity: 'common', value: 5, foodDays: 5 },
+  { id: 'waterskin', name: 'Waterskin', category: 'Water', description: '3 days of water', rarity: 'common', value: 2, waterDays: 3 },
   { id: 'rope', name: 'Hempen Rope', category: 'Gear', description: '50 feet of rope', rarity: 'common', value: 1 },
   { id: 'torch', name: 'Torches', category: 'Gear', description: 'Light source', rarity: 'common', value: 1, quantity: 10 },
   { id: 'arrows', name: 'Arrows', category: 'Ammunition', description: 'Standard arrows', rarity: 'common', value: 1, quantity: 20 },
@@ -131,8 +137,9 @@ const COMMON_LOOT: LootItem[] = [
  * Uncommon loot pool
  */
 const UNCOMMON_LOOT: LootItem[] = [
-  { id: 'gp-large', name: 'Large Coin Purse', category: 'Currency', description: '60-75 gold pieces (max 75 gp)', rarity: 'uncommon', value: 67.5 },
+  { id: 'gp-large', name: 'Small Silver Pouch', category: 'Currency', description: '1-7 silver pieces', rarity: 'uncommon', value: 40 }, // 4 silver (40 copper)
   { id: 'greater-healing', name: 'Potion of Greater Healing', category: 'Consumable', description: 'Restores 4d4+4 hit points', rarity: 'uncommon', value: 150 },
+  { id: 'preserved-food', name: 'Preserved Rations', category: 'Food', description: '10 days of preserved food', rarity: 'uncommon', value: 15, foodDays: 10 },
   { id: 'spell-scroll-1', name: 'Spell Scroll (1st Level)', category: 'Consumable', description: 'Contains a 1st level spell', rarity: 'uncommon', value: 100 },
   { id: 'masterwork-weapon', name: 'Masterwork Weapon', category: 'Weapon', description: '+1 to attack and damage rolls', rarity: 'uncommon', value: 300 },
   { id: 'cloak-protection', name: 'Cloak of Protection', category: 'Armor', description: '+1 to AC and saving throws', rarity: 'uncommon', value: 250 },
@@ -144,8 +151,10 @@ const UNCOMMON_LOOT: LootItem[] = [
  * Rare loot pool
  */
 const RARE_LOOT: LootItem[] = [
-  { id: 'gp-huge', name: 'Treasure Hoard', category: 'Currency', description: '50-75 gold pieces (max 75 gp)', rarity: 'rare', value: 62.5 },
+  { id: 'gp-huge', name: 'Silver Pouch', category: 'Currency', description: '1-25 silver pieces', rarity: 'rare', value: 130 }, // 13 silver (130 copper)
   { id: 'superior-healing', name: 'Potion of Superior Healing', category: 'Consumable', description: 'Restores 8d4+8 hit points', rarity: 'rare', value: 500 },
+  { id: 'endless-rations', name: 'Bag of Endless Rations', category: 'Food', description: '30 days of magical food that never spoils', rarity: 'rare', value: 50, foodDays: 30 },
+  { id: 'purifying-flask', name: 'Decanter of Endless Water', category: 'Water', description: '20 days of pure water', rarity: 'rare', value: 30, waterDays: 20 },
   { id: 'spell-scroll-3', name: 'Spell Scroll (3rd Level)', category: 'Consumable', description: 'Contains a 3rd level spell', rarity: 'rare', value: 300 },
   { id: 'weapon-plus-2', name: 'Weapon +2', category: 'Weapon', description: '+2 to attack and damage rolls', rarity: 'rare', value: 1000 },
   { id: 'armor-plus-2', name: 'Armor +2', category: 'Armor', description: '+2 to AC', rarity: 'rare', value: 1200 },
@@ -157,7 +166,7 @@ const RARE_LOOT: LootItem[] = [
  * More Epic loot - moved from old very-rare tier
  */
 const MORE_EPIC_LOOT: LootItem[] = [
-  { id: 'platinum-hoard', name: 'Platinum Hoard', category: 'Currency', description: '3-7 platinum pieces (max 10 pp)', rarity: 'epic', value: 500 },
+  { id: 'platinum-hoard', name: 'Small Gold Pouch', category: 'Currency', description: '1-10 gold pieces', rarity: 'epic', value: 550 }, // 5.5 gold (550 copper)
   { id: 'spell-scroll-5', name: 'Spell Scroll (5th Level)', category: 'Consumable', description: 'Contains a 5th level spell', rarity: 'epic', value: 800 },
   { id: 'weapon-plus-3', name: 'Weapon +3', category: 'Weapon', description: '+3 to attack and damage rolls', rarity: 'epic', value: 3000 },
   { id: 'armor-plus-3', name: 'Armor +3', category: 'Armor', description: '+3 to AC', rarity: 'epic', value: 3500 },
@@ -169,7 +178,7 @@ const MORE_EPIC_LOOT: LootItem[] = [
  * Epic loot pool - extremely powerful items
  */
 const EPIC_LOOT: LootItem[] = [
-  { id: 'epic-fortune', name: 'Dragon\'s Fortune', category: 'Currency', description: '5-10 platinum pieces (max 10 pp)', rarity: 'epic', value: 750 },
+  { id: 'epic-fortune', name: 'Gold Pouch', category: 'Currency', description: '10-15 gold pieces', rarity: 'epic', value: 1250 }, // 12.5 gold (1250 copper)
   { id: 'spell-scroll-7', name: 'Spell Scroll (7th Level)', category: 'Consumable', description: 'Contains a 7th level spell', rarity: 'epic', value: 2000 },
   { id: 'dragonslayer-greatsword', name: 'Dragonslayer Greatsword', category: 'Weapon', description: '+3 greatsword, deals 3d6 extra damage to dragons', rarity: 'epic', value: 6000 },
   { id: 'plate-ethereal', name: 'Ethereal Plate Armor', category: 'Armor', description: '+3 plate, can phase through objects once per day', rarity: 'epic', value: 7000 },
@@ -183,7 +192,7 @@ const EPIC_LOOT: LootItem[] = [
  * Legendary loot pool
  */
 const LEGENDARY_LOOT: LootItem[] = [
-  { id: 'ancient-treasure', name: 'Ancient Treasure Hoard', category: 'Currency', description: '7-10 platinum pieces (max 10 pp)', rarity: 'legendary', value: 850 },
+  { id: 'ancient-treasure', name: 'Ancient Gold Hoard', category: 'Currency', description: '50-95 gold pieces', rarity: 'legendary', value: 7250 }, // 72.5 gold (7250 copper)
   { id: 'spell-scroll-9', name: 'Spell Scroll (9th Level)', category: 'Consumable', description: 'Contains a 9th level spell', rarity: 'legendary', value: 5000 },
   { id: 'tome-class-change', name: 'Tome of Reincarnation', category: 'Consumable', description: 'Allows you to completely change your class. All old class features, spells, and abilities are lost and replaced with your new class.', rarity: 'legendary', value: 25000 },
   { id: 'holy-avenger', name: 'Holy Avenger', category: 'Weapon', description: '+3 longsword with divine powers', rarity: 'legendary', value: 10000 },

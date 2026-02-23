@@ -280,7 +280,7 @@ export const SORCERER_LEVEL_1_SPELLS: Spell[] = [
     description: 'This spell allows you to move at an incredible pace. When you cast this spell, and then as a bonus action on each of your turns until the spell ends, you can take the Dash action.',
     level: 1,
     school: 'transmutation',
-    castingTime: { amount: 1, unit: 'bonus' },
+    castingTime: { amount: 1, unit: 'bonusAction' },
     range: { type: 'self' },
     components: { verbal: true, somatic: true, material: false },
     duration: { type: 'timed', amount: 10, unit: 'minute' },

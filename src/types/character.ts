@@ -1,5 +1,5 @@
 import type { Race } from './race'
-import type { Class, Subclass } from './class'
+import type { Class, Subclass, ClassFeature } from './class'
 import type { Background } from './background'
 import type { Spell } from './spell'
 import type { Equipment, Currency } from './equipment'
@@ -209,6 +209,7 @@ export interface Character {
 
   // Features & Spellcasting
   featureCharges: FeatureCharge[]
+  itemFeatures: ClassFeature[] // Features granted by magical items/equipment
   spellSlots: SpellSlots
   knownSpells: Spell[]
   preparedSpells: string[] // Spell IDs
@@ -216,6 +217,14 @@ export interface Character {
   // Equipment
   equipment: Equipment[]
   currency: Currency
+
+  // Carrying Capacity & Supplies
+  carryingCapacity: {
+    current: number // Current weight carried in pounds
+    maximum: number // Max capacity = STR × 15 (or STR × 5 for encumbered)
+  }
+  foodRations: number // Days of food
+  waterSupply: number // Days of water
 
   // Daily Income
   dailyIncome?: {
@@ -294,4 +303,31 @@ export function calculateTotalAbilityScores(
   })
 
   return total
+}
+
+/**
+ * Calculate maximum carrying capacity
+ * @param strength - Character's strength score
+ * @returns Maximum carrying capacity in pounds (STR × 15)
+ */
+export function calculateCarryingCapacity(strength: number): number {
+  return strength * 15
+}
+
+/**
+ * Calculate encumbrance threshold
+ * @param strength - Character's strength score
+ * @returns Encumbrance threshold in pounds (STR × 5)
+ */
+export function calculateEncumbranceThreshold(strength: number): number {
+  return strength * 5
+}
+
+/**
+ * Calculate total weight of equipment
+ * @param equipment - Array of equipment items
+ * @returns Total weight in pounds
+ */
+export function calculateTotalWeight(equipment: Array<{ weight: number; quantity: number }>): number {
+  return equipment.reduce((total, item) => total + (item.weight * item.quantity), 0)
 }
