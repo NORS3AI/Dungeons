@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useCharacterStore } from '../stores/characterStore'
-import { DiceRoller, DiceRollerButton, DiceRollerModal } from '../components/DiceRoller'
+import { DiceRollerButton, DiceRollerModal } from '../components/DiceRoller'
 import { calculateModifier, calculateProficiencyBonus, rollDice } from '../types/dice'
 import { isWeapon, isArmor, isShield, isCloak, autoConvertCurrency, EMPTY_CURRENCY } from '../types/equipment'
 import type { Character, Ability, Equipment, Weapon, Armor, Currency, Material, Class } from '../types'
@@ -1070,9 +1070,6 @@ export function CharacterSheetPage() {
                 )}
               </div>
             </div>
-
-            {/* Dice Roller */}
-            <DiceRoller />
 
             {/* Consumables (Potions) - Quick Access */}
             {character.equipment.filter(item =>

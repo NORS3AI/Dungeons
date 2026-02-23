@@ -1,5 +1,19 @@
 # Dungeons - Patch Notes
 
+## Version 0.3.2 - February 23, 2026 @ 01:06 AM MST
+
+### 🎲 UI Cleanup
+
+Removed redundant dice roller component from main overview tab.
+
+#### **Dice Roller Removal**
+- **Removed**: Dice roller widget from main/overview tab
+- **Kept**: Floating dice button in lower right corner
+- Cleaner interface with less clutter
+- Dice roller still accessible via floating button
+
+---
+
 ## Version 0.3.1 - February 23, 2026
 
 ### ⚡ Actions Tab Major Overhaul
