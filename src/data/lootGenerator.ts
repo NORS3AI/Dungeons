@@ -251,10 +251,23 @@ const ARTIFACT_LOOT: LootItem[] = [
 
 /**
  * Roll for loot rarity based on character level
+ *
+ * Restrictions:
+ * - Levels 1-7: Cannot create Epic or better (max: Rare)
+ * - Levels 8-20: Cannot create Artifact (max: Legendary)
+ * - Artifact quality is created by DM only via generateLegendaryLoot
  */
 export function rollLootRarity(characterLevel: number): LootRarity {
   const roll = Math.random() * 100
 
+  // Levels 1-7: Max rarity is Rare
+  if (characterLevel <= 7) {
+    if (roll < 60) return 'common'
+    if (roll < 85) return 'uncommon'
+    return 'rare' // Capped at rare for low levels
+  }
+
+  // Levels 8-20: Max rarity is Legendary (no Artifact from normal loot)
   if (characterLevel >= 17) {
     // High level characters
     if (roll < 20) return 'common'
@@ -269,19 +282,12 @@ export function rollLootRarity(characterLevel: number): LootRarity {
     if (roll < 80) return 'rare'
     if (roll < 95) return 'epic'
     return 'legendary'
-  } else if (characterLevel >= 5) {
-    // Mid level
+  } else {
+    // Levels 8-10
     if (roll < 35) return 'common'
     if (roll < 70) return 'uncommon'
     if (roll < 90) return 'rare'
     if (roll < 99) return 'epic'
-    return 'legendary'
-  } else {
-    // Low level
-    if (roll < 60) return 'common'
-    if (roll < 85) return 'uncommon'
-    if (roll < 97) return 'rare'
-    if (roll < 99.5) return 'epic'
     return 'legendary'
   }
 }

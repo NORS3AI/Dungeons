@@ -4,7 +4,7 @@ import { useCharacterStore } from '../stores/characterStore'
 import { DiceRollerButton, DiceRollerModal } from '../components/DiceRoller'
 import { calculateModifier, calculateProficiencyBonus, rollDice } from '../types/dice'
 import { isWeapon, isArmor, isShield, isCloak, autoConvertCurrency, EMPTY_CURRENCY } from '../types/equipment'
-import type { Character, Ability, Equipment, Weapon, Armor, Currency, Material, Class } from '../types'
+import type { Character, Ability, Equipment, Weapon, Currency, Material, Class } from '../types'
 import {
   FIGHTER,
   WARLOCK,
@@ -330,6 +330,46 @@ export function CharacterSheetPage() {
       // Still add to inventory so player can see they have it
       setEditingLootItem(lootItem)
       setShowEquipmentEditor(true)
+      return
+    }
+
+    // Auto-add accessories (cloaks, rings, trinkets, necklaces, orbs, books) without editor
+    const isAccessory = lootItem.category === 'Cloak' ||
+                       lootItem.category === 'cloak' ||
+                       lootItem.category === 'jewelry' ||
+                       lootItem.category === 'trinket' ||
+                       nameLower.includes('ring') ||
+                       nameLower.includes('necklace') ||
+                       nameLower.includes('orb') ||
+                       nameLower.includes('book')
+
+    if (isAccessory) {
+      // Determine proper category
+      let category: 'cloak' | 'jewelry' | 'trinket' | 'adventuringGear' = 'adventuringGear'
+      if (lootItem.category === 'Cloak' || lootItem.category === 'cloak' || nameLower.includes('cloak')) {
+        category = 'cloak'
+      } else if (lootItem.category === 'jewelry' || nameLower.includes('ring') || nameLower.includes('necklace')) {
+        category = 'jewelry'
+      } else if (lootItem.category === 'trinket' || nameLower.includes('orb') || nameLower.includes('book')) {
+        category = 'trinket'
+      }
+
+      const accessoryItem: Equipment = {
+        id: lootItem.id + '-' + Date.now(),
+        name: lootItem.name,
+        description: lootItem.description,
+        category,
+        equipped: true, // Auto-equip accessories
+        rarity: lootItem.rarity,
+        quantity: lootItem.quantity || 1,
+        weight: 0.5,
+        cost: {
+          ...EMPTY_CURRENCY,
+          gold: lootItem.value || 0,
+        },
+      }
+      addEquipment(accessoryItem)
+      saveCharacter()
       return
     }
 
@@ -1455,13 +1495,13 @@ export function CharacterSheetPage() {
             </div>
           )}
 
-          {/* Equipped Armor */}
-          {character.equipment.filter(item => isArmor(item) && item.equipped !== false).length > 0 && (
+          {/* Equipped Armor & Cloaks */}
+          {character.equipment.filter(item => (isArmor(item) || item.category === 'cloak') && item.equipped !== false).length > 0 && (
             <div className="card bg-gray-800 border-gray-700 p-4">
-              <h3 className="text-lg font-bold text-white mb-4">🛡️ Equipped Armor</h3>
+              <h3 className="text-lg font-bold text-white mb-4">🛡️ Equipped Armor & Cloaks</h3>
               <div className="space-y-2">
                 {character.equipment
-                  .filter((item): item is Armor => isArmor(item) && item.equipped !== false)
+                  .filter((item) => (isArmor(item) || item.category === 'cloak') && item.equipped !== false)
                   .map((item) => (
                     <EquipmentItem
                       key={item.id}
@@ -1486,18 +1526,55 @@ export function CharacterSheetPage() {
             </div>
           )}
 
-          {/* Equipped Shields, Cloaks & Jewelry */}
+          {/* Equipped Shields */}
           {character.equipment.filter(item =>
             item.equipped &&
-            (item.category === 'shield' || item.category === 'cloak' || item.category === 'jewelry')
+            item.category === 'shield'
           ).length > 0 && (
             <div className="card bg-gray-800 border-gray-700 p-4">
-              <h3 className="text-lg font-bold text-white mb-4">✨ Equipped Accessories</h3>
+              <h3 className="text-lg font-bold text-white mb-4">🛡 Equipped Shields</h3>
               <div className="space-y-2">
                 {character.equipment
                   .filter(item =>
                     item.equipped &&
-                    (item.category === 'shield' || item.category === 'cloak' || item.category === 'jewelry')
+                    item.category === 'shield'
+                  )
+                  .map((item) => (
+                    <EquipmentItem
+                      key={item.id}
+                      item={item}
+                      character={character}
+                      onRemove={() => {
+                        removeEquipment(item.id)
+                        saveCharacter()
+                      }}
+                      onToggleEquip={() => {
+                        toggleEquipment(item.id)
+                        saveCharacter()
+                      }}
+                      onChangeQuantity={(change) => {
+                        changeEquipmentQuantity(item.id, change)
+                        saveCharacter()
+                      }}
+                      onUse={() => handleUseConsumable(item)}
+                    />
+                  ))}
+              </div>
+            </div>
+          )}
+
+          {/* Jewelry & Trinkets */}
+          {character.equipment.filter(item =>
+            item.equipped &&
+            (item.category === 'jewelry' || item.category === 'trinket')
+          ).length > 0 && (
+            <div className="card bg-gray-800 border-gray-700 p-4">
+              <h3 className="text-lg font-bold text-white mb-4">💎 Jewelry & Trinkets</h3>
+              <div className="space-y-2">
+                {character.equipment
+                  .filter(item =>
+                    item.equipped &&
+                    (item.category === 'jewelry' || item.category === 'trinket')
                   )
                   .map((item) => (
                     <EquipmentItem
