@@ -29,6 +29,7 @@ import { LootCache } from '../components/LootCache'
 import { HPEditor, HPEditorButton } from '../components/HPEditor'
 import { LevelUpSpellSelector } from '../components/LevelUpSpellSelector'
 import { NinthLevelSpellSelector } from '../components/NinthLevelSpellSelector'
+import { SpellSelector } from '../components/SpellSelector'
 import { EquipmentEditor } from '../components/EquipmentEditor'
 import { FIGHTING_STANCES } from '../data/fightingStances'
 import type { LootItem } from '../data/lootGenerator'
@@ -90,6 +91,7 @@ export function CharacterSheetPage() {
   const [consumableItemToRemove, setConsumableItemToRemove] = useState<string | null>(null)
   const [showConsumableNotification, setShowConsumableNotification] = useState<{ message: string; type: 'success' | 'info' } | null>(null)
   const [showManualSpellAdd, setShowManualSpellAdd] = useState(false)
+  const [showClassSpellSelector, setShowClassSpellSelector] = useState(false)
 
   useEffect(() => {
     if (id) {
@@ -737,8 +739,20 @@ export function CharacterSheetPage() {
 
       {activeTab === 'spells' && (
         <div className="space-y-6">
-          {/* Add Spell Button */}
-          <div className="flex justify-end">
+          {/* Spell Action Buttons */}
+          <div className="flex justify-end gap-3">
+            {/* Choose Class Spells - only for spellcasting classes */}
+            {character.class && character.class.spellcasting !== 'none' && (
+              <button
+                onClick={() => setShowClassSpellSelector(true)}
+                className="px-4 py-2 bg-blue-700 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors flex items-center gap-2"
+                title="Choose spells from your class spell list"
+              >
+                <span className="text-lg">📚</span>
+                Choose Class Spells
+              </button>
+            )}
+            {/* Add Any Spell - for shops or other sources */}
             <button
               onClick={() => setShowManualSpellAdd(true)}
               className="px-4 py-2 bg-purple-700 hover:bg-purple-600 text-white font-semibold rounded-lg transition-colors flex items-center gap-2"
@@ -1370,6 +1384,50 @@ export function CharacterSheetPage() {
           }}
           onClose={() => setShowManualSpellAdd(false)}
         />
+      )}
+
+      {/* Class Spell Selector Modal */}
+      {showClassSpellSelector && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-900 rounded-lg border-2 border-dnd-gold max-w-5xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-gray-900 border-b border-gray-700 p-6 z-10">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold text-dnd-gold">Choose Class Spells</h2>
+                  <p className="text-gray-400 mt-1">
+                    Select spells from your {character.class?.name || 'class'} spell list
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowClassSpellSelector(false)}
+                  className="text-gray-400 hover:text-white text-2xl font-bold w-8 h-8 flex items-center justify-center"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+            <div className="p-6">
+              <SpellSelector
+                characterClass={character.class}
+                subclass={character.subclass}
+                level={character.level}
+                onSubmit={(cantrips, spells) => {
+                  // Add all selected spells
+                  cantrips.forEach((spell) => addSpell(spell))
+                  spells.forEach((spell) => addSpell(spell))
+                  saveCharacter()
+                  setShowClassSpellSelector(false)
+                  setShowConsumableNotification({
+                    message: `Added ${cantrips.length + spells.length} spell(s)`,
+                    type: 'success'
+                  })
+                  setTimeout(() => setShowConsumableNotification(null), 3000)
+                }}
+                onBack={() => setShowClassSpellSelector(false)}
+              />
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Consumable Notification */}
