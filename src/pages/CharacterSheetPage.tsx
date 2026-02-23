@@ -73,7 +73,7 @@ export function CharacterSheetPage() {
   const navigate = useNavigate()
   const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, changeEquipmentQuantity, setFightingStance, addEquipment, updateHitPoints, addSpell, removeSpell, useItemCharge, saveCharacter, addFoodRations, addWaterSupply, addItemFeature } = useCharacterStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
-  const [activeTab, setActiveTab] = useState<'main' | 'spells' | 'inventory' | 'features' | 'loot'>('main')
+  const [activeTab, setActiveTab] = useState<'main' | 'actions' | 'spells' | 'inventory' | 'features' | 'loot'>('main')
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
   const [showIncomeRoller, setShowIncomeRoller] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
@@ -429,6 +429,7 @@ export function CharacterSheetPage() {
 
   const tabs = [
     { id: 'main', label: 'Overview' },
+    { id: 'actions', label: 'Actions' },
     { id: 'spells', label: 'Spells' },
     { id: 'inventory', label: 'Inventory' },
     { id: 'features', label: 'Features' },
@@ -1058,6 +1059,213 @@ export function CharacterSheetPage() {
               <p className="text-gray-300 whitespace-pre-wrap">{character.backstory}</p>
             </div>
           )}
+        </div>
+      )}
+
+      {activeTab === 'actions' && (
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="card bg-gradient-to-br from-blue-900/30 to-purple-900/30 border-2 border-dnd-gold p-6">
+            <h2 className="text-3xl font-bold text-dnd-gold mb-2">⚔️ Actions - What Can I Do?</h2>
+            <p className="text-gray-300">
+              All your available actions, attacks, spells, and consumables in one place. Perfect for quick reference during combat!
+            </p>
+          </div>
+
+          {/* Weapon Attacks */}
+          <div className="card bg-gray-800 border-gray-700 p-6">
+            <h3 className="text-2xl font-bold text-white mb-4">🗡️ Weapon Attacks</h3>
+            {character.equipment.filter(item => item.category === 'weapon' && item.equipped).length > 0 ? (
+              <div className="grid md:grid-cols-2 gap-4">
+                {character.equipment
+                  .filter((item): item is import('../types').Weapon => item.category === 'weapon' && item.equipped === true)
+                  .map((weapon) => {
+                    const attackBonus = weapon.properties?.includes('finesse')
+                      ? Math.max(
+                          calculateModifier(character.abilityScores.strength),
+                          calculateModifier(character.abilityScores.dexterity)
+                        ) + calculateProficiencyBonus(character.level)
+                      : calculateModifier(character.abilityScores.strength) + calculateProficiencyBonus(character.level)
+
+                    return (
+                      <div key={weapon.id} className="p-4 bg-gray-900 border border-gray-700 rounded-lg">
+                        <div className="flex items-start justify-between mb-2">
+                          <div>
+                            <h4 className="font-bold text-white">{weapon.name}</h4>
+                            <p className="text-sm text-gray-400">{weapon.weaponType}</p>
+                          </div>
+                        </div>
+                        <div className="space-y-1 text-sm">
+                          <div className="flex items-center gap-2">
+                            <span className="text-green-400 font-bold">Attack:</span>
+                            <span className="text-white">+{attackBonus} to hit</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-red-400 font-bold">Damage:</span>
+                            <span className="text-white">{weapon.damage.dice} {weapon.damage.type}</span>
+                          </div>
+                          {weapon.properties && weapon.properties.length > 0 && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-blue-400 font-bold">Properties:</span>
+                              <span className="text-gray-300 text-xs">{weapon.properties.join(', ')}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
+              </div>
+            ) : (
+              <p className="text-gray-500 italic">No weapons equipped</p>
+            )}
+          </div>
+
+          {/* Consumables (Potions, Scrolls, etc.) */}
+          <div className="card bg-gray-800 border-gray-700 p-6">
+            <h3 className="text-2xl font-bold text-white mb-4">🧪 Consumables & Items</h3>
+            {character.equipment.filter(item =>
+              item.category === 'consumable' ||
+              item.name.toLowerCase().includes('potion') ||
+              item.name.toLowerCase().includes('scroll') ||
+              item.name.toLowerCase().includes('elixir')
+            ).length > 0 ? (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {character.equipment
+                  .filter(item =>
+                    item.category === 'consumable' ||
+                    item.name.toLowerCase().includes('potion') ||
+                    item.name.toLowerCase().includes('scroll') ||
+                    item.name.toLowerCase().includes('elixir')
+                  )
+                  .map((item) => (
+                    <div key={item.id} className="p-4 bg-gradient-to-br from-green-900/20 to-blue-900/20 border border-green-700 rounded-lg">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex-1">
+                          <h4 className="font-bold text-green-400">{item.name}</h4>
+                          {item.quantity && item.quantity > 1 && (
+                            <p className="text-sm text-gray-400">Qty: {item.quantity}</p>
+                          )}
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-300 mb-2">{item.description}</p>
+                      {item.charges && (
+                        <div className="text-xs text-blue-300">
+                          Magical: {item.charges.spellName}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+              </div>
+            ) : (
+              <p className="text-gray-500 italic">No consumables in inventory</p>
+            )}
+          </div>
+
+          {/* Spells */}
+          {character.knownSpells.length > 0 && (
+            <div className="card bg-gray-800 border-gray-700 p-6">
+              <h3 className="text-2xl font-bold text-white mb-4">✨ Spells</h3>
+
+              {/* Cantrips */}
+              {character.knownSpells.filter(s => s.level === 0).length > 0 && (
+                <div className="mb-6">
+                  <h4 className="text-lg font-semibold text-purple-400 mb-3">Cantrips (At Will)</h4>
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {character.knownSpells.filter(s => s.level === 0).map((spell) => (
+                      <div key={spell.id} className="p-3 bg-purple-900/20 border border-purple-700 rounded-lg">
+                        <div className="font-semibold text-purple-300">{spell.name}</div>
+                        <div className="text-xs text-gray-400 mt-1">{spell.school}</div>
+                        {spell.damage && (
+                          <div className="text-sm text-red-400 mt-1">Damage: {spell.damage.dice}</div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Leveled Spells */}
+              {character.knownSpells.filter(s => s.level > 0).length > 0 && (
+                <div>
+                  <h4 className="text-lg font-semibold text-blue-400 mb-3">Leveled Spells</h4>
+                  <div className="grid md:grid-cols-2 gap-3">
+                    {character.knownSpells.filter(s => s.level > 0).map((spell) => {
+                      const slotKey = `level${spell.level}` as keyof typeof character.spellSlots
+                      const slots = character.spellSlots[slotKey]
+                      const slotsRemaining = slots.max - slots.used
+
+                      return (
+                        <div key={spell.id} className="p-3 bg-blue-900/20 border border-blue-700 rounded-lg">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="font-semibold text-blue-300">{spell.name}</div>
+                              <div className="text-xs text-gray-400">
+                                Level {spell.level} {spell.school}
+                              </div>
+                            </div>
+                            {slots.max > 0 && (
+                              <div className="text-xs font-bold text-yellow-400 ml-2">
+                                {slotsRemaining}/{slots.max} slots
+                              </div>
+                            )}
+                          </div>
+                          {spell.damage && (
+                            <div className="text-sm text-red-400 mt-1">Damage: {spell.damage.dice}</div>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Special Abilities & Features */}
+          {(character.featureCharges.length > 0 || character.itemFeatures.length > 0) && (
+            <div className="card bg-gray-800 border-gray-700 p-6">
+              <h3 className="text-2xl font-bold text-white mb-4">⚡ Special Abilities</h3>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                {/* Class Features with Charges */}
+                {character.featureCharges.map((feature) => (
+                  <div key={feature.id} className="p-4 bg-yellow-900/20 border border-yellow-700 rounded-lg">
+                    <div className="flex items-start justify-between mb-2">
+                      <h4 className="font-bold text-yellow-400">{feature.name}</h4>
+                      <div className="text-sm font-bold text-yellow-300">
+                        {feature.current}/{feature.maximum}
+                      </div>
+                    </div>
+                    <div className="text-xs text-gray-400">
+                      Recharges on: {feature.rechargeOn.replace(/([A-Z])/g, ' $1').trim()}
+                    </div>
+                  </div>
+                ))}
+
+                {/* Item Features */}
+                {character.itemFeatures.map((feature) => (
+                  <div key={feature.id} className="p-4 bg-cyan-900/20 border border-cyan-700 rounded-lg">
+                    <h4 className="font-bold text-cyan-400">{feature.name}</h4>
+                    <p className="text-sm text-gray-300 mt-1">{feature.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Quick Tip */}
+          <div className="card bg-blue-900/20 border border-blue-700 p-4">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">💡</span>
+              <div>
+                <h4 className="font-bold text-blue-400 mb-1">Quick Tip for New Players</h4>
+                <p className="text-sm text-gray-300">
+                  On your turn, you can: <strong>Move</strong> up to your speed, take one <strong>Action</strong> (attack, cast a spell, use an item),
+                  and sometimes a <strong>Bonus Action</strong> (if you have abilities that use it). Click the dice button to roll for attacks!
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
