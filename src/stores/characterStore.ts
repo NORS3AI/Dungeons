@@ -218,6 +218,9 @@ interface CharacterState {
   addItemFeature: (feature: ClassFeature) => void
   removeItemFeature: (featureId: string) => void
   useSpellSlot: (level: number) => void
+  initializeResourcePools: () => void
+  spendResource: (poolId: string, amount: number) => void
+  restoreResource: (poolId: string, amount: number) => void
   shortRest: () => void
   longRest: () => void
 
@@ -998,6 +1001,131 @@ export const useCharacterStore = create<CharacterState>()(
           }
         },
 
+        initializeResourcePools: () => {
+          const { currentCharacter } = get()
+          if (!currentCharacter || !currentCharacter.class) return
+
+          const resourcePools = []
+          const classId = currentCharacter.class.id
+          const level = currentCharacter.level
+
+          // Death Knight - Runic Power
+          if (classId === 'death-knight') {
+            const max = 4 + level
+            resourcePools.push({
+              id: 'runic-power',
+              name: 'Runic Power',
+              current: max,
+              maximum: max,
+              rechargeOn: 'longRest' as const,
+            })
+          }
+
+          // Monk - Ki Points
+          if (classId === 'monk') {
+            const max = level
+            resourcePools.push({
+              id: 'ki',
+              name: 'Ki Points',
+              current: max,
+              maximum: max,
+              rechargeOn: 'shortRest' as const,
+            })
+          }
+
+          // Sorcerer - Sorcery Points
+          if (classId === 'sorcerer') {
+            const max = level
+            resourcePools.push({
+              id: 'sorcery-points',
+              name: 'Sorcery Points',
+              current: max,
+              maximum: max,
+              rechargeOn: 'longRest' as const,
+            })
+          }
+
+          // Barbarian - Rage
+          if (classId === 'barbarian') {
+            const max = level < 3 ? 2 : level < 6 ? 3 : level < 12 ? 4 : level < 17 ? 5 : level < 20 ? 6 : 999
+            resourcePools.push({
+              id: 'rage',
+              name: 'Rage',
+              current: max,
+              maximum: max,
+              rechargeOn: 'longRest' as const,
+            })
+          }
+
+          // Bard - Bardic Inspiration
+          if (classId === 'bard') {
+            const conMod = Math.floor((currentCharacter.abilityScores.charisma - 10) / 2)
+            const max = Math.max(1, conMod)
+            resourcePools.push({
+              id: 'bardic-inspiration',
+              name: 'Bardic Inspiration',
+              current: max,
+              maximum: max,
+              rechargeOn: 'shortRest' as const,
+            })
+          }
+
+          // Cleric/Paladin - Channel Divinity
+          if (classId === 'cleric' || classId === 'paladin') {
+            const max = level < 6 ? 1 : level < 18 ? 2 : 3
+            resourcePools.push({
+              id: 'channel-divinity',
+              name: 'Channel Divinity',
+              current: max,
+              maximum: max,
+              rechargeOn: 'shortRest' as const,
+            })
+          }
+
+          set({
+            currentCharacter: {
+              ...currentCharacter,
+              resourcePools,
+            },
+          })
+        },
+
+        spendResource: (poolId: string, amount: number) => {
+          const { currentCharacter } = get()
+          if (!currentCharacter) return
+
+          const resourcePools = currentCharacter.resourcePools.map((pool) =>
+            pool.id === poolId
+              ? { ...pool, current: Math.max(0, pool.current - amount) }
+              : pool
+          )
+
+          set({
+            currentCharacter: {
+              ...currentCharacter,
+              resourcePools,
+            },
+          })
+        },
+
+        restoreResource: (poolId: string, amount: number) => {
+          const { currentCharacter } = get()
+          if (!currentCharacter) return
+
+          const resourcePools = currentCharacter.resourcePools.map((pool) =>
+            pool.id === poolId
+              ? { ...pool, current: Math.min(pool.maximum, pool.current + amount) }
+              : pool
+          )
+
+          set({
+            currentCharacter: {
+              ...currentCharacter,
+              resourcePools,
+            },
+          })
+        },
+
         shortRest: () => {
           const { currentCharacter } = get()
           if (!currentCharacter) return
@@ -1007,10 +1135,18 @@ export const useCharacterStore = create<CharacterState>()(
             f.rechargeOn === 'shortRest' ? { ...f, current: f.maximum } : f
           )
 
+          // Restore short rest resource pools (half restoration for longRest pools, full for shortRest pools)
+          const resourcePools = currentCharacter.resourcePools.map((pool) =>
+            pool.rechargeOn === 'shortRest'
+              ? { ...pool, current: pool.maximum }
+              : { ...pool, current: Math.min(pool.current + Math.floor(pool.maximum / 2), pool.maximum) }
+          )
+
           set({
             currentCharacter: {
               ...currentCharacter,
               featureCharges,
+              resourcePools,
             },
           })
         },
@@ -1026,6 +1162,12 @@ export const useCharacterStore = create<CharacterState>()(
               : f
           )
 
+          // Restore all resource pools (full restore on long rest)
+          const resourcePools = currentCharacter.resourcePools.map((pool) => ({
+            ...pool,
+            current: pool.maximum,
+          }))
+
           // Reset spell slots
           const spellSlots = { ...currentCharacter.spellSlots }
           for (const key of Object.keys(spellSlots) as (keyof typeof spellSlots)[]) {
@@ -1038,12 +1180,24 @@ export const useCharacterStore = create<CharacterState>()(
             current: currentCharacter.hitPoints.maximum,
           }
 
+          // Add daily income if configured
+          let currency = { ...currentCharacter.currency }
+          if (currentCharacter.dailyIncome) {
+            const { amount, currency: currencyType } = currentCharacter.dailyIncome
+            currency = {
+              ...currency,
+              [currencyType]: currency[currencyType] + amount,
+            }
+          }
+
           set({
             currentCharacter: {
               ...currentCharacter,
               featureCharges,
+              resourcePools,
               spellSlots,
               hitPoints,
+              currency,
               deathSaves: { successes: 0, failures: 0 },
             },
           })
