@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useCharacterStore } from '../stores/characterStore'
 import { DiceRoller, DiceRollerButton, DiceRollerModal } from '../components/DiceRoller'
-import { calculateModifier, calculateProficiencyBonus } from '../types/dice'
-import { isWeapon, isArmor, isShield, isCloak, autoConvertCurrency } from '../types/equipment'
+import { calculateModifier, calculateProficiencyBonus, rollDice } from '../types/dice'
+import { isWeapon, isArmor, isShield, isCloak, autoConvertCurrency, EMPTY_CURRENCY } from '../types/equipment'
 import type { Character, Ability, Equipment, Weapon, Armor, Currency, Material, Class } from '../types'
 import {
   FIGHTER,
@@ -94,6 +94,7 @@ export function CharacterSheetPage() {
   const [showManualSpellAdd, setShowManualSpellAdd] = useState(false)
   const [showClassSpellSelector, setShowClassSpellSelector] = useState(false)
   const [showAlignmentSelector, setShowAlignmentSelector] = useState(false)
+  const [weaponRolls, setWeaponRolls] = useState<Record<string, { hit?: number; damage?: number }>>({})
 
   useEffect(() => {
     if (id) {
@@ -290,6 +291,33 @@ export function CharacterSheetPage() {
       return
     }
 
+    // Consumables (potions, scrolls, elixirs) go directly to inventory
+    const nameLower = lootItem.name.toLowerCase()
+    const isConsumable = lootItem.category === 'consumable' ||
+                        nameLower.includes('potion') ||
+                        nameLower.includes('scroll') ||
+                        nameLower.includes('elixir')
+
+    if (isConsumable) {
+      const consumableItem: Equipment = {
+        id: lootItem.id + '-' + Date.now(),
+        name: lootItem.name,
+        description: lootItem.description,
+        category: 'consumable',
+        equipped: false,
+        rarity: lootItem.rarity,
+        quantity: lootItem.quantity || 1,
+        weight: 0.1,
+        cost: {
+          ...EMPTY_CURRENCY,
+          gold: lootItem.value || 0,
+        },
+      }
+      addEquipment(consumableItem)
+      saveCharacter()
+      return
+    }
+
     // Items with special abilities (like invisibility cloak) -> add to Features
     if (lootItem.feature) {
       addItemFeature(lootItem.feature)
@@ -430,6 +458,136 @@ export function CharacterSheetPage() {
     setTimeout(() => {
       setShowConsumableNotification(null)
     }, 3000)
+  }
+
+  // Roll to hit for weapon attack
+  const handleRollToHit = (weaponId: string, attackBonus: number) => {
+    const roll = rollDice('1d20')
+    if (!roll) return
+    const totalRoll = roll.grandTotal + attackBonus
+    setWeaponRolls(prev => ({
+      ...prev,
+      [weaponId]: { ...prev[weaponId], hit: totalRoll }
+    }))
+
+    // Clear after 5 seconds
+    setTimeout(() => {
+      setWeaponRolls(prev => {
+        const newRolls = { ...prev }
+        if (newRolls[weaponId]) {
+          delete newRolls[weaponId].hit
+        }
+        return newRolls
+      })
+    }, 5000)
+  }
+
+  // Roll damage for weapon
+  const handleRollDamage = (weaponId: string, damageDice: string) => {
+    const roll = rollDice(damageDice)
+    if (!roll) return
+    setWeaponRolls(prev => ({
+      ...prev,
+      [weaponId]: { ...prev[weaponId], damage: roll.grandTotal }
+    }))
+
+    // Clear after 5 seconds
+    setTimeout(() => {
+      setWeaponRolls(prev => {
+        const newRolls = { ...prev }
+        if (newRolls[weaponId]) {
+          delete newRolls[weaponId].damage
+        }
+        return newRolls
+      })
+    }, 5000)
+  }
+
+  // Get resource pools for the character based on their class
+  const getResourcePools = () => {
+    const pools: Array<{
+      name: string
+      current: number
+      max: number
+      description: string
+      color: string
+    }> = []
+
+    const charClass = character.class
+
+    // Death Knight - Runic Power
+    if (charClass?.id === 'death-knight') {
+      const max = 4 + character.level
+      pools.push({
+        name: 'Runic Power',
+        current: max, // TODO: Track usage
+        max,
+        description: 'Regain half on short rest, all on long rest. +1 on critical hit.',
+        color: 'text-cyan-400'
+      })
+    }
+
+    // Monk - Ki Points
+    if (charClass?.id === 'monk') {
+      pools.push({
+        name: 'Ki Points',
+        current: character.level, // TODO: Track usage
+        max: character.level,
+        description: 'Regain all on short rest.',
+        color: 'text-yellow-400'
+      })
+    }
+
+    // Sorcerer - Sorcery Points
+    if (charClass?.id === 'sorcerer') {
+      pools.push({
+        name: 'Sorcery Points',
+        current: character.level, // TODO: Track usage
+        max: character.level,
+        description: character.level >= 20 ? 'Regain 4 on short rest, all on long rest.' : 'Regain all on long rest.',
+        color: 'text-purple-400'
+      })
+    }
+
+    // Barbarian - Rage
+    if (charClass?.id === 'barbarian') {
+      const rageFeature = charClass.features.find(f => f.id === 'rage')
+      const rageAmount = rageFeature?.charges?.amount || 2
+      const rageUses = typeof rageAmount === 'number' ? rageAmount : 2
+      pools.push({
+        name: 'Rage',
+        current: rageUses, // TODO: Track usage
+        max: rageUses,
+        description: 'Regain all on long rest.',
+        color: 'text-red-400'
+      })
+    }
+
+    // Bard - Bardic Inspiration
+    if (charClass?.id === 'bard') {
+      const charismaModifier = calculateModifier(character.abilityScores.charisma)
+      const max = Math.max(1, charismaModifier)
+      pools.push({
+        name: 'Bardic Inspiration',
+        current: max, // TODO: Track usage
+        max,
+        description: character.level >= 5 ? 'Regain all on short rest.' : 'Regain all on long rest.',
+        color: 'text-pink-400'
+      })
+    }
+
+    // Cleric & Paladin - Channel Divinity
+    if (charClass?.id === 'cleric' || charClass?.id === 'paladin') {
+      pools.push({
+        name: 'Channel Divinity',
+        current: 1, // TODO: Track usage (increases at higher levels)
+        max: 1,
+        description: 'Regain all on short rest.',
+        color: 'text-amber-400'
+      })
+    }
+
+    return pools
   }
 
   const handleUpdateHP = (hp: Partial<Character['hitPoints']>) => {
@@ -1549,6 +1707,149 @@ export function CharacterSheetPage() {
             </p>
           </div>
 
+          {/* Resource Pools */}
+          {getResourcePools().length > 0 && (
+            <div className="card bg-gray-800 border-gray-700 p-6">
+              <h3 className="text-2xl font-bold text-white mb-4">💎 Resource Pools</h3>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {getResourcePools().map((pool) => (
+                  <div key={pool.name} className="p-4 bg-gray-900 border border-gray-700 rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className={`font-bold ${pool.color}`}>{pool.name}</h4>
+                      <span className="text-2xl font-bold text-white">
+                        {pool.current} / {pool.max}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-400">{pool.description}</p>
+
+                    {/* Visual bar */}
+                    <div className="mt-3 h-2 bg-gray-700 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300"
+                        style={{ width: `${(pool.current / pool.max) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 p-3 bg-blue-900/20 border border-blue-700/30 rounded-lg">
+                <p className="text-sm text-blue-300">
+                  <span className="font-bold">💡 Tip:</span> Resource tracking is currently display-only.
+                  Mark usage on paper or use the Notes tab to track consumption during your session!
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Spells */}
+          {character.knownSpells && character.knownSpells.length > 0 && (
+            <div className="card bg-gray-800 border-gray-700 p-6">
+              <h3 className="text-2xl font-bold text-white mb-4">✨ Spells</h3>
+
+              {/* Spell Slots Summary */}
+              {character.class?.spellcasting !== 'none' && (
+                <div className="mb-6 p-4 bg-gray-900 rounded-lg border border-purple-500/30">
+                  <h4 className="font-bold text-purple-400 mb-2">Spell Slots</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {Object.entries(character.spellSlots).map(([level, slots]) => {
+                      if (slots.max === 0) return null
+                      return (
+                        <div key={level} className="px-3 py-2 bg-purple-900/30 rounded border border-purple-500/50">
+                          <span className="text-purple-300 font-bold">
+                            {level === '1' ? '1st' : level === '2' ? '2nd' : level === '3' ? '3rd' : `${level}th`}:
+                          </span>{' '}
+                          <span className="text-white">{slots.current}/{slots.max}</span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Group spells by level */}
+              {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((spellLevel) => {
+                const spellsOfLevel = character.knownSpells.filter(s => s.level === spellLevel)
+                if (spellsOfLevel.length === 0) return null
+
+                return (
+                  <div key={spellLevel} className="mb-6">
+                    <h4 className="text-lg font-bold text-purple-400 mb-3">
+                      {spellLevel === 0 ? 'Cantrips' :
+                       spellLevel === 1 ? '1st Level Spells' :
+                       spellLevel === 2 ? '2nd Level Spells' :
+                       spellLevel === 3 ? '3rd Level Spells' :
+                       `${spellLevel}th Level Spells`}
+                    </h4>
+                    <div className="grid md:grid-cols-2 gap-3">
+                      {spellsOfLevel.map((spell) => {
+                        const isPrepared = character.preparedSpells.includes(spell.id)
+                        return (
+                          <div
+                            key={spell.id}
+                            className={`p-4 bg-gray-900 rounded-lg border ${
+                              isPrepared ? 'border-purple-500' : 'border-gray-700'
+                            }`}
+                          >
+                            <div className="flex items-start justify-between mb-2">
+                              <div className="flex-1">
+                                <QuickRefTooltip type="spell" id={spell.id}>
+                                  <h5 className="font-bold text-white hover:text-purple-300 cursor-pointer">
+                                    {spell.name}
+                                  </h5>
+                                </QuickRefTooltip>
+                                <p className="text-xs text-gray-400">{spell.school}</p>
+                              </div>
+                              {isPrepared && (
+                                <span className="ml-2 px-2 py-0.5 bg-purple-600 text-white text-xs rounded">
+                                  Prepared
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="space-y-1 text-sm">
+                              <div className="flex items-center gap-2 text-gray-300">
+                                <span className="text-blue-400">⏱</span>
+                                <span>{spell.castingTime.amount} {spell.castingTime.unit}</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-gray-300">
+                                <span className="text-green-400">📏</span>
+                                <span>
+                                  Range: {spell.range.type === 'ranged' ? `${spell.range.distance} ft` : spell.range.type}
+                                </span>
+                              </div>
+                              {spell.concentration && (
+                                <div className="flex items-center gap-2">
+                                  <span className="px-2 py-0.5 bg-yellow-900/30 text-yellow-400 text-xs rounded">
+                                    Concentration
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+
+                            <p className="mt-2 text-sm text-gray-400 line-clamp-2">
+                              {spell.description}
+                            </p>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )
+              })}
+
+              {character.class?.spellcasting !== 'none' && (
+                <div className="mt-4 p-3 bg-purple-900/20 border border-purple-700/30 rounded-lg">
+                  <p className="text-sm text-purple-300">
+                    <span className="font-bold">💡 Tip:</span> Click spell names for full details!
+                    {(character.class?.id === 'cleric' || character.class?.id === 'druid' ||
+                      character.class?.id === 'paladin' || character.class?.id === 'wizard') &&
+                      ' Remember to prepare your spells each day.'}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Weapon Attacks */}
           <div className="card bg-gray-800 border-gray-700 p-6">
             <h3 className="text-2xl font-bold text-white mb-4">🗡️ Weapon Attacks</h3>
@@ -1565,21 +1866,53 @@ export function CharacterSheetPage() {
                       : calculateModifier(character.abilityScores.strength) + calculateProficiencyBonus(character.level)
 
                     return (
-                      <div key={weapon.id} className="p-4 bg-gray-900 border border-gray-700 rounded-lg">
-                        <div className="flex items-start justify-between mb-2">
+                      <div key={weapon.id} className="p-4 bg-gray-900 border border-gray-700 rounded-lg relative">
+                        {/* Roll buttons in top right */}
+                        <div className="absolute top-2 right-2 flex gap-1">
+                          <button
+                            onClick={() => handleRollToHit(weapon.id, attackBonus)}
+                            className="w-7 h-7 bg-green-700 hover:bg-green-600 text-white rounded font-bold text-xs flex items-center justify-center transition-colors"
+                            title="Roll to hit (1d20 + attack bonus)"
+                          >
+                            H
+                          </button>
+                          <button
+                            onClick={() => handleRollDamage(weapon.id, weapon.damage.dice)}
+                            className="w-7 h-7 bg-red-700 hover:bg-red-600 text-white rounded text-xs flex items-center justify-center transition-colors"
+                            title={`Roll damage (${weapon.damage.dice})`}
+                          >
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M10 2L2 6v4c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V6l-8-4zm0 2.18l6 3v3.82c0 4.52-3.12 8.75-7 9.86V4.18z"/>
+                              <circle cx="10" cy="10" r="2"/>
+                            </svg>
+                          </button>
+                        </div>
+
+                        <div className="flex items-start justify-between mb-2 pr-16">
                           <div>
                             <h4 className="font-bold text-white">{weapon.name}</h4>
                             <p className="text-sm text-gray-400">{weapon.weaponType}</p>
                           </div>
                         </div>
+
                         <div className="space-y-1 text-sm">
                           <div className="flex items-center gap-2">
                             <span className="text-green-400 font-bold">Attack:</span>
                             <span className="text-white">+{attackBonus} to hit</span>
+                            {weaponRolls[weapon.id]?.hit !== undefined && (
+                              <span className="ml-2 px-2 py-0.5 bg-green-600 text-white rounded font-bold animate-pulse">
+                                {weaponRolls[weapon.id].hit}
+                              </span>
+                            )}
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="text-red-400 font-bold">Damage:</span>
                             <span className="text-white">{weapon.damage.dice} {weapon.damage.type}</span>
+                            {weaponRolls[weapon.id]?.damage !== undefined && (
+                              <span className="ml-2 px-2 py-0.5 bg-red-600 text-white rounded font-bold animate-pulse">
+                                {weaponRolls[weapon.id].damage}
+                              </span>
+                            )}
                           </div>
                           {weapon.properties && weapon.properties.length > 0 && (
                             <div className="flex items-center gap-2">
@@ -1755,6 +2088,257 @@ export function CharacterSheetPage() {
               </div>
             </div>
           )}
+
+          {/* Skill Checks - d20 Rolls */}
+          <div className="card bg-gray-800 border-gray-700 p-6">
+            <h3 className="text-2xl font-bold text-white mb-4">🎲 Skill Checks (d20)</h3>
+            <p className="text-gray-400 mb-6">
+              When the DM asks you to make a skill check, roll a d20 and add the bonus shown below.
+              <span className="text-dnd-gold font-bold"> Proficient</span> skills get extra bonuses!
+            </p>
+
+            {/* Skills grouped by ability */}
+            <div className="space-y-6">
+              {/* Strength Skills */}
+              <div>
+                <h4 className="text-lg font-bold text-red-400 mb-3 flex items-center gap-2">
+                  <span>💪 Strength</span>
+                  <span className="text-sm font-normal text-gray-400">
+                    (Modifier: {calculateModifier(character.abilityScores.strength) >= 0 ? '+' : ''}{calculateModifier(character.abilityScores.strength)})
+                  </span>
+                </h4>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {/* Athletics */}
+                  {(() => {
+                    const modifier = calculateModifier(character.abilityScores.strength)
+                    const profBonus = character.skills.athletics !== 'none' ? calculateProficiencyBonus(character.level) : 0
+                    const expertiseBonus = character.skills.athletics === 'expertise' ? calculateProficiencyBonus(character.level) : 0
+                    const total = modifier + profBonus + expertiseBonus
+                    return (
+                      <div className="p-3 bg-gray-900 border border-gray-700 rounded-lg">
+                        <div className="flex items-center justify-between mb-1">
+                          <QuickRefTooltip type="skill" id="athletics">
+                            <span className="font-bold text-white hover:text-blue-300 cursor-pointer">Athletics</span>
+                          </QuickRefTooltip>
+                          <span className="text-2xl font-bold text-green-400">{total >= 0 ? '+' : ''}{total}</span>
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          {modifier >= 0 ? '+' : ''}{modifier} (STR)
+                          {character.skills.athletics === 'proficient' && ` + ${profBonus} (Proficient)`}
+                          {character.skills.athletics === 'expertise' && ` + ${profBonus + expertiseBonus} (Expertise)`}
+                        </div>
+                      </div>
+                    )
+                  })()}
+                </div>
+              </div>
+
+              {/* Dexterity Skills */}
+              <div>
+                <h4 className="text-lg font-bold text-green-400 mb-3 flex items-center gap-2">
+                  <span>🤸 Dexterity</span>
+                  <span className="text-sm font-normal text-gray-400">
+                    (Modifier: {calculateModifier(character.abilityScores.dexterity) >= 0 ? '+' : ''}{calculateModifier(character.abilityScores.dexterity)})
+                  </span>
+                </h4>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {/* Acrobatics */}
+                  {(() => {
+                    const modifier = calculateModifier(character.abilityScores.dexterity)
+                    const profBonus = character.skills.acrobatics !== 'none' ? calculateProficiencyBonus(character.level) : 0
+                    const expertiseBonus = character.skills.acrobatics === 'expertise' ? calculateProficiencyBonus(character.level) : 0
+                    const total = modifier + profBonus + expertiseBonus
+                    return (
+                      <div className="p-3 bg-gray-900 border border-gray-700 rounded-lg">
+                        <div className="flex items-center justify-between mb-1">
+                          <QuickRefTooltip type="skill" id="acrobatics">
+                            <span className="font-bold text-white hover:text-blue-300 cursor-pointer">Acrobatics</span>
+                          </QuickRefTooltip>
+                          <span className="text-2xl font-bold text-green-400">{total >= 0 ? '+' : ''}{total}</span>
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          {modifier >= 0 ? '+' : ''}{modifier} (DEX)
+                          {character.skills.acrobatics === 'proficient' && ` + ${profBonus} (Proficient)`}
+                          {character.skills.acrobatics === 'expertise' && ` + ${profBonus + expertiseBonus} (Expertise)`}
+                        </div>
+                      </div>
+                    )
+                  })()}
+                  {/* Sleight of Hand */}
+                  {(() => {
+                    const modifier = calculateModifier(character.abilityScores.dexterity)
+                    const profBonus = character.skills.sleightOfHand !== 'none' ? calculateProficiencyBonus(character.level) : 0
+                    const expertiseBonus = character.skills.sleightOfHand === 'expertise' ? calculateProficiencyBonus(character.level) : 0
+                    const total = modifier + profBonus + expertiseBonus
+                    return (
+                      <div className="p-3 bg-gray-900 border border-gray-700 rounded-lg">
+                        <div className="flex items-center justify-between mb-1">
+                          <QuickRefTooltip type="skill" id="sleight-of-hand">
+                            <span className="font-bold text-white hover:text-blue-300 cursor-pointer">Sleight of Hand</span>
+                          </QuickRefTooltip>
+                          <span className="text-2xl font-bold text-green-400">{total >= 0 ? '+' : ''}{total}</span>
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          {modifier >= 0 ? '+' : ''}{modifier} (DEX)
+                          {character.skills.sleightOfHand === 'proficient' && ` + ${profBonus} (Proficient)`}
+                          {character.skills.sleightOfHand === 'expertise' && ` + ${profBonus + expertiseBonus} (Expertise)`}
+                        </div>
+                      </div>
+                    )
+                  })()}
+                  {/* Stealth */}
+                  {(() => {
+                    const modifier = calculateModifier(character.abilityScores.dexterity)
+                    const profBonus = character.skills.stealth !== 'none' ? calculateProficiencyBonus(character.level) : 0
+                    const expertiseBonus = character.skills.stealth === 'expertise' ? calculateProficiencyBonus(character.level) : 0
+                    const total = modifier + profBonus + expertiseBonus
+                    return (
+                      <div className="p-3 bg-gray-900 border border-gray-700 rounded-lg">
+                        <div className="flex items-center justify-between mb-1">
+                          <QuickRefTooltip type="skill" id="stealth">
+                            <span className="font-bold text-white hover:text-blue-300 cursor-pointer">Stealth</span>
+                          </QuickRefTooltip>
+                          <span className="text-2xl font-bold text-green-400">{total >= 0 ? '+' : ''}{total}</span>
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          {modifier >= 0 ? '+' : ''}{modifier} (DEX)
+                          {character.skills.stealth === 'proficient' && ` + ${profBonus} (Proficient)`}
+                          {character.skills.stealth === 'expertise' && ` + ${profBonus + expertiseBonus} (Expertise)`}
+                        </div>
+                      </div>
+                    )
+                  })()}
+                </div>
+              </div>
+
+              {/* Intelligence Skills */}
+              <div>
+                <h4 className="text-lg font-bold text-blue-400 mb-3 flex items-center gap-2">
+                  <span>🧠 Intelligence</span>
+                  <span className="text-sm font-normal text-gray-400">
+                    (Modifier: {calculateModifier(character.abilityScores.intelligence) >= 0 ? '+' : ''}{calculateModifier(character.abilityScores.intelligence)})
+                  </span>
+                </h4>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {['arcana', 'history', 'investigation', 'nature', 'religion'].map((skillKey) => {
+                    const skill = skillKey as keyof typeof character.skills
+                    const modifier = calculateModifier(character.abilityScores.intelligence)
+                    const profBonus = character.skills[skill] !== 'none' ? calculateProficiencyBonus(character.level) : 0
+                    const expertiseBonus = character.skills[skill] === 'expertise' ? calculateProficiencyBonus(character.level) : 0
+                    const total = modifier + profBonus + expertiseBonus
+                    const displayName = skillKey === 'sleightOfHand' ? 'Sleight of Hand' :
+                                       skillKey === 'animalHandling' ? 'Animal Handling' :
+                                       skillKey.charAt(0).toUpperCase() + skillKey.slice(1)
+                    return (
+                      <div key={skill} className="p-3 bg-gray-900 border border-gray-700 rounded-lg">
+                        <div className="flex items-center justify-between mb-1">
+                          <QuickRefTooltip type="skill" id={skillKey === 'sleightOfHand' ? 'sleight-of-hand' : skillKey === 'animalHandling' ? 'animal-handling' : skillKey}>
+                            <span className="font-bold text-white hover:text-blue-300 cursor-pointer">{displayName}</span>
+                          </QuickRefTooltip>
+                          <span className="text-2xl font-bold text-green-400">{total >= 0 ? '+' : ''}{total}</span>
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          {modifier >= 0 ? '+' : ''}{modifier} (INT)
+                          {character.skills[skill] === 'proficient' && ` + ${profBonus} (Proficient)`}
+                          {character.skills[skill] === 'expertise' && ` + ${profBonus + expertiseBonus} (Expertise)`}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* Wisdom Skills */}
+              <div>
+                <h4 className="text-lg font-bold text-purple-400 mb-3 flex items-center gap-2">
+                  <span>🦉 Wisdom</span>
+                  <span className="text-sm font-normal text-gray-400">
+                    (Modifier: {calculateModifier(character.abilityScores.wisdom) >= 0 ? '+' : ''}{calculateModifier(character.abilityScores.wisdom)})
+                  </span>
+                </h4>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {['animalHandling', 'insight', 'medicine', 'perception', 'survival'].map((skillKey) => {
+                    const skill = skillKey as keyof typeof character.skills
+                    const modifier = calculateModifier(character.abilityScores.wisdom)
+                    const profBonus = character.skills[skill] !== 'none' ? calculateProficiencyBonus(character.level) : 0
+                    const expertiseBonus = character.skills[skill] === 'expertise' ? calculateProficiencyBonus(character.level) : 0
+                    const total = modifier + profBonus + expertiseBonus
+                    const displayName = skillKey === 'animalHandling' ? 'Animal Handling' :
+                                       skillKey.charAt(0).toUpperCase() + skillKey.slice(1)
+                    return (
+                      <div key={skill} className="p-3 bg-gray-900 border border-gray-700 rounded-lg">
+                        <div className="flex items-center justify-between mb-1">
+                          <QuickRefTooltip type="skill" id={skillKey === 'animalHandling' ? 'animal-handling' : skillKey}>
+                            <span className="font-bold text-white hover:text-blue-300 cursor-pointer">{displayName}</span>
+                          </QuickRefTooltip>
+                          <span className="text-2xl font-bold text-green-400">{total >= 0 ? '+' : ''}{total}</span>
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          {modifier >= 0 ? '+' : ''}{modifier} (WIS)
+                          {character.skills[skill] === 'proficient' && ` + ${profBonus} (Proficient)`}
+                          {character.skills[skill] === 'expertise' && ` + ${profBonus + expertiseBonus} (Expertise)`}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* Charisma Skills */}
+              <div>
+                <h4 className="text-lg font-bold text-pink-400 mb-3 flex items-center gap-2">
+                  <span>✨ Charisma</span>
+                  <span className="text-sm font-normal text-gray-400">
+                    (Modifier: {calculateModifier(character.abilityScores.charisma) >= 0 ? '+' : ''}{calculateModifier(character.abilityScores.charisma)})
+                  </span>
+                </h4>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {['deception', 'intimidation', 'performance', 'persuasion'].map((skillKey) => {
+                    const skill = skillKey as keyof typeof character.skills
+                    const modifier = calculateModifier(character.abilityScores.charisma)
+                    const profBonus = character.skills[skill] !== 'none' ? calculateProficiencyBonus(character.level) : 0
+                    const expertiseBonus = character.skills[skill] === 'expertise' ? calculateProficiencyBonus(character.level) : 0
+                    const total = modifier + profBonus + expertiseBonus
+                    const displayName = skillKey.charAt(0).toUpperCase() + skillKey.slice(1)
+                    return (
+                      <div key={skill} className="p-3 bg-gray-900 border border-gray-700 rounded-lg">
+                        <div className="flex items-center justify-between mb-1">
+                          <QuickRefTooltip type="skill" id={skillKey}>
+                            <span className="font-bold text-white hover:text-blue-300 cursor-pointer">{displayName}</span>
+                          </QuickRefTooltip>
+                          <span className="text-2xl font-bold text-green-400">{total >= 0 ? '+' : ''}{total}</span>
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          {modifier >= 0 ? '+' : ''}{modifier} (CHA)
+                          {character.skills[skill] === 'proficient' && ` + ${profBonus} (Proficient)`}
+                          {character.skills[skill] === 'expertise' && ` + ${profBonus + expertiseBonus} (Expertise)`}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Explanation Box */}
+            <div className="mt-6 p-4 bg-blue-900/20 border border-blue-700/30 rounded-lg">
+              <h4 className="font-bold text-blue-400 mb-2">📚 How to Use Skill Checks</h4>
+              <div className="text-sm text-gray-300 space-y-2">
+                <p>
+                  <strong>1. DM asks for a check:</strong> "Make a Perception check to spot the trap."
+                </p>
+                <p>
+                  <strong>2. Roll d20 and add your bonus:</strong> If you rolled 15 and your Perception is +3, your total is 18.
+                </p>
+                <p>
+                  <strong>3. Tell the DM your total:</strong> The DM compares it to a target number (DC) to see if you succeed.
+                </p>
+                <p className="text-dnd-gold font-bold mt-3">
+                  💡 Higher bonuses mean you're better at that skill! Click skill names to learn what each one does.
+                </p>
+              </div>
+            </div>
+          </div>
 
           {/* Quick Tip */}
           <div className="card bg-blue-900/20 border border-blue-700 p-4">
