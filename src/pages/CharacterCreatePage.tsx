@@ -228,6 +228,7 @@ export function CharacterCreatePage() {
         return (
           <EquipmentSelector
             characterClass={currentCharacter?.class || undefined}
+            race={currentCharacter?.race || null}
             onSubmit={handleEquipmentSubmit}
             onBack={handleBack}
           />

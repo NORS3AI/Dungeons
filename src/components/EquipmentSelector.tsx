@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import type { Class, Equipment, Weapon } from '../types'
+import type { Class, Equipment, Weapon, Race } from '../types'
 import { isArmor, isShield } from '../types/equipment'
 import {
   ALL_WEAPONS,
@@ -13,30 +13,36 @@ import { formatWeight } from '../utils/formatting'
 
 interface EquipmentSelectorProps {
   characterClass?: Class
+  race?: Race | null
   onSubmit: (equipment: Equipment[]) => void
   onBack: () => void
 }
 
 type EquipmentTab = 'packs' | 'weapons' | 'armor' | 'gear'
 
-export function EquipmentSelector({ characterClass, onSubmit, onBack }: EquipmentSelectorProps) {
+export function EquipmentSelector({ characterClass, race, onSubmit, onBack }: EquipmentSelectorProps) {
   const [activeTab, setActiveTab] = useState<EquipmentTab>('packs')
   const [selectedEquipment, setSelectedEquipment] = useState<Equipment[]>([])
   const [selectedPackId, setSelectedPackId] = useState<string | null>(null)
 
-  // Filter weapons based on class proficiencies
+  // Filter weapons based on class AND racial proficiencies
   const availableWeapons = useMemo(() => {
     if (!characterClass) return ALL_WEAPONS
 
     const hasSimple = characterClass.weaponProficiencies.includes('simple')
     const hasMartial = characterClass.weaponProficiencies.includes('martial')
+    const racialProficiencies = race?.weaponProficiencies || []
 
     return ALL_WEAPONS.filter((weapon) => {
       if (hasMartial) return true
       if (hasSimple && weapon.weaponType === 'simple') return true
-      return characterClass.weaponProficiencies.includes(weapon.id)
+      // Check class-specific proficiencies
+      if (characterClass.weaponProficiencies.includes(weapon.id)) return true
+      // Check racial proficiencies
+      if (racialProficiencies.includes(weapon.id)) return true
+      return false
     })
-  }, [characterClass])
+  }, [characterClass, race])
 
   // Filter armor based on class proficiencies
   const availableArmor = useMemo(() => {

@@ -12,6 +12,7 @@ export * from './necromancer'
 export * from './wizard'
 export * from './cleric'
 export * from './sorcerer'
+export * from './druid'
 
 // Subclass spells
 export * from './subclasses/great-old-one'

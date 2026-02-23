@@ -12,6 +12,8 @@ import {
   CLERIC_LEVEL_1_SPELLS,
   SORCERER_CANTRIPS,
   SORCERER_LEVEL_1_SPELLS,
+  DRUID_CANTRIPS,
+  DRUID_LEVEL_1_SPELLS,
   GOO_EXPANDED_SPELLS,
 } from '../data/spells'
 
@@ -21,6 +23,7 @@ interface SpellSelectorProps {
   level?: number
   onSubmit: (cantrips: Spell[], spells: Spell[]) => void
   onBack: () => void
+  isCharacterCreation?: boolean // If true, shows "Next: Equipment", if false shows "Done"
 }
 
 /**
@@ -33,6 +36,7 @@ export function SpellSelector({
   level = 1,
   onSubmit,
   onBack,
+  isCharacterCreation = true,
 }: SpellSelectorProps) {
   const [selectedCantrips, setSelectedCantrips] = useState<Spell[]>([])
   const [selectedSpells, setSelectedSpells] = useState<Spell[]>([])
@@ -44,6 +48,7 @@ export function SpellSelector({
     if (characterClass?.id === 'wizard') return WIZARD_CANTRIPS
     if (characterClass?.id === 'cleric') return CLERIC_CANTRIPS
     if (characterClass?.id === 'sorcerer') return SORCERER_CANTRIPS
+    if (characterClass?.id === 'druid') return DRUID_CANTRIPS
     return []
   }, [characterClass])
 
@@ -67,6 +72,9 @@ export function SpellSelector({
     }
     if (characterClass?.id === 'sorcerer') {
       return [...SORCERER_LEVEL_1_SPELLS]
+    }
+    if (characterClass?.id === 'druid') {
+      return [...DRUID_LEVEL_1_SPELLS]
     }
     return []
   }, [characterClass, subclass])
@@ -142,7 +150,7 @@ export function SpellSelector({
             className="px-8 py-3 bg-dnd-gold text-gray-900 rounded-lg font-semibold
                      hover:bg-yellow-500 transition-colors duration-200"
           >
-            Next: Equipment
+            {isCharacterCreation ? 'Next: Equipment' : 'Done'}
           </button>
         </div>
       </div>
@@ -324,7 +332,7 @@ export function SpellSelector({
                            : 'bg-gray-700 text-gray-500 cursor-not-allowed'
                        }`}
           >
-            Next: Equipment
+            {isCharacterCreation ? 'Next: Equipment' : 'Done'}
           </button>
         </div>
       </div>

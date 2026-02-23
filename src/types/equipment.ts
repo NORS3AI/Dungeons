@@ -68,6 +68,7 @@ export type EquipmentCategory =
   | 'armor'
   | 'shield'
   | 'cloak'
+  | 'jewelry'
   | 'adventuringGear'
   | 'tool'
   | 'mount'
@@ -75,6 +76,7 @@ export type EquipmentCategory =
   | 'trinket'
   | 'treasure'
   | 'consumable'
+  | 'Crafting Material'
 
 /**
  * Weapon properties
