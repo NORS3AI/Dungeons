@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useCharacterStore } from '../stores/characterStore'
 import { DiceRoller, DiceRollerButton, DiceRollerModal } from '../components/DiceRoller'
 import { calculateModifier, calculateProficiencyBonus } from '../types/dice'
-import { isWeapon, isArmor, isShield, isCloak } from '../types/equipment'
+import { isWeapon, isArmor, isShield, isCloak, autoConvertCurrency } from '../types/equipment'
 import type { Character, Ability, Equipment, Weapon, Armor, Shield, Cloak, Currency, Class } from '../types'
 import {
   FIGHTER,
@@ -215,6 +215,13 @@ export function CharacterSheetPage() {
     backstory: string
   }) => {
     updateCharacterDetails(details)
+    saveCharacter()
+  }
+
+  const handleManualConvertCurrency = () => {
+    if (!character) return
+    const converted = autoConvertCurrency(character.currency)
+    updateCurrency(converted)
     saveCharacter()
   }
 
@@ -833,6 +840,13 @@ export function CharacterSheetPage() {
                   className="px-3 py-1 text-sm bg-green-700 text-white rounded-lg hover:bg-green-600 transition-colors"
                 >
                   Add Currency
+                </button>
+                <button
+                  onClick={handleManualConvertCurrency}
+                  className="px-3 py-1 text-sm bg-yellow-700 text-white rounded-lg hover:bg-yellow-600 transition-colors"
+                  title="Convert currency to higher denominations (100 copper → 1 silver, 100 silver → 1 gold, 100 gold → 1 platinum)"
+                >
+                  💱 Convert
                 </button>
               </div>
             </div>
