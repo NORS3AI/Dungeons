@@ -17,6 +17,13 @@
 - **Always Applied**: Happens automatically on all currency updates
 - **No Manual Work**: Never need to manually exchange coins
 
+#### **Manual Currency Conversion Button**
+- **💱 Convert Button**: New button in Currency section for manual conversion
+- **For Old Characters**: Fixes currency for characters created before auto-conversion
+- **One-Click Fix**: Instantly converts existing currency to new system
+- **Yellow Button**: Located next to "Add Currency" button
+- **Tooltip**: Hover to see conversion rates (100cp→1sp, 100sp→1gp, 100gp→1pp)
+
 #### **Loot Generator Currency Limits**
 - **Legendary Loot**: Max 10 platinum pieces (down from 5000-10000 gp)
 - **Epic Loot**: Max 10 platinum pieces
@@ -41,10 +48,11 @@
 
 #### **Fixed Spell Scroll Selector Scrolling**
 - **Issue**: 9th level spell scroll selector list was unscrollable
-- **Problem**: Parent container didn't have proper overflow settings
-- **Solution**: Added `overflow-hidden` to parent, changed child to `overflow-y-auto`
-- **Result**: Can now scroll through all 9th level spells when finding scrolls
-- **Also Fixed**: Applies to all spell level scroll selectors
+- **Problem**: Grid layout didn't properly constrain child heights for overflow
+- **First Attempt**: Added `overflow-hidden` to parent - didn't work
+- **Final Solution**: Replaced grid with flexbox layout using `flex flex-col` and `flex-1 min-h-0`
+- **Technical**: Flexbox with `min-h-0` allows children to shrink below content size
+- **Result**: Both spell list and details panels now scroll properly
 
 ### 🛠️ Technical Improvements
 
@@ -56,12 +64,16 @@
 
 #### **Files Updated**
 - `src/types/equipment.ts` - Currency interface and auto-conversion logic
+- `src/types/index.ts` - Export autoConvertCurrency function
 - `src/stores/characterStore.ts` - Integrated auto-conversion
 - `src/data/lootGenerator.ts` - Updated all currency loot limits
-- `src/pages/CharacterSheetPage.tsx` - Removed electrum from displays
+- `src/data/equipment.ts` - Removed electrum from cost objects
+- `src/pages/CharacterSheetPage.tsx` - Removed electrum, added manual convert button
 - `src/components/EquipmentEditor.tsx` - Removed electrum from editor
-- `src/components/NinthLevelSpellSelector.tsx` - Fixed scrolling
+- `src/components/PatchNotesModal.tsx` - Created for bundled markdown display
+- `src/components/NinthLevelSpellSelector.tsx` - Fixed scrolling with flexbox
 - `src/components/LanguageSelector.tsx` - Fixed infinite loop
+- `src/vite-env.d.ts` - Added type declarations for raw markdown imports
 
 ---
 
