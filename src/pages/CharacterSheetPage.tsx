@@ -96,6 +96,7 @@ export function CharacterSheetPage() {
   const [showClassSpellSelector, setShowClassSpellSelector] = useState(false)
   const [showAlignmentSelector, setShowAlignmentSelector] = useState(false)
   const [weaponRolls, setWeaponRolls] = useState<Record<string, { hit?: number; damage?: number }>>({})
+  const [spellRolls, setSpellRolls] = useState<Record<string, { hit?: number; damage?: number }>>({})
   const [showDMAbilityEditor, setShowDMAbilityEditor] = useState(false)
   const [lastHealingRoll, setLastHealingRoll] = useState<{ itemId: string; amount: number } | null>(null)
   const [showMigrationSuccess, setShowMigrationSuccess] = useState(false)
@@ -597,6 +598,52 @@ export function CharacterSheetPage() {
         const newRolls = { ...prev }
         if (newRolls[weaponId]) {
           delete newRolls[weaponId].damage
+        }
+        return newRolls
+      })
+    }, 5000)
+  }
+
+  const handleRollSpellAttack = (spellId: string, spellcastingAbility: string) => {
+    const abilityScore = character.abilityScores[spellcastingAbility as keyof typeof character.abilityScores]
+    const abilityMod = Math.floor((abilityScore - 10) / 2)
+    const profBonus = calculateProficiencyBonus(character.level)
+    const attackBonus = abilityMod + profBonus
+
+    const roll = rollDice('1d20')
+    if (!roll) return
+    const totalRoll = roll.grandTotal + attackBonus
+    setSpellRolls(prev => ({
+      ...prev,
+      [spellId]: { ...prev[spellId], hit: totalRoll }
+    }))
+
+    // Clear after 5 seconds
+    setTimeout(() => {
+      setSpellRolls(prev => {
+        const newRolls = { ...prev }
+        if (newRolls[spellId]) {
+          delete newRolls[spellId].hit
+        }
+        return newRolls
+      })
+    }, 5000)
+  }
+
+  const handleRollSpellDamage = (spellId: string, damageDice: string) => {
+    const roll = rollDice(damageDice)
+    if (!roll) return
+    setSpellRolls(prev => ({
+      ...prev,
+      [spellId]: { ...prev[spellId], damage: roll.grandTotal }
+    }))
+
+    // Clear after 5 seconds
+    setTimeout(() => {
+      setSpellRolls(prev => {
+        const newRolls = { ...prev }
+        if (newRolls[spellId]) {
+          delete newRolls[spellId].damage
         }
         return newRolls
       })
@@ -2070,14 +2117,43 @@ export function CharacterSheetPage() {
                     <div className="grid md:grid-cols-2 gap-3">
                       {spellsOfLevel.map((spell) => {
                         const isPrepared = character.preparedSpells.includes(spell.id)
+                        const spellcastingAbility = character.class?.spellcastingAbility || 'intelligence'
+
                         return (
                           <div
                             key={spell.id}
-                            className={`p-4 bg-gray-900 rounded-lg border ${
+                            className={`p-4 bg-gray-900 rounded-lg border relative ${
                               isPrepared ? 'border-purple-500' : 'border-gray-700'
                             }`}
                           >
-                            <div className="flex items-start justify-between mb-2">
+                            {/* Roll buttons in top right */}
+                            {(spell.attackRoll || spell.damage || spell.healing) && (
+                              <div className="absolute top-2 right-2 flex gap-1">
+                                {spell.attackRoll && (
+                                  <button
+                                    onClick={() => handleRollSpellAttack(spell.id, spellcastingAbility)}
+                                    className="w-7 h-7 bg-green-700 hover:bg-green-600 text-white rounded font-bold text-xs flex items-center justify-center transition-colors"
+                                    title="Roll spell attack (1d20 + spellcasting modifier + proficiency)"
+                                  >
+                                    H
+                                  </button>
+                                )}
+                                {(spell.damage || spell.healing) && (
+                                  <button
+                                    onClick={() => handleRollSpellDamage(spell.id, spell.damage?.dice || spell.healing?.dice || '1d6')}
+                                    className="w-7 h-7 bg-red-700 hover:bg-red-600 text-white rounded text-xs flex items-center justify-center transition-colors"
+                                    title={`Roll ${spell.damage ? 'damage' : 'healing'} (${spell.damage?.dice || spell.healing?.dice})`}
+                                  >
+                                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                      <path d="M10 2L2 6v4c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V6l-8-4zm0 2.18l6 3v3.82c0 4.52-3.12 8.75-7 9.86V4.18z"/>
+                                      <circle cx="10" cy="10" r="2"/>
+                                    </svg>
+                                  </button>
+                                )}
+                              </div>
+                            )}
+
+                            <div className="flex items-start justify-between mb-2 pr-16">
                               <div className="flex-1">
                                 <QuickRefTooltip type="spell" id={spell.id}>
                                   <h5 className="font-bold text-white hover:text-purple-300 cursor-pointer">
@@ -2094,6 +2170,42 @@ export function CharacterSheetPage() {
                             </div>
 
                             <div className="space-y-1 text-sm">
+                              {spell.attackRoll && (
+                                <div className="flex items-center gap-2">
+                                  <span className="text-green-400 font-bold">Attack:</span>
+                                  <span className="text-white">+{
+                                    Math.floor((character.abilityScores[spellcastingAbility as keyof typeof character.abilityScores] - 10) / 2) +
+                                    calculateProficiencyBonus(character.level)
+                                  } to hit</span>
+                                  {spellRolls[spell.id]?.hit !== undefined && (
+                                    <span className="ml-2 px-2 py-0.5 bg-green-600 text-white rounded font-bold animate-pulse">
+                                      {spellRolls[spell.id].hit}
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+                              {spell.damage && (
+                                <div className="flex items-center gap-2">
+                                  <span className="text-red-400 font-bold">Damage:</span>
+                                  <span className="text-white">{spell.damage.dice} {spell.damage.type}</span>
+                                  {spellRolls[spell.id]?.damage !== undefined && (
+                                    <span className="ml-2 px-2 py-0.5 bg-red-600 text-white rounded font-bold animate-pulse">
+                                      {spellRolls[spell.id].damage}
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+                              {spell.healing && (
+                                <div className="flex items-center gap-2">
+                                  <span className="text-green-400 font-bold">Healing:</span>
+                                  <span className="text-white">{spell.healing.dice}</span>
+                                  {spellRolls[spell.id]?.damage !== undefined && (
+                                    <span className="ml-2 px-2 py-0.5 bg-green-600 text-white rounded font-bold animate-pulse">
+                                      {spellRolls[spell.id].damage} HP
+                                    </span>
+                                  )}
+                                </div>
+                              )}
                               <div className="flex items-center gap-2 text-gray-300">
                                 <span className="text-blue-400">⏱</span>
                                 <span>{spell.castingTime.amount} {spell.castingTime.unit}</span>
