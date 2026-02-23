@@ -4,7 +4,7 @@ import { useCharacterStore } from '../stores/characterStore'
 import { DiceRoller, DiceRollerButton, DiceRollerModal } from '../components/DiceRoller'
 import { calculateModifier, calculateProficiencyBonus } from '../types/dice'
 import { isWeapon, isArmor, isShield, isCloak, autoConvertCurrency } from '../types/equipment'
-import type { Character, Ability, Equipment, Weapon, Armor, Shield, Cloak, Currency, Material, Class } from '../types'
+import type { Character, Ability, Equipment, Weapon, Armor, Currency, Material, Class } from '../types'
 import {
   FIGHTER,
   WARLOCK,
@@ -73,7 +73,7 @@ const SKILLS: { name: string; ability: Ability; key: SkillKey; refId: string }[]
 export function CharacterSheetPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, equipAll, unequipAll, changeEquipmentQuantity, setFightingStance, addEquipment, addMaterial, removeMaterial, changeMaterialQuantity, updateHitPoints, addSpell, removeSpell, useItemCharge, saveCharacter, addFoodRations, addWaterSupply, addItemFeature, setAlignment } = useCharacterStore()
+  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, equipAll, unequipAll, changeEquipmentQuantity, setFightingStance, addEquipment, addMaterial, removeMaterial, changeMaterialQuantity, updateHitPoints, addSpell, removeSpell, saveCharacter, addFoodRations, addWaterSupply, addItemFeature, setAlignment } = useCharacterStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
   const [activeTab, setActiveTab] = useState<'main' | 'actions' | 'spells' | 'inventory' | 'features' | 'story' | 'loot'>('main')
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
@@ -382,6 +382,54 @@ export function CharacterSheetPage() {
     // Remove material from inventory
     removeMaterial(materialId)
     saveCharacter()
+  }
+
+  // Parse healing amount from potion description
+  const parseHealingAmount = (description: string): string | null => {
+    // Look for patterns like "2d4+2", "restores 10 hit points", "heals 2d8", etc.
+    const dicePattern = /(\d+d\d+(?:\s*[+\-]\s*\d+)?)/i
+    const hpPattern = /(\d+)\s*hit points?/i
+    const healsPattern = /heals?\s+(\d+d\d+(?:\s*[+\-]\s*\d+)?|\d+)/i
+
+    let match = description.match(healsPattern)
+    if (match) return match[1]
+
+    match = description.match(dicePattern)
+    if (match) return match[1]
+
+    match = description.match(hpPattern)
+    if (match) return match[1]
+
+    return null
+  }
+
+  // Handle using a potion/consumable
+  const handleUsePotion = (itemId: string) => {
+    const item = character.equipment.find(eq => eq.id === itemId)
+    if (!item) return
+
+    // Check if it has multiple quantities
+    if (item.quantity && item.quantity > 1) {
+      changeEquipmentQuantity(itemId, item.quantity - 1)
+      setShowConsumableNotification({
+        message: `Used ${item.name}. ${item.quantity - 1} remaining.`,
+        type: 'success'
+      })
+    } else {
+      // Remove the item entirely
+      removeEquipment(itemId)
+      setShowConsumableNotification({
+        message: `Used ${item.name}. Item removed from inventory.`,
+        type: 'success'
+      })
+    }
+
+    saveCharacter()
+
+    // Auto-hide notification after 3 seconds
+    setTimeout(() => {
+      setShowConsumableNotification(null)
+    }, 3000)
   }
 
   const handleUpdateHP = (hp: Partial<Character['hitPoints']>) => {
@@ -867,6 +915,66 @@ export function CharacterSheetPage() {
 
             {/* Dice Roller */}
             <DiceRoller />
+
+            {/* Consumables (Potions) - Quick Access */}
+            {character.equipment.filter(item =>
+              item.category === 'consumable' ||
+              item.name.toLowerCase().includes('potion') ||
+              item.name.toLowerCase().includes('scroll') ||
+              item.name.toLowerCase().includes('elixir')
+            ).length > 0 && (
+              <div className="card bg-gray-800 border-gray-700 p-4">
+                <h3 className="text-lg font-bold text-white mb-3">🧪 Consumables</h3>
+
+                {/* Notification */}
+                {showConsumableNotification && (
+                  <div className={`mb-3 p-2 rounded-lg text-sm ${
+                    showConsumableNotification.type === 'success'
+                      ? 'bg-green-900/30 border border-green-700 text-green-300'
+                      : 'bg-blue-900/30 border border-blue-700 text-blue-300'
+                  }`}>
+                    {showConsumableNotification.message}
+                  </div>
+                )}
+
+                <div className="space-y-2">
+                  {character.equipment
+                    .filter(item =>
+                      item.category === 'consumable' ||
+                      item.name.toLowerCase().includes('potion') ||
+                      item.name.toLowerCase().includes('scroll') ||
+                      item.name.toLowerCase().includes('elixir')
+                    )
+                    .map((item) => {
+                      const healingAmount = parseHealingAmount(item.description)
+                      return (
+                        <div key={item.id} className="p-3 bg-gradient-to-r from-green-900/20 to-blue-900/20 border border-green-700 rounded-lg">
+                          <div className="flex items-start justify-between mb-2">
+                            <div className="flex-1">
+                              <h4 className="font-bold text-green-400 text-sm">{item.name}</h4>
+                              {item.quantity && item.quantity > 1 && (
+                                <p className="text-xs text-gray-400">Qty: {item.quantity}</p>
+                              )}
+                              {healingAmount && (
+                                <p className="text-xs font-medium text-emerald-400 mt-0.5">
+                                  ❤️ Heals: {healingAmount}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                          <p className="text-xs text-gray-300 mb-2 line-clamp-2">{item.description}</p>
+                          <button
+                            onClick={() => handleUsePotion(item.id)}
+                            className="w-full px-2 py-1.5 bg-green-600 hover:bg-green-500 text-white text-sm rounded font-medium transition-colors"
+                          >
+                            Use
+                          </button>
+                        </div>
+                      )
+                    })}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -957,21 +1065,6 @@ export function CharacterSheetPage() {
 
       {activeTab === 'inventory' && (
         <div className="space-y-6">
-          {/* Equipped Gear Section */}
-          <EquippedGearSection
-            equipment={character.equipment}
-            character={character}
-            onToggleEquip={(itemId) => {
-              toggleEquipment(itemId)
-              saveCharacter()
-            }}
-            onUseCharge={(itemId) => {
-              useItemCharge(itemId)
-              saveCharacter()
-            }}
-            calculateAC={calculateAC}
-          />
-
           {/* Currency */}
           <div className="card bg-gray-800 border-gray-700 p-4">
             <div className="flex items-center justify-between mb-4">
@@ -1507,6 +1600,18 @@ export function CharacterSheetPage() {
           {/* Consumables (Potions, Scrolls, etc.) */}
           <div className="card bg-gray-800 border-gray-700 p-6">
             <h3 className="text-2xl font-bold text-white mb-4">🧪 Consumables & Items</h3>
+
+            {/* Notification */}
+            {showConsumableNotification && (
+              <div className={`mb-4 p-3 rounded-lg ${
+                showConsumableNotification.type === 'success'
+                  ? 'bg-green-900/30 border border-green-700 text-green-300'
+                  : 'bg-blue-900/30 border border-blue-700 text-blue-300'
+              }`}>
+                {showConsumableNotification.message}
+              </div>
+            )}
+
             {character.equipment.filter(item =>
               item.category === 'consumable' ||
               item.name.toLowerCase().includes('potion') ||
@@ -1521,24 +1626,38 @@ export function CharacterSheetPage() {
                     item.name.toLowerCase().includes('scroll') ||
                     item.name.toLowerCase().includes('elixir')
                   )
-                  .map((item) => (
-                    <div key={item.id} className="p-4 bg-gradient-to-br from-green-900/20 to-blue-900/20 border border-green-700 rounded-lg">
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex-1">
-                          <h4 className="font-bold text-green-400">{item.name}</h4>
-                          {item.quantity && item.quantity > 1 && (
-                            <p className="text-sm text-gray-400">Qty: {item.quantity}</p>
-                          )}
+                  .map((item) => {
+                    const healingAmount = parseHealingAmount(item.description)
+                    return (
+                      <div key={item.id} className="p-4 bg-gradient-to-br from-green-900/20 to-blue-900/20 border border-green-700 rounded-lg">
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex-1">
+                            <h4 className="font-bold text-green-400">{item.name}</h4>
+                            {item.quantity && item.quantity > 1 && (
+                              <p className="text-sm text-gray-400">Qty: {item.quantity}</p>
+                            )}
+                            {healingAmount && (
+                              <p className="text-sm font-medium text-emerald-400 mt-1">
+                                ❤️ Heals: {healingAmount}
+                              </p>
+                            )}
+                          </div>
                         </div>
+                        <p className="text-sm text-gray-300 mb-3">{item.description}</p>
+                        {item.charges && (
+                          <div className="text-xs text-blue-300 mb-3">
+                            Magical: {item.charges.spellName}
+                          </div>
+                        )}
+                        <button
+                          onClick={() => handleUsePotion(item.id)}
+                          className="w-full px-3 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg font-medium transition-colors"
+                        >
+                          Use
+                        </button>
                       </div>
-                      <p className="text-sm text-gray-300 mb-2">{item.description}</p>
-                      {item.charges && (
-                        <div className="text-xs text-blue-300">
-                          Magical: {item.charges.spellName}
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                    )
+                  })}
               </div>
             ) : (
               <p className="text-gray-500 italic">No consumables in inventory</p>
@@ -1980,288 +2099,6 @@ function EquipToggle({ equipped, onToggle, canEquip = true }: { equipped: boolea
   )
 }
 
-// Equipped Gear Section
-function EquippedGearSection({
-  equipment,
-  character,
-  onToggleEquip,
-  onUseCharge,
-  calculateAC,
-}: {
-  equipment: Equipment[]
-  character: Character
-  onToggleEquip: (itemId: string) => void
-  onUseCharge: (itemId: string) => void
-  calculateAC: () => number
-}) {
-  const equippedWeapons = equipment.filter((e) => isWeapon(e) && e.equipped) as Weapon[]
-  const equippedArmor = equipment.find((e) => isArmor(e) && e.equipped) as Armor | undefined
-  const equippedShield = equipment.find((e) => isShield(e) && e.equipped) as Shield | undefined
-  const equippedCloak = equipment.find((e) => isCloak(e) && e.equipped) as Cloak | undefined
-  const equippedGeneric = equipment.filter((e) => !isWeapon(e) && !isArmor(e) && !isShield(e) && !isCloak(e) && e.equipped)
-
-  const getAbilityMod = (ability: Ability): number => {
-    return calculateModifier(character.abilityScores[ability])
-  }
-  const profBonus = calculateProficiencyBonus(character.level)
-
-  const getConditionDamageBonus = (): number => {
-    let bonus = 0
-    if (character.conditions.includes('enraged')) {
-      bonus += 1
-    }
-    return bonus
-  }
-
-  const hasEquippedGear = equippedWeapons.length > 0 || equippedArmor || equippedShield || equippedCloak || equippedGeneric.length > 0
-
-  return (
-    <div className="card bg-gray-800 border-gray-700 p-4 border-l-4 border-l-dnd-gold">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-bold text-dnd-gold">Equipped Gear</h3>
-        <div className="flex items-center gap-2">
-          <span className="text-gray-400 text-sm">Total AC:</span>
-          <span className="text-xl font-bold text-white bg-gray-900 px-3 py-1 rounded-lg">{calculateAC()}</span>
-        </div>
-      </div>
-
-      {!hasEquippedGear ? (
-        <p className="text-gray-400 text-center py-4">No gear equipped. Equip items from your inventory below.</p>
-      ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {/* Equipped Weapons */}
-          {equippedWeapons.map((weapon) => {
-            const isFinesse = weapon.properties.includes('finesse')
-            const attackMod = isFinesse
-              ? Math.max(getAbilityMod('strength'), getAbilityMod('dexterity'))
-              : weapon.weaponCategory === 'ranged'
-              ? getAbilityMod('dexterity')
-              : getAbilityMod('strength')
-            const attackBonus = attackMod + profBonus
-            const conditionDamageBonus = getConditionDamageBonus()
-            const damageMod = attackMod
-            const totalDamageMod = damageMod + conditionDamageBonus
-
-            return (
-              <div key={weapon.id} className="p-3 bg-green-900/20 rounded-lg border border-green-600/50">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-green-400 uppercase font-medium">
-                    {weapon.charges ? '✨ Magical Weapon' : 'Weapon'}
-                  </span>
-                  <button
-                    onClick={() => onToggleEquip(weapon.id)}
-                    className="text-xs text-gray-400 hover:text-red-400"
-                  >
-                    Unequip
-                  </button>
-                </div>
-                <div className="font-semibold text-white">{weapon.name}</div>
-                <div className="text-sm text-gray-300">
-                  <span className="text-dnd-gold">+{attackBonus}</span> to hit |{' '}
-                  <span className="text-red-400">{weapon.damage.dice}{totalDamageMod >= 0 ? '+' : ''}{totalDamageMod}</span> {weapon.damage.type}
-                  {conditionDamageBonus > 0 && (
-                    <span className="text-orange-400 ml-1">(+{conditionDamageBonus} enraged)</span>
-                  )}
-                </div>
-                {weapon.charges && (
-                  <div className="mt-2 p-2 bg-purple-900/30 border border-purple-600/50 rounded">
-                    <div className="flex items-center justify-between">
-                      <div className="text-sm">
-                        <div className="font-medium text-purple-300">{weapon.charges.spellName}</div>
-                        <div className="text-xs text-purple-400">
-                          {weapon.charges.damageDice} {weapon.charges.damageType} damage
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-lg font-bold text-purple-300">
-                          {weapon.charges.currentCharges}/{weapon.charges.maxCharges}
-                        </div>
-                        <div className="text-xs text-purple-400">charges</div>
-                      </div>
-                    </div>
-                    {weapon.charges.currentCharges > 0 && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          onUseCharge(weapon.id)
-                        }}
-                        className="mt-2 w-full px-2 py-1 bg-purple-600 hover:bg-purple-700 text-white text-xs rounded transition-all"
-                      >
-                        Use 1 Charge
-                      </button>
-                    )}
-                    {weapon.charges.rechargeRate && (
-                      <div className="text-xs text-gray-500 mt-1">
-                        Recharges: {weapon.charges.rechargeRate}
-                      </div>
-                    )}
-                  </div>
-                )}
-                {weapon.properties.length > 0 && (
-                  <div className="text-xs text-gray-500 mt-1">
-                    {weapon.properties.join(', ')}
-                  </div>
-                )}
-              </div>
-            )
-          })}
-
-          {/* Equipped Armor */}
-          {equippedArmor && (
-            <div className="p-3 bg-blue-900/20 rounded-lg border border-blue-600/50">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs text-blue-400 uppercase font-medium">Armor</span>
-                <button
-                  onClick={() => onToggleEquip(equippedArmor.id)}
-                  className="text-xs text-gray-400 hover:text-red-400"
-                >
-                  Unequip
-                </button>
-              </div>
-              <div className="font-semibold text-white">{equippedArmor.name}</div>
-              <div className="text-sm text-gray-300">
-                Base AC: <span className="text-blue-400">{equippedArmor.baseAC}</span>
-                {equippedArmor.maxDexBonus !== undefined && (
-                  <span className="text-gray-500"> (+DEX max {equippedArmor.maxDexBonus})</span>
-                )}
-              </div>
-              <div className="text-xs text-gray-500 mt-1 capitalize">{equippedArmor.armorType} armor</div>
-            </div>
-          )}
-
-          {/* Equipped Shield */}
-          {equippedShield && (
-            <div className="p-3 bg-purple-900/20 rounded-lg border border-purple-600/50">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs text-purple-400 uppercase font-medium">Shield</span>
-                <button
-                  onClick={() => onToggleEquip(equippedShield.id)}
-                  className="text-xs text-gray-400 hover:text-red-400"
-                >
-                  Unequip
-                </button>
-              </div>
-              <div className="font-semibold text-white">{equippedShield.name}</div>
-              <div className="text-sm text-gray-300">
-                AC Bonus: <span className="text-purple-400">+{equippedShield.acBonus}</span>
-              </div>
-            </div>
-          )}
-
-          {/* Equipped Cloak */}
-          {equippedCloak && (
-            <div className="p-3 bg-indigo-900/20 rounded-lg border border-indigo-600/50">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs text-indigo-400 uppercase font-medium">✨ Cloak</span>
-                <button
-                  onClick={() => onToggleEquip(equippedCloak.id)}
-                  className="text-xs text-gray-400 hover:text-red-400"
-                >
-                  Unequip
-                </button>
-              </div>
-              <div className="font-semibold text-white">{equippedCloak.name}</div>
-              {equippedCloak.description && (
-                <div className="text-sm text-gray-300 mt-1">{equippedCloak.description}</div>
-              )}
-              {equippedCloak.acBonus !== undefined && equippedCloak.acBonus > 0 && (
-                <div className="text-sm text-gray-300 mt-1">
-                  AC Bonus: <span className="text-indigo-400">+{equippedCloak.acBonus}</span>
-                </div>
-              )}
-              {equippedCloak.magicalEffect && (
-                <div className="text-sm text-indigo-300 mt-2 italic">
-                  {equippedCloak.magicalEffect}
-                </div>
-              )}
-              {equippedCloak.charges && (
-                <div className="mt-2 p-2 bg-purple-900/30 border border-purple-600/50 rounded">
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm">
-                      <div className="font-medium text-purple-300">{equippedCloak.charges.spellName}</div>
-                      <div className="text-xs text-purple-400">
-                        {equippedCloak.charges.damageDice} {equippedCloak.charges.damageType} damage
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-lg font-bold text-purple-300">
-                        {equippedCloak.charges.currentCharges}/{equippedCloak.charges.maxCharges}
-                      </div>
-                      <div className="text-xs text-purple-400">Charges</div>
-                    </div>
-                  </div>
-                  {equippedCloak.charges.currentCharges > 0 && (
-                    <button
-                      onClick={() => onUseCharge(equippedCloak.id)}
-                      className="w-full mt-2 px-2 py-1 bg-purple-700 hover:bg-purple-600 text-white text-xs rounded transition-colors"
-                    >
-                      Use 1 Charge
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Equipped Generic Items */}
-          {equippedGeneric.map((item) => (
-            <div key={item.id} className="p-3 bg-yellow-900/20 rounded-lg border border-yellow-600/50">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs text-yellow-400 uppercase font-medium capitalize">
-                  {item.charges ? '✨ Magical ' : ''}{item.category.replace(/([A-Z])/g, ' $1').trim()}
-                </span>
-                <button
-                  onClick={() => onToggleEquip(item.id)}
-                  className="text-xs text-gray-400 hover:text-red-400"
-                >
-                  Unequip
-                </button>
-              </div>
-              <div className="font-semibold text-white">{item.name}</div>
-              {item.description && (
-                <div className="text-sm text-gray-300 mt-1">{item.description}</div>
-              )}
-              {item.charges && (
-                <div className="mt-2 p-2 bg-purple-900/30 border border-purple-600/50 rounded">
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm">
-                      <div className="font-medium text-purple-300">{item.charges.spellName}</div>
-                      <div className="text-xs text-purple-400">
-                        {item.charges.damageDice} {item.charges.damageType} damage
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-lg font-bold text-purple-300">
-                        {item.charges.currentCharges}/{item.charges.maxCharges}
-                      </div>
-                      <div className="text-xs text-purple-400">charges</div>
-                    </div>
-                  </div>
-                  {item.charges.currentCharges > 0 && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        onUseCharge(item.id)
-                      }}
-                      className="mt-2 w-full px-2 py-1 bg-purple-600 hover:bg-purple-700 text-white text-xs rounded transition-all"
-                    >
-                      Use 1 Charge
-                    </button>
-                  )}
-                  {item.charges.rechargeRate && (
-                    <div className="text-xs text-gray-500 mt-1">
-                      Recharges: {item.charges.rechargeRate}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
 
 // Equipment item component
 function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuantity, onUse, onSell }: { item: Equipment; character: Character; onRemove: () => void; onToggleEquip: () => void; onChangeQuantity: (change: number) => void; onUse: () => void; onSell?: () => void }) {

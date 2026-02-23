@@ -188,6 +188,7 @@ export function CharacterCreatePage() {
         return (
           <BackgroundSelector
             initialBackground={currentCharacter?.background}
+            characterClass={currentCharacter?.class}
             onSelect={handleBackgroundSelect}
             onBack={handleBack}
           />
