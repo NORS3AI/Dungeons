@@ -5959,6 +5959,28 @@ export const TRAITS: Record<string, TraitRef> = {
     description: 'You gain the ability to twist your spells to suit your needs. You learn two Metamagic options of your choice from the Metamagic Options list. You can use only one Metamagic option on a spell when you cast it, unless otherwise noted. Common Metamagic options include: Careful Spell (spend 1 sorcery point to protect allies from your spell\'s area), Distant Spell (spend 1 point to double spell range), Empowered Spell (spend 1 point to reroll damage dice), Extended Spell (spend 1 point to double duration), Heightened Spell (spend 3 points to give one target disadvantage on first save), Quickened Spell (spend 2 points to cast 1 action spell as bonus action), Subtle Spell (spend 1 point to cast without verbal/somatic components), and Twinned Spell (spend points equal to spell level to target second creature). You learn one additional Metamagic option at 10th level and another at 17th level.',
     mechanics: 'Learn 2 options at level 3 (+ 1 at 10th, +1 at 17th). Spend sorcery points to modify spells. Only one option per spell (unless specified).',
   },
+  // Death Knight Traits
+  'runic-power': {
+    id: 'runic-power',
+    name: 'Runic Power',
+    source: 'Death Knight (Level 1)',
+    description: 'You channel dark runic energy to fuel your abilities. You have a pool of Runic Power equal to 4 + your Death Knight level. You regain half your maximum Runic Power (rounded down) when you finish a short rest, and all of it when you finish a long rest. Additionally, whenever you score a critical hit with a weapon attack, you regenerate 1 Runic Power.',
+    mechanics: 'Pool = 4 + level. Regain half on short rest, all on long rest. +1 on critical hit.',
+  },
+  'rune-weapon': {
+    id: 'rune-weapon',
+    name: 'Rune Weapon',
+    source: 'Death Knight (Level 1)',
+    description: 'As a bonus action, you can spend 2 Runic Power to infuse your weapon with dark runes. For 1 minute, your weapon attacks deal an additional 1d4 necrotic damage. The necrotic damage increases to 1d6 at 5th level, 1d8 at 11th level, and 1d10 at 17th level.',
+    mechanics: 'Bonus action. Cost: 2 Runic Power. Duration: 1 minute. +1d4 necrotic (scales with level).',
+  },
+  'lichborne': {
+    id: 'lichborne',
+    name: 'Lichborne',
+    source: 'Death Knight (Level 7)',
+    description: 'You have embraced your undead nature. You are immune to being charmed or frightened. Additionally, you have advantage on saving throws against disease and poison, and you have resistance to poison damage.',
+    mechanics: 'Immune to charmed and frightened. Advantage on disease/poison saves. Resistance to poison damage.',
+  },
 }
 
 // RULES DATA - Game mechanics explanations for new players
