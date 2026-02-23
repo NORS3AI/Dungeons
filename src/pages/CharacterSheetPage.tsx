@@ -73,7 +73,7 @@ const SKILLS: { name: string; ability: Ability; key: SkillKey; refId: string }[]
 export function CharacterSheetPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, changeEquipmentQuantity, setFightingStance, addEquipment, updateHitPoints, addSpell, removeSpell, useItemCharge, saveCharacter, addFoodRations, addWaterSupply, addItemFeature, setAlignment } = useCharacterStore()
+  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, equipAll, unequipAll, changeEquipmentQuantity, setFightingStance, addEquipment, updateHitPoints, addSpell, removeSpell, useItemCharge, saveCharacter, addFoodRations, addWaterSupply, addItemFeature, setAlignment } = useCharacterStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
   const [activeTab, setActiveTab] = useState<'main' | 'actions' | 'spells' | 'inventory' | 'features' | 'story' | 'loot'>('main')
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
@@ -992,7 +992,7 @@ export function CharacterSheetPage() {
           </div>
 
           {/* Equipped Weapons */}
-          {character.equipment.filter(item => isWeapon(item) && item.equipped).length > 0 && (
+          {character.equipment.filter(item => isWeapon(item) && item.equipped !== false).length > 0 && (
             <div className="card bg-gray-800 border-gray-700 p-4">
               <h3 className="text-lg font-bold text-white mb-4">⚔️ Equipped Weapons</h3>
               <div className="space-y-2">
@@ -1023,7 +1023,7 @@ export function CharacterSheetPage() {
           )}
 
           {/* Equipped Armor */}
-          {character.equipment.filter(item => isArmor(item) && item.equipped).length > 0 && (
+          {character.equipment.filter(item => isArmor(item) && item.equipped !== false).length > 0 && (
             <div className="card bg-gray-800 border-gray-700 p-4">
               <h3 className="text-lg font-bold text-white mb-4">🛡️ Equipped Armor</h3>
               <div className="space-y-2">
@@ -1127,6 +1127,32 @@ export function CharacterSheetPage() {
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold text-white">🎒 Backpack & Misc Items</h3>
               <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    equipAll()
+                    saveCharacter()
+                  }}
+                  className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors flex items-center gap-2"
+                  title="Equip all items (respects armor/shield/cloak limits)"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Equip All
+                </button>
+                <button
+                  onClick={() => {
+                    unequipAll()
+                    saveCharacter()
+                  }}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors flex items-center gap-2"
+                  title="Unequip all items"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Unequip All
+                </button>
                 <button
                   onClick={() => {
                     setEditingLootItem({
@@ -1299,7 +1325,7 @@ export function CharacterSheetPage() {
           {/* Weapon Attacks */}
           <div className="card bg-gray-800 border-gray-700 p-6">
             <h3 className="text-2xl font-bold text-white mb-4">🗡️ Weapon Attacks</h3>
-            {character.equipment.filter(item => isWeapon(item) && item.equipped).length > 0 ? (
+            {character.equipment.filter(item => isWeapon(item) && item.equipped !== false).length > 0 ? (
               <div className="grid md:grid-cols-2 gap-4">
                 {character.equipment
                   .filter((item): item is Weapon => isWeapon(item) && item.equipped !== false)

@@ -185,6 +185,8 @@ interface CharacterState {
   addEquipment: (item: Equipment) => void
   removeEquipment: (itemId: string) => void
   toggleEquipment: (itemId: string) => void
+  equipAll: () => void
+  unequipAll: () => void
   changeEquipmentQuantity: (itemId: string, change: number) => void
   useItemCharge: (itemId: string) => void
   updateCurrency: (currency: Partial<Currency>) => void
@@ -545,6 +547,72 @@ export const useCharacterStore = create<CharacterState>()(
             }
             return e
           })
+
+          set({
+            currentCharacter: {
+              ...currentCharacter,
+              equipment,
+            },
+            history: addToHistory(history, currentCharacter),
+          })
+        },
+
+        equipAll: () => {
+          const { currentCharacter, history } = get()
+          if (!currentCharacter) return
+
+          // Equip all items, ensuring only one armor/shield/cloak is equipped
+          let hasArmor = false
+          let hasShield = false
+          let hasCloak = false
+
+          const equipment = currentCharacter.equipment.map((e) => {
+            // Skip equipping armor if we already have one equipped
+            if (e.category === 'armor') {
+              if (!hasArmor) {
+                hasArmor = true
+                return { ...e, equipped: true }
+              }
+              return { ...e, equipped: false }
+            }
+            // Skip equipping shield if we already have one equipped
+            if (e.category === 'shield') {
+              if (!hasShield) {
+                hasShield = true
+                return { ...e, equipped: true }
+              }
+              return { ...e, equipped: false }
+            }
+            // Skip equipping cloak if we already have one equipped
+            if (e.category === 'cloak') {
+              if (!hasCloak) {
+                hasCloak = true
+                return { ...e, equipped: true }
+              }
+              return { ...e, equipped: false }
+            }
+            // Equip all other items
+            return { ...e, equipped: true }
+          })
+
+          set({
+            currentCharacter: {
+              ...currentCharacter,
+              equipment,
+            },
+            history: addToHistory(history, currentCharacter),
+          })
+        },
+
+        unequipAll: () => {
+          const { currentCharacter, history } = get()
+          if (!currentCharacter) return
+
+          // Unequip all items
+          const equipment = currentCharacter.equipment.map((e) => ({
+            ...e,
+            equipped: false,
+          }))
 
           set({
             currentCharacter: {
