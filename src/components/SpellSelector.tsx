@@ -224,13 +224,13 @@ export function SpellSelector({
         </div>
       </div>
 
-      {/* Level 1 Spells Section */}
+      {/* Spells Section - Group by level */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-xl font-bold text-white">
-            1st Level Spells
+            Spells
             <span className="text-sm font-normal text-gray-400 ml-2">
-              (Choose {spellsKnown})
+              (Choose {spellsKnown} total)
             </span>
           </h3>
           <span className={`text-sm ${selectedSpells.length === spellsKnown ? 'text-green-400' : 'text-dnd-gold'}`}>
@@ -238,8 +238,18 @@ export function SpellSelector({
           </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {availableSpells.map((spell) => {
+        {/* Group spells by level and display each level separately */}
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((spellLevel) => {
+          const spellsOfLevel = availableSpells.filter((s) => s.level === spellLevel)
+          if (spellsOfLevel.length === 0) return null
+
+          return (
+            <div key={spellLevel} className="mb-6">
+              <h4 className="text-lg font-semibold text-dnd-gold mb-3">
+                {spellLevel === 1 ? '1st' : spellLevel === 2 ? '2nd' : spellLevel === 3 ? '3rd' : `${spellLevel}th`} Level Spells
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {spellsOfLevel.map((spell) => {
             const isExpanded = subclass?.expandedSpells?.some((es) =>
               es.spells.includes(spell.id)
             )
@@ -262,7 +272,10 @@ export function SpellSelector({
               </div>
             )
           })}
-        </div>
+              </div>
+            </div>
+          )
+        })}
       </div>
 
       {/* Pact Magic Info */}

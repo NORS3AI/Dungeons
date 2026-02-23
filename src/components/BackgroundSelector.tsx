@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import type { Background } from '../types/background'
+import type { Class, Ability } from '../types'
 import { AVAILABLE_BACKGROUNDS } from '../types/background'
 import { BackgroundCard } from './BackgroundCard'
 import { QuickRefTooltip } from './QuickRefTooltip'
@@ -7,6 +8,7 @@ import { ScrollNavigation } from './ScrollNavigation'
 
 interface BackgroundSelectorProps {
   initialBackground?: Background | null
+  characterClass?: Class | null
   onSelect: (background: Background) => void
   onBack: () => void
 }
@@ -42,8 +44,44 @@ function formatSkillName(skill: string): string {
  * Background Selector Component
  * Displays available backgrounds as cards and shows detailed info when selected
  */
-export function BackgroundSelector({ initialBackground, onSelect, onBack }: BackgroundSelectorProps) {
+export function BackgroundSelector({ initialBackground, characterClass, onSelect, onBack }: BackgroundSelectorProps) {
   const [selectedBackground, setSelectedBackground] = useState<Background | null>(initialBackground || null)
+
+  // Determine key abilities for the class
+  const keyAbilities = useMemo(() => {
+    if (!characterClass) return []
+
+    const abilities: Ability[] = [...characterClass.primaryAbility]
+    if (characterClass.spellcastingAbility && !abilities.includes(characterClass.spellcastingAbility)) {
+      abilities.push(characterClass.spellcastingAbility)
+    }
+    return abilities
+  }, [characterClass])
+
+  // Sort backgrounds - suggested ones first (those that give bonuses to key abilities)
+  const { suggestedBackgrounds, otherBackgrounds } = useMemo(() => {
+    if (keyAbilities.length === 0) {
+      return { suggestedBackgrounds: [], otherBackgrounds: AVAILABLE_BACKGROUNDS }
+    }
+
+    const suggested: Background[] = []
+    const others: Background[] = []
+
+    AVAILABLE_BACKGROUNDS.forEach(bg => {
+      // Check if background gives a bonus to any key ability
+      const hasKeyAbilityBonus = bg.abilityBonuses.some(bonus =>
+        keyAbilities.includes(bonus.ability)
+      )
+
+      if (hasKeyAbilityBonus) {
+        suggested.push(bg)
+      } else {
+        others.push(bg)
+      }
+    })
+
+    return { suggestedBackgrounds: suggested, otherBackgrounds: others }
+  }, [keyAbilities])
 
   const handleBackgroundSelect = (background: Background) => {
     setSelectedBackground(background)
@@ -66,17 +104,49 @@ export function BackgroundSelector({ initialBackground, onSelect, onBack }: Back
         </p>
       </div>
 
-      {/* Background Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        {AVAILABLE_BACKGROUNDS.map((background) => (
-          <BackgroundCard
-            key={background.id}
-            background={background}
-            isSelected={selectedBackground?.id === background.id}
-            onSelect={handleBackgroundSelect}
-          />
-        ))}
-      </div>
+      {/* Suggested Backgrounds (if class selected) */}
+      {suggestedBackgrounds.length > 0 && (
+        <div className="mb-8">
+          <div className="mb-4 p-3 bg-dnd-gold/10 border border-dnd-gold/30 rounded-lg">
+            <h3 className="text-lg font-bold text-dnd-gold mb-1">
+              ⭐ Suggested for {characterClass?.name}
+            </h3>
+            <p className="text-sm text-gray-300">
+              These backgrounds grant ability bonuses that match your class's primary abilities
+              {characterClass && ` (${keyAbilities.map(a => a.toUpperCase()).join(', ')})`}.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {suggestedBackgrounds.map((background) => (
+              <BackgroundCard
+                key={background.id}
+                background={background}
+                isSelected={selectedBackground?.id === background.id}
+                onSelect={handleBackgroundSelect}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Other Backgrounds */}
+      {otherBackgrounds.length > 0 && (
+        <div className="mb-8">
+          {suggestedBackgrounds.length > 0 && (
+            <h3 className="text-lg font-semibold text-gray-400 mb-4">Other Backgrounds</h3>
+          )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {otherBackgrounds.map((background) => (
+              <BackgroundCard
+                key={background.id}
+                background={background}
+                isSelected={selectedBackground?.id === background.id}
+                onSelect={handleBackgroundSelect}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Selected Background Details */}
       {selectedBackground && (

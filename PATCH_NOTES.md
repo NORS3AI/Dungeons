@@ -1,5 +1,153 @@
 # Dungeons - Patch Notes
 
+## Version 0.3.0 - February 23, 2026
+
+### 🧪 Consumables & Potions System
+
+Potions and consumables are now prominently displayed in Actions and Overview tabs with quick-use functionality.
+
+#### **New Features**
+- **Consumables in Actions Tab**: All potions, scrolls, and elixirs now appear in a dedicated section
+- **Consumables in Overview Tab**: Quick access to potions directly from the Overview tab's right column
+- **Healing Amount Display**: Potions automatically parse and display healing amounts (e.g., "❤️ Heals: 2d4+2")
+- **Use Button**: Click "Use" to consume a potion, automatically reducing quantity or removing it
+- **Quantity Tracking**: Potions with multiple quantities (e.g., 3x Healing Potion) decrease by 1 on use
+- **Use Notifications**: Success messages show when potions are used and how many remain
+
+#### **Healing Detection**
+The system intelligently detects healing amounts from potion descriptions:
+- Dice notation (2d4+2, 1d8, etc.)
+- Hit point values (restores 10 hit points)
+- Heals pattern (heals 2d8)
+
+#### **How to Use**
+1. Navigate to **Actions** or **Overview** tab
+2. Find your consumables in the "🧪 Consumables" section
+3. Click **Use** button to consume the item
+4. Item quantity decreases or item is removed from inventory
+
+### 🎯 Spell Selection Improvements
+
+Fixed spell selection for Druids and improved spell grouping by level.
+
+#### **Spell Level Grouping**
+- **Before**: All spells shown in single "1st Level Spells" section
+- **After**: Spells grouped by actual spell level (1st, 2nd, 3rd, etc.)
+- Each spell level has its own header and grid
+- Level 4 Druids can now select from both 1st and 2nd level spells
+- Cleaner organization for multiclass spellcasters
+
+#### **Druid Spell Selection Fixed**
+- Level 4 Druids can now properly select 1st level spells
+- Spell selector dynamically shows available spell levels based on character level
+- Fixed: Spell selection was previously showing all spells in one section
+
+### 🐉 Kobold Race Updates (PHB 2024)
+
+Updated Kobold racial traits to match Player's Handbook 2024 rules.
+
+#### **New Traits** (PHB 2024)
+- **Draconic Cry**: Bonus action to grant advantage on attacks vs. enemies within 10 ft until start of next turn. Uses = proficiency bonus per long rest
+- **Kobold Legacy**: Choose one of three options:
+  - **Craftiness**: Proficiency in one skill of your choice
+  - **Defiance**: Advantage on saves to avoid or end frightened condition
+  - **Draconic Sorcery**: Know one sorcerer cantrip (INT, WIS, or CHA for spellcasting)
+
+#### **Legacy Traits** (Pre-2024)
+Old Kobold traits preserved for backwards compatibility:
+- **Grovel, Cower, and Beg**: Action to give allies advantage (marked as Legacy)
+- **Pack Tactics**: Advantage on attacks when ally within 5 ft (marked as Legacy)
+
+#### **Quick Reference Updates**
+- Added `draconic-cry` to clickable trait references
+- Added `kobold-legacy` to clickable trait references
+- Updated existing traits to indicate "Kobold (PHB 2024)" vs "Kobold (Legacy)"
+
+### ⭐ Suggested Backgrounds
+
+Background selector now intelligently suggests backgrounds based on your class's primary abilities.
+
+#### **New Features**
+- **Suggested Section**: Backgrounds that grant bonuses to class primary abilities appear first
+- **Smart Sorting**: Fighter sees STR backgrounds first, Wizard sees INT backgrounds first
+- **Class Matching**: Considers both primary ability AND spellcasting ability
+- **Visual Indicator**: Gold star (⭐) and highlighted section for suggested backgrounds
+- **Ability Display**: Shows which abilities match (e.g., "Suggested for Wizard (INTELLIGENCE)")
+
+#### **How It Works**
+- **Wizard** (INT primary): Sees Sage, Acolyte, Noble backgrounds first
+- **Fighter** (STR primary): Sees Soldier, Folk Hero backgrounds first
+- **Cleric** (WIS primary): Sees Acolyte, Folk Hero backgrounds first
+- **Warlock** (CHA primary): Sees Noble, Criminal backgrounds first
+
+#### **Other Backgrounds Section**
+- Backgrounds without matching bonuses shown in separate "Other Backgrounds" section
+- All backgrounds still available, just organized by relevance
+
+### 🧹 UI Cleanup
+
+#### **Inventory Tab**
+- **Removed**: Large "Equipped Gear" section from top of Inventory tab
+- **Kept**: Small cutaway windows showing important equipped gear
+- Cleaner, more compact inventory view
+- Less scrolling to reach actual inventory items
+
+### 🛠️ Technical Changes
+
+#### **Files Modified**
+- `src/pages/CharacterSheetPage.tsx`
+  - Added `parseHealingAmount()` helper function
+  - Added `handleUsePotion()` function for consuming items
+  - Added consumables section to Actions tab with healing display
+  - Added consumables section to Overview tab's right column
+  - Removed unused `EquippedGearSection` component (282 lines)
+  - Removed unused imports (Shield, Cloak, useItemCharge)
+- `src/components/SpellSelector.tsx`
+  - Refactored to group spells by level (1st, 2nd, 3rd, etc.)
+  - Dynamic level headers based on available spells
+  - Fixed spell selection for higher level characters
+- `src/data/quickReference.ts`
+  - Added `draconic-cry` trait for Kobold (PHB 2024)
+  - Added `kobold-legacy` trait for Kobold (PHB 2024)
+  - Updated `grovel-cower-beg` source to "Kobold (Legacy)"
+  - Updated `pack-tactics` source to "Kobold (Legacy)"
+- `src/components/BackgroundSelector.tsx`
+  - Added `characterClass` prop
+  - Added `useMemo` hook for sorting backgrounds
+  - Separated suggested vs. other backgrounds
+  - Added suggested backgrounds header with class info
+- `src/pages/CharacterCreatePage.tsx`
+  - Passed `characterClass` prop to BackgroundSelector
+
+#### **New Functions**
+```typescript
+// Parse healing amount from potion description
+const parseHealingAmount = (description: string): string | null
+
+// Handle using a potion/consumable
+const handleUsePotion = (itemId: string): void
+```
+
+#### **State Management**
+- Added `showConsumableNotification` state for use feedback
+- Notifications auto-hide after 3 seconds
+
+### 📊 Component Improvements
+
+#### **SpellSelector**
+- Before: All spells in one section
+- After: Grouped by spell level with separate grids
+- Better support for multiclass characters
+- Cleaner visual organization
+
+#### **BackgroundSelector**
+- Before: All backgrounds in one grid
+- After: Suggested backgrounds first, others below
+- Smart ability matching
+- Better new player guidance
+
+---
+
 ## Version 0.2.9 - February 23, 2026
 
 ### 📦 Mats Inventory System
