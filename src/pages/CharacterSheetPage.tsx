@@ -251,6 +251,23 @@ export function CharacterSheetPage() {
       return
     }
 
+    // Crafting materials go directly to inventory
+    if (lootItem.category === 'Crafting Material') {
+      const craftingItem: Equipment = {
+        id: `${lootItem.id}-${Date.now()}`,
+        name: lootItem.name,
+        description: lootItem.description,
+        category: 'Crafting Material',
+        weight: 0.5,
+        cost: { copper: 0, silver: 0, gold: 0, platinum: 0 },
+        quantity: lootItem.quantity || 1,
+        rarity: lootItem.rarity,
+      }
+      addEquipment(craftingItem)
+      saveCharacter()
+      return
+    }
+
     // Items with special abilities (like invisibility cloak) -> add to Features
     if (lootItem.feature) {
       addItemFeature(lootItem.feature)
@@ -270,6 +287,45 @@ export function CharacterSheetPage() {
     saveCharacter()
     setShowEquipmentEditor(false)
     setEditingLootItem(null)
+  }
+
+  const handleSellItem = (itemId: string) => {
+    const item = character.equipment.find(e => e.id === itemId)
+    if (!item || !item.rarity) return
+
+    // Calculate sell price based on rarity
+    let copperValue = 0
+
+    // Check if it's a gem (gems sell for 1 gold each)
+    if (item.name.toLowerCase().includes('gem') ||
+        item.name.toLowerCase().includes('diamond') ||
+        item.name.toLowerCase().includes('emerald') ||
+        item.name.toLowerCase().includes('ruby') ||
+        item.name.toLowerCase().includes('sapphire') ||
+        item.name.toLowerCase().includes('amethyst')) {
+      copperValue = 100 * (item.quantity || 1) // 1 gold = 100 copper
+    } else {
+      // Crafting materials sell based on rarity
+      const rarityPrices: Record<string, number> = {
+        'trash': 0,
+        'common': 5,
+        'uncommon': 10,
+        'rare': 20,
+        'epic': 35,
+        'legendary': 50,
+        'artifact': 100, // Artifact materials worth more
+      }
+      copperValue = (rarityPrices[item.rarity] || 0) * (item.quantity || 1)
+    }
+
+    // Add currency to character
+    const currentCurrency = { ...character.currency }
+    currentCurrency.copper += copperValue
+    updateCurrency(autoConvertCurrency(currentCurrency))
+
+    // Remove item from inventory
+    removeEquipment(itemId)
+    saveCharacter()
   }
 
   const handleUpdateHP = (hp: Partial<Character['hitPoints']>) => {
@@ -1059,6 +1115,7 @@ export function CharacterSheetPage() {
                         saveCharacter()
                       }}
                       onUse={() => handleUseConsumable(item)}
+                      onSell={() => handleSellItem(item.id)}
                     />
                   ))}
               </div>
@@ -2047,7 +2104,7 @@ function EquippedGearSection({
 }
 
 // Equipment item component
-function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuantity, onUse }: { item: Equipment; character: Character; onRemove: () => void; onToggleEquip: () => void; onChangeQuantity: (change: number) => void; onUse: () => void }) {
+function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuantity, onUse, onSell }: { item: Equipment; character: Character; onRemove: () => void; onToggleEquip: () => void; onChangeQuantity: (change: number) => void; onUse: () => void; onSell?: () => void }) {
   const getAbilityMod = (ability: Ability): number => {
     return calculateModifier(character.abilityScores[ability])
   }
@@ -2303,6 +2360,17 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          </button>
+        )}
+        {item.category === 'Crafting Material' && onSell && (
+          <button
+            onClick={onSell}
+            className="p-1.5 text-yellow-400 hover:text-yellow-300 hover:bg-yellow-900/30 rounded transition-colors"
+            title="Sell item for currency"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </button>
         )}

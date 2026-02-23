@@ -161,6 +161,7 @@ export interface BaseEquipment {
   equipped?: boolean
   charges?: MagicalItemCharges // For magical items with limited uses
   abilityScoreModifiers?: AbilityScoreModifiers // e.g., Belt of Giant Strength (+2 STR)
+  rarity?: 'trash' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'artifact' // For selling crafting materials
 }
 
 /**
