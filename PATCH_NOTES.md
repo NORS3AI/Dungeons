@@ -31,6 +31,24 @@
 - **Trash Loot**: Max 75 copper pieces
 - **Balanced Rewards**: More reasonable treasure amounts for weekly sessions
 
+### 📚 Content Additions
+
+#### **Sorcerer Origin Trait References**
+- **Wild Magic Surge**: Full trait reference with mechanics and table link
+- **Tides of Chaos**: Detailed explanation of advantage mechanic and surge interaction
+- **Dragon Ancestor**: Complete dragon type list, Draconic language, interaction bonuses
+- **Draconic Resilience**: HP bonus calculation and unarmored AC formula
+- **Elemental Affinity**: Damage bonus and resistance mechanics
+- **Dragon Wings**: Flying speed mechanics and armor compatibility
+- **Draconic Presence**: Aura mechanics, charm/frighten effects, save DCs
+
+#### **Wild Magic Surge Table**
+- **Complete d100 Table**: All 50 random magical effects
+- **Effect Categories**: Helpful, harmful, and bizarre outcomes
+- **Full Details**: Duration, mechanics, save DCs for each effect
+- **Clickable Reference**: Links from Wild Magic Surge trait to full table
+- **Example Effects**: Fireball centered on self, grow a shouting beard, teleport randomly, gain temporary benefits
+
 ### 🐛 Bug Fixes
 
 #### **Fixed Patch Notes Loading**
@@ -65,9 +83,11 @@
 #### **Files Updated**
 - `src/types/equipment.ts` - Currency interface and auto-conversion logic
 - `src/types/index.ts` - Export autoConvertCurrency function
+- `src/types/class.ts` - Added reference tags to Wild Magic and Draconic Bloodline features
 - `src/stores/characterStore.ts` - Integrated auto-conversion
 - `src/data/lootGenerator.ts` - Updated all currency loot limits
 - `src/data/equipment.ts` - Removed electrum from cost objects
+- `src/data/quickReference.ts` - Added 7 sorcerer traits, Wild Magic Surge table
 - `src/pages/CharacterSheetPage.tsx` - Removed electrum, added manual convert button
 - `src/components/EquipmentEditor.tsx` - Removed electrum from editor
 - `src/components/PatchNotesModal.tsx` - Created for bundled markdown display
