@@ -74,7 +74,7 @@ const SKILLS: { name: string; ability: Ability; key: SkillKey; refId: string }[]
 export function CharacterSheetPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { characters, loadCharacter, currentCharacter, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, equipAll, unequipAll, changeEquipmentQuantity, setFightingStance, addEquipment, addMaterial, removeMaterial, changeMaterialQuantity, updateHitPoints, addSpell, removeSpell, saveCharacter, addFoodRations, addWaterSupply, addItemFeature, setAlignment, setAbilityScores, migrateCurrentCharacter, needsMigration, setLevelWithHP } = useCharacterStore()
+  const { characters, loadCharacter, currentCharacter, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, equipAll, unequipAll, changeEquipmentQuantity, setFightingStance, addEquipment, addMaterial, removeMaterial, changeMaterialQuantity, updateHitPoints, addSpell, removeSpell, saveCharacter, addFoodRations, addWaterSupply, addItemFeature, setAlignment, setAbilityScores, migrateCurrentCharacter, needsMigration, setLevelWithHP, shortRest, longRest, initializeResourcePools } = useCharacterStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
   const [activeTab, setActiveTab] = useState<'main' | 'actions' | 'spells' | 'inventory' | 'features' | 'story' | 'loot'>('main')
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
@@ -101,6 +101,7 @@ export function CharacterSheetPage() {
   const [showMigrationSuccess, setShowMigrationSuccess] = useState(false)
   const [showLevelUpHPModal, setShowLevelUpHPModal] = useState(false)
   const [levelUpHPRoll, setLevelUpHPRoll] = useState<{ rolls: number[]; highest: number; isRolling: boolean } | null>(null)
+  const [restNotification, setRestNotification] = useState<{ type: 'short' | 'long' | 'trance'; message: string } | null>(null)
 
   useEffect(() => {
     if (id) {
@@ -115,6 +116,13 @@ export function CharacterSheetPage() {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [id])
+
+  // Initialize resource pools if character doesn't have any
+  useEffect(() => {
+    if (currentCharacter && currentCharacter.class && currentCharacter.resourcePools.length === 0) {
+      initializeResourcePools()
+    }
+  }, [currentCharacter?.id, currentCharacter?.class?.id, initializeResourcePools])
 
   const character = currentCharacter
 
@@ -587,93 +595,6 @@ export function CharacterSheetPage() {
     }, 5000)
   }
 
-  // Get resource pools for the character based on their class
-  const getResourcePools = () => {
-    const pools: Array<{
-      name: string
-      current: number
-      max: number
-      description: string
-      color: string
-    }> = []
-
-    const charClass = character.class
-
-    // Death Knight - Runic Power
-    if (charClass?.id === 'death-knight') {
-      const max = 4 + character.level
-      pools.push({
-        name: 'Runic Power',
-        current: max, // TODO: Track usage
-        max,
-        description: 'Regain half on short rest, all on long rest. +1 on critical hit.',
-        color: 'text-cyan-400'
-      })
-    }
-
-    // Monk - Ki Points
-    if (charClass?.id === 'monk') {
-      pools.push({
-        name: 'Ki Points',
-        current: character.level, // TODO: Track usage
-        max: character.level,
-        description: 'Regain all on short rest.',
-        color: 'text-yellow-400'
-      })
-    }
-
-    // Sorcerer - Sorcery Points
-    if (charClass?.id === 'sorcerer') {
-      pools.push({
-        name: 'Sorcery Points',
-        current: character.level, // TODO: Track usage
-        max: character.level,
-        description: character.level >= 20 ? 'Regain 4 on short rest, all on long rest.' : 'Regain all on long rest.',
-        color: 'text-purple-400'
-      })
-    }
-
-    // Barbarian - Rage
-    if (charClass?.id === 'barbarian') {
-      const rageFeature = charClass.features.find(f => f.id === 'rage')
-      const rageAmount = rageFeature?.charges?.amount || 2
-      const rageUses = typeof rageAmount === 'number' ? rageAmount : 2
-      pools.push({
-        name: 'Rage',
-        current: rageUses, // TODO: Track usage
-        max: rageUses,
-        description: 'Regain all on long rest.',
-        color: 'text-red-400'
-      })
-    }
-
-    // Bard - Bardic Inspiration
-    if (charClass?.id === 'bard') {
-      const charismaModifier = calculateModifier(character.abilityScores.charisma)
-      const max = Math.max(1, charismaModifier)
-      pools.push({
-        name: 'Bardic Inspiration',
-        current: max, // TODO: Track usage
-        max,
-        description: character.level >= 5 ? 'Regain all on short rest.' : 'Regain all on long rest.',
-        color: 'text-pink-400'
-      })
-    }
-
-    // Cleric & Paladin - Channel Divinity
-    if (charClass?.id === 'cleric' || charClass?.id === 'paladin') {
-      pools.push({
-        name: 'Channel Divinity',
-        current: 1, // TODO: Track usage (increases at higher levels)
-        max: 1,
-        description: 'Regain all on short rest.',
-        color: 'text-amber-400'
-      })
-    }
-
-    return pools
-  }
-
   const handleUpdateHP = (hp: Partial<Character['hitPoints']>) => {
     updateHitPoints(hp)
     saveCharacter()
@@ -690,6 +611,37 @@ export function CharacterSheetPage() {
     setTimeout(() => {
       setShowMigrationSuccess(false)
     }, 5000)
+  }
+
+  const handleShortRest = () => {
+    shortRest()
+    saveCharacter()
+    setRestNotification({
+      type: 'short',
+      message: '🛌 Short Rest complete! Some abilities and half of long rest resources restored.'
+    })
+    setTimeout(() => setRestNotification(null), 5000)
+  }
+
+  const handleLongRest = () => {
+    longRest()
+    saveCharacter()
+    setRestNotification({
+      type: 'long',
+      message: '😴 Long Rest complete! HP, spell slots, and all resources fully restored. Daily income added!'
+    })
+    setTimeout(() => setRestNotification(null), 5000)
+  }
+
+  const handleTrance = () => {
+    // Trance is equivalent to a long rest for elves (4 hours instead of 8)
+    longRest()
+    saveCharacter()
+    setRestNotification({
+      type: 'trance',
+      message: '🧘 Trance complete! (4 hours) HP, spell slots, and all resources fully restored. Daily income added!'
+    })
+    setTimeout(() => setRestNotification(null), 5000)
   }
 
   const handleLevelUp = () => {
@@ -1836,44 +1788,114 @@ export function CharacterSheetPage() {
       )}
 
       {activeTab === 'actions' && (
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {/* Header */}
-          <div className="card bg-gradient-to-br from-blue-900/30 to-purple-900/30 border-2 border-dnd-gold p-6">
-            <h2 className="text-3xl font-bold text-dnd-gold mb-2">⚔️ Actions - What Can I Do?</h2>
-            <p className="text-gray-300">
+          <div className="card bg-gradient-to-br from-blue-900/30 to-purple-900/30 border-2 border-dnd-gold p-4 sm:p-6">
+            <h2 className="text-2xl sm:text-3xl font-bold text-dnd-gold mb-2">⚔️ Actions - What Can I Do?</h2>
+            <p className="text-sm sm:text-base text-gray-300">
               All your available actions, attacks, spells, and consumables in one place. Perfect for quick reference during combat!
             </p>
           </div>
 
+          {/* Rest System */}
+          <div className="card bg-gradient-to-br from-indigo-900/30 to-purple-900/30 border-2 border-purple-600 p-4 sm:p-6">
+            <h3 className="text-xl sm:text-2xl font-bold text-purple-400 mb-3 sm:mb-4">😴 Rest & Recovery</h3>
+
+            {/* Rest Notification */}
+            {restNotification && (
+              <div className={`mb-4 p-3 sm:p-4 rounded-lg border-2 animate-pulse ${
+                restNotification.type === 'short' ? 'bg-blue-900/30 border-blue-600 text-blue-200' :
+                restNotification.type === 'trance' ? 'bg-cyan-900/30 border-cyan-600 text-cyan-200' :
+                'bg-green-900/30 border-green-600 text-green-200'
+              }`}>
+                <p className="text-sm sm:text-base font-medium">{restNotification.message}</p>
+              </div>
+            )}
+
+            <p className="text-sm sm:text-base text-gray-300 mb-4">
+              Restore your health, spell slots, and class resources by resting.
+            </p>
+
+            {/* Rest Buttons */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              {/* Short Rest */}
+              <button
+                onClick={handleShortRest}
+                className="p-4 bg-gradient-to-br from-blue-600 to-blue-800 hover:from-blue-500 hover:to-blue-700 border-2 border-blue-400 rounded-lg transition-all transform hover:scale-105 active:scale-95"
+              >
+                <div className="text-3xl sm:text-4xl mb-2">🛌</div>
+                <div className="font-bold text-base sm:text-lg text-white mb-1">Short Rest</div>
+                <div className="text-xs sm:text-sm text-blue-100">
+                  ~1 hour. Restores short rest abilities and half of long rest resources.
+                </div>
+              </button>
+
+              {/* Long Rest */}
+              <button
+                onClick={handleLongRest}
+                className="p-4 bg-gradient-to-br from-green-600 to-green-800 hover:from-green-500 hover:to-green-700 border-2 border-green-400 rounded-lg transition-all transform hover:scale-105 active:scale-95"
+              >
+                <div className="text-3xl sm:text-4xl mb-2">😴</div>
+                <div className="font-bold text-base sm:text-lg text-white mb-1">Long Rest</div>
+                <div className="text-xs sm:text-sm text-green-100">
+                  8 hours. Fully restores HP, spells, and all resources. Adds daily income.
+                </div>
+              </button>
+
+              {/* Trance (Elf Only) */}
+              {character.race?.id === 'elf' || character.race?.id === 'drow' ? (
+                <button
+                  onClick={handleTrance}
+                  className="p-4 bg-gradient-to-br from-cyan-600 to-cyan-800 hover:from-cyan-500 hover:to-cyan-700 border-2 border-cyan-400 rounded-lg transition-all transform hover:scale-105 active:scale-95"
+                >
+                  <div className="text-3xl sm:text-4xl mb-2">🧘</div>
+                  <div className="font-bold text-base sm:text-lg text-white mb-1">Trance</div>
+                  <div className="text-xs sm:text-sm text-cyan-100">
+                    4 hours (Elf/Drow). Counts as a long rest. Fully restores everything.
+                  </div>
+                </button>
+              ) : (
+                <div className="p-4 bg-gray-800/50 border-2 border-gray-700 rounded-lg opacity-50">
+                  <div className="text-3xl sm:text-4xl mb-2">🧘</div>
+                  <div className="font-bold text-base sm:text-lg text-gray-400 mb-1">Trance</div>
+                  <div className="text-xs sm:text-sm text-gray-500">
+                    Only available for Elves and Drow
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Resource Pools */}
-          {getResourcePools().length > 0 && (
-            <div className="card bg-gray-800 border-gray-700 p-6">
-              <h3 className="text-2xl font-bold text-white mb-4">💎 Resource Pools</h3>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {getResourcePools().map((pool) => (
-                  <div key={pool.name} className="p-4 bg-gray-900 border border-gray-700 rounded-lg">
+          {character.resourcePools.length > 0 && (
+            <div className="card bg-gray-800 border-gray-700 p-4 sm:p-6">
+              <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4">💎 Resource Pools</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                {character.resourcePools.map((pool) => (
+                  <div key={pool.id} className="p-4 bg-gray-900 border border-gray-700 rounded-lg">
                     <div className="flex items-center justify-between mb-2">
-                      <h4 className={`font-bold ${pool.color}`}>{pool.name}</h4>
-                      <span className="text-2xl font-bold text-white">
-                        {pool.current} / {pool.max}
+                      <h4 className="font-bold text-cyan-400 text-sm sm:text-base">{pool.name}</h4>
+                      <span className="text-xl sm:text-2xl font-bold text-white">
+                        {pool.current} / {pool.maximum}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-400">{pool.description}</p>
+                    <p className="text-xs sm:text-sm text-gray-400 mb-2">
+                      Restores on: <span className="text-blue-400 font-medium">{pool.rechargeOn === 'shortRest' ? 'Short Rest' : 'Long Rest'}</span>
+                    </p>
 
                     {/* Visual bar */}
                     <div className="mt-3 h-2 bg-gray-700 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300"
-                        style={{ width: `${(pool.current / pool.max) * 100}%` }}
+                        style={{ width: `${(pool.current / pool.maximum) * 100}%` }}
                       />
                     </div>
                   </div>
                 ))}
               </div>
-              <div className="mt-4 p-3 bg-blue-900/20 border border-blue-700/30 rounded-lg">
-                <p className="text-sm text-blue-300">
-                  <span className="font-bold">💡 Tip:</span> Resource tracking is currently display-only.
-                  Mark usage on paper or use the Notes tab to track consumption during your session!
+              <div className="mt-4 p-3 bg-cyan-900/20 border border-cyan-700/30 rounded-lg">
+                <p className="text-xs sm:text-sm text-cyan-300">
+                  <span className="font-bold">💡 Tip:</span> Resources automatically restore when you rest above!
                 </p>
               </div>
             </div>
