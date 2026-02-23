@@ -941,7 +941,7 @@ export function CharacterSheetPage() {
               <h3 className="text-lg font-bold text-white mb-4">⚔️ Equipped Weapons</h3>
               <div className="space-y-2">
                 {character.equipment
-                  .filter((item): item is Weapon => isWeapon(item) && item.equipped === true)
+                  .filter((item): item is Weapon => isWeapon(item) && item.equipped !== false)
                   .map((item) => (
                     <EquipmentItem
                       key={item.id}
@@ -972,7 +972,7 @@ export function CharacterSheetPage() {
               <h3 className="text-lg font-bold text-white mb-4">🛡️ Equipped Armor</h3>
               <div className="space-y-2">
                 {character.equipment
-                  .filter((item): item is Armor => isArmor(item) && item.equipped === true)
+                  .filter((item): item is Armor => isArmor(item) && item.equipped !== false)
                   .map((item) => (
                     <EquipmentItem
                       key={item.id}
@@ -1245,7 +1245,7 @@ export function CharacterSheetPage() {
             {character.equipment.filter(item => isWeapon(item) && item.equipped).length > 0 ? (
               <div className="grid md:grid-cols-2 gap-4">
                 {character.equipment
-                  .filter((item): item is Weapon => isWeapon(item) && item.equipped === true)
+                  .filter((item): item is Weapon => isWeapon(item) && item.equipped !== false)
                   .map((weapon) => {
                     const attackBonus = weapon.properties?.includes('finesse')
                       ? Math.max(
