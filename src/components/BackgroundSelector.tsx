@@ -289,7 +289,7 @@ export function BackgroundSelector({ initialBackground, characterClass, onSelect
                          : 'bg-gray-700 text-gray-500 cursor-not-allowed'
                      }`}
         >
-          Next: Allocate Stats
+          Next: Alignment
         </button>
       </div>
 

@@ -273,7 +273,7 @@ export function AlignmentSelector({ initialAlignment, onSelect, onBack }: Alignm
                          : 'bg-gray-700 text-gray-500 cursor-not-allowed'
                      }`}
         >
-          Next: Allocate Stats
+          Next: Allocate Abilities
         </button>
       </div>
 

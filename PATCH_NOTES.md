@@ -1,5 +1,129 @@
 # Dungeons - Patch Notes
 
+## Version 0.3.1 - February 23, 2026
+
+### ⚡ Actions Tab Major Overhaul
+
+The Actions tab has been completely redesigned to be the ultimate combat and skill check reference for players!
+
+#### **🎲 Interactive Weapon Rolls**
+- **Hit Roll Button ("H")**: Click to roll 1d20 + attack bonus for hit determination
+- **Damage Roll Button (Dice Icon)**: Click to roll weapon damage dice
+- **Instant Results**: Roll results display inline for 5 seconds with animated badges
+- **Attack Bonus Calculation**: Automatically uses STR or DEX modifier (finesse weapons use higher)
+- Perfect for quick combat resolution without fumbling for physical dice!
+
+#### **💎 Resource Pool Tracking**
+Class-specific resource pools now displayed prominently with visual bars:
+- **Death Knight**: Runic Power (4 + level, regain half on short rest, all on long rest, +1 on crit)
+- **Monk**: Ki Points (equal to monk level, regain all on short rest)
+- **Sorcerer**: Sorcery Points (equal to sorcerer level, regain all on long rest)
+- **Barbarian**: Rage (2 uses at level 1, regain all on long rest)
+- **Bard**: Bardic Inspiration (CHA modifier uses, regain on short rest at level 5+)
+- **Cleric/Paladin**: Channel Divinity (1 use, regain on short rest)
+- Visual progress bars show current/max values with color-coded display
+- Hover tooltips explain recharge mechanics
+
+#### **✨ Complete Spell List Display**
+- **Spell Slots Summary**: Shows all available spell slots by level with current/max counts
+- **Grouped by Spell Level**: Cantrips, 1st, 2nd, 3rd... through 9th level spells
+- **Prepared Indicators**: Clearly shows which spells are prepared with purple badges
+- **Quick Stats**: Casting time, range, and concentration requirements at a glance
+- **Clickable Spell Names**: Click any spell for full QuickRef details
+- **Spell Description Preview**: First two lines of spell text visible in card
+- **Smart Tips**: Reminds prepared casters (Cleric, Druid, Paladin, Wizard) to prepare daily
+
+#### **🎲 Comprehensive Skill Checks Section**
+All 18 D&D skills displayed with bonuses and player-friendly explanations!
+
+**Skills Organized by Ability Score:**
+- **💪 Strength**: Athletics
+- **🤸 Dexterity**: Acrobatics, Sleight of Hand, Stealth
+- **🧠 Intelligence**: Arcana, History, Investigation, Nature, Religion
+- **🦉 Wisdom**: Animal Handling, Insight, Medicine, Perception, Survival
+- **✨ Charisma**: Deception, Intimidation, Performance, Persuasion
+
+**Each Skill Shows:**
+- **Total Bonus**: Large, easy-to-read modifier (e.g., +5)
+- **Breakdown**: Shows ability modifier + proficiency bonus breakdown
+- **Proficiency Status**: "Proficient" or "Expertise" badges
+- **Clickable Names**: Click skill name for QuickRef explanation of what it does
+
+**How to Use Guide:**
+- Step-by-step instructions for new players
+- Example: "Roll 15 + your Perception bonus (+3) = 18 total"
+- Explains DC comparison and success determination
+- Gold tip: "Higher bonuses mean you're better at that skill!"
+
+#### **Better Organization**
+The Actions tab now flows logically:
+1. Resource Pools (class-specific mechanics)
+2. Spells (if spellcaster)
+3. Weapon Attacks (with roll buttons)
+4. Consumables & Items
+5. Special Abilities & Features
+6. Skill Checks (complete reference)
+7. Quick Tip for new players
+
+### 🔄 Character Creation Flow Fixed
+
+Fixed navigation button labels in character wizard to reflect correct sequence.
+
+#### **Background Selector**
+- **Before**: "Next: Allocate Stats"
+- **After**: "Next: Alignment"
+- Now correctly indicates the next step is choosing alignment
+
+#### **Alignment Selector**
+- **Before**: "Next: Allocate Stats"
+- **After**: "Next: Allocate Abilities"
+- More accurate terminology (abilities vs stats)
+- Matches the actual next step
+
+### 🎒 Loot Cache Auto-Add
+
+Consumables and crafting materials now automatically added to inventory from loot cache!
+
+#### **How It Works**
+- **Consumables Detection**: Automatically detects potions, scrolls, elixirs by name
+- **Direct to Inventory**: Adds directly without opening equipment editor
+- **Smart Categorization**: Sets category to 'consumable' automatically
+- **Properties Preserved**: Maintains rarity, quantity, description, and value
+- **Cost Conversion**: Converts loot value to gold pieces in Currency format
+
+#### **Benefits**
+- **Faster Workflow**: No more clicking through editor for every potion
+- **Less Tedious**: Craft materials go straight to inventory
+- **Still Editable**: Can edit from Inventory tab if needed
+- **Special Items Still Manual**: Items with features (like magical cloaks) still open editor
+
+### 🛠️ Technical Changes
+
+#### **Files Modified**
+- `src/pages/CharacterSheetPage.tsx`
+  - Added `getResourcePools()` function to calculate class-specific resource pools
+  - Added `handleRollToHit()` function for weapon attack rolls
+  - Added `handleRollDamage()` function for weapon damage rolls
+  - Added `weaponRolls` state to track temporary roll results
+  - Added resource pools section to Actions tab (lines 1709-1741)
+  - Added spell list section to Actions tab (lines 1744-1851)
+  - Added comprehensive skill checks section (lines 2092-2341)
+  - Modified loot cache handler to auto-add consumables (lines 293-318)
+  - Imported `EMPTY_CURRENCY` from equipment types
+
+- `src/components/BackgroundSelector.tsx`
+  - Changed button text from "Next: Allocate Stats" to "Next: Alignment" (line 292)
+
+- `src/components/AlignmentSelector.tsx`
+  - Changed button text to "Next: Allocate Abilities" (line 276)
+
+#### **Dependencies**
+- Uses existing `rollDice()` function from dice types
+- Uses existing `QuickRefTooltip` component for skill/spell references
+- Uses existing `calculateModifier()` and `calculateProficiencyBonus()` functions
+
+---
+
 ## Version 0.3.0 - February 23, 2026
 
 ### 🧪 Consumables & Potions System
