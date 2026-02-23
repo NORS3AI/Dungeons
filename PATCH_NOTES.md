@@ -1,5 +1,81 @@
 # Dungeons - Patch Notes
 
+## Version 0.2.6 - February 23, 2026
+
+### 🔨 Crafting Materials System
+
+Players can now find crafting materials in loot caches to support blacksmithing, tailoring, leatherworking, and alchemy professions.
+
+#### **Crafting Materials by Rarity**
+
+**Common & Uncommon Loot** (entry-level crafting):
+- **Iron Ore Clumps** - Base material for weapons and armor
+- **Copper Ore Clumps** - Base material for tools and accessories
+- **Common Herbs** - Lavender, Mint for basic potions and healing salves
+- **Uncommon Herbs** - Foxglove, Wolfsbane for potent potions and antidotes
+
+**Rare Loot** (advanced crafting):
+- **Silver Ore Clumps** - Fine jewelry and silver weapons
+- **Gold Ore Clumps** - Valuable jewelry and decorative items
+- **Rare Herbs** - Mandrake Root, Bloodthorn for powerful alchemical concoctions
+
+**Epic Loot** (legendary crafting):
+- **Mithril Ore Clumps** - Lightweight, superior armor and weapons
+- **Adamantite Ore Clumps** - Incredibly hard, indestructible equipment
+- **Extremely Rare Herbs** - Arcane Nightshade, Phoenix Feather Grass for legendary elixirs
+
+**Legendary Loot** (mythical crafting):
+- **Dragonscale Leather Hides** - Ancient dragon hide for legendary armor
+- **Obsidian-Steel Ore Clumps** - Mythical volcanic metal forged in dragon fire
+
+**Artifact Loot** (ultimate crafting):
+- **Flawless Gems** - Diamond, Emerald, Ruby, Sapphire, Amethyst for the most powerful enchantments
+
+#### **Crafting Material Benefits**
+- **Sell for Profit**: All materials have gold value and can be sold for income
+- **Future Crafting**: Foundation for blacksmithing, tailoring, and leatherworking systems
+- **Alchemy Ingredients**: Herbs for potion-making and alchemical experiments
+- **Economic Gameplay**: Players can specialize in gathering and selling materials
+
+### 📖 Story Tab - Character Lore & Notes
+
+New dedicated tab for writing and tracking character stories, background, and campaign notes.
+
+#### **Story Editor Features**
+- **Large Text Area**: Spacious textarea (h-96) for extensive writing
+- **Auto-Save Support**: Save button to preserve your story
+- **Free-Form Writing**: Write anything - backstory, personality, goals, relationships, events
+- **Placeholder Guide**: Built-in prompts for what to include
+
+#### **Story Writing Guide**
+Includes helpful sections:
+- **Backstory**: Where they came from, childhood, formative events
+- **Personality**: Character traits, behaviors, quirks
+- **Goals & Motivations**: What drives them to adventure
+- **Relationships**: Family, friends, mentors, rivals, enemies
+- **Important Events**: Major moments in their life or campaign
+- **Campaign Notes**: Quest details, NPCs met, secrets discovered
+
+#### **User Experience**
+- **Beautiful UI**: Purple/indigo gradient header with gold accents
+- **Success Notifications**: Confirmation when story is saved
+- **Positioned After Features**: Easy to find between Features and Loot Cache tabs
+- **Perfect for DMs**: Track character development and story arcs
+
+### 🛠️ Technical Changes
+
+#### **Modified Files**
+- `src/data/lootGenerator.ts` - Added 20+ crafting materials across all rarity tiers
+- `src/pages/CharacterSheetPage.tsx` - Added Story tab with robust text editor
+
+#### **New Features**
+- Added 'story' to activeTab union type
+- Story tab with 400px tall textarea for extensive writing
+- Crafting Material category in loot system
+- Quantity support for stackable crafting materials
+
+---
+
 ## Version 0.2.5 - February 23, 2026
 
 ### 🎒 Survival & Supply Tracking

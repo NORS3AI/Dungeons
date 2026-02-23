@@ -75,7 +75,7 @@ export function CharacterSheetPage() {
   const navigate = useNavigate()
   const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, changeEquipmentQuantity, setFightingStance, addEquipment, updateHitPoints, addSpell, removeSpell, useItemCharge, saveCharacter, addFoodRations, addWaterSupply, addItemFeature, setAlignment } = useCharacterStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
-  const [activeTab, setActiveTab] = useState<'main' | 'actions' | 'spells' | 'inventory' | 'features' | 'loot'>('main')
+  const [activeTab, setActiveTab] = useState<'main' | 'actions' | 'spells' | 'inventory' | 'features' | 'story' | 'loot'>('main')
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
   const [showIncomeRoller, setShowIncomeRoller] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
@@ -437,6 +437,7 @@ export function CharacterSheetPage() {
     { id: 'spells', label: 'Spells' },
     { id: 'inventory', label: 'Inventory' },
     { id: 'features', label: 'Features' },
+    { id: 'story', label: 'Story' },
     { id: 'loot', label: 'Loot Cache' },
   ] as const
 
@@ -1298,6 +1299,83 @@ export function CharacterSheetPage() {
                   On your turn, you can: <strong>Move</strong> up to your speed, take one <strong>Action</strong> (attack, cast a spell, use an item),
                   and sometimes a <strong>Bonus Action</strong> (if you have abilities that use it). Click the dice button to roll for attacks!
                 </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'story' && (
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="card bg-gradient-to-br from-purple-900/30 to-indigo-900/30 border-2 border-dnd-gold p-6">
+            <h2 className="text-3xl font-bold text-dnd-gold mb-2">📖 Character Story & Lore</h2>
+            <p className="text-gray-300">
+              Write your character's backstory, personality traits, goals, relationships, and any important events or notes.
+            </p>
+          </div>
+
+          {/* Story Editor */}
+          <div className="card bg-gray-800 border-gray-700 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-white">Character Story</h3>
+              <button
+                onClick={() => {
+                  updateCharacterDetails({ backstory: character.backstory })
+                  saveCharacter()
+                  setShowConsumableNotification({
+                    message: 'Story saved successfully',
+                    type: 'success'
+                  })
+                  setTimeout(() => setShowConsumableNotification(null), 3000)
+                }}
+                className="px-4 py-2 bg-dnd-gold hover:bg-yellow-600 text-gray-900 font-semibold rounded-lg transition-colors"
+              >
+                💾 Save Story
+              </button>
+            </div>
+            <textarea
+              value={character.backstory || ''}
+              onChange={(e) => updateCharacterDetails({ backstory: e.target.value })}
+              className="w-full h-96 p-4 bg-gray-900 border border-gray-700 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-dnd-gold resize-none"
+              placeholder="Write your character's story here...&#10;&#10;Include:&#10;• Backstory - Where did they come from?&#10;• Personality - What are they like?&#10;• Goals - What do they want to achieve?&#10;• Relationships - Family, friends, rivals, enemies&#10;• Important Events - Key moments in their life&#10;• Notes - Anything else important to remember"
+            />
+            <p className="text-sm text-gray-500 mt-2">
+              This is a free-form text area. Press Ctrl+Enter (or Cmd+Enter on Mac) to add line breaks.
+            </p>
+          </div>
+
+          {/* Quick Reference Guide */}
+          <div className="card bg-blue-900/20 border-blue-600/50 p-6">
+            <h3 className="text-xl font-bold text-blue-400 mb-4">📝 Story Writing Guide</h3>
+            <div className="grid md:grid-cols-2 gap-4 text-sm">
+              <div className="space-y-2">
+                <div>
+                  <h4 className="font-bold text-white mb-1">Backstory</h4>
+                  <p className="text-gray-400">Where were they born? What was their childhood like? What events shaped who they are?</p>
+                </div>
+                <div>
+                  <h4 className="font-bold text-white mb-1">Personality</h4>
+                  <p className="text-gray-400">Are they brave or cautious? Kind or cynical? Serious or humorous?</p>
+                </div>
+                <div>
+                  <h4 className="font-bold text-white mb-1">Goals & Motivations</h4>
+                  <p className="text-gray-400">What drives them? What do they want to achieve? Why are they adventuring?</p>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div>
+                  <h4 className="font-bold text-white mb-1">Relationships</h4>
+                  <p className="text-gray-400">Who matters to them? Family, friends, mentors, rivals, or enemies?</p>
+                </div>
+                <div>
+                  <h4 className="font-bold text-white mb-1">Important Events</h4>
+                  <p className="text-gray-400">What major moments have happened in their life or during the campaign?</p>
+                </div>
+                <div>
+                  <h4 className="font-bold text-white mb-1">Campaign Notes</h4>
+                  <p className="text-gray-400">Track quest details, important NPCs met, or secrets discovered.</p>
+                </div>
               </div>
             </div>
           </div>
