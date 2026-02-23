@@ -74,7 +74,7 @@ const SKILLS: { name: string; ability: Ability; key: SkillKey; refId: string }[]
 export function CharacterSheetPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { characters, loadCharacter, currentCharacter, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, equipAll, unequipAll, changeEquipmentQuantity, setFightingStance, addEquipment, addMaterial, removeMaterial, changeMaterialQuantity, updateHitPoints, addSpell, removeSpell, saveCharacter, addFoodRations, addWaterSupply, addItemFeature, setAlignment, setAbilityScores, migrateCurrentCharacter, needsMigration, setLevelWithHP, shortRest, longRest, initializeResourcePools } = useCharacterStore()
+  const { characters, loadCharacter, currentCharacter, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, equipAll, unequipAll, changeEquipmentQuantity, setFightingStance, addEquipment, addMaterial, removeMaterial, changeMaterialQuantity, updateHitPoints, addSpell, removeSpell, saveCharacter, addFoodRations, addWaterSupply, addItemFeature, setAlignment, setAbilityScores, migrateCurrentCharacter, needsMigration, setLevelWithHP, shortRest, longRest, initializeResourcePools, initializeFeatureCharges, useFeatureCharge } = useCharacterStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
   const [activeTab, setActiveTab] = useState<'main' | 'actions' | 'spells' | 'inventory' | 'features' | 'story' | 'loot'>('main')
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
@@ -102,6 +102,7 @@ export function CharacterSheetPage() {
   const [showLevelUpHPModal, setShowLevelUpHPModal] = useState(false)
   const [levelUpHPRoll, setLevelUpHPRoll] = useState<{ rolls: number[]; highest: number; isRolling: boolean } | null>(null)
   const [restNotification, setRestNotification] = useState<{ type: 'short' | 'long' | 'trance'; message: string } | null>(null)
+  const [abilityNotification, setAbilityNotification] = useState<{ featureName: string; message: string } | null>(null)
 
   useEffect(() => {
     if (id) {
@@ -123,6 +124,13 @@ export function CharacterSheetPage() {
       initializeResourcePools()
     }
   }, [currentCharacter?.id, currentCharacter?.class?.id, initializeResourcePools])
+
+  // Initialize feature charges if character doesn't have any
+  useEffect(() => {
+    if (currentCharacter && currentCharacter.class && currentCharacter.featureCharges.length === 0) {
+      initializeFeatureCharges()
+    }
+  }, [currentCharacter?.id, currentCharacter?.class?.id, currentCharacter?.level, initializeFeatureCharges])
 
   const character = currentCharacter
 
@@ -642,6 +650,45 @@ export function CharacterSheetPage() {
       message: '🧘 Trance complete! (4 hours) HP, spell slots, and all resources fully restored. Daily income added!'
     })
     setTimeout(() => setRestNotification(null), 5000)
+  }
+
+  const handleUseAbility = (featureId: string, featureName: string) => {
+    // Check if character has charges remaining
+    const feature = character.featureCharges.find(f => f.id === featureId)
+    if (!feature || feature.current <= 0) {
+      setAbilityNotification({
+        featureName,
+        message: `❌ No charges remaining for ${featureName}!`
+      })
+      setTimeout(() => setAbilityNotification(null), 3000)
+      return
+    }
+
+    // Use the charge
+    useFeatureCharge(featureId)
+
+    // Special handling for Second Wind (Fighter healing ability)
+    if (featureId === 'second-wind') {
+      const healRoll = Math.floor(Math.random() * 10) + 1 // 1d10
+      const healAmount = healRoll + character.level
+      const newHP = Math.min(character.hitPoints.current + healAmount, character.hitPoints.maximum)
+
+      updateHitPoints({ current: newHP })
+
+      setAbilityNotification({
+        featureName,
+        message: `💚 Second Wind! Healed ${healAmount} HP (${healRoll} + ${character.level})`
+      })
+    } else {
+      // Generic ability use notification
+      setAbilityNotification({
+        featureName,
+        message: `⚡ Used ${featureName}!`
+      })
+    }
+
+    saveCharacter()
+    setTimeout(() => setAbilityNotification(null), 5000)
   }
 
   const handleLevelUp = () => {
@@ -2244,32 +2291,88 @@ export function CharacterSheetPage() {
 
           {/* Special Abilities & Features */}
           {(character.featureCharges.length > 0 || character.itemFeatures.length > 0) && (
-            <div className="card bg-gray-800 border-gray-700 p-6">
-              <h3 className="text-2xl font-bold text-white mb-4">⚡ Special Abilities</h3>
+            <div className="card bg-gradient-to-br from-amber-900/30 to-yellow-900/30 border-2 border-yellow-600 p-4 sm:p-6">
+              <h3 className="text-xl sm:text-2xl font-bold text-yellow-400 mb-3 sm:mb-4">⚡ Class Abilities & Features</h3>
 
-              <div className="grid md:grid-cols-2 gap-4">
+              {/* Ability Notification */}
+              {abilityNotification && (
+                <div className="mb-4 p-3 sm:p-4 rounded-lg border-2 bg-green-900/30 border-green-600 text-green-200 animate-pulse">
+                  <p className="text-sm sm:text-base font-medium">{abilityNotification.message}</p>
+                </div>
+              )}
+
+              <p className="text-sm sm:text-base text-gray-300 mb-4">
+                Limited-use abilities that recharge during rests. Click "Use" to activate!
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 {/* Class Features with Charges */}
-                {character.featureCharges.map((feature) => (
-                  <div key={feature.id} className="p-4 bg-yellow-900/20 border border-yellow-700 rounded-lg">
-                    <div className="flex items-start justify-between mb-2">
-                      <h4 className="font-bold text-yellow-400">{feature.name}</h4>
-                      <div className="text-sm font-bold text-yellow-300">
-                        {feature.current}/{feature.maximum}
+                {character.featureCharges.map((feature) => {
+                  // Get full feature info from class
+                  const classFeature = character.class?.features.find(f => f.id === feature.id)
+                  const isUsable = feature.current > 0
+
+                  return (
+                    <div
+                      key={feature.id}
+                      className={`p-4 rounded-lg border-2 transition-all ${
+                        isUsable
+                          ? 'bg-yellow-900/40 border-yellow-500 hover:border-yellow-400'
+                          : 'bg-gray-800/50 border-gray-700 opacity-50'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <h4 className="font-bold text-base sm:text-lg text-yellow-400">{feature.name}</h4>
+                        <div className={`text-xl sm:text-2xl font-bold ${
+                          isUsable ? 'text-yellow-300' : 'text-gray-500'
+                        }`}>
+                          {feature.current}/{feature.maximum}
+                        </div>
+                      </div>
+
+                      {classFeature && (
+                        <p className="text-xs sm:text-sm text-gray-300 mb-3 line-clamp-2">
+                          {classFeature.description}
+                        </p>
+                      )}
+
+                      <div className="flex items-center justify-between mt-3 pt-3 border-t border-yellow-700/30">
+                        <span className="text-xs text-gray-400">
+                          {feature.rechargeOn === 'shortRest' ? '🛌 Short Rest' : '😴 Long Rest'}
+                        </span>
+
+                        <button
+                          onClick={() => handleUseAbility(feature.id, feature.name)}
+                          disabled={!isUsable}
+                          className={`px-3 py-1.5 rounded-lg font-medium text-sm transition-all ${
+                            isUsable
+                              ? 'bg-yellow-600 hover:bg-yellow-500 text-white transform hover:scale-105 active:scale-95'
+                              : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                          }`}
+                        >
+                          {isUsable ? 'Use' : 'No Charges'}
+                        </button>
                       </div>
                     </div>
-                    <div className="text-xs text-gray-400">
-                      Recharges on: {feature.rechargeOn.replace(/([A-Z])/g, ' $1').trim()}
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
 
                 {/* Item Features */}
                 {character.itemFeatures.map((feature) => (
-                  <div key={feature.id} className="p-4 bg-cyan-900/20 border border-cyan-700 rounded-lg">
-                    <h4 className="font-bold text-cyan-400">{feature.name}</h4>
-                    <p className="text-sm text-gray-300 mt-1">{feature.description}</p>
+                  <div key={feature.id} className="p-4 bg-cyan-900/40 border-2 border-cyan-700 rounded-lg hover:border-cyan-600 transition-all">
+                    <h4 className="font-bold text-base sm:text-lg text-cyan-400 mb-2">{feature.name}</h4>
+                    <p className="text-xs sm:text-sm text-gray-300">{feature.description}</p>
+                    <div className="mt-2 text-xs text-cyan-300">
+                      ✨ From magical item
+                    </div>
                   </div>
                 ))}
+              </div>
+
+              <div className="mt-4 p-3 bg-yellow-900/20 border border-yellow-700/30 rounded-lg">
+                <p className="text-xs sm:text-sm text-yellow-300">
+                  <span className="font-bold">💡 Tip:</span> Use rest buttons above to restore your ability charges!
+                </p>
               </div>
             </div>
           )}

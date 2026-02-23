@@ -15,6 +15,7 @@ import type {
   Condition,
   FightingStance,
   ClassFeature,
+  FeatureCharge,
 } from '../types'
 import { DEFAULT_ABILITY_SCORES, EMPTY_CURRENCY, autoConvertCurrency } from '../types'
 import { migrateCharacter, needsMigration } from '../utils/characterMigration'
@@ -218,6 +219,7 @@ interface CharacterState {
   addItemFeature: (feature: ClassFeature) => void
   removeItemFeature: (featureId: string) => void
   useSpellSlot: (level: number) => void
+  initializeFeatureCharges: () => void
   initializeResourcePools: () => void
   spendResource: (poolId: string, amount: number) => void
   restoreResource: (poolId: string, amount: number) => void
@@ -1086,6 +1088,61 @@ export const useCharacterStore = create<CharacterState>()(
             currentCharacter: {
               ...currentCharacter,
               resourcePools,
+            },
+          })
+        },
+
+        initializeFeatureCharges: () => {
+          const { currentCharacter } = get()
+          if (!currentCharacter || !currentCharacter.class) return
+
+          const featureCharges: FeatureCharge[] = []
+          const level = currentCharacter.level
+
+          // Get features from class that have charges
+          const classFeatures = currentCharacter.class.features.filter(
+            (f) => f.level <= level && f.charges
+          )
+
+          classFeatures.forEach((feature) => {
+            if (feature.charges) {
+              // Check if this feature already exists to avoid duplicates
+              const existingFeature = currentCharacter.featureCharges.find(fc => fc.id === feature.id)
+              if (!existingFeature) {
+                // Calculate actual charge amount
+                let chargeAmount = 1
+                if (typeof feature.charges.amount === 'number') {
+                  chargeAmount = feature.charges.amount
+                } else if (feature.charges.amount === 'proficiencyBonus') {
+                  chargeAmount = Math.floor((level - 1) / 4) + 2
+                } else if (feature.charges.amount === 'abilityModifier' && feature.charges.abilityModifier) {
+                  const abilityScore = currentCharacter.abilityScores[feature.charges.abilityModifier]
+                  chargeAmount = Math.max(1, Math.floor((abilityScore - 10) / 2))
+                }
+
+                featureCharges.push({
+                  id: feature.id,
+                  name: feature.name,
+                  current: chargeAmount,
+                  maximum: chargeAmount,
+                  rechargeOn: feature.charges.rechargeOn,
+                })
+              }
+            }
+          })
+
+          // Merge with existing featureCharges to avoid overwriting
+          const mergedCharges = [...currentCharacter.featureCharges]
+          featureCharges.forEach((newCharge) => {
+            if (!mergedCharges.find(fc => fc.id === newCharge.id)) {
+              mergedCharges.push(newCharge)
+            }
+          })
+
+          set({
+            currentCharacter: {
+              ...currentCharacter,
+              featureCharges: mergedCharges,
             },
           })
         },
