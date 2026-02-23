@@ -4,7 +4,7 @@ import { useCharacterStore } from '../stores/characterStore'
 import { DiceRollerButton, DiceRollerModal } from '../components/DiceRoller'
 import { calculateModifier, calculateProficiencyBonus, rollDice } from '../types/dice'
 import { isWeapon, isArmor, isShield, isCloak, autoConvertCurrency, EMPTY_CURRENCY } from '../types/equipment'
-import type { Character, Ability, Equipment, Weapon, Armor, Currency, Material, Class } from '../types'
+import type { Character, Ability, Equipment, Weapon, Currency, Material, Class } from '../types'
 import {
   FIGHTER,
   WARLOCK,
@@ -110,6 +110,11 @@ export function CharacterSheetPage() {
       }
     }
   }, [id, characters, loadCharacter])
+
+  // Scroll to top when character loads
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [id])
 
   const character = currentCharacter
 
@@ -330,6 +335,46 @@ export function CharacterSheetPage() {
       // Still add to inventory so player can see they have it
       setEditingLootItem(lootItem)
       setShowEquipmentEditor(true)
+      return
+    }
+
+    // Auto-add accessories (cloaks, rings, trinkets, necklaces, orbs, books) without editor
+    const isAccessory = lootItem.category === 'Cloak' ||
+                       lootItem.category === 'cloak' ||
+                       lootItem.category === 'jewelry' ||
+                       lootItem.category === 'trinket' ||
+                       nameLower.includes('ring') ||
+                       nameLower.includes('necklace') ||
+                       nameLower.includes('orb') ||
+                       nameLower.includes('book')
+
+    if (isAccessory) {
+      // Determine proper category
+      let category: 'cloak' | 'jewelry' | 'trinket' | 'adventuringGear' = 'adventuringGear'
+      if (lootItem.category === 'Cloak' || lootItem.category === 'cloak' || nameLower.includes('cloak')) {
+        category = 'cloak'
+      } else if (lootItem.category === 'jewelry' || nameLower.includes('ring') || nameLower.includes('necklace')) {
+        category = 'jewelry'
+      } else if (lootItem.category === 'trinket' || nameLower.includes('orb') || nameLower.includes('book')) {
+        category = 'trinket'
+      }
+
+      const accessoryItem: Equipment = {
+        id: lootItem.id + '-' + Date.now(),
+        name: lootItem.name,
+        description: lootItem.description,
+        category,
+        equipped: true, // Auto-equip accessories
+        rarity: lootItem.rarity,
+        quantity: lootItem.quantity || 1,
+        weight: 0.5,
+        cost: {
+          ...EMPTY_CURRENCY,
+          gold: lootItem.value || 0,
+        },
+      }
+      addEquipment(accessoryItem)
+      saveCharacter()
       return
     }
 
@@ -1455,13 +1500,13 @@ export function CharacterSheetPage() {
             </div>
           )}
 
-          {/* Equipped Armor */}
-          {character.equipment.filter(item => isArmor(item) && item.equipped !== false).length > 0 && (
+          {/* Equipped Armor & Cloaks */}
+          {character.equipment.filter(item => (isArmor(item) || item.category === 'cloak') && item.equipped !== false).length > 0 && (
             <div className="card bg-gray-800 border-gray-700 p-4">
-              <h3 className="text-lg font-bold text-white mb-4">🛡️ Equipped Armor</h3>
+              <h3 className="text-lg font-bold text-white mb-4">🛡️ Equipped Armor & Cloaks</h3>
               <div className="space-y-2">
                 {character.equipment
-                  .filter((item): item is Armor => isArmor(item) && item.equipped !== false)
+                  .filter((item) => (isArmor(item) || item.category === 'cloak') && item.equipped !== false)
                   .map((item) => (
                     <EquipmentItem
                       key={item.id}
@@ -1486,18 +1531,55 @@ export function CharacterSheetPage() {
             </div>
           )}
 
-          {/* Equipped Shields, Cloaks & Jewelry */}
+          {/* Equipped Shields */}
           {character.equipment.filter(item =>
             item.equipped &&
-            (item.category === 'shield' || item.category === 'cloak' || item.category === 'jewelry')
+            item.category === 'shield'
           ).length > 0 && (
             <div className="card bg-gray-800 border-gray-700 p-4">
-              <h3 className="text-lg font-bold text-white mb-4">✨ Equipped Accessories</h3>
+              <h3 className="text-lg font-bold text-white mb-4">🛡 Equipped Shields</h3>
               <div className="space-y-2">
                 {character.equipment
                   .filter(item =>
                     item.equipped &&
-                    (item.category === 'shield' || item.category === 'cloak' || item.category === 'jewelry')
+                    item.category === 'shield'
+                  )
+                  .map((item) => (
+                    <EquipmentItem
+                      key={item.id}
+                      item={item}
+                      character={character}
+                      onRemove={() => {
+                        removeEquipment(item.id)
+                        saveCharacter()
+                      }}
+                      onToggleEquip={() => {
+                        toggleEquipment(item.id)
+                        saveCharacter()
+                      }}
+                      onChangeQuantity={(change) => {
+                        changeEquipmentQuantity(item.id, change)
+                        saveCharacter()
+                      }}
+                      onUse={() => handleUseConsumable(item)}
+                    />
+                  ))}
+              </div>
+            </div>
+          )}
+
+          {/* Jewelry & Trinkets */}
+          {character.equipment.filter(item =>
+            item.equipped &&
+            (item.category === 'jewelry' || item.category === 'trinket')
+          ).length > 0 && (
+            <div className="card bg-gray-800 border-gray-700 p-4">
+              <h3 className="text-lg font-bold text-white mb-4">💎 Jewelry & Trinkets</h3>
+              <div className="space-y-2">
+                {character.equipment
+                  .filter(item =>
+                    item.equipped &&
+                    (item.category === 'jewelry' || item.category === 'trinket')
                   )
                   .map((item) => (
                     <EquipmentItem
@@ -2057,66 +2139,6 @@ export function CharacterSheetPage() {
               <p className="text-gray-500 italic">No consumables in inventory</p>
             )}
           </div>
-
-          {/* Spells */}
-          {character.knownSpells.length > 0 && (
-            <div className="card bg-gray-800 border-gray-700 p-6">
-              <h3 className="text-2xl font-bold text-white mb-4">✨ Spells</h3>
-
-              {/* Cantrips */}
-              {character.knownSpells.filter(s => s.level === 0).length > 0 && (
-                <div className="mb-6">
-                  <h4 className="text-lg font-semibold text-purple-400 mb-3">Cantrips (At Will)</h4>
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {character.knownSpells.filter(s => s.level === 0).map((spell) => (
-                      <div key={spell.id} className="p-3 bg-purple-900/20 border border-purple-700 rounded-lg">
-                        <div className="font-semibold text-purple-300">{spell.name}</div>
-                        <div className="text-xs text-gray-400 mt-1">{spell.school}</div>
-                        {spell.damage && (
-                          <div className="text-sm text-red-400 mt-1">Damage: {spell.damage.dice}</div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Leveled Spells */}
-              {character.knownSpells.filter(s => s.level > 0).length > 0 && (
-                <div>
-                  <h4 className="text-lg font-semibold text-blue-400 mb-3">Leveled Spells</h4>
-                  <div className="grid md:grid-cols-2 gap-3">
-                    {character.knownSpells.filter(s => s.level > 0).map((spell) => {
-                      const slotKey = `level${spell.level}` as keyof typeof character.spellSlots
-                      const slots = character.spellSlots[slotKey]
-                      const slotsRemaining = slots.max - slots.used
-
-                      return (
-                        <div key={spell.id} className="p-3 bg-blue-900/20 border border-blue-700 rounded-lg">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="font-semibold text-blue-300">{spell.name}</div>
-                              <div className="text-xs text-gray-400">
-                                Level {spell.level} {spell.school}
-                              </div>
-                            </div>
-                            {slots.max > 0 && (
-                              <div className="text-xs font-bold text-yellow-400 ml-2">
-                                {slotsRemaining}/{slots.max} slots
-                              </div>
-                            )}
-                          </div>
-                          {spell.damage && (
-                            <div className="text-sm text-red-400 mt-1">Damage: {spell.damage.dice}</div>
-                          )}
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
 
           {/* Special Abilities & Features */}
           {(character.featureCharges.length > 0 || character.itemFeatures.length > 0) && (
