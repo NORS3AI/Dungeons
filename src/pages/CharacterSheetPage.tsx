@@ -30,6 +30,7 @@ import { HPEditor, HPEditorButton } from '../components/HPEditor'
 import { LevelUpSpellSelector } from '../components/LevelUpSpellSelector'
 import { NinthLevelSpellSelector } from '../components/NinthLevelSpellSelector'
 import { SpellSelector } from '../components/SpellSelector'
+import { AlignmentSelector } from '../components/AlignmentSelector'
 import { EquipmentEditor } from '../components/EquipmentEditor'
 import { FIGHTING_STANCES } from '../data/fightingStances'
 import type { LootItem } from '../data/lootGenerator'
@@ -72,7 +73,7 @@ const SKILLS: { name: string; ability: Ability; key: SkillKey; refId: string }[]
 export function CharacterSheetPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, changeEquipmentQuantity, setFightingStance, addEquipment, updateHitPoints, addSpell, removeSpell, useItemCharge, saveCharacter, addFoodRations, addWaterSupply, addItemFeature } = useCharacterStore()
+  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, changeEquipmentQuantity, setFightingStance, addEquipment, updateHitPoints, addSpell, removeSpell, useItemCharge, saveCharacter, addFoodRations, addWaterSupply, addItemFeature, setAlignment } = useCharacterStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
   const [activeTab, setActiveTab] = useState<'main' | 'actions' | 'spells' | 'inventory' | 'features' | 'loot'>('main')
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
@@ -92,6 +93,7 @@ export function CharacterSheetPage() {
   const [showConsumableNotification, setShowConsumableNotification] = useState<{ message: string; type: 'success' | 'info' } | null>(null)
   const [showManualSpellAdd, setShowManualSpellAdd] = useState(false)
   const [showClassSpellSelector, setShowClassSpellSelector] = useState(false)
+  const [showAlignmentSelector, setShowAlignmentSelector] = useState(false)
 
   useEffect(() => {
     if (id) {
@@ -686,6 +688,25 @@ export function CharacterSheetPage() {
             <div className="card bg-gray-800 border-gray-700 p-4">
               <h3 className="text-lg font-bold text-white mb-4">Character Info</h3>
               <div className="space-y-3 text-sm">
+                {/* Alignment */}
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-500">Alignment</span>
+                  <div className="flex items-center gap-2">
+                    <span className={character.alignment ? "text-gray-300" : "text-red-400 italic"}>
+                      {character.alignment
+                        ? character.alignment.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
+                        : 'Not Selected'
+                      }
+                    </span>
+                    <button
+                      onClick={() => setShowAlignmentSelector(true)}
+                      className="text-xs px-2 py-1 bg-blue-700 hover:bg-blue-600 text-white rounded transition-colors"
+                      title={character.alignment ? "Change alignment" : "Choose alignment"}
+                    >
+                      {character.alignment ? '✏️' : '➕'}
+                    </button>
+                  </div>
+                </div>
                 {character.playerName && (
                   <div className="flex justify-between">
                     <span className="text-gray-500">Player</span>
@@ -1089,10 +1110,10 @@ export function CharacterSheetPage() {
           {/* Weapon Attacks */}
           <div className="card bg-gray-800 border-gray-700 p-6">
             <h3 className="text-2xl font-bold text-white mb-4">🗡️ Weapon Attacks</h3>
-            {character.equipment.filter(item => item.category === 'weapon' && item.equipped).length > 0 ? (
+            {character.equipment.filter(item => isWeapon(item) && item.equipped).length > 0 ? (
               <div className="grid md:grid-cols-2 gap-4">
                 {character.equipment
-                  .filter((item): item is import('../types').Weapon => item.category === 'weapon' && item.equipped === true)
+                  .filter((item): item is Weapon => isWeapon(item) && item.equipped === true)
                   .map((weapon) => {
                     const attackBonus = weapon.properties?.includes('finesse')
                       ? Math.max(
@@ -1424,6 +1445,48 @@ export function CharacterSheetPage() {
                   setTimeout(() => setShowConsumableNotification(null), 3000)
                 }}
                 onBack={() => setShowClassSpellSelector(false)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Alignment Selector Modal */}
+      {showAlignmentSelector && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-900 rounded-lg border-2 border-dnd-gold max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-gray-900 border-b border-gray-700 p-6 z-10">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold text-dnd-gold">
+                    {character.alignment ? 'Change Alignment' : 'Choose Alignment'}
+                  </h2>
+                  <p className="text-gray-400 mt-1">
+                    Select your character's moral and ethical outlook
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowAlignmentSelector(false)}
+                  className="text-gray-400 hover:text-white text-2xl font-bold w-8 h-8 flex items-center justify-center"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+            <div className="p-6">
+              <AlignmentSelector
+                initialAlignment={character.alignment}
+                onSelect={(alignment) => {
+                  setAlignment(alignment)
+                  saveCharacter()
+                  setShowAlignmentSelector(false)
+                  setShowConsumableNotification({
+                    message: `Alignment ${character.alignment ? 'changed' : 'set'} to ${alignment.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}`,
+                    type: 'success'
+                  })
+                  setTimeout(() => setShowConsumableNotification(null), 3000)
+                }}
+                onBack={() => setShowAlignmentSelector(false)}
               />
             </div>
           </div>

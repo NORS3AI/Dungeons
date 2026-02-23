@@ -1,5 +1,135 @@
 # Dungeons - Patch Notes
 
+## Version 0.2.5 - February 23, 2026
+
+### 🎒 Survival & Supply Tracking
+
+#### **Carrying Capacity System**
+- **Weight Management**: Track current weight vs maximum capacity (STR × 15)
+- **Encumbrance Threshold**: Calculated at STR × 5 for speed reduction
+- **Auto-Calculation**: Total weight computed from all equipped items
+- **Utility Functions**: `calculateCarryingCapacity()`, `calculateEncumbranceThreshold()`, `calculateTotalWeight()`
+
+#### **Food & Water Supplies**
+- **Days of Food**: Track food rations as days remaining
+- **Days of Water**: Track water supply as days remaining
+- **Auto-Storage**: Food/water loot automatically adds to supplies instead of inventory
+- **Smart Detection**: Items categorized as 'Food' or 'Water' route to supply tracking
+
+### ⚔️ Actions Tab - At-a-Glance Combat Reference
+
+#### **New "Actions" Tab**
+- **Combat-Ready Interface**: Everything needed for combat in one place
+- **Perfect for New Players**: All available actions shown clearly
+- **Smart Organization**: Divided into weapons, consumables, spells, and abilities
+
+#### **Weapon Attacks Section** 🗡️
+- **Equipped Weapons Display**: Shows all equipped weapons with stats
+- **Auto-Calculated Attack Bonuses**: Ability modifier + proficiency bonus
+- **Finesse Weapon Support**: Uses best of STR or DEX automatically
+- **Damage Display**: Shows damage dice and type (e.g., "2d6 slashing")
+- **Properties Listed**: Finesse, versatile, reach, etc.
+
+#### **Consumables Section** 🧪
+- **Potion Auto-Detection**: Finds all potions, scrolls, and elixirs
+- **Quantity Display**: Shows how many you have of each
+- **Magical Charges**: Displays charges for wands and magical items
+- **Quick Access**: No need to dig through inventory during combat
+
+#### **Spells Section** ✨
+- **Cantrips**: At-will spells shown separately (purple theme)
+- **Leveled Spells**: All spells with remaining spell slot tracking
+- **Damage Quick-Reference**: Damage dice shown for attack spells
+- **Spell School Display**: Shows spell type for quick identification
+
+#### **Special Abilities Section** ⚡
+- **Class Features**: Action Surge, Second Wind, etc. with charge tracking
+- **Item Abilities**: Invisibility cloaks and other magical items
+- **Recharge Conditions**: Shows when abilities recharge (short rest, long rest)
+
+#### **Quick Tip for New Players** 💡
+- **Turn Structure Explained**: Move, Action, Bonus Action
+- **Beginner-Friendly**: Helps players understand what they can do
+
+### 📚 Spell Selection Improvements
+
+#### **"Choose Class Spells" Button**
+- **Mid-Game Spell Selection**: Change or add spells anytime
+- **Class-Filtered**: Only shows spells available to your class
+- **Subclass Integration**: Includes domain/patron spells
+- **For Spellcasters Only**: Hidden for melee classes (Fighter, Barbarian, etc.)
+- **Perfect for Late Additions**: Players who skipped spell selection during creation
+
+#### **Two Spell Buttons**
+- **"Choose Class Spells" (📚)**: Select from your class spell list
+- **"Add Spell" (+)**: Add any spell (from shops, scrolls, magic items)
+
+### ⚖️ Alignment Management
+
+#### **Alignment in Overview**
+- **Always Visible**: Alignment shown in Character Info section
+- **Not Selected Warning**: Shows "Not Selected" in red if alignment missing
+- **Change Anytime**: Edit button (✏️) or Add button (➕) next to alignment
+- **Modal Selector**: Full alignment grid opens in modal
+
+#### **Alignment Change Feature**
+- **Full Alignment Selector**: 3×3 grid with all nine alignments
+- **Hover Descriptions**: See examples and explanations for each alignment
+- **Color-Coded**: Visual distinction between Good, Neutral, Evil
+- **Success Notification**: Confirms alignment change/selection
+
+### 🎁 Item Features System
+
+#### **Magical Items with Abilities**
+- **Auto-Feature Addition**: Items like "Invisibility Cloak" automatically add abilities to Features tab
+- **Easy Access**: Players see all abilities at a glance
+- **Stored in Features**: No need to remember which items grant abilities
+- **Still in Inventory**: Items appear in both equipment and features
+
+### 💰 Loot Currency Rebalancing
+
+#### **More Realistic Currency Rewards**
+- **Trash**: 1-10 copper (was 1-5)
+- **Common**: 30-70 copper (was 10-75 gold)
+- **Uncommon**: 1-7 silver (was 60-75 gold)
+- **Rare**: 1-25 silver (was 50-75 gold)
+- **Epic**: 1-15 gold (was 3-10 platinum)
+- **Legendary**: 50-95 gold (was 7-10 platinum)
+- **No More Decimals**: All currency values are whole numbers
+
+### 🐛 Bug Fixes
+
+#### **Fixed Actions Tab Type Guards**
+- **Weapon Filtering**: Uses proper `isWeapon()` type guard
+- **Type Safety**: Prevents runtime errors when displaying weapons
+- **No More Crashes**: Actions tab renders correctly for all character types
+
+### 🛠️ Technical Updates
+
+#### **Files Modified**
+- `src/types/character.ts` - Added carryingCapacity, foodRations, waterSupply, itemFeatures
+- `src/types/index.ts` - Exported new utility functions
+- `src/stores/characterStore.ts` - Added supply management actions, setAlignment
+- `src/data/lootGenerator.ts` - Updated currency values, added foodDays/waterDays fields, added feature field
+- `src/pages/CharacterSheetPage.tsx` - Added Actions tab, alignment selector modal, food/water/ability routing
+- `src/components/AlignmentSelector.tsx` - Imported for mid-game alignment changes
+
+#### **New Utility Functions**
+- `calculateCarryingCapacity(strength)` - Returns STR × 15
+- `calculateEncumbranceThreshold(strength)` - Returns STR × 5
+- `calculateTotalWeight(equipment)` - Sums equipment weight
+
+#### **New Store Actions**
+- `updateCarryingCapacity()` - Recalculates weight and capacity
+- `addFoodRations(days)` - Adds days of food
+- `consumeFoodRations(days)` - Consumes food rations
+- `addWaterSupply(days)` - Adds days of water
+- `consumeWaterSupply(days)` - Consumes water supply
+- `addItemFeature(feature)` - Adds magical item ability to features
+- `removeItemFeature(featureId)` - Removes item feature
+
+---
+
 ## Version 0.2.4 - February 23, 2026
 
 ### ⚖️ Alignment Selection
