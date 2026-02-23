@@ -1901,6 +1901,86 @@ export function CharacterSheetPage() {
             </div>
           )}
 
+          {/* Racial Abilities */}
+          {character.race?.spells && character.race.spells.length > 0 && (
+            <div className="card bg-gradient-to-br from-emerald-900/30 to-teal-900/30 border-2 border-emerald-600 p-4 sm:p-6">
+              <h3 className="text-xl sm:text-2xl font-bold text-emerald-400 mb-3 sm:mb-4">
+                🧬 Racial Abilities - {character.race.name}
+              </h3>
+
+              <p className="text-sm sm:text-base text-gray-300 mb-4">
+                Innate magical abilities from your racial heritage. These abilities unlock as you level up.
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                {character.race.spells.map((racialSpell) => {
+                  const isUnlocked = character.level >= racialSpell.levelGained
+                  const abilityMod = Math.floor(
+                    (character.abilityScores[racialSpell.castingAbility] - 10) / 2
+                  )
+
+                  return (
+                    <div
+                      key={racialSpell.spellId}
+                      className={`p-4 rounded-lg border-2 transition-all ${
+                        isUnlocked
+                          ? 'bg-emerald-900/40 border-emerald-500 hover:border-emerald-400'
+                          : 'bg-gray-800/50 border-gray-700 opacity-50'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className={`font-bold text-base sm:text-lg ${
+                          isUnlocked ? 'text-emerald-300' : 'text-gray-500'
+                        }`}>
+                          {racialSpell.spellName}
+                        </h4>
+                        {!isUnlocked && (
+                          <span className="text-xs px-2 py-0.5 bg-gray-700 text-gray-400 rounded">
+                            Lv {racialSpell.levelGained}
+                          </span>
+                        )}
+                      </div>
+
+                      {isUnlocked ? (
+                        <div className="space-y-2 text-sm">
+                          <div className="flex items-center justify-between">
+                            <span className="text-gray-400">Casting Ability:</span>
+                            <span className="text-white font-medium capitalize">
+                              {racialSpell.castingAbility.slice(0, 3).toUpperCase()} ({abilityMod >= 0 ? '+' : ''}{abilityMod})
+                            </span>
+                          </div>
+
+                          <div className="flex items-center justify-between">
+                            <span className="text-gray-400">Uses:</span>
+                            <span className="text-emerald-300 font-bold">
+                              {racialSpell.usesPerDay === 'atwill' ? 'At Will' : `${racialSpell.usesPerDay}/day`}
+                            </span>
+                          </div>
+
+                          <div className="mt-3 pt-3 border-t border-emerald-700/30">
+                            <p className="text-xs text-emerald-200">
+                              <span className="font-bold">Unlocked at Level {racialSpell.levelGained}</span>
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-sm text-gray-500">
+                          <p>🔒 Unlocks at character level {racialSpell.levelGained}</p>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+
+              <div className="mt-4 p-3 bg-emerald-900/20 border border-emerald-700/30 rounded-lg">
+                <p className="text-xs sm:text-sm text-emerald-300">
+                  <span className="font-bold">💡 Tip:</span> Racial abilities are innate to your heritage and don't require preparation or spell slots!
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Spells */}
           {character.knownSpells && character.knownSpells.length > 0 && (
             <div className="card bg-gray-800 border-gray-700 p-6">
