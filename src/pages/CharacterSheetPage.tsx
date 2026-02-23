@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useCharacterStore } from '../stores/characterStore'
-import { DiceRoller, DiceRollerButton, DiceRollerModal } from '../components/DiceRoller'
+import { DiceRollerButton, DiceRollerModal } from '../components/DiceRoller'
 import { calculateModifier, calculateProficiencyBonus, rollDice } from '../types/dice'
 import { isWeapon, isArmor, isShield, isCloak, autoConvertCurrency, EMPTY_CURRENCY } from '../types/equipment'
 import type { Character, Ability, Equipment, Weapon, Armor, Currency, Material, Class } from '../types'
@@ -24,6 +24,7 @@ import { exportCharacterToJSON, exportCharacterToPDF } from '../utils/characterI
 import { QuickRefTooltip } from '../components/QuickRefTooltip'
 import { SPELLS } from '../data/quickReference'
 import { CharacterEditModal } from '../components/CharacterEditModal'
+import { DMAbilityScoreEditor } from '../components/DMAbilityScoreEditor'
 import { FightingStanceSelector } from '../components/FightingStanceSelector'
 import { LootCache } from '../components/LootCache'
 import { HPEditor, HPEditorButton } from '../components/HPEditor'
@@ -73,7 +74,7 @@ const SKILLS: { name: string; ability: Ability; key: SkillKey; refId: string }[]
 export function CharacterSheetPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, equipAll, unequipAll, changeEquipmentQuantity, setFightingStance, addEquipment, addMaterial, removeMaterial, changeMaterialQuantity, updateHitPoints, addSpell, removeSpell, saveCharacter, addFoodRations, addWaterSupply, addItemFeature, setAlignment } = useCharacterStore()
+  const { characters, loadCharacter, currentCharacter, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, equipAll, unequipAll, changeEquipmentQuantity, setFightingStance, addEquipment, addMaterial, removeMaterial, changeMaterialQuantity, updateHitPoints, addSpell, removeSpell, saveCharacter, addFoodRations, addWaterSupply, addItemFeature, setAlignment, setAbilityScores, migrateCurrentCharacter, needsMigration, setLevelWithHP } = useCharacterStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
   const [activeTab, setActiveTab] = useState<'main' | 'actions' | 'spells' | 'inventory' | 'features' | 'story' | 'loot'>('main')
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
@@ -95,6 +96,11 @@ export function CharacterSheetPage() {
   const [showClassSpellSelector, setShowClassSpellSelector] = useState(false)
   const [showAlignmentSelector, setShowAlignmentSelector] = useState(false)
   const [weaponRolls, setWeaponRolls] = useState<Record<string, { hit?: number; damage?: number }>>({})
+  const [showDMAbilityEditor, setShowDMAbilityEditor] = useState(false)
+  const [lastHealingRoll, setLastHealingRoll] = useState<{ itemId: string; amount: number } | null>(null)
+  const [showMigrationSuccess, setShowMigrationSuccess] = useState(false)
+  const [showLevelUpHPModal, setShowLevelUpHPModal] = useState(false)
+  const [levelUpHPRoll, setLevelUpHPRoll] = useState<{ rolls: number[]; highest: number; isRolling: boolean } | null>(null)
 
   useEffect(() => {
     if (id) {
@@ -436,18 +442,51 @@ export function CharacterSheetPage() {
     const item = character.equipment.find(eq => eq.id === itemId)
     if (!item) return
 
+    // Try to roll healing dice if this is a healing potion
+    const healingFormula = parseHealingAmount(item.description)
+    let healingRoll: number | null = null
+
+    if (healingFormula) {
+      // Check if it's a dice formula or flat number
+      if (healingFormula.includes('d')) {
+        const roll = rollDice(healingFormula)
+        if (roll) {
+          healingRoll = roll.grandTotal
+        }
+      } else {
+        // It's a flat number
+        healingRoll = parseInt(healingFormula)
+      }
+    }
+
+    // Store the healing roll result
+    if (healingRoll !== null) {
+      setLastHealingRoll({ itemId, amount: healingRoll })
+
+      // Clear after 5 seconds
+      setTimeout(() => {
+        setLastHealingRoll(null)
+      }, 5000)
+    }
+
     // Check if it has multiple quantities
     if (item.quantity && item.quantity > 1) {
       changeEquipmentQuantity(itemId, item.quantity - 1)
+      const message = healingRoll !== null
+        ? `Used ${item.name}. Healed ${healingRoll} HP! ${item.quantity - 1} remaining.`
+        : `Used ${item.name}. ${item.quantity - 1} remaining.`
       setShowConsumableNotification({
-        message: `Used ${item.name}. ${item.quantity - 1} remaining.`,
+        message,
         type: 'success'
       })
     } else {
       // Remove the item entirely
       removeEquipment(itemId)
+      const message = healingRoll !== null
+        ? `Used ${item.name}. Healed ${healingRoll} HP! Item removed from inventory.`
+        : `Used ${item.name}. Item removed from inventory.`
       setShowConsumableNotification({
-        message: `Used ${item.name}. Item removed from inventory.`,
+        message,
         type: 'success'
       })
     }
@@ -595,11 +634,37 @@ export function CharacterSheetPage() {
     saveCharacter()
   }
 
-  const handleLevelUp = () => {
-    const newLevel = character.level + 1
+  const handleUpdateAbilityScores = (scores: Character['abilityScores']) => {
+    setAbilityScores(scores)
+    saveCharacter()
+  }
 
-    // Level up the character
-    levelUp()
+  const handleMigrateCharacter = () => {
+    migrateCurrentCharacter()
+    setShowMigrationSuccess(true)
+    setTimeout(() => {
+      setShowMigrationSuccess(false)
+    }, 5000)
+  }
+
+  const handleLevelUp = () => {
+    // Show HP rolling modal instead of immediately leveling up
+    setLevelUpHPRoll(null)
+    setShowLevelUpHPModal(true)
+  }
+
+  const handleAcceptLevelUpHP = (hpRoll: number) => {
+    const newLevel = character.level + 1
+    const conModifier = calculateModifier(character.abilityScores.constitution)
+    const hpIncrease = Math.max(1, hpRoll + conModifier)
+    const newMaxHP = character.hitPoints.maximum + hpIncrease
+
+    // Update level and HP
+    setLevelWithHP(newLevel, newMaxHP)
+
+    // Close the modal
+    setShowLevelUpHPModal(false)
+    setLevelUpHPRoll(null)
 
     // Save immediately to persist the level change
     saveCharacter()
@@ -855,12 +920,57 @@ export function CharacterSheetPage() {
       </div>
 
       {activeTab === 'main' && (
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Left Column - Ability Scores */}
-          <div className="space-y-6">
+        <>
+          {/* Migration Warning/Success Banner */}
+          {needsMigration() && !showMigrationSuccess && (
+            <div className="mb-6 p-4 bg-yellow-900/30 border-2 border-yellow-600/50 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <h3 className="text-yellow-400 font-bold text-lg mb-1">⚠️ Character Data Update Available</h3>
+                  <p className="text-yellow-200/90 text-sm">
+                    This character was created with an older version of the app. Click "Fix Character Data" to update it to the latest format. This will ensure all features work correctly.
+                  </p>
+                </div>
+                <button
+                  onClick={handleMigrateCharacter}
+                  className="ml-4 px-6 py-3 bg-yellow-600 hover:bg-yellow-500 text-gray-900 font-bold rounded-lg transition-colors whitespace-nowrap"
+                >
+                  Fix Character Data
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Migration Success Banner */}
+          {showMigrationSuccess && (
+            <div className="mb-6 p-4 bg-green-900/30 border-2 border-green-600/50 rounded-lg">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">✅</span>
+                <div>
+                  <h3 className="text-green-400 font-bold text-lg">Character Data Updated!</h3>
+                  <p className="text-green-200/90 text-sm">
+                    Your character has been successfully updated to the latest data format. All features should now work correctly.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="grid lg:grid-cols-3 gap-6">
+            {/* Left Column - Ability Scores */}
+            <div className="space-y-6">
             {/* Ability Scores */}
             <div className="card bg-gray-800 border-gray-700 p-4">
-              <h3 className="text-lg font-bold text-white mb-4">Ability Scores</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-white">Ability Scores</h3>
+                <button
+                  onClick={() => setShowDMAbilityEditor(true)}
+                  className="px-3 py-1 bg-purple-600 hover:bg-purple-500 text-white text-xs font-medium rounded transition-colors flex items-center gap-1"
+                  title="DM: Edit Ability Scores"
+                >
+                  ⚙️ DM Edit
+                </button>
+              </div>
               <div className="grid grid-cols-2 gap-3">
                 {(Object.keys(ABILITY_NAMES) as Ability[]).map((ability) => (
                   <div
@@ -1070,71 +1180,9 @@ export function CharacterSheetPage() {
                 )}
               </div>
             </div>
-
-            {/* Dice Roller */}
-            <DiceRoller />
-
-            {/* Consumables (Potions) - Quick Access */}
-            {character.equipment.filter(item =>
-              item.category === 'consumable' ||
-              item.name.toLowerCase().includes('potion') ||
-              item.name.toLowerCase().includes('scroll') ||
-              item.name.toLowerCase().includes('elixir')
-            ).length > 0 && (
-              <div className="card bg-gray-800 border-gray-700 p-4">
-                <h3 className="text-lg font-bold text-white mb-3">🧪 Consumables</h3>
-
-                {/* Notification */}
-                {showConsumableNotification && (
-                  <div className={`mb-3 p-2 rounded-lg text-sm ${
-                    showConsumableNotification.type === 'success'
-                      ? 'bg-green-900/30 border border-green-700 text-green-300'
-                      : 'bg-blue-900/30 border border-blue-700 text-blue-300'
-                  }`}>
-                    {showConsumableNotification.message}
-                  </div>
-                )}
-
-                <div className="space-y-2">
-                  {character.equipment
-                    .filter(item =>
-                      item.category === 'consumable' ||
-                      item.name.toLowerCase().includes('potion') ||
-                      item.name.toLowerCase().includes('scroll') ||
-                      item.name.toLowerCase().includes('elixir')
-                    )
-                    .map((item) => {
-                      const healingAmount = parseHealingAmount(item.description)
-                      return (
-                        <div key={item.id} className="p-3 bg-gradient-to-r from-green-900/20 to-blue-900/20 border border-green-700 rounded-lg">
-                          <div className="flex items-start justify-between mb-2">
-                            <div className="flex-1">
-                              <h4 className="font-bold text-green-400 text-sm">{item.name}</h4>
-                              {item.quantity && item.quantity > 1 && (
-                                <p className="text-xs text-gray-400">Qty: {item.quantity}</p>
-                              )}
-                              {healingAmount && (
-                                <p className="text-xs font-medium text-emerald-400 mt-0.5">
-                                  ❤️ Heals: {healingAmount}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                          <p className="text-xs text-gray-300 mb-2 line-clamp-2">{item.description}</p>
-                          <button
-                            onClick={() => handleUsePotion(item.id)}
-                            className="w-full px-2 py-1.5 bg-green-600 hover:bg-green-500 text-white text-sm rounded font-medium transition-colors"
-                          >
-                            Use
-                          </button>
-                        </div>
-                      )
-                    })}
-                </div>
-              </div>
-            )}
           </div>
         </div>
+        </>
       )}
 
       {activeTab === 'spells' && (
@@ -1564,7 +1612,11 @@ export function CharacterSheetPage() {
               item.category !== 'shield' &&
               item.category !== 'cloak' &&
               item.category !== 'jewelry' &&
-              item.category !== 'Crafting Material'
+              item.category !== 'Crafting Material' &&
+              item.category !== 'consumable' &&
+              !item.name.toLowerCase().includes('potion') &&
+              !item.name.toLowerCase().includes('scroll') &&
+              !item.name.toLowerCase().includes('elixir')
             ).length === 0 ? (
               <p className="text-gray-400 text-center py-4">Backpack is empty.</p>
             ) : (
@@ -1576,7 +1628,11 @@ export function CharacterSheetPage() {
                     item.category !== 'shield' &&
                     item.category !== 'cloak' &&
                     item.category !== 'jewelry' &&
-                    item.category !== 'Crafting Material'
+                    item.category !== 'Crafting Material' &&
+                    item.category !== 'consumable' &&
+                    !item.name.toLowerCase().includes('potion') &&
+                    !item.name.toLowerCase().includes('scroll') &&
+                    !item.name.toLowerCase().includes('elixir')
                   )
                   .map((item) => (
                     <EquipmentItem
@@ -1970,9 +2026,14 @@ export function CharacterSheetPage() {
                               <p className="text-sm text-gray-400">Qty: {item.quantity}</p>
                             )}
                             {healingAmount && (
-                              <p className="text-sm font-medium text-emerald-400 mt-1">
-                                ❤️ Heals: {healingAmount}
-                              </p>
+                              <div className="flex items-center gap-2 text-sm font-medium text-emerald-400 mt-1">
+                                <span>❤️ Heals: {healingAmount}</span>
+                                {lastHealingRoll?.itemId === item.id && (
+                                  <span className="px-2 py-0.5 bg-emerald-600 text-white rounded font-bold animate-pulse">
+                                    {lastHealingRoll.amount} HP
+                                  </span>
+                                )}
+                              </div>
                             )}
                           </div>
                         </div>
@@ -2452,6 +2513,14 @@ export function CharacterSheetPage() {
         onSave={handleSaveDetails}
       />
 
+      {/* DM Ability Score Editor Modal */}
+      <DMAbilityScoreEditor
+        character={character}
+        isOpen={showDMAbilityEditor}
+        onClose={() => setShowDMAbilityEditor(false)}
+        onSave={handleUpdateAbilityScores}
+      />
+
       {/* HP Editor Modal */}
       {showHPEditor && (
         <HPEditor
@@ -2459,6 +2528,117 @@ export function CharacterSheetPage() {
           onUpdateHP={handleUpdateHP}
           onClose={() => setShowHPEditor(false)}
         />
+      )}
+
+      {/* Level Up HP Rolling Modal */}
+      {showLevelUpHPModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+          <div className="bg-gray-900 border-2 border-red-600 rounded-xl max-w-2xl w-full shadow-2xl">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-red-600 to-orange-600 p-6">
+              <h2 className="text-3xl font-bold text-white">Level Up - Roll Hit Points</h2>
+              <p className="text-red-100 mt-2">
+                Roll your hit die 3 times and choose the highest roll!
+              </p>
+            </div>
+
+            {/* Content */}
+            <div className="p-6">
+              <div className="text-center">
+                <div className="text-lg text-gray-300 mb-4">
+                  Hit Die: <span className="text-dnd-gold font-bold">{character.class?.hitDie || '1d8'}</span>
+                  {' + '}
+                  <span className="text-blue-400">
+                    {calculateModifier(character.abilityScores.constitution) >= 0 ? '+' : ''}
+                    {calculateModifier(character.abilityScores.constitution)} CON
+                  </span>
+                </div>
+
+                {levelUpHPRoll?.isRolling ? (
+                  <div className="text-4xl text-dnd-gold animate-bounce my-8">🎲</div>
+                ) : levelUpHPRoll?.highest ? (
+                  <div className="space-y-4">
+                    <div className="text-lg text-gray-400 mb-3 text-center">
+                      You rolled 3 times:
+                    </div>
+                    <div className="flex gap-3 justify-center mb-4">
+                      {levelUpHPRoll.rolls.map((roll, index) => (
+                        <div
+                          key={index}
+                          className={`px-5 py-4 rounded-lg font-bold text-3xl ${
+                            roll === levelUpHPRoll.highest
+                              ? 'bg-green-600 text-white border-2 border-green-400'
+                              : 'bg-gray-800 text-gray-400'
+                          }`}
+                        >
+                          {roll}
+                        </div>
+                      ))}
+                    </div>
+                    <div className="text-center text-sm text-green-400 mb-4">
+                      ⭐ Highest roll: {levelUpHPRoll.highest}
+                    </div>
+                    <div className="text-xl text-gray-400 text-center mb-4">
+                      HP Increase: <span className="text-red-400 font-bold">
+                        {Math.max(1, levelUpHPRoll.highest + calculateModifier(character.abilityScores.constitution))}
+                      </span>
+                      {' '}({levelUpHPRoll.highest} + {calculateModifier(character.abilityScores.constitution)} CON)
+                    </div>
+                    <div className="text-lg text-gray-300 text-center mb-6">
+                      New Max HP: <span className="text-red-400 font-bold text-2xl">
+                        {character.hitPoints.maximum + Math.max(1, levelUpHPRoll.highest + calculateModifier(character.abilityScores.constitution))}
+                      </span>
+                    </div>
+                    <div className="flex gap-3 justify-center">
+                      <button
+                        onClick={() => handleAcceptLevelUpHP(levelUpHPRoll.highest)}
+                        className="px-6 py-3 bg-green-600 hover:bg-green-500 text-white rounded-lg font-medium transition-colors"
+                      >
+                        Accept & Level Up
+                      </button>
+                      <button
+                        onClick={() => setLevelUpHPRoll(null)}
+                        className="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors"
+                      >
+                        Roll Again
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setLevelUpHPRoll({ rolls: [], highest: 0, isRolling: true })
+                      setTimeout(() => {
+                        const hitDie = character.class?.hitDie || '1d8'
+                        const rolls: number[] = []
+                        for (let i = 0; i < 3; i++) {
+                          const roll = rollDice(hitDie)
+                          if (roll) {
+                            rolls.push(roll.grandTotal)
+                          }
+                        }
+                        const highest = Math.max(...rolls)
+                        setLevelUpHPRoll({ rolls, highest, isRolling: false })
+                      }, 1000)
+                    }}
+                    className="px-8 py-4 bg-red-600 hover:bg-red-500 text-white text-xl font-bold rounded-lg transition-colors"
+                  >
+                    🎲 Roll Hit Die (3 times)
+                  </button>
+                )}
+
+                {!levelUpHPRoll && (
+                  <button
+                    onClick={() => setShowLevelUpHPModal(false)}
+                    className="mt-6 text-sm text-gray-500 hover:text-gray-300 underline"
+                  >
+                    Cancel Level Up
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Level Up Spell Selector */}

@@ -17,6 +17,7 @@ import type {
   ClassFeature,
 } from '../types'
 import { DEFAULT_ABILITY_SCORES, EMPTY_CURRENCY, autoConvertCurrency } from '../types'
+import { migrateCharacter, needsMigration } from '../utils/characterMigration'
 
 /**
  * Character creation step
@@ -167,6 +168,8 @@ interface CharacterState {
   saveCharacter: () => void
   deleteCharacter: (id: string) => void
   importCharacter: (character: Character) => void
+  migrateCurrentCharacter: () => void
+  needsMigration: () => boolean
 
   // Creation wizard
   setCreationStep: (step: CreationStep) => void
@@ -302,6 +305,30 @@ export const useCharacterStore = create<CharacterState>()(
             characters: [...state.characters, character],
             currentCharacter: character,
           }))
+        },
+
+        migrateCurrentCharacter: () => {
+          const { currentCharacter, characters } = get()
+          if (!currentCharacter) return
+
+          // Migrate the current character
+          const migrated = migrateCharacter(currentCharacter)
+
+          // Update in both currentCharacter and characters array
+          const updatedCharacters = characters.map((c) =>
+            c.id === migrated.id ? migrated : c
+          )
+
+          set({
+            currentCharacter: migrated,
+            characters: updatedCharacters,
+            history: { past: [], future: [] }, // Reset history after migration
+          })
+        },
+
+        needsMigration: () => {
+          const { currentCharacter } = get()
+          return currentCharacter ? needsMigration(currentCharacter) : false
         },
 
         setCreationStep: (step: CreationStep) => {
