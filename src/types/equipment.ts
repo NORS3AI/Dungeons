@@ -226,6 +226,20 @@ export interface GenericEquipment extends BaseEquipment {
 export type Equipment = Weapon | Armor | Shield | Cloak | GenericEquipment
 
 /**
+ * Crafting material for the Mats inventory
+ * These consolidate automatically when added
+ */
+export interface Material {
+  id: string // Unique identifier for the material type
+  name: string
+  description: string
+  category: 'herb' | 'ore' | 'leather' | 'hide' | 'gem' | 'other'
+  quantity: number
+  rarity: 'trash' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'artifact'
+  weight: number // Weight per unit
+}
+
+/**
  * Type guard for weapons
  */
 export function isWeapon(item: Equipment): item is Weapon {

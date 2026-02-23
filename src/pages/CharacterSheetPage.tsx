@@ -4,7 +4,7 @@ import { useCharacterStore } from '../stores/characterStore'
 import { DiceRoller, DiceRollerButton, DiceRollerModal } from '../components/DiceRoller'
 import { calculateModifier, calculateProficiencyBonus } from '../types/dice'
 import { isWeapon, isArmor, isShield, isCloak, autoConvertCurrency } from '../types/equipment'
-import type { Character, Ability, Equipment, Weapon, Armor, Shield, Cloak, Currency, Class } from '../types'
+import type { Character, Ability, Equipment, Weapon, Armor, Shield, Cloak, Currency, Material, Class } from '../types'
 import {
   FIGHTER,
   WARLOCK,
@@ -73,7 +73,7 @@ const SKILLS: { name: string; ability: Ability; key: SkillKey; refId: string }[]
 export function CharacterSheetPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, equipAll, unequipAll, changeEquipmentQuantity, setFightingStance, addEquipment, updateHitPoints, addSpell, removeSpell, useItemCharge, saveCharacter, addFoodRations, addWaterSupply, addItemFeature, setAlignment } = useCharacterStore()
+  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, equipAll, unequipAll, changeEquipmentQuantity, setFightingStance, addEquipment, addMaterial, removeMaterial, changeMaterialQuantity, updateHitPoints, addSpell, removeSpell, useItemCharge, saveCharacter, addFoodRations, addWaterSupply, addItemFeature, setAlignment } = useCharacterStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
   const [activeTab, setActiveTab] = useState<'main' | 'actions' | 'spells' | 'inventory' | 'features' | 'story' | 'loot'>('main')
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
@@ -251,19 +251,41 @@ export function CharacterSheetPage() {
       return
     }
 
-    // Crafting materials go directly to inventory
+    // Crafting materials (herbs, ores, leathers, hides) go to Mats inventory
     if (lootItem.category === 'Crafting Material') {
-      const craftingItem: Equipment = {
-        id: `${lootItem.id}-${Date.now()}`,
+      // Determine material category based on name
+      const nameLower = lootItem.name.toLowerCase()
+      let materialCategory: 'herb' | 'ore' | 'leather' | 'hide' | 'gem' | 'other' = 'other'
+
+      if (nameLower.includes('herb') || nameLower.includes('lavender') || nameLower.includes('mint') ||
+          nameLower.includes('sage') || nameLower.includes('thyme') || nameLower.includes('basil') ||
+          nameLower.includes('rosemary') || nameLower.includes('chamomile') || nameLower.includes('petal') ||
+          nameLower.includes('root') || nameLower.includes('flower')) {
+        materialCategory = 'herb'
+      } else if (nameLower.includes('ore') || nameLower.includes('ingot') || nameLower.includes('metal') ||
+                 nameLower.includes('iron') || nameLower.includes('copper') || nameLower.includes('gold') ||
+                 nameLower.includes('silver') || nameLower.includes('mithril') || nameLower.includes('adamantine')) {
+        materialCategory = 'ore'
+      } else if (nameLower.includes('leather')) {
+        materialCategory = 'leather'
+      } else if (nameLower.includes('hide') || nameLower.includes('pelt') || nameLower.includes('fur')) {
+        materialCategory = 'hide'
+      } else if (nameLower.includes('gem') || nameLower.includes('diamond') || nameLower.includes('ruby') ||
+                 nameLower.includes('sapphire') || nameLower.includes('emerald') || nameLower.includes('amethyst')) {
+        materialCategory = 'gem'
+      }
+
+      const material: Material = {
+        id: lootItem.id, // Use consistent ID for consolidation
         name: lootItem.name,
         description: lootItem.description,
-        category: 'Crafting Material',
-        weight: 0.5,
-        cost: { copper: 0, silver: 0, gold: 0, platinum: 0 },
+        category: materialCategory,
         quantity: lootItem.quantity || 1,
-        rarity: lootItem.rarity,
+        rarity: lootItem.rarity as any,
+        weight: 0.1, // 0.1 pounds per unit
       }
-      addEquipment(craftingItem)
+
+      addMaterial(material)
       saveCharacter()
       return
     }
@@ -325,6 +347,40 @@ export function CharacterSheetPage() {
 
     // Remove item from inventory
     removeEquipment(itemId)
+    saveCharacter()
+  }
+
+  const handleSellMaterial = (materialId: string) => {
+    const material = character.materials.find(m => m.id === materialId)
+    if (!material) return
+
+    // Calculate sell price based on rarity and category
+    let copperValue = 0
+
+    // Check if it's a gem (gems sell for 1 gold each)
+    if (material.category === 'gem') {
+      copperValue = 100 * material.quantity // 1 gold = 100 copper
+    } else {
+      // Other materials sell based on rarity
+      const rarityPrices: Record<string, number> = {
+        'trash': 0,
+        'common': 5,
+        'uncommon': 10,
+        'rare': 20,
+        'epic': 35,
+        'legendary': 50,
+        'artifact': 100,
+      }
+      copperValue = (rarityPrices[material.rarity] || 0) * material.quantity
+    }
+
+    // Add currency to character
+    const currentCurrency = { ...character.currency }
+    currentCurrency.copper += copperValue
+    updateCurrency(autoConvertCurrency(currentCurrency))
+
+    // Remove material from inventory
+    removeMaterial(materialId)
     saveCharacter()
   }
 
@@ -990,6 +1046,84 @@ export function CharacterSheetPage() {
               </div>
             )}
           </div>
+
+          {/* Mats (Crafting Materials) */}
+          {character.materials && character.materials.length > 0 && (
+            <div className="card bg-gray-800 border-gray-700 p-4">
+              <h3 className="text-lg font-bold text-white mb-4">📦 Mats (Crafting Materials)</h3>
+              <div className="space-y-2">
+                {character.materials.map((material) => (
+                  <div
+                    key={material.id}
+                    className="flex items-center justify-between p-3 bg-gray-900/50 rounded-lg hover:bg-gray-900/70 transition-colors"
+                  >
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-white">{material.name}</span>
+                        <span className="text-xs px-2 py-0.5 bg-purple-900/50 text-purple-300 rounded">
+                          {material.category}
+                        </span>
+                        <span className={`text-xs px-2 py-0.5 rounded ${
+                          material.rarity === 'legendary' ? 'bg-orange-900/50 text-orange-300' :
+                          material.rarity === 'epic' ? 'bg-purple-900/50 text-purple-300' :
+                          material.rarity === 'rare' ? 'bg-blue-900/50 text-blue-300' :
+                          material.rarity === 'uncommon' ? 'bg-green-900/50 text-green-300' :
+                          'bg-gray-700/50 text-gray-400'
+                        }`}>
+                          {material.rarity}
+                        </span>
+                      </div>
+                      <div className="text-sm text-gray-400 mt-1">{material.description}</div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        Quantity: {material.quantity} ({(material.weight * material.quantity).toFixed(1)} lbs)
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => {
+                          changeMaterialQuantity(material.id, -1)
+                          saveCharacter()
+                        }}
+                        className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-900/30 rounded transition-colors"
+                        title="Decrease quantity"
+                        disabled={material.quantity <= 1}
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => {
+                          changeMaterialQuantity(material.id, 1)
+                          saveCharacter()
+                        }}
+                        className="p-1.5 text-green-400 hover:text-green-300 hover:bg-green-900/30 rounded transition-colors"
+                        title="Increase quantity"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => handleSellMaterial(material.id)}
+                        className="p-1.5 text-yellow-400 hover:text-yellow-300 hover:bg-yellow-900/30 rounded transition-colors"
+                        title={`Sell for ${material.category === 'gem' ? material.quantity :
+                          material.rarity === 'legendary' ? material.quantity * 50 :
+                          material.rarity === 'epic' ? material.quantity * 35 :
+                          material.rarity === 'rare' ? material.quantity * 20 :
+                          material.rarity === 'uncommon' ? material.quantity * 10 :
+                          material.quantity * 5} copper`}
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Equipped Weapons */}
           {character.equipment.filter(item => isWeapon(item) && item.equipped !== false).length > 0 && (

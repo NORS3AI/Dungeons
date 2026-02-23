@@ -14,6 +14,7 @@ import {
   SORCERER_LEVEL_1_SPELLS,
   DRUID_CANTRIPS,
   DRUID_LEVEL_1_SPELLS,
+  DRUID_LEVEL_2_SPELLS,
   GOO_EXPANDED_SPELLS,
 } from '../data/spells'
 
@@ -53,14 +54,32 @@ export function SpellSelector({
   }, [characterClass])
 
   const availableSpells = useMemo(() => {
+    const spells: Spell[] = []
+
+    // Warlock spells with subclass expanded spells
     if (characterClass?.id === 'warlock') {
-      const spells = [...WARLOCK_LEVEL_1_SPELLS]
+      spells.push(...WARLOCK_LEVEL_1_SPELLS)
       // Add expanded spells from subclass
       if (subclass?.id === 'great-old-one') {
         spells.push(...GOO_EXPANDED_SPELLS)
       }
       return spells
     }
+
+    // Druid spells - add spell levels based on character level
+    if (characterClass?.id === 'druid') {
+      spells.push(...DRUID_LEVEL_1_SPELLS)
+      if (level >= 3) {
+        spells.push(...DRUID_LEVEL_2_SPELLS)
+      }
+      // TODO: Add higher level spell arrays when character level allows
+      // Level 5-6: DRUID_LEVEL_3_SPELLS
+      // Level 7-8: DRUID_LEVEL_4_SPELLS
+      // etc.
+      return spells
+    }
+
+    // Other classes - currently only level 1 spells (TODO: Add level-based progression)
     if (characterClass?.id === 'necromancer') {
       return [...NECROMANCER_LEVEL_1_SPELLS]
     }
@@ -73,11 +92,9 @@ export function SpellSelector({
     if (characterClass?.id === 'sorcerer') {
       return [...SORCERER_LEVEL_1_SPELLS]
     }
-    if (characterClass?.id === 'druid') {
-      return [...DRUID_LEVEL_1_SPELLS]
-    }
+
     return []
-  }, [characterClass, subclass])
+  }, [characterClass, subclass, level])
 
   // Determine limits based on class
   const cantripsKnown = characterClass?.cantripsKnown?.[level - 1] || 0

@@ -155,6 +155,7 @@ export type {
   Cloak,
   GenericEquipment,
   Equipment,
+  Material,
   WeaponMasteryStyle,
   WeaponMastery,
 } from './equipment'

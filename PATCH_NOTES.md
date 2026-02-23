@@ -1,5 +1,104 @@
 # Dungeons - Patch Notes
 
+## Version 0.2.9 - February 23, 2026
+
+### 📦 Mats Inventory System
+
+Added a separate "Mats" inventory for crafting materials that auto-consolidates quantities.
+
+#### **New Features**
+- **Separate Mats Inventory**: Herbs, ores, leathers, hides, and gems now go to a dedicated Mats inventory instead of equipment
+- **Auto-Consolidation**: Materials with the same ID automatically combine quantities (5 Iron Ore + 3 Iron Ore = 8 Iron Ore)
+- **Category Detection**: Automatically categorizes materials as herb, ore, leather, hide, gem, or other based on name
+- **Sell System**: Each material has a sell button with rarity-based pricing
+- **Quantity Management**: Increase/decrease quantities with +/- buttons
+- **Weight Tracking**: Materials show total weight (0.1 lbs per unit)
+
+#### **Material Categories**
+- **Herbs**: Lavender, mint, sage, thyme, basil, rosemary, chamomile, flower petals, roots
+- **Ores**: Iron ore, copper ore, gold, silver, mithril, adamantine, ingots
+- **Leather**: Any leather-based materials
+- **Hides**: Pelts, furs, hides
+- **Gems**: Diamonds, rubies, sapphires, emeralds, amethysts, and other gems
+
+#### **Sell Pricing**
+- **Gems**: 1 gold per gem (100 copper)
+- **Common**: 5 copper per unit
+- **Uncommon**: 10 copper per unit
+- **Rare**: 20 copper per unit
+- **Epic**: 35 copper per unit
+- **Legendary**: 50 copper per unit
+- **Artifact**: 100 copper per unit
+
+#### **Where to Find**
+- Mats section appears in **Inventory** tab after Currency section
+- Only visible when you have materials in your inventory
+- Acquired from loot caches automatically
+
+### 🪄 Druid 2nd Level Spells
+
+Added 2nd level Druid spells and fixed spell selection for higher level characters.
+
+#### **Druid 2nd Level Spells** (18 total)
+- **Animal Messenger**: Send message via animal
+- **Barkskin**: AC can't be less than 16
+- **Beast Sense**: See through beast's eyes
+- **Darkvision**: Grant darkvision 60 ft
+- **Enhance Ability**: Advantage on ability checks
+- **Find Traps**: Sense nearby traps
+- **Flame Blade**: 3d6 fire damage melee attack
+- **Flaming Sphere**: 2d6 fire damage AoE
+- **Gust of Wind**: Push creatures 15 feet
+- **Heat Metal**: 2d8 fire damage to metal wearers
+- **Hold Person**: Paralyze humanoid
+- **Lesser Restoration**: Remove disease or condition
+- **Locate Animals or Plants**: Find creatures/plants within 5 miles
+- **Locate Object**: Find object within 1,000 feet
+- **Moonbeam**: 2d10 radiant damage cylinder
+- **Pass without Trace**: +10 Stealth, can't be tracked
+- **Protection from Poison**: Neutralize poison, advantage on saves
+- **Spike Growth**: 2d4 piercing per 5 feet moved
+
+#### **The Fix**
+- **Level 1-2 Druids**: Can select 1st level spells
+- **Level 3-4 Druids**: Can select 1st AND 2nd level spells
+- **Level 5+ Druids**: Can select 1st, 2nd, and 3rd level spells (progression continues)
+- Fixed SpellSelector component to dynamically load spells based on character level
+- Other spellcasting classes still need level-based progression (future update)
+
+### 🛠️ Technical Changes
+
+#### **Files Added**
+- None (added to existing files)
+
+#### **Files Modified**
+- `src/types/equipment.ts` - Added Material interface
+- `src/types/character.ts` - Added materials array to Character
+- `src/types/index.ts` - Exported Material type
+- `src/stores/characterStore.ts` - Added addMaterial, removeMaterial, changeMaterialQuantity functions
+- `src/pages/CharacterSheetPage.tsx` - Added Mats section, handleSellMaterial function, material routing
+- `src/data/spells/druid.ts` - Added DRUID_LEVEL_2_SPELLS array (18 spells)
+- `src/components/SpellSelector.tsx` - Added level-based spell loading for Druid
+
+#### **New Data Structures**
+```typescript
+interface Material {
+  id: string
+  name: string
+  description: string
+  category: 'herb' | 'ore' | 'leather' | 'hide' | 'gem' | 'other'
+  quantity: number
+  rarity: 'trash' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'artifact'
+  weight: number
+}
+```
+
+#### **Spell Additions**
+- **Druid**: 18 new 2nd level spells
+- **Total Druid Spells**: 75 spells (8 cantrips + 67 leveled spells)
+
+---
+
 ## Version 0.2.8 - February 23, 2026
 
 ### 🪄 Complete Druid Spell List
