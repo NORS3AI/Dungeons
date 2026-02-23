@@ -86,6 +86,7 @@ export function migrateCharacter(character: Partial<Character>): Character {
     // Features & Spellcasting
     featureCharges: character.featureCharges || [],
     itemFeatures: character.itemFeatures || [], // NEW: Features from magical items
+    resourcePools: character.resourcePools || [], // NEW: Class-specific resource tracking
     spellSlots: character.spellSlots || {
       level1: { used: 0, max: 0 },
       level2: { used: 0, max: 0 },
@@ -141,6 +142,7 @@ export function needsMigration(character: any): boolean {
   const checks = [
     character.materials === undefined,
     character.itemFeatures === undefined,
+    character.resourcePools === undefined,
     character.carryingCapacity === undefined,
     character.foodRations === undefined,
     character.waterSupply === undefined,

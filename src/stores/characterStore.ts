@@ -90,6 +90,7 @@ function createEmptyCharacter(): Character {
     conditions: [],
     featureCharges: [],
     itemFeatures: [],
+    resourcePools: [],
     spellSlots: {
       level1: { used: 0, max: 0 },
       level2: { used: 0, max: 0 },

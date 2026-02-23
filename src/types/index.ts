@@ -8,6 +8,7 @@ export type {
   DeathSaves,
   SpellSlots,
   FeatureCharge,
+  ResourcePool,
   Alignment,
   Condition,
   FightingStance,
