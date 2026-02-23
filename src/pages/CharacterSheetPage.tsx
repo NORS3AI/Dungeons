@@ -24,6 +24,7 @@ import { exportCharacterToJSON, exportCharacterToPDF } from '../utils/characterI
 import { QuickRefTooltip } from '../components/QuickRefTooltip'
 import { SPELLS } from '../data/quickReference'
 import { CharacterEditModal } from '../components/CharacterEditModal'
+import { DMAbilityScoreEditor } from '../components/DMAbilityScoreEditor'
 import { FightingStanceSelector } from '../components/FightingStanceSelector'
 import { LootCache } from '../components/LootCache'
 import { HPEditor, HPEditorButton } from '../components/HPEditor'
@@ -73,7 +74,7 @@ const SKILLS: { name: string; ability: Ability; key: SkillKey; refId: string }[]
 export function CharacterSheetPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, equipAll, unequipAll, changeEquipmentQuantity, setFightingStance, addEquipment, addMaterial, removeMaterial, changeMaterialQuantity, updateHitPoints, addSpell, removeSpell, saveCharacter, addFoodRations, addWaterSupply, addItemFeature, setAlignment } = useCharacterStore()
+  const { characters, loadCharacter, currentCharacter, levelUp, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, equipAll, unequipAll, changeEquipmentQuantity, setFightingStance, addEquipment, addMaterial, removeMaterial, changeMaterialQuantity, updateHitPoints, addSpell, removeSpell, saveCharacter, addFoodRations, addWaterSupply, addItemFeature, setAlignment, setAbilityScores } = useCharacterStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
   const [activeTab, setActiveTab] = useState<'main' | 'actions' | 'spells' | 'inventory' | 'features' | 'story' | 'loot'>('main')
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
@@ -95,6 +96,7 @@ export function CharacterSheetPage() {
   const [showClassSpellSelector, setShowClassSpellSelector] = useState(false)
   const [showAlignmentSelector, setShowAlignmentSelector] = useState(false)
   const [weaponRolls, setWeaponRolls] = useState<Record<string, { hit?: number; damage?: number }>>({})
+  const [showDMAbilityEditor, setShowDMAbilityEditor] = useState(false)
 
   useEffect(() => {
     if (id) {
@@ -595,6 +597,11 @@ export function CharacterSheetPage() {
     saveCharacter()
   }
 
+  const handleUpdateAbilityScores = (scores: Character['abilityScores']) => {
+    setAbilityScores(scores)
+    saveCharacter()
+  }
+
   const handleLevelUp = () => {
     const newLevel = character.level + 1
 
@@ -860,7 +867,16 @@ export function CharacterSheetPage() {
           <div className="space-y-6">
             {/* Ability Scores */}
             <div className="card bg-gray-800 border-gray-700 p-4">
-              <h3 className="text-lg font-bold text-white mb-4">Ability Scores</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-white">Ability Scores</h3>
+                <button
+                  onClick={() => setShowDMAbilityEditor(true)}
+                  className="px-3 py-1 bg-purple-600 hover:bg-purple-500 text-white text-xs font-medium rounded transition-colors flex items-center gap-1"
+                  title="DM: Edit Ability Scores"
+                >
+                  ⚙️ DM Edit
+                </button>
+              </div>
               <div className="grid grid-cols-2 gap-3">
                 {(Object.keys(ABILITY_NAMES) as Ability[]).map((ability) => (
                   <div
@@ -1070,66 +1086,6 @@ export function CharacterSheetPage() {
                 )}
               </div>
             </div>
-
-            {/* Consumables (Potions) - Quick Access */}
-            {character.equipment.filter(item =>
-              item.category === 'consumable' ||
-              item.name.toLowerCase().includes('potion') ||
-              item.name.toLowerCase().includes('scroll') ||
-              item.name.toLowerCase().includes('elixir')
-            ).length > 0 && (
-              <div className="card bg-gray-800 border-gray-700 p-4">
-                <h3 className="text-lg font-bold text-white mb-3">🧪 Consumables</h3>
-
-                {/* Notification */}
-                {showConsumableNotification && (
-                  <div className={`mb-3 p-2 rounded-lg text-sm ${
-                    showConsumableNotification.type === 'success'
-                      ? 'bg-green-900/30 border border-green-700 text-green-300'
-                      : 'bg-blue-900/30 border border-blue-700 text-blue-300'
-                  }`}>
-                    {showConsumableNotification.message}
-                  </div>
-                )}
-
-                <div className="space-y-2">
-                  {character.equipment
-                    .filter(item =>
-                      item.category === 'consumable' ||
-                      item.name.toLowerCase().includes('potion') ||
-                      item.name.toLowerCase().includes('scroll') ||
-                      item.name.toLowerCase().includes('elixir')
-                    )
-                    .map((item) => {
-                      const healingAmount = parseHealingAmount(item.description)
-                      return (
-                        <div key={item.id} className="p-3 bg-gradient-to-r from-green-900/20 to-blue-900/20 border border-green-700 rounded-lg">
-                          <div className="flex items-start justify-between mb-2">
-                            <div className="flex-1">
-                              <h4 className="font-bold text-green-400 text-sm">{item.name}</h4>
-                              {item.quantity && item.quantity > 1 && (
-                                <p className="text-xs text-gray-400">Qty: {item.quantity}</p>
-                              )}
-                              {healingAmount && (
-                                <p className="text-xs font-medium text-emerald-400 mt-0.5">
-                                  ❤️ Heals: {healingAmount}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                          <p className="text-xs text-gray-300 mb-2 line-clamp-2">{item.description}</p>
-                          <button
-                            onClick={() => handleUsePotion(item.id)}
-                            className="w-full px-2 py-1.5 bg-green-600 hover:bg-green-500 text-white text-sm rounded font-medium transition-colors"
-                          >
-                            Use
-                          </button>
-                        </div>
-                      )
-                    })}
-                </div>
-              </div>
-            )}
           </div>
         </div>
       )}
@@ -2447,6 +2403,14 @@ export function CharacterSheetPage() {
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
         onSave={handleSaveDetails}
+      />
+
+      {/* DM Ability Score Editor Modal */}
+      <DMAbilityScoreEditor
+        character={character}
+        isOpen={showDMAbilityEditor}
+        onClose={() => setShowDMAbilityEditor(false)}
+        onSave={handleUpdateAbilityScores}
       />
 
       {/* HP Editor Modal */}

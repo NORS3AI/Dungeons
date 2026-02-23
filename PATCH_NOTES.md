@@ -1,5 +1,72 @@
 # Dungeons - Patch Notes
 
+## Version 0.3.3 - February 23, 2026 @ 01:24 AM MST
+
+### 🧙 Death Knight Spell System
+
+Added complete Death Knight spell lists with WoW-themed frost and blood magic!
+
+#### **New Death Knight Spells**
+**Cantrips (0 Level):**
+- **Icy Touch**: Cold damage melee attack that reduces speed
+- **Blood Tap**: Ranged necrotic damage that grants temporary HP
+
+**1st Level:**
+- **Death Grip**: Pull enemies toward you (WoW signature ability)
+- **Blood Strike**: Melee attack with self-healing
+
+**3rd Level:**
+- **Frost Fever**: Debilitating cold plague DOT effect
+- **Rune Strike**: Empower weapons with necrotic damage
+
+**5th Level:**
+- **Obliterate**: Massive single-target necrotic strike
+- **Vampiric Blood**: Temporary HP + lifesteal on melee hits
+
+**7th Level:**
+- **Summon Frost Wyrm**: Summon undead frost dragon
+- **Anti-Magic Shell**: Reactive spell defense that absorbs magic
+
+**9th Level:**
+- **Summon Val'kyr**: Summon powerful Val'kyr (planetar-tier)
+- **Apocalypse**: Four horsemen of death devastate enemies
+
+#### **Spell Integration**
+- All spells use Constitution as spellcasting ability (Death Knight theme)
+- Spells emphasize frost, blood, and necromancy schools
+- Balanced damage scaling for third-caster progression
+- Many spells grant self-healing or temporary HP (blood magic)
+
+### ⚙️ DM Tools Enhancement
+
+Added DM-only ability score editor for quick character corrections!
+
+#### **DM Ability Score Editor**
+- **DM Edit Button**: Purple button on ability scores card (Overview tab)
+- **Auto-Save**: Changes save automatically as you type
+- **Range Validation**: Scores clamped between 1-30
+- **Live Modifier Display**: Shows calculated modifier as you edit
+- **Keyboard Support**: Press ESC to close modal
+- **Visual Feedback**: Color-coded modifiers (green for positive, red for negative)
+
+#### **Use Cases**
+- Fix ability score mistakes without re-creating characters
+- Adjust scores for magic items (Belt of Giant Strength, etc.)
+- Apply temporary ability score changes
+- Correct data entry errors
+
+### 🎲 UI Cleanup
+
+Removed consumables from Overview tab to reduce clutter.
+
+#### **Consumables Removal**
+- **Removed**: Consumables quick-access section from main/overview tab
+- **Kept**: Full consumables display in Actions tab
+- **Benefit**: Cleaner overview interface with less scrolling
+- **Access**: All potions, scrolls, and elixirs still in Actions tab
+
+---
+
 ## Version 0.3.2 - February 23, 2026 @ 01:06 AM MST
 
 ### 🎲 UI Cleanup
