@@ -1,5 +1,71 @@
 # Dungeons - Patch Notes
 
+## Version 0.2.4 - February 23, 2026
+
+### ⚖️ Alignment Selection
+
+#### **New Character Creation Step**
+- **Interactive Alignment Selector**: Beautiful 3x3 grid for choosing character alignment
+- **Color-Coded Alignments**: Each alignment has distinct colors (blue for good, red for evil, etc.)
+- **Examples & Descriptions**: Hover over alignments to see character examples
+- **Position in Flow**: Alignment selection added between Background and Stats steps
+- **Educational**: Explains Law/Chaos and Good/Evil axes for new players
+
+#### **Alignment System**
+- **Nine Options**: Lawful Good, Neutral Good, Chaotic Good, Lawful Neutral, True Neutral, Chaotic Neutral, Lawful Evil, Neutral Evil, Chaotic Evil
+- **Character Sheet Integration**: Alignment displayed in character review
+- **Save System**: Alignment persists with character data
+
+### 🔮 Sorcerer Spell Lists
+
+#### **Complete Spell Implementation**
+- **15 Cantrips**: Acid Splash, Blade Ward, Chill Touch, Dancing Lights, Fire Bolt, Friends, Light, Message, Poison Spray, Ray of Frost, Shocking Grasp, True Strike, plus Mage Hand, Minor Illusion, Prestidigitation
+- **18 Level 1 Spells**: Burning Hands, Charm Person, Chromatic Orb, Color Spray, Disguise Self, Expeditious Retreat, False Life, Feather Fall, Fog Cloud, Jump, Mage Armor, Magic Missile, Ray of Sickness, Shield, Silent Image, Sleep, Thunderwave, Witch Bolt, plus Detect Magic
+- **Spell Selector Integration**: Sorcerers now have full spell selection during character creation
+- **Shared Spell List**: Many spells also available to Wizards (Fire Bolt, Magic Missile, Shield, etc.)
+
+### 🎒 Equipment Ability Score Modifiers
+
+#### **Magic Item Stats System**
+- **New Field**: `abilityScoreModifiers` on all equipment types
+- **Automatic Calculation**: Equipped items modify ability scores (e.g., Belt of Giant Strength +2 STR)
+- **Character Sheet Display**: Total ability scores shown (base + equipment bonuses)
+- **Utility Function**: `calculateTotalAbilityScores()` computes final stats
+- **Flexible System**: Any equipment can boost any ability score
+
+### 📖 Reference System Improvements
+
+#### **Fixed Broken References**
+- **Lightning Breath**: Added full dragonborn breath weapon trait (damage scaling, save DC, recharge)
+- **Spellcasting**: Added general spellcasting trait (spell save DC, attack bonus, slot mechanics)
+- **Font of Magic**: Added sorcerer sorcery points trait (conversion rates, point costs)
+- **Metamagic**: Added sorcerer metamagic trait (all 8 options, costs, progression)
+
+#### **New Trait References**
+- All four traits fully documented with mechanics, examples, and formulas
+- Clickable <ref> tags added to Sorcerer class features
+- Dragonborn Lightning Breath now links to full trait explanation
+
+### 🛠️ Technical Updates
+
+#### **Files Added**
+- `src/components/AlignmentSelector.tsx` - Interactive alignment selection UI
+- `src/data/spells/sorcerer.ts` - Complete sorcerer spell lists
+
+#### **Files Modified**
+- `src/types/character.ts` - Added Alignment type, calculateTotalAbilityScores()
+- `src/types/equipment.ts` - Added AbilityScoreModifiers interface
+- `src/types/index.ts` - Exported new types and functions
+- `src/types/class.ts` - Added reference tags to Sorcerer features
+- `src/stores/characterStore.ts` - Added alignment step, setAlignment action
+- `src/pages/CharacterCreatePage.tsx` - Integrated alignment selector
+- `src/components/SpellSelector.tsx` - Added sorcerer spell support
+- `src/data/spells/index.ts` - Exported sorcerer spells
+- `src/data/quickReference.ts` - Added 4 new trait references
+- `src/constants/characterCreation.ts` - Updated wizard steps
+
+---
+
 ## Version 0.2.3 - February 22, 2026
 
 ### 💰 Currency System Overhaul

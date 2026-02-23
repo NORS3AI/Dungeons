@@ -7,6 +7,7 @@ import type {
   Class,
   Subclass,
   Background,
+  Alignment,
   Equipment,
   Currency,
   Spell,
@@ -23,6 +24,7 @@ export type CreationStep =
   | 'race'
   | 'class'
   | 'background'
+  | 'alignment'
   | 'stats'
   | 'spells'
   | 'equipment'
@@ -46,6 +48,7 @@ function createEmptyCharacter(): Character {
     class: null,
     subclass: null,
     background: null,
+    alignment: null,
     abilityScores: { ...DEFAULT_ABILITY_SCORES },
     skills: {
       athletics: 'none',
@@ -166,6 +169,7 @@ interface CharacterState {
   setClass: (characterClass: Class) => void
   setSubclass: (subclass: Subclass) => void
   setBackground: (background: Background) => void
+  setAlignment: (alignment: Alignment) => void
   setAbilityScores: (scores: AbilityScores) => void
   setLanguages: (languages: string[]) => void
   addSpell: (spell: Spell) => void
@@ -206,7 +210,7 @@ interface CharacterState {
 /**
  * Creation step order
  */
-const STEP_ORDER: CreationStep[] = ['details', 'race', 'class', 'background', 'stats', 'spells', 'equipment', 'review']
+const STEP_ORDER: CreationStep[] = ['details', 'race', 'class', 'background', 'alignment', 'stats', 'spells', 'equipment', 'review']
 
 /**
  * Character store with persistence
@@ -404,6 +408,16 @@ export const useCharacterStore = create<CharacterState>()(
               currency: updatedCurrency,
               equipment: [...currentCharacter.equipment, ...startingEquipment],
             },
+            history: addToHistory(history, currentCharacter),
+          })
+        },
+
+        setAlignment: (alignment: Alignment) => {
+          const { currentCharacter, history } = get()
+          if (!currentCharacter) return
+
+          set({
+            currentCharacter: { ...currentCharacter, alignment },
             history: addToHistory(history, currentCharacter),
           })
         },

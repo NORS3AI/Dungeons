@@ -106,6 +106,20 @@ export interface FeatureCharge {
 }
 
 /**
+ * Character alignment
+ */
+export type Alignment =
+  | 'lawful-good'
+  | 'neutral-good'
+  | 'chaotic-good'
+  | 'lawful-neutral'
+  | 'true-neutral'
+  | 'chaotic-neutral'
+  | 'lawful-evil'
+  | 'neutral-evil'
+  | 'chaotic-evil'
+
+/**
  * Character condition/status effect
  */
 export type Condition =
@@ -177,6 +191,7 @@ export interface Character {
   class: Class | null
   subclass: Subclass | null
   background: Background | null
+  alignment: Alignment | null
 
   // Abilities
   abilityScores: AbilityScores
@@ -252,3 +267,31 @@ export const POINT_BUY_COSTS: Record<number, number> = {
  * Total points available for point buy
  */
 export const POINT_BUY_TOTAL = 27
+
+/**
+ * Calculate total ability scores including equipment modifiers
+ * @param baseScores - Character's base ability scores
+ * @param equipment - Array of equipped items
+ * @returns Total ability scores (base + equipment modifiers)
+ */
+export function calculateTotalAbilityScores(
+  baseScores: AbilityScores,
+  equipment: Array<{ equipped?: boolean; abilityScoreModifiers?: Partial<AbilityScores> }>
+): AbilityScores {
+  const total = { ...baseScores }
+
+  // Add modifiers from all equipped items
+  equipment.forEach((item) => {
+    if (item.equipped && item.abilityScoreModifiers) {
+      const modifiers = item.abilityScoreModifiers
+      if (modifiers.strength) total.strength += modifiers.strength
+      if (modifiers.dexterity) total.dexterity += modifiers.dexterity
+      if (modifiers.constitution) total.constitution += modifiers.constitution
+      if (modifiers.intelligence) total.intelligence += modifiers.intelligence
+      if (modifiers.wisdom) total.wisdom += modifiers.wisdom
+      if (modifiers.charisma) total.charisma += modifiers.charisma
+    }
+  })
+
+  return total
+}

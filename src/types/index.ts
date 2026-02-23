@@ -19,6 +19,7 @@ export {
   STANDARD_ARRAY,
   POINT_BUY_COSTS,
   POINT_BUY_TOTAL,
+  calculateTotalAbilityScores,
 } from './character'
 
 // Race types
@@ -142,6 +143,7 @@ export type {
   WeaponCategory,
   DamageType,
   ArmorType,
+  AbilityScoreModifiers,
   BaseEquipment,
   Weapon,
   Armor,

@@ -6,11 +6,12 @@ import { CharacterDetailsForm } from '../components/CharacterDetailsForm'
 import { RaceSelector } from '../components/RaceSelector'
 import { ClassSelector } from '../components/ClassSelector'
 import { BackgroundSelector } from '../components/BackgroundSelector'
+import { AlignmentSelector } from '../components/AlignmentSelector'
 import { StatAllocator } from '../components/StatAllocator'
 import { SpellSelector } from '../components/SpellSelector'
 import { EquipmentSelector } from '../components/EquipmentSelector'
 import { LanguageSelector } from '../components/LanguageSelector'
-import type { Race, Class, Subclass, AbilityScores, Spell, Background, Equipment } from '../types'
+import type { Race, Class, Subclass, AbilityScores, Spell, Background, Alignment, Equipment } from '../types'
 import { calculateModifier } from '../types'
 import { rollDice } from '../types/dice'
 
@@ -22,10 +23,11 @@ const STEP_TO_NUMBER: Record<string, number> = {
   race: 2,
   class: 3,
   background: 4,
-  stats: 5,
-  spells: 6,
-  equipment: 7,
-  review: 8,
+  alignment: 5,
+  stats: 6,
+  spells: 7,
+  equipment: 8,
+  review: 9,
 }
 
 export function CharacterCreatePage() {
@@ -39,6 +41,7 @@ export function CharacterCreatePage() {
     setClass,
     setSubclass,
     setBackground,
+    setAlignment,
     setAbilityScores,
     setLanguages,
     addSpell,
@@ -113,6 +116,11 @@ export function CharacterCreatePage() {
     nextStep()
   }
 
+  const handleAlignmentSelect = (alignment: Alignment) => {
+    setAlignment(alignment)
+    nextStep()
+  }
+
   const handleStatsSubmit = (scores: AbilityScores) => {
     setAbilityScores(scores)
     nextStep()
@@ -181,6 +189,15 @@ export function CharacterCreatePage() {
           <BackgroundSelector
             initialBackground={currentCharacter?.background}
             onSelect={handleBackgroundSelect}
+            onBack={handleBack}
+          />
+        )
+
+      case 'alignment':
+        return (
+          <AlignmentSelector
+            initialAlignment={currentCharacter?.alignment}
+            onSelect={handleAlignmentSelect}
             onBack={handleBack}
           />
         )
@@ -262,6 +279,17 @@ export function CharacterCreatePage() {
                       <span className="text-gray-500">Background:</span>{' '}
                       <span className="text-gray-300">
                         {currentCharacter.background?.name || 'Not selected'}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Alignment:</span>{' '}
+                      <span className="text-gray-300">
+                        {currentCharacter.alignment ?
+                          currentCharacter.alignment
+                            .split('-')
+                            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                            .join(' ')
+                          : 'Not selected'}
                       </span>
                     </div>
                   </div>

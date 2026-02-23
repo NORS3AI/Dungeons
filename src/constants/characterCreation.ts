@@ -16,8 +16,9 @@ export const CHARACTER_CREATION_STEPS: Step[] = [
   { id: 2, name: 'Race', shortName: 'Race' },
   { id: 3, name: 'Class', shortName: 'Class' },
   { id: 4, name: 'Background', shortName: 'BG' },
-  { id: 5, name: 'Stats', shortName: 'Stats' },
-  { id: 6, name: 'Spells', shortName: 'Spells' },
-  { id: 7, name: 'Equipment', shortName: 'Equip' },
-  { id: 8, name: 'Review', shortName: 'Review' },
+  { id: 5, name: 'Alignment', shortName: 'Align' },
+  { id: 6, name: 'Stats', shortName: 'Stats' },
+  { id: 7, name: 'Spells', shortName: 'Spells' },
+  { id: 8, name: 'Equipment', shortName: 'Equip' },
+  { id: 9, name: 'Review', shortName: 'Review' },
 ]
