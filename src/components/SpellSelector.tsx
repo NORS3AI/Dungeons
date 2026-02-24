@@ -2,25 +2,29 @@ import { useState, useMemo } from 'react'
 import type { Spell, Class, Subclass } from '../types'
 import { SpellCard } from './SpellCard'
 import {
-  WARLOCK_CANTRIPS,
-  WARLOCK_LEVEL_1_SPELLS,
-  NECROMANCER_CANTRIPS,
-  NECROMANCER_LEVEL_1_SPELLS,
-  WIZARD_CANTRIPS,
-  WIZARD_LEVEL_1_SPELLS,
+  BARD_CANTRIPS,
+  BARD_LEVEL_1_SPELLS,
+  BARD_LEVEL_2_SPELLS,
+  BARD_LEVEL_3_SPELLS,
   CLERIC_CANTRIPS,
   CLERIC_LEVEL_1_SPELLS,
-  SORCERER_CANTRIPS,
-  SORCERER_LEVEL_1_SPELLS,
-  DRUID_CANTRIPS,
-  DRUID_LEVEL_1_SPELLS,
-  DRUID_LEVEL_2_SPELLS,
   DEATH_KNIGHT_CANTRIPS,
   DEATH_KNIGHT_LEVEL_1_SPELLS,
   DEATH_KNIGHT_LEVEL_3_SPELLS,
   DEATH_KNIGHT_LEVEL_5_SPELLS,
   DEATH_KNIGHT_LEVEL_7_SPELLS,
   DEATH_KNIGHT_LEVEL_9_SPELLS,
+  DRUID_CANTRIPS,
+  DRUID_LEVEL_1_SPELLS,
+  DRUID_LEVEL_2_SPELLS,
+  NECROMANCER_CANTRIPS,
+  NECROMANCER_LEVEL_1_SPELLS,
+  SORCERER_CANTRIPS,
+  SORCERER_LEVEL_1_SPELLS,
+  WARLOCK_CANTRIPS,
+  WARLOCK_LEVEL_1_SPELLS,
+  WIZARD_CANTRIPS,
+  WIZARD_LEVEL_1_SPELLS,
   GOO_EXPANDED_SPELLS,
 } from '../data/spells'
 
@@ -50,18 +54,35 @@ export function SpellSelector({
 
   // Determine available spells based on class
   const availableCantrips = useMemo(() => {
-    if (characterClass?.id === 'warlock') return WARLOCK_CANTRIPS
-    if (characterClass?.id === 'necromancer') return NECROMANCER_CANTRIPS
-    if (characterClass?.id === 'wizard') return WIZARD_CANTRIPS
+    if (characterClass?.id === 'bard') return BARD_CANTRIPS
     if (characterClass?.id === 'cleric') return CLERIC_CANTRIPS
-    if (characterClass?.id === 'sorcerer') return SORCERER_CANTRIPS
-    if (characterClass?.id === 'druid') return DRUID_CANTRIPS
     if (characterClass?.id === 'death-knight') return DEATH_KNIGHT_CANTRIPS
+    if (characterClass?.id === 'druid') return DRUID_CANTRIPS
+    if (characterClass?.id === 'necromancer') return NECROMANCER_CANTRIPS
+    if (characterClass?.id === 'sorcerer') return SORCERER_CANTRIPS
+    if (characterClass?.id === 'warlock') return WARLOCK_CANTRIPS
+    if (characterClass?.id === 'wizard') return WIZARD_CANTRIPS
     return []
   }, [characterClass])
 
   const availableSpells = useMemo(() => {
     const spells: Spell[] = []
+
+    // Bard spells - full caster with level-based progression
+    if (characterClass?.id === 'bard') {
+      spells.push(...BARD_LEVEL_1_SPELLS)
+      if (level >= 3) {
+        spells.push(...BARD_LEVEL_2_SPELLS)
+      }
+      if (level >= 5) {
+        spells.push(...BARD_LEVEL_3_SPELLS)
+      }
+      // TODO: Add higher level spell arrays when available
+      // Level 7-8: BARD_LEVEL_4_SPELLS
+      // Level 9-10: BARD_LEVEL_5_SPELLS
+      // etc.
+      return spells
+    }
 
     // Warlock spells with subclass expanded spells
     if (characterClass?.id === 'warlock') {
@@ -105,17 +126,17 @@ export function SpellSelector({
     }
 
     // Other classes - currently only level 1 spells (TODO: Add level-based progression)
-    if (characterClass?.id === 'necromancer') {
-      return [...NECROMANCER_LEVEL_1_SPELLS]
-    }
-    if (characterClass?.id === 'wizard') {
-      return [...WIZARD_LEVEL_1_SPELLS]
-    }
     if (characterClass?.id === 'cleric') {
       return [...CLERIC_LEVEL_1_SPELLS]
     }
+    if (characterClass?.id === 'necromancer') {
+      return [...NECROMANCER_LEVEL_1_SPELLS]
+    }
     if (characterClass?.id === 'sorcerer') {
       return [...SORCERER_LEVEL_1_SPELLS]
+    }
+    if (characterClass?.id === 'wizard') {
+      return [...WIZARD_LEVEL_1_SPELLS]
     }
 
     return []
