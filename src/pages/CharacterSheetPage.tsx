@@ -103,6 +103,7 @@ export function CharacterSheetPage() {
   const [showLevelUpHPModal, setShowLevelUpHPModal] = useState(false)
   const [levelUpHPRoll, setLevelUpHPRoll] = useState<{ rolls: number[]; highest: number; isRolling: boolean } | null>(null)
   const [restNotification, setRestNotification] = useState<{ type: 'short' | 'long' | 'trance'; message: string } | null>(null)
+  const [sellConfirmation, setSellConfirmation] = useState<{ itemName: string; value: number; currencyType: 'cp' | 'sp' | 'gp' | 'pp'; onConfirm: () => void } | null>(null)
   const [abilityNotification, setAbilityNotification] = useState<{ featureName: string; message: string } | null>(null)
 
   useEffect(() => {
@@ -436,14 +437,38 @@ export function CharacterSheetPage() {
       copperValue = (rarityPrices[item.rarity] || 0) * (item.quantity || 1)
     }
 
-    // Add currency to character
-    const currentCurrency = { ...character.currency }
-    currentCurrency.copper += copperValue
-    updateCurrency(autoConvertCurrency(currentCurrency))
+    // Convert to appropriate currency type
+    let value = copperValue
+    let currencyType: 'cp' | 'sp' | 'gp' | 'pp' = 'cp'
 
-    // Remove item from inventory
-    removeEquipment(itemId)
-    saveCharacter()
+    if (copperValue >= 10000) {
+      value = copperValue / 10000
+      currencyType = 'pp'
+    } else if (copperValue >= 100) {
+      value = copperValue / 100
+      currencyType = 'gp'
+    } else if (copperValue >= 10) {
+      value = copperValue / 10
+      currencyType = 'sp'
+    }
+
+    // Show confirmation modal
+    setSellConfirmation({
+      itemName: item.name,
+      value,
+      currencyType,
+      onConfirm: () => {
+        // Add currency to character
+        const currentCurrency = { ...character.currency }
+        currentCurrency.copper += copperValue
+        updateCurrency(autoConvertCurrency(currentCurrency))
+
+        // Remove item from inventory
+        removeEquipment(itemId)
+        saveCharacter()
+        setSellConfirmation(null)
+      }
+    })
   }
 
   const handleSellMaterial = (materialId: string) => {
@@ -470,14 +495,38 @@ export function CharacterSheetPage() {
       copperValue = (rarityPrices[material.rarity] || 0) * material.quantity
     }
 
-    // Add currency to character
-    const currentCurrency = { ...character.currency }
-    currentCurrency.copper += copperValue
-    updateCurrency(autoConvertCurrency(currentCurrency))
+    // Convert to appropriate currency type
+    let value = copperValue
+    let currencyType: 'cp' | 'sp' | 'gp' | 'pp' = 'cp'
 
-    // Remove material from inventory
-    removeMaterial(materialId)
-    saveCharacter()
+    if (copperValue >= 10000) {
+      value = copperValue / 10000
+      currencyType = 'pp'
+    } else if (copperValue >= 100) {
+      value = copperValue / 100
+      currencyType = 'gp'
+    } else if (copperValue >= 10) {
+      value = copperValue / 10
+      currencyType = 'sp'
+    }
+
+    // Show confirmation modal
+    setSellConfirmation({
+      itemName: material.name,
+      value,
+      currencyType,
+      onConfirm: () => {
+        // Add currency to character
+        const currentCurrency = { ...character.currency }
+        currentCurrency.copper += copperValue
+        updateCurrency(autoConvertCurrency(currentCurrency))
+
+        // Remove material from inventory
+        removeMaterial(materialId)
+        saveCharacter()
+        setSellConfirmation(null)
+      }
+    })
   }
 
   // Parse healing amount from potion description
@@ -3161,6 +3210,55 @@ export function CharacterSheetPage() {
             setConsumableItemToRemove(null)
           }}
         />
+      )}
+
+      {/* Sell Confirmation Modal */}
+      {sellConfirmation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+          <div className="bg-gray-900 border-2 border-yellow-600 rounded-xl max-w-md w-full shadow-2xl">
+            <div className="bg-gradient-to-r from-yellow-600 to-orange-600 p-6">
+              <h2 className="text-2xl font-bold text-white">💰 Confirm Sale</h2>
+            </div>
+
+            <div className="p-6">
+              <p className="text-lg text-gray-300 mb-4">
+                Do you really want to sell <span className="font-bold text-white">"{sellConfirmation.itemName}"</span>?
+              </p>
+
+              <div className="p-4 bg-yellow-900/20 border-2 border-yellow-600 rounded-lg mb-6">
+                <div className="text-center">
+                  <div className="text-sm text-gray-400 mb-1">You will receive:</div>
+                  <div className="text-3xl font-bold text-yellow-300">
+                    {sellConfirmation.value} {
+                      sellConfirmation.currencyType === 'cp' ? 'Copper' :
+                      sellConfirmation.currencyType === 'sp' ? 'Silver' :
+                      sellConfirmation.currencyType === 'gp' ? 'Gold' :
+                      'Platinum'
+                    }
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    ({sellConfirmation.currencyType.toUpperCase()})
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setSellConfirmation(null)}
+                  className="flex-1 px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={sellConfirmation.onConfirm}
+                  className="flex-1 px-4 py-3 bg-yellow-600 hover:bg-yellow-500 text-white rounded-lg font-medium transition-colors"
+                >
+                  Sell Item
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Manual Spell Adder Modal */}
