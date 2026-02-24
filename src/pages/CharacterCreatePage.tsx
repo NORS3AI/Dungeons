@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCharacterStore } from '../stores/characterStore'
+import { usePreloadReferences } from '../hooks/useCharacterReferences'
 import { WizardSteps, CHARACTER_CREATION_STEPS } from '../components/WizardSteps'
 import { CharacterDetailsForm } from '../components/CharacterDetailsForm'
 import { RaceSelector } from '../components/RaceSelector'
@@ -57,6 +58,9 @@ export function CharacterCreatePage() {
   // HP rolling state - track 3 rolls and select highest
   const [hpRoll, setHpRoll] = useState<{ rolls: number[]; highest: number; isRolling: boolean } | null>(null)
 
+  // Hook for preloading references in the background
+  const preloadReferences = usePreloadReferences()
+
   // Always initialize a new character when entering creation
   useEffect(() => {
     createNewCharacter()
@@ -99,6 +103,10 @@ export function CharacterCreatePage() {
 
   const handleRaceSelect = (race: Race) => {
     setRace(race)
+
+    // Preload race-specific traits in the background for better performance
+    preloadReferences({ race: race.id.toLowerCase() })
+
     nextStep()
   }
 
@@ -107,6 +115,14 @@ export function CharacterCreatePage() {
     if (subclass) {
       setSubclass(subclass)
     }
+
+    // Preload class-specific spells and traits in the background
+    // Combines with previously loaded race traits for optimal performance
+    preloadReferences({
+      race: currentCharacter?.race?.id.toLowerCase(),
+      classId: classData.id.toLowerCase(),
+    })
+
     // Note: skills and fightingStyle would be stored in character - add to store if needed
     // For now we'll just move forward
     nextStep()

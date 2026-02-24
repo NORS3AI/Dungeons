@@ -400,6 +400,77 @@ When a user creates a Drow Warlock:
 2. Character creation: `traits-drow`, `spells-warlock`, `traits-warlock` (lazy loaded)
 3. NOT loaded: Wizard spells, Cleric traits, Tiefling traits, etc. (~70% bundle savings)
 
+#### **Phase 4: Character Creation Integration (COMPLETED ✅)**
+
+Integrated lazy loading system into character creation workflow for automatic background preloading.
+
+**Modified Files:**
+- `src/pages/CharacterCreatePage.tsx` - Added preload hooks to character creation wizard
+
+**Integration Points:**
+
+**Race Selection:**
+When user selects a race (Drow, Tiefling, Elf, etc.):
+- Automatically preloads race-specific traits in the background
+- Non-blocking - user can continue to next step immediately
+- Cache warmed before user reaches steps that need the data
+
+**Class Selection:**
+When user selects a class (Warlock, Wizard, Cleric, etc.):
+- Automatically preloads class-specific spells and traits in the background
+- Combines with previously loaded race traits
+- Parallel loading for maximum performance
+
+**Implementation:**
+```typescript
+// Import preload hook
+import { usePreloadReferences } from '../hooks/useCharacterReferences'
+
+// Use in component
+const preloadReferences = usePreloadReferences()
+
+// Preload when race selected
+const handleRaceSelect = (race: Race) => {
+  setRace(race)
+  preloadReferences({ race: race.id.toLowerCase() })
+  nextStep()
+}
+
+// Preload when class selected
+const handleClassSelect = (classData: Class) => {
+  setClass(classData)
+  preloadReferences({
+    race: currentCharacter?.race?.id.toLowerCase(),
+    classId: classData.id.toLowerCase(),
+  })
+  nextStep()
+}
+```
+
+**User Experience:**
+- **Seamless**: Preloading happens invisibly in the background
+- **Fast**: Data ready before user needs it (spell selection, equipment, etc.)
+- **Non-blocking**: UI never waits for preloading to complete
+- **Progressive**: Loads only what's needed for selected race/class
+
+**Technical Benefits:**
+- Background cache warming during character creation
+- Reduces perceived loading time for later steps
+- Leverages browser's native module caching
+- Works seamlessly with Vite's chunk splitting (Phase 3)
+
+**Build Status:**
+Build succeeds with informational warnings about mixed static/dynamic imports (expected in transitional state). Preloading works correctly and warms the cache.
+
+**Current State:**
+Some reference modules are both statically and dynamically imported (transitional state). This means they're included in the main bundle but also available for dynamic loading. Full optimization would require removing static exports, but current implementation provides cache warming benefits without breaking existing code.
+
+**Performance Impact:**
+- Preloading begins as soon as race/class selected
+- Network requests happen during user's reading/decision time
+- By the time user reaches spell selection, data is already cached
+- Smoother, faster experience with no perceived loading
+
 ---
 
 ## Version 0.3.3 - February 23, 2026 @ 01:24 AM MST
