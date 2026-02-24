@@ -195,6 +195,7 @@ interface CharacterState {
   equipAll: () => void
   unequipAll: () => void
   changeEquipmentQuantity: (itemId: string, change: number) => void
+  renameEquipment: (itemId: string, newName: string) => void
   useItemCharge: (itemId: string) => void
   updateCurrency: (currency: Partial<Currency>) => void
   addMaterial: (material: Material) => void // Auto-consolidates if material already exists
@@ -669,6 +670,26 @@ export const useCharacterStore = create<CharacterState>()(
             if (e.id === itemId) {
               const newQuantity = Math.max(1, e.quantity + change)
               return { ...e, quantity: newQuantity }
+            }
+            return e
+          })
+
+          set({
+            currentCharacter: {
+              ...currentCharacter,
+              equipment,
+            },
+            history: addToHistory(history, currentCharacter),
+          })
+        },
+
+        renameEquipment: (itemId: string, newName: string) => {
+          const { currentCharacter, history } = get()
+          if (!currentCharacter) return
+
+          const equipment = currentCharacter.equipment.map((e) => {
+            if (e.id === itemId) {
+              return { ...e, name: newName }
             }
             return e
           })

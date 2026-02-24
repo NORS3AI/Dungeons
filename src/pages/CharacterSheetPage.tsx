@@ -74,7 +74,7 @@ const SKILLS: { name: string; ability: Ability; key: SkillKey; refId: string }[]
 export function CharacterSheetPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { characters, loadCharacter, currentCharacter, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, equipAll, unequipAll, changeEquipmentQuantity, setFightingStance, addEquipment, addMaterial, removeMaterial, changeMaterialQuantity, updateHitPoints, addSpell, removeSpell, saveCharacter, addFoodRations, addWaterSupply, addItemFeature, setAlignment, setAbilityScores, migrateCurrentCharacter, needsMigration, setLevelWithHP, shortRest, longRest, initializeResourcePools, initializeFeatureCharges, useFeatureCharge } = useCharacterStore()
+  const { characters, loadCharacter, currentCharacter, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, equipAll, unequipAll, changeEquipmentQuantity, renameEquipment, setFightingStance, addEquipment, addMaterial, removeMaterial, changeMaterialQuantity, updateHitPoints, addSpell, removeSpell, saveCharacter, addFoodRations, addWaterSupply, addItemFeature, setAlignment, setAbilityScores, migrateCurrentCharacter, needsMigration, setLevelWithHP, shortRest, longRest, initializeResourcePools, initializeFeatureCharges, useFeatureCharge } = useCharacterStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
   const [activeTab, setActiveTab] = useState<'main' | 'actions' | 'spells' | 'inventory' | 'features' | 'story' | 'loot'>('main')
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
@@ -1708,6 +1708,10 @@ export function CharacterSheetPage() {
                         saveCharacter()
                       }}
                       onUse={() => handleUseConsumable(item)}
+                      onRename={(newName) => {
+                        renameEquipment(item.id, newName)
+                        saveCharacter()
+                      }}
                     />
                   ))}
               </div>
@@ -1739,6 +1743,10 @@ export function CharacterSheetPage() {
                         saveCharacter()
                       }}
                       onUse={() => handleUseConsumable(item)}
+                      onRename={(newName) => {
+                        renameEquipment(item.id, newName)
+                        saveCharacter()
+                      }}
                     />
                   ))}
               </div>
@@ -1776,6 +1784,10 @@ export function CharacterSheetPage() {
                         saveCharacter()
                       }}
                       onUse={() => handleUseConsumable(item)}
+                      onRename={(newName) => {
+                        renameEquipment(item.id, newName)
+                        saveCharacter()
+                      }}
                     />
                   ))}
               </div>
@@ -3310,7 +3322,7 @@ function EquipToggle({ equipped, onToggle, canEquip = true }: { equipped: boolea
 
 
 // Equipment item component
-function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuantity, onUse, onSell }: { item: Equipment; character: Character; onRemove: () => void; onToggleEquip: () => void; onChangeQuantity: (change: number) => void; onUse: () => void; onSell?: () => void }) {
+function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuantity, onUse, onSell, onRename }: { item: Equipment; character: Character; onRemove: () => void; onToggleEquip: () => void; onChangeQuantity: (change: number) => void; onUse: () => void; onSell?: () => void; onRename?: (newName: string) => void }) {
   const getAbilityMod = (ability: Ability): number => {
     return calculateModifier(character.abilityScores[ability])
   }
@@ -3339,6 +3351,22 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
               <span className="font-medium text-white hover:text-dnd-gold">
                 {weapon.name}
               </span>
+              {onRename && (
+                <button
+                  onClick={() => {
+                    const newName = prompt('Enter new name for weapon:', weapon.name)
+                    if (newName && newName.trim()) {
+                      onRename(newName.trim())
+                    }
+                  }}
+                  className="text-gray-500 hover:text-dnd-gold transition-colors p-0.5"
+                  title="Rename weapon"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  </svg>
+                </button>
+              )}
               {isEquipped && <span className="text-xs text-green-400 bg-green-900/50 px-1.5 py-0.5 rounded">Equipped</span>}
             </div>
             {weapon.quantity > 1 && (
@@ -3388,6 +3416,22 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="font-medium text-white">{item.name}</span>
+              {onRename && (
+                <button
+                  onClick={() => {
+                    const newName = prompt('Enter new name for armor:', item.name)
+                    if (newName && newName.trim()) {
+                      onRename(newName.trim())
+                    }
+                  }}
+                  className="text-gray-500 hover:text-dnd-gold transition-colors p-0.5"
+                  title="Rename armor"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  </svg>
+                </button>
+              )}
               {isEquipped && <span className="text-xs text-blue-400 bg-blue-900/50 px-1.5 py-0.5 rounded">Equipped</span>}
             </div>
             <div className="text-sm text-gray-400">
