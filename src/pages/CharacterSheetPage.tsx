@@ -1437,6 +1437,28 @@ export function CharacterSheetPage() {
             )}
           </div>
 
+          {/* Total Carrying Weight */}
+          <div className="card bg-gradient-to-br from-amber-900/30 to-orange-900/30 border-2 border-orange-600 p-4">
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <div>
+                <h3 className="text-lg font-bold text-orange-400">⚖️ Total Carrying Weight</h3>
+                <p className="text-xs text-gray-400 mt-1">Combined weight of all equipped and inventory items</p>
+              </div>
+              <div className="text-right">
+                <div className="text-3xl font-bold text-orange-300">
+                  {character.equipment.reduce((total, item) => {
+                    const itemWeight = item.weight || 0
+                    const quantity = item.quantity || 1
+                    return total + (itemWeight * quantity)
+                  }, 0).toFixed(1)} lbs
+                </div>
+                <div className="text-xs text-gray-500 mt-1">
+                  {character.materials?.reduce((total, mat) => total + (mat.weight * mat.quantity), 0).toFixed(1) || '0'} lbs from materials
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Mats (Crafting Materials) */}
           {character.materials && character.materials.length > 0 && (
             <div className="card bg-gray-800 border-gray-700 p-4">
