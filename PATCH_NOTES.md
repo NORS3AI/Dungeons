@@ -71,7 +71,11 @@ Death Knight spells can now be selected during character creation and level up.
 - Death Knight spells appear in spell selector during character creation
 - Level-based progression for third caster spell access (levels 1, 7, 13, 17, 19)
 - Constitution-based spellcasting (Death Knight theme)
-- Fixed: Death Knight characters can now properly select their class spells
+- **CRITICAL FIX**: Added missing infrastructure for Death Knight spell selection
+  - Created reference filter (`src/data/references/spells/death-knight.ts`)
+  - Added Death Knight to dynamic loader for lazy loading
+  - Added Death Knight chunk to Vite config (`spells-death-knight` - 0.29 kB)
+  - Death Knights can now actually select spells in character creation!
 
 #### **Death Knight Spell Slot Fix**
 - **Fixed 0/0 Display**: Death Knights now show correct cantrips and spell slots

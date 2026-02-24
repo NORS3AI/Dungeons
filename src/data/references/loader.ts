@@ -50,6 +50,10 @@ export async function loadClassSpells(classId: string): Promise<{ spells: Record
         const { BARD_SPELLS, BARD_SPELL_COUNT } = await import('./spells/bard')
         return { spells: BARD_SPELLS, count: BARD_SPELL_COUNT }
       }
+      case 'death-knight': {
+        const { DEATH_KNIGHT_SPELLS, DEATH_KNIGHT_SPELL_COUNT } = await import('./spells/death-knight')
+        return { spells: DEATH_KNIGHT_SPELLS, count: DEATH_KNIGHT_SPELL_COUNT }
+      }
       case 'paladin': {
         const { PALADIN_SPELLS, PALADIN_SPELL_COUNT } = await import('./spells/paladin')
         return { spells: PALADIN_SPELLS, count: PALADIN_SPELL_COUNT }
