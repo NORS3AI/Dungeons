@@ -15,6 +15,12 @@ import {
   DRUID_CANTRIPS,
   DRUID_LEVEL_1_SPELLS,
   DRUID_LEVEL_2_SPELLS,
+  DEATH_KNIGHT_CANTRIPS,
+  DEATH_KNIGHT_LEVEL_1_SPELLS,
+  DEATH_KNIGHT_LEVEL_3_SPELLS,
+  DEATH_KNIGHT_LEVEL_5_SPELLS,
+  DEATH_KNIGHT_LEVEL_7_SPELLS,
+  DEATH_KNIGHT_LEVEL_9_SPELLS,
   GOO_EXPANDED_SPELLS,
 } from '../data/spells'
 
@@ -50,6 +56,7 @@ export function SpellSelector({
     if (characterClass?.id === 'cleric') return CLERIC_CANTRIPS
     if (characterClass?.id === 'sorcerer') return SORCERER_CANTRIPS
     if (characterClass?.id === 'druid') return DRUID_CANTRIPS
+    if (characterClass?.id === 'death-knight') return DEATH_KNIGHT_CANTRIPS
     return []
   }, [characterClass])
 
@@ -76,6 +83,24 @@ export function SpellSelector({
       // Level 5-6: DRUID_LEVEL_3_SPELLS
       // Level 7-8: DRUID_LEVEL_4_SPELLS
       // etc.
+      return spells
+    }
+
+    // Death Knight spells - third caster progression
+    if (characterClass?.id === 'death-knight') {
+      spells.push(...DEATH_KNIGHT_LEVEL_1_SPELLS)
+      if (level >= 7) {
+        spells.push(...DEATH_KNIGHT_LEVEL_3_SPELLS)
+      }
+      if (level >= 13) {
+        spells.push(...DEATH_KNIGHT_LEVEL_5_SPELLS)
+      }
+      if (level >= 17) {
+        spells.push(...DEATH_KNIGHT_LEVEL_7_SPELLS)
+      }
+      if (level >= 19) {
+        spells.push(...DEATH_KNIGHT_LEVEL_9_SPELLS)
+      }
       return spells
     }
 
