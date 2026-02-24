@@ -1,6 +1,12 @@
 # Dungeons - Patch Notes
 
-## Version 0.3.4 - February 24, 2026
+## Version 0.3.4-alpha - February 24, 2026
+
+**Alpha Release Notice**: This version contains new experimental features. Some functionality may still be under development.
+
+### 🎮 Major Features & Quality of Life Improvements
+
+This release focuses on improving the new player experience with comprehensive tooltips, mobile optimization, and expanding class support.
 
 ### 📱 Mobile UI Improvements
 
@@ -13,6 +19,8 @@ Improved mobile experience with better responsive layouts.
 - **Consistent Spacing**: Improved gap spacing between currency boxes
 - **Header Responsiveness**: Header switches from column to row layout at sm breakpoint
 
+**Why This Matters**: Mobile players can now properly view and manage their currency without text overlap or buttons disappearing off-screen.
+
 ### 🍖 Starting Supplies System
 
 New characters now begin their adventure properly equipped with survival supplies.
@@ -23,6 +31,8 @@ New characters now begin their adventure properly equipped with survival supplie
 - **Survival Ready**: Players can track consumption from day one
 - **Integration**: Works with existing Food & Water Supplies tracking system
 
+**Why This Matters**: New players no longer forget to buy basic supplies during character creation. Characters start campaign-ready with realistic provisions.
+
 ### 🎒 Inventory Organization
 
 Cleaned up inventory display to prevent duplicate item listings.
@@ -32,6 +42,8 @@ Cleaned up inventory display to prevent duplicate item listings.
 - **Dedicated Section**: These items still tracked in "Food & Water Supplies" section
 - **Cleaner Interface**: No more duplicate listings of food/water items
 - **Filter Implementation**: ID-based filtering removes 'waterskin' and 'rations' from backpack view
+
+**Why This Matters**: Reduces clutter in inventory tab. Food and water are survival mechanics, not regular backpack items.
 
 ### 🧙 Death Knight Spell Support
 
@@ -47,9 +59,11 @@ Death Knight spells can now be selected during character creation and level up.
 
 #### **Spell Selector Integration**
 - Death Knight spells appear in spell selector during character creation
-- Level-based progression for third caster spell access
+- Level-based progression for third caster spell access (levels 1, 7, 13, 17, 19)
 - Constitution-based spellcasting (Death Knight theme)
 - Fixed: Death Knight characters can now properly select their class spells
+
+**Why This Matters**: Death Knights were previously unable to select spells. Now fully playable with WoW-themed frost and blood magic.
 
 ### ❤️ Healing Spell Roll Buttons
 
@@ -68,6 +82,8 @@ Healing spells now have dedicated roll buttons with heart icon in Actions tab.
 - Roll results appear inline with animated badge
 - Perfect for Clerics, Paladins, and other healers
 
+**Why This Matters**: Healers no longer need to manually calculate healing amounts. Click the heart, see the result instantly. Streamlines support gameplay.
+
 ### 💧 Daily Water Consumption
 
 Water supply now decreases automatically on long rests, matching food consumption.
@@ -83,6 +99,8 @@ Water supply now decreases automatically on long rests, matching food consumptio
 - Encourages players to manage supplies and restock
 - Integrates with existing Food & Water Supplies tracking
 
+**Why This Matters**: Realistic survival mechanics. Players must manage resources during long journeys. DMs can create interesting scenarios around supply shortages.
+
 ### 🧬 Racial Ability References
 
 Racial spell names in Actions tab now clickable with detailed tooltips.
@@ -93,27 +111,32 @@ Racial spell names in Actions tab now clickable with detailed tooltips.
 - **New Player Friendly**: Explains what each racial ability does
 - **Consistent UI**: Matches spell reference system elsewhere in app
 
-### 📊 Combat Stat References
+**Why This Matters**: New players can learn what their racial abilities do without leaving the game or consulting external rulebooks.
 
-Combat statistics now have detailed quick references explaining game mechanics.
+### 📊 Combat Stat References - New Player Learning System
+
+Combat statistics now have detailed quick references explaining game mechanics. This is a major quality-of-life improvement for teaching new players D&D.
 
 #### **New Stat References**
-- **Armor Class (AC)**: How AC works, armor types, DEX modifiers
-- **Initiative**: Turn order determination, DEX modifier usage
-- **Hit Dice**: HP recovery, class-specific dice sizes, rest mechanics
-- **Speed**: Movement rules, special speeds (fly, swim), difficult terrain
-- **Proficiency Bonus**: Level scaling table, where it applies
+- **Armor Class (AC)**: How AC works, armor types, DEX modifiers, examples of AC calculation
+- **Initiative**: Turn order determination, DEX modifier usage, tiebreaking rules
+- **Hit Dice**: HP recovery mechanics, class-specific dice sizes, short rest usage
+- **Speed**: Movement rules, special speeds (fly, swim), difficult terrain, dash action
+- **Proficiency Bonus**: Level scaling table (1-4: +2, 5-8: +3, etc.), where it applies
 
 #### **Character Info References**
-- **Alignment**: All nine alignments with descriptions and examples
-- **Darkvision**: Vision range, color limitations, magical darkness
-- **Languages**: Common languages table, typical speakers
+- **Alignment**: All nine alignments with descriptions and famous examples (Superman = Lawful Good, Robin Hood = Chaotic Good)
+- **Darkvision**: Vision range, color limitations, magical darkness rules, race comparisons
+- **Languages**: Common languages table with typical speakers, how communication works
 
 #### **User Experience**
-- All stat labels now clickable with hover effect
-- Tooltips open on click showing comprehensive information
-- Perfect for new players learning D&D rules
-- Reduces need to look up rules externally
+- All stat labels now clickable with hover effect (cursor changes to pointer)
+- Tooltips open on click showing comprehensive information with examples
+- Perfect for new players learning D&D rules during gameplay
+- Reduces need to look up rules externally or interrupt DM
+- Tables for quick reference (proficiency bonus by level, languages by race, etc.)
+
+**Why This Matters**: This transforms the character sheet into an interactive learning tool. New players can click any stat to learn what it does, how it's calculated, and see examples. No more "What's AC?" or "How does initiative work?" questions mid-game. Veterans benefit from quick reference tables without leaving the app.
 
 ### 🛠️ Technical Changes
 
