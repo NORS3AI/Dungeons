@@ -112,8 +112,8 @@ function createEmptyCharacter(): Character {
       current: 0,
       maximum: 150, // Will be updated when STR is set
     },
-    foodRations: 0,
-    waterSupply: 0,
+    foodRations: 10, // Start with 10 days of food
+    waterSupply: 10, // Start with 10 days of water
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   }

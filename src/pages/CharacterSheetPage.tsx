@@ -1407,9 +1407,9 @@ export function CharacterSheetPage() {
         <div className="space-y-6">
           {/* Currency */}
           <div className="card bg-gray-800 border-gray-700 p-4">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
               <h3 className="text-lg font-bold text-white">Currency</h3>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 {!character.dailyIncome ? (
                   <button
                     onClick={() => setShowIncomeRoller(true)}
@@ -1462,18 +1462,18 @@ export function CharacterSheetPage() {
                 </button>
               </div>
             </div>
-            <div className="flex flex-wrap gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
                 { key: 'platinum', label: 'PP', color: 'text-gray-300', bgColor: 'bg-gray-600/20' },
                 { key: 'gold', label: 'GP', color: 'text-yellow-400', bgColor: 'bg-yellow-600/20' },
                 { key: 'silver', label: 'SP', color: 'text-gray-400', bgColor: 'bg-gray-500/20' },
                 { key: 'copper', label: 'CP', color: 'text-orange-400', bgColor: 'bg-orange-600/20' },
               ].map(({ key, label, color, bgColor }) => (
-                <div key={key} className={`${bgColor} bg-gray-900 rounded-lg px-4 py-2 text-center min-w-[80px]`}>
-                  <div className={`text-xl font-bold ${color}`}>
+                <div key={key} className={`${bgColor} bg-gray-900 rounded-lg px-4 py-3 text-center`}>
+                  <div className={`text-2xl sm:text-xl font-bold ${color}`}>
                     {character.currency[key as keyof typeof character.currency]}
                   </div>
-                  <div className="text-xs text-gray-500">{label}</div>
+                  <div className="text-xs text-gray-500 mt-1">{label}</div>
                 </div>
               ))}
             </div>
@@ -1924,7 +1924,9 @@ export function CharacterSheetPage() {
               item.category !== 'consumable' &&
               !item.name.toLowerCase().includes('potion') &&
               !item.name.toLowerCase().includes('scroll') &&
-              !item.name.toLowerCase().includes('elixir')
+              !item.name.toLowerCase().includes('elixir') &&
+              item.id !== 'waterskin' &&
+              item.id !== 'rations'
             ).length === 0 ? (
               <p className="text-gray-400 text-center py-4">Backpack is empty.</p>
             ) : (
@@ -1940,7 +1942,9 @@ export function CharacterSheetPage() {
                     item.category !== 'consumable' &&
                     !item.name.toLowerCase().includes('potion') &&
                     !item.name.toLowerCase().includes('scroll') &&
-                    !item.name.toLowerCase().includes('elixir')
+                    !item.name.toLowerCase().includes('elixir') &&
+                    item.id !== 'waterskin' &&
+                    item.id !== 'rations'
                   )
                   .map((item) => (
                     <EquipmentItem
