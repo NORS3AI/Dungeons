@@ -1,5 +1,101 @@
 # Dungeons - Patch Notes
 
+## Version 0.3.5-alpha - February 24, 2026
+
+**Alpha Release Notice**: This version contains new features for higher-level gameplay, DM tools, and improved character information display.
+
+### 🎵 Higher Level Spells - Bard Levels 4-6
+
+Bards now have access to 4th, 5th, and 6th level spells for higher level campaigns.
+
+#### **Bard Spell Expansion**
+- **Level 4 Spells (10 spells)**: Charm Monster, Compulsion, Confusion, Dimension Door, Freedom of Movement, Greater Invisibility, Hallucinatory Terrain, Locate Creature, Polymorph, Geas
+- **Level 5 Spells (12 spells)**: Animate Objects, Awaken, Dominate Person, Dream, Greater Restoration, Hold Monster, Legend Lore, Mass Cure Wounds, Mislead, Modify Memory, Planar Binding, Raise Dead
+- **Level 6 Spells (8 spells)**: Eyebite, Find the Path, Guards and Wards, Irresistible Dance, Mass Suggestion, Programmed Illusion, True Seeing, Heroes' Feast
+- **Total New Spells**: 30 spells for Bard characters
+
+#### **Spell Progression Integration**
+- Bard characters level 7+ can now select from 4th level spells
+- Bard characters level 9+ can now select from 5th level spells
+- Bard characters level 11+ can now select from 6th level spells
+- Full caster progression maintained (new spell level every 2 character levels)
+
+**Why This Matters**: Bards were limited to 3rd level spells, capping effective character levels at 6. Now supports characters up to level 11-12 with iconic spells like Mass Suggestion, Greater Restoration, and Polymorph.
+
+### ⚔️ Higher Level Spells - Paladin Levels 4-5
+
+Paladins now have access to 4th and 5th level spells, completing their half-caster spell progression.
+
+#### **Paladin Spell Expansion**
+- **Level 4 Spells (7 spells)**: Aura of Life, Aura of Purity, Banishment, Death Ward, Freedom of Movement, Staggering Smite, Locate Creature
+- **Level 5 Spells (7 spells)**: Banishing Smite, Circle of Power, Destructive Wave, Dispel Evil and Good, Flame Strike, Geas, Raise Dead
+- **Total New Spells**: 14 spells (including all Paladin Smite spells)
+
+#### **Spell Progression Integration**
+- Paladin characters level 13+ can now select from 4th level spells
+- Paladin characters level 17+ can now select from 5th level spells
+- Half-caster progression maintained (new spell level every 4 character levels)
+
+**Why This Matters**: Paladins were limited to 3rd level spells, capping effective character levels at 12. Now supports characters up to level 20 with powerful divine magic like Circle of Power, Destructive Wave, and the full Smite spell line.
+
+### 🏹 Higher Level Spells - Ranger Levels 4-5
+
+Rangers now have access to 4th and 5th level spells, completing their half-caster spell progression.
+
+#### **Ranger Spell Expansion**
+- **Level 4 Spells (5 spells)**: Conjure Woodland Beings, Freedom of Movement, Grasping Vine, Locate Creature, Stoneskin
+- **Level 5 Spells (6 spells)**: Commune with Nature, Conjure Volley, Greater Restoration, Steel Wind Strike, Swift Quiver, Tree Stride
+- **Total New Spells**: 11 spells for primal wilderness magic
+
+#### **Spell Progression Integration**
+- Ranger characters level 13+ can now select from 4th level spells
+- Ranger characters level 17+ can now select from 5th level spells
+- Half-caster progression maintained (new spell level every 4 character levels)
+
+**Why This Matters**: Rangers were limited to 3rd level spells, capping effective character levels at 12. Now supports characters up to level 20 with powerful nature magic like Swift Quiver, Conjure Volley, and Steel Wind Strike.
+
+### 🛡️ Character Info - Resistances & Immunities Display
+
+Character Overview tab now clearly displays damage resistances and condition immunities from racial traits.
+
+#### **New Display Features**
+- **Damage Resistances**: Shows in green text (e.g., Tiefling fire resistance)
+- **Condition Immunities**: Shows in blue text (e.g., Dwarf poison resistance)
+- **Automatic Display**: Pulls directly from race data
+- **Smart Filtering**: Only appears if character's race has resistances/immunities
+
+#### **Example Displays**
+- Tiefling characters: Shows "Fire" resistance in green
+- Dwarf characters: Shows "Poison" resistance in green
+- Characters without resistances: Section doesn't appear (no clutter)
+
+**Why This Matters**: Players no longer need to remember or look up racial resistances. Critical combat information is now visible at a glance in the Overview tab's Character Info section.
+
+### 🔐 DM Mode - Secret Unlock System
+
+Added a secret code system to unlock DM tools and enhanced editing features.
+
+#### **DM Mode Features**
+- **Secret Code**: Enter "0220" to unlock DM mode
+- **Persistent Storage**: DM mode stays enabled across sessions
+- **Visual Indicator**: Purple "DM Mode" button in top-right corner when active
+- **Easy Toggle**: Click button to enable/disable DM mode at any time
+
+#### **How to Use**
+1. Click "DM Tools" button in top-right corner of home page
+2. Enter secret code: `0220`
+3. DM mode unlocks and is saved to browser settings
+4. Purple "DM Mode" badge indicates active status
+
+#### **DM Features Unlocked**
+- DM Edit buttons on character sheets (ability scores, HP)
+- Enhanced character editing capabilities
+- Future DM tools and campaign management features
+
+**Why This Matters**: Provides a clean separation between player and DM features. The secret code prevents accidental activation while keeping DM tools easily accessible for those who need them.
+
+---
+
 ## Version 0.3.4-alpha - February 24, 2026
 
 **Alpha Release Notice**: This version contains new experimental features. Some functionality may still be under development.
