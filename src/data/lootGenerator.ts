@@ -148,7 +148,7 @@ const UNCOMMON_LOOT: LootItem[] = [
   { id: 'spell-scroll-1', name: 'Spell Scroll (1st Level)', category: 'Consumable', description: 'Contains a 1st level spell', rarity: 'uncommon', value: 100 },
   { id: 'masterwork-weapon', name: 'Masterwork Weapon', category: 'Weapon', description: '+1 to attack and damage rolls', rarity: 'uncommon', value: 300 },
   { id: 'cloak-protection', name: 'Cloak of Protection', category: 'Armor', description: '+1 to AC and saving throws', rarity: 'uncommon', value: 250 },
-  { id: 'bag-holding', name: 'Bag of Holding', category: 'Wondrous', description: 'Holds up to 500 lbs', rarity: 'uncommon', value: 400 },
+  { id: 'bag-holding', name: 'Bag of Holding', category: 'Wondrous', description: 'Holds up to 50 lbs', rarity: 'uncommon', value: 400 },
   { id: 'boots-speed', name: 'Boots of Speed', category: 'Wondrous', description: 'Double movement speed for 1 minute', rarity: 'uncommon', value: 350 },
   // Crafting Materials
   { id: 'iron-ore-unc', name: 'Quality Iron Ore', category: 'Crafting Material', description: 'Higher quality iron ore for blacksmithing', rarity: 'uncommon', value: 10, quantity: 5 },
