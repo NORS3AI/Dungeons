@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import type { Class, Equipment, Weapon, Race } from '../types'
 import { isArmor, isShield } from '../types/equipment'
 import {
@@ -6,7 +6,6 @@ import {
   ALL_ARMOR,
   SHIELDS,
   ADVENTURING_GEAR,
-  EQUIPMENT_PACKS,
 } from '../data/equipment'
 import { calculateTotalWeight } from '../utils/calculations'
 import { formatWeight } from '../utils/formatting'
@@ -18,12 +17,48 @@ interface EquipmentSelectorProps {
   onBack: () => void
 }
 
-type EquipmentTab = 'packs' | 'weapons' | 'armor' | 'gear'
+type EquipmentTab = 'weapons' | 'armor'
+
+/**
+ * Standard starting equipment auto-added to all characters
+ */
+const STANDARD_STARTING_GEAR = [
+  { id: 'backpack', quantity: 1 },
+  { id: 'bedroll', quantity: 1 },
+  { id: 'rations', quantity: 10 },
+  { id: 'waterskin', quantity: 1 },
+  { id: 'rope-hemp', quantity: 1 },
+  { id: 'tinderbox', quantity: 1 },
+  { id: 'torch', quantity: 10 },
+  { id: 'component-pouch', quantity: 1 }, // For spellcasting
+]
 
 export function EquipmentSelector({ characterClass, race, onSubmit, onBack }: EquipmentSelectorProps) {
-  const [activeTab, setActiveTab] = useState<EquipmentTab>('packs')
+  const [activeTab, setActiveTab] = useState<EquipmentTab>('weapons')
   const [selectedEquipment, setSelectedEquipment] = useState<Equipment[]>([])
-  const [selectedPackId, setSelectedPackId] = useState<string | null>(null)
+
+  // Auto-add standard starting gear on mount
+  useEffect(() => {
+    const startingGear: Equipment[] = []
+
+    // Add standard starting gear
+    STANDARD_STARTING_GEAR.forEach(({ id, quantity }) => {
+      const item = ADVENTURING_GEAR.find((g) => g.id === id)
+      if (item) {
+        startingGear.push({ ...item, quantity })
+      }
+    })
+
+    // Auto-add thieves' tools for Rogues
+    if (characterClass?.name === 'Rogue') {
+      const thievesTools = ADVENTURING_GEAR.find((g) => g.id === 'thieves-tools')
+      if (thievesTools) {
+        startingGear.push({ ...thievesTools, quantity: 1 })
+      }
+    }
+
+    setSelectedEquipment(startingGear)
+  }, [characterClass])
 
   // Filter weapons based on class AND racial proficiencies
   const availableWeapons = useMemo(() => {
@@ -128,36 +163,6 @@ export function EquipmentSelector({ characterClass, race, onSubmit, onBack }: Eq
     return true
   }
 
-  const selectPack = (packId: string) => {
-    setSelectedPackId(packId)
-    // Add pack items to equipment
-    const pack = EQUIPMENT_PACKS.find((p) => p.id === packId)
-    if (pack) {
-      const packItems = pack.items
-        .map((itemId) => ADVENTURING_GEAR.find((g) => g.id === itemId))
-        .filter((item): item is typeof ADVENTURING_GEAR[number] => item !== undefined)
-
-      // Count duplicates and set quantities
-      const itemCounts: Record<string, number> = {}
-      packItems.forEach((item) => {
-        itemCounts[item.id] = (itemCounts[item.id] || 0) + 1
-      })
-
-      const uniqueItems: Equipment[] = Object.entries(itemCounts).map(([id, count]) => {
-        const foundItem = ADVENTURING_GEAR.find((g) => g.id === id)
-        if (!foundItem) throw new Error(`Item ${id} not found`)
-        return { ...foundItem, quantity: count }
-      })
-
-      setSelectedEquipment((prev) => {
-        // Remove old pack items and add new ones
-        const nonPackItems = prev.filter(
-          (equipItem) => !ADVENTURING_GEAR.some((g) => g.id === equipItem.id)
-        )
-        return [...nonPackItems, ...uniqueItems]
-      })
-    }
-  }
 
   const handleSubmit = () => {
     onSubmit(selectedEquipment)
@@ -181,10 +186,8 @@ export function EquipmentSelector({ characterClass, race, onSubmit, onBack }: Eq
   }
 
   const tabs: { id: EquipmentTab; label: string }[] = [
-    { id: 'packs', label: 'Starting Packs' },
     { id: 'weapons', label: 'Weapons' },
     { id: 'armor', label: 'Armor' },
-    { id: 'gear', label: 'Gear' },
   ]
 
   return (
@@ -215,28 +218,6 @@ export function EquipmentSelector({ characterClass, race, onSubmit, onBack }: Eq
 
       {/* Tab Content */}
       <div className="min-h-[400px]">
-        {activeTab === 'packs' && (
-          <div className="grid md:grid-cols-2 gap-4">
-            {EQUIPMENT_PACKS.map((pack) => (
-              <button
-                key={pack.id}
-                onClick={() => selectPack(pack.id)}
-                className={`p-4 rounded-xl border text-left transition-all ${
-                  selectedPackId === pack.id
-                    ? 'border-dnd-gold bg-dnd-gold/10'
-                    : 'border-gray-700 bg-gray-800 hover:border-gray-600'
-                }`}
-              >
-                <h3 className="font-bold text-white mb-2">{pack.name}</h3>
-                <p className="text-gray-400 text-sm mb-3">{pack.description}</p>
-                <p className="text-xs text-gray-500">
-                  Includes: Backpack, bedroll, rations, rope, torches, and more
-                </p>
-              </button>
-            ))}
-          </div>
-        )}
-
         {activeTab === 'weapons' && (
           <div>
             <div className="mb-4 flex justify-between items-center">
@@ -355,30 +336,6 @@ export function EquipmentSelector({ characterClass, race, onSubmit, onBack }: Eq
               })
             )}
             </div>
-          </div>
-        )}
-
-        {activeTab === 'gear' && (
-          <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2">
-            {ADVENTURING_GEAR.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => toggleEquipment(item)}
-                className={`w-full p-4 rounded-xl border text-left transition-all ${
-                  isSelected(item.id)
-                    ? 'border-dnd-gold bg-dnd-gold/10'
-                    : 'border-gray-700 bg-gray-800 hover:border-gray-600'
-                }`}
-              >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-bold text-white">{item.name}</h3>
-                    <p className="text-sm text-gray-400">{item.description}</p>
-                  </div>
-                  <p className="text-xs text-gray-500">{item.weight} lb</p>
-                </div>
-              </button>
-            ))}
           </div>
         )}
       </div>

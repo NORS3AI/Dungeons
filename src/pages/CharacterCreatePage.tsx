@@ -51,6 +51,7 @@ export function CharacterCreatePage() {
     setCreationStep,
     saveCharacter,
     initializeHP,
+    setLevel,
   } = useCharacterStore()
 
   // HP rolling state - track 3 rolls and select highest
@@ -208,6 +209,7 @@ export function CharacterCreatePage() {
           <StatAllocator
             initialScores={currentCharacter?.abilityScores}
             race={currentCharacter?.race}
+            charClass={currentCharacter?.class}
             background={currentCharacter?.background}
             onSubmit={handleStatsSubmit}
             onBack={handleBack}
@@ -260,9 +262,20 @@ export function CharacterCreatePage() {
                         {currentCharacter.playerName || 'Not specified'}
                       </span>
                     </div>
-                    <div>
-                      <span className="text-gray-500">Level:</span>{' '}
-                      <span className="text-gray-300">{currentCharacter.level}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-500">Starting Level:</span>{' '}
+                      <select
+                        value={currentCharacter.level}
+                        onChange={(e) => setLevel(Number(e.target.value))}
+                        className="px-3 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm
+                                 focus:outline-none focus:ring-2 focus:ring-dnd-gold"
+                      >
+                        {Array.from({ length: 20 }, (_, i) => i + 1).map((level) => (
+                          <option key={level} value={level}>
+                            Level {level}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div>
                       <span className="text-gray-500">Race:</span>{' '}
@@ -405,15 +418,9 @@ export function CharacterCreatePage() {
                                 onClick={() => {
                                   initializeHP(hpRoll.highest)
                                 }}
-                                className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg font-medium transition-colors"
+                                className="px-6 py-3 bg-green-600 hover:bg-green-500 text-white rounded-lg font-bold text-lg transition-colors"
                               >
-                                Accept
-                              </button>
-                              <button
-                                onClick={() => setHpRoll(null)}
-                                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors"
-                              >
-                                Roll Again
+                                Accept & Continue
                               </button>
                             </div>
                           </div>

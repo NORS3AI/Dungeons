@@ -14,6 +14,7 @@ interface LanguageSelectorProps {
   className?: string
   backgroundName?: string
   onChange: (languages: string[]) => void
+  maxLanguages?: number // Maximum number of languages allowed (default: 5)
 }
 
 export function LanguageSelector({
@@ -22,6 +23,7 @@ export function LanguageSelector({
   className,
   backgroundName,
   onChange,
+  maxLanguages = 5,
 }: LanguageSelectorProps) {
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>(currentLanguages)
 
@@ -45,11 +47,17 @@ export function LanguageSelector({
     if (selectedLanguages.includes(languageId)) {
       setSelectedLanguages(selectedLanguages.filter((id) => id !== languageId))
     } else {
+      // Check if we've reached the maximum language limit
+      if (selectedLanguages.length >= maxLanguages) {
+        return // Cannot add more languages
+      }
       setSelectedLanguages([...selectedLanguages, languageId])
     }
   }
 
   const renderLanguageGroup = (title: string, languages: Language[]) => {
+    const isAtLimit = selectedLanguages.length >= maxLanguages
+
     return (
       <div className="mb-6">
         <h3 className="text-lg font-semibold text-dnd-gold mb-3">{title}</h3>
@@ -58,20 +66,21 @@ export function LanguageSelector({
             const isSelected = selectedLanguages.includes(lang.id)
             const isSuggested = suggestions.includes(lang.id)
             const isCommon = lang.id === 'common'
+            const isDisabled = isCommon || (isAtLimit && !isSelected)
 
             return (
               <button
                 key={lang.id}
                 type="button"
                 onClick={() => toggleLanguage(lang.id)}
-                disabled={isCommon}
+                disabled={isDisabled}
                 className={`p-3 rounded-lg border text-left transition-all ${
                   isSelected
                     ? 'border-dnd-gold bg-dnd-gold/10'
                     : isSuggested
                       ? 'border-blue-500/50 bg-blue-900/20 hover:bg-blue-900/30'
                       : 'border-gray-700 bg-gray-800 hover:border-gray-600'
-                } ${isCommon ? 'opacity-100 cursor-default' : 'cursor-pointer'}`}
+                } ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1">
@@ -133,7 +142,12 @@ export function LanguageSelector({
       <div className="mb-4 p-3 bg-gray-800 rounded-lg border border-gray-700">
         <div className="text-sm">
           <span className="text-gray-400">Selected Languages:</span>{' '}
-          <span className="text-dnd-gold font-medium">{selectedLanguages.length}</span>
+          <span className={`font-medium ${selectedLanguages.length >= maxLanguages ? 'text-red-400' : 'text-dnd-gold'}`}>
+            {selectedLanguages.length} / {maxLanguages}
+          </span>
+          {selectedLanguages.length >= maxLanguages && (
+            <span className="ml-2 text-xs text-red-400">(Maximum reached)</span>
+          )}
         </div>
         {selectedLanguages.length > 1 && (
           <div className="mt-2 flex flex-wrap gap-1">
@@ -155,7 +169,23 @@ export function LanguageSelector({
 
       {renderLanguageGroup('Standard Languages', STANDARD_LANGUAGES)}
       {renderLanguageGroup('Exotic Languages', EXOTIC_LANGUAGES)}
-      {renderLanguageGroup('Secret Languages', SECRET_LANGUAGES)}
+      {/* Filter secret languages based on class */}
+      {(() => {
+        const filteredSecretLanguages = SECRET_LANGUAGES.filter((lang) => {
+          // Only show Druidic for Druids
+          if (lang.id === 'druidic') {
+            return className?.toLowerCase().includes('druid')
+          }
+          // Only show Thieves' Cant for Rogues
+          if (lang.id === 'thieves-cant') {
+            return className?.toLowerCase().includes('rogue')
+          }
+          return true
+        })
+        return filteredSecretLanguages.length > 0
+          ? renderLanguageGroup('Secret Languages', filteredSecretLanguages)
+          : null
+      })()}
     </div>
   )
 }
