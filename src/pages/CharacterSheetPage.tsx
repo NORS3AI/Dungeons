@@ -1170,7 +1170,9 @@ export function CharacterSheetPage() {
 
             {/* Proficiency Bonus */}
             <div className="card bg-gray-800 border-gray-700 p-4 text-center">
-              <div className="text-xs text-gray-500 uppercase mb-1">Proficiency Bonus</div>
+              <QuickRefTooltip type="rule" id="proficiency-bonus">
+                <div className="text-xs text-gray-500 uppercase mb-1 cursor-pointer hover:text-gray-300">Proficiency Bonus</div>
+              </QuickRefTooltip>
               <div className="text-3xl font-bold text-dnd-gold">+{profBonus}</div>
             </div>
           </div>
@@ -1182,7 +1184,9 @@ export function CharacterSheetPage() {
               <h3 className="text-lg font-bold text-white mb-4">Combat</h3>
               <div className="grid grid-cols-3 gap-4 mb-4">
                 <div className="bg-gray-900 rounded-lg p-3 text-center border border-gray-700">
-                  <div className="text-xs text-gray-500 uppercase mb-1">AC</div>
+                  <QuickRefTooltip type="rule" id="armor-class">
+                    <div className="text-xs text-gray-500 uppercase mb-1 cursor-pointer hover:text-gray-300">AC</div>
+                  </QuickRefTooltip>
                   <div className="text-2xl font-bold text-white">
                     {calculateAC()}
                     {character.conditions.includes('enraged') && (
@@ -1205,7 +1209,9 @@ export function CharacterSheetPage() {
                   )}
                 </div>
                 <div className="bg-gray-900 rounded-lg p-3 text-center border border-gray-700">
-                  <div className="text-xs text-gray-500 uppercase mb-1">Speed</div>
+                  <QuickRefTooltip type="rule" id="speed">
+                    <div className="text-xs text-gray-500 uppercase mb-1 cursor-pointer hover:text-gray-300">Speed</div>
+                  </QuickRefTooltip>
                   <div className="text-2xl font-bold text-white">
                     {character.race?.speed || 30} ft
                   </div>
@@ -1213,13 +1219,17 @@ export function CharacterSheetPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-gray-900 rounded-lg p-3 text-center border border-gray-700">
-                  <div className="text-xs text-gray-500 uppercase mb-1">Initiative</div>
+                  <QuickRefTooltip type="rule" id="initiative">
+                    <div className="text-xs text-gray-500 uppercase mb-1 cursor-pointer hover:text-gray-300">Initiative</div>
+                  </QuickRefTooltip>
                   <div className="text-xl font-bold text-white">
                     {formatMod(getAbilityMod('dexterity'))}
                   </div>
                 </div>
                 <div className="bg-gray-900 rounded-lg p-3 text-center border border-gray-700">
-                  <div className="text-xs text-gray-500 uppercase mb-1">Hit Die</div>
+                  <QuickRefTooltip type="rule" id="hit-die">
+                    <div className="text-xs text-gray-500 uppercase mb-1 cursor-pointer hover:text-gray-300">Hit Die</div>
+                  </QuickRefTooltip>
                   <div className="text-xl font-bold text-white">
                     {character.level}{character.class?.hitDie || 'd8'}
                   </div>
@@ -1273,7 +1283,9 @@ export function CharacterSheetPage() {
               <div className="space-y-3 text-sm">
                 {/* Alignment */}
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-500">Alignment</span>
+                  <QuickRefTooltip type="rule" id="alignment">
+                    <span className="text-gray-500 cursor-pointer hover:text-gray-300">Alignment</span>
+                  </QuickRefTooltip>
                   <div className="flex items-center gap-2">
                     <span className={character.alignment ? "text-gray-300" : "text-red-400 italic"}>
                       {character.alignment
@@ -1316,7 +1328,12 @@ export function CharacterSheetPage() {
                 )}
                 {character.race?.vision && (
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Vision</span>
+                    <QuickRefTooltip
+                      type="rule"
+                      id={character.race.vision === 'superiorDarkvision' ? 'superior-darkvision' : 'darkvision'}
+                    >
+                      <span className="text-gray-500 cursor-pointer hover:text-gray-300">Vision</span>
+                    </QuickRefTooltip>
                     <span className="text-gray-300">
                       {character.race.vision === 'superiorDarkvision'
                         ? `Superior Darkvision (${character.race.visionRange} ft)`
@@ -1328,7 +1345,9 @@ export function CharacterSheetPage() {
                 )}
                 {character.race?.languages && (
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Languages</span>
+                    <QuickRefTooltip type="rule" id="languages">
+                      <span className="text-gray-500 cursor-pointer hover:text-gray-300">Languages</span>
+                    </QuickRefTooltip>
                     <span className="text-gray-300">{character.race.languages.join(', ')}</span>
                   </div>
                 )}

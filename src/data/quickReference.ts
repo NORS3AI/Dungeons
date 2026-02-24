@@ -6333,6 +6333,154 @@ export const RULES: Record<string, RuleRef> = {
     },
     relatedRules: ['ability-checks', 'attack-rolls', 'spell-save-dc'],
   },
+  'armor-class': {
+    id: 'armor-class',
+    name: 'Armor Class (AC)',
+    category: 'combat',
+    summary: 'How hard you are to hit. Higher AC means enemies need to roll higher to damage you.',
+    description: 'Armor Class (AC) represents how difficult you are to hit in combat. When an enemy attacks you, they roll 1d20 and add modifiers. If their total equals or exceeds your AC, they hit. AC is calculated from: armor worn + DEX modifier (limited by armor type) + shield + other bonuses. Unarmored AC = 10 + DEX modifier. Light armor = armor AC + full DEX. Medium armor = armor AC + DEX (max +2). Heavy armor = armor AC only (no DEX).',
+    examples: [
+      'Leather armor (AC 11) + DEX +3 = AC 14',
+      'Chain mail (AC 16) + shield (+2) = AC 18',
+      'Unarmored Monk: 10 + DEX +3 + WIS +2 = AC 15',
+      'Enemy rolls 17 vs your AC 16 = they hit you',
+      'Enemy rolls 15 vs your AC 16 = they miss'
+    ],
+    relatedRules: ['attack-rolls', 'damage-resistance'],
+  },
+  'initiative': {
+    id: 'initiative',
+    name: 'Initiative',
+    category: 'combat',
+    summary: 'Determines turn order in combat. Roll 1d20 + your DEX modifier at the start of battle.',
+    description: 'Initiative determines the order in which creatures act during combat. When combat begins, everyone rolls 1d20 and adds their Dexterity modifier (and any other initiative bonuses). Higher rolls go first. Ties are broken by comparing DEX scores (or DM decides). You keep the same initiative throughout the entire combat encounter.',
+    examples: [
+      'Fighter (DEX +1) rolls 14 → Initiative 15',
+      'Wizard (DEX +3) rolls 12 → Initiative 15 (tied)',
+      'Rogue (DEX +4) rolls 18 → Initiative 22 (goes first!)',
+      'Turn order: Rogue → Fighter/Wizard (DM decides) → Goblin',
+      'Alert feat: +5 bonus to initiative!'
+    ],
+    relatedRules: ['combat', 'surprised'],
+  },
+  'hit-die': {
+    id: 'hit-die',
+    name: 'Hit Dice',
+    category: 'general',
+    summary: 'Dice used to determine HP and regain HP during short rests. Class determines die size.',
+    description: 'Hit Dice represent your character\'s vitality and resilience. Each class has a specific Hit Die (d6, d8, d10, or d12). At 1st level, you get maximum HP = max hit die + CON modifier. At each new level, roll your Hit Die and add CON modifier for HP gained (or take the average). You have a number of Hit Dice equal to your level. During a short rest, you can spend Hit Dice to regain HP by rolling and adding your CON modifier. You regain half your spent Hit Dice (minimum 1) after a long rest.',
+    examples: [
+      'Wizard (d6): Frail but magical',
+      'Fighter (d10): Tough and durable',
+      'Barbarian (d12): Incredibly hardy',
+      'Level 5 Fighter: Has 5d10 Hit Dice',
+      'Short rest: Spend 2 Hit Dice, roll 2d10+CON each for healing'
+    ],
+    table: {
+      headers: ['Class', 'Hit Die'],
+      rows: [
+        ['Wizard, Sorcerer', 'd6'],
+        ['Bard, Cleric, Druid, Monk, Rogue, Warlock', 'd8'],
+        ['Fighter, Paladin, Ranger', 'd10'],
+        ['Barbarian', 'd12']
+      ]
+    },
+    relatedRules: ['short-rest', 'long-rest', 'leveling-up'],
+  },
+  'speed': {
+    id: 'speed',
+    name: 'Speed',
+    category: 'general',
+    summary: 'How far you can move on your turn, measured in feet. Most races have 30 ft speed.',
+    description: 'Speed determines how far you can move on your turn in combat or exploration. The number shown is the distance in feet you can travel with your movement. Most races have a base walking speed of 30 feet. Some have special speeds like flying, swimming, or climbing. You can split your movement before and after your action (move 15 ft → attack → move 15 ft). Difficult terrain costs 2 feet for every 1 foot moved. Dash action: Double your movement for that turn.',
+    examples: [
+      'Human: 30 ft walking speed (standard)',
+      'Wood Elf: 35 ft walking speed (faster!)',
+      'Dwarf: 25 ft, but not slowed by heavy armor',
+      'Aarakocra: 25 ft walk, 50 ft fly',
+      'Move 20 ft → Attack → Move 10 ft (total 30 ft)',
+      'Dash action: Move 60 ft total (30 × 2)'
+    ],
+    relatedRules: ['dash', 'difficult-terrain', 'combat'],
+  },
+  'darkvision': {
+    id: 'darkvision',
+    name: 'Darkvision',
+    category: 'general',
+    summary: 'See in darkness up to a certain distance. Darkness appears as dim light (black and white).',
+    description: 'Many creatures have darkvision, allowing them to see in dim light within a specific range (usually 60 feet) as if it were bright light, and in darkness as if it were dim light. In darkness, you can\'t discern color, only shades of gray. Darkvision doesn\'t let you see through magical darkness or invisible creatures. Common races with darkvision: Dwarves (60 ft), Elves (60 ft), Half-Orcs (60 ft), Tieflings (60 ft), Drow (120 ft).',
+    examples: [
+      'Elf in dark cave: Can see 60 ft as if dimly lit',
+      'Beyond 60 ft: Pitch black, can\'t see',
+      'Drow in darkness: Can see 120 ft (superior darkvision)',
+      'Colors: Everything appears in shades of gray',
+      'Magical darkness: Darkvision doesn\'t work'
+    ],
+    relatedRules: ['superior-darkvision', 'light'],
+  },
+  'alignment': {
+    id: 'alignment',
+    name: 'Alignment',
+    category: 'general',
+    summary: 'Your character\'s moral and ethical stance. Describes how they approach good vs evil, law vs chaos.',
+    description: 'Alignment represents your character\'s moral compass and worldview. It\'s a combination of two axes: Good vs Evil (morality) and Lawful vs Chaotic (order). The nine alignments are: Lawful Good (crusader), Neutral Good (benefactor), Chaotic Good (rebel), Lawful Neutral (judge), True Neutral (undecided), Chaotic Neutral (free spirit), Lawful Evil (dominator), Neutral Evil (malefactor), Chaotic Evil (destroyer). Alignment can change based on your actions and experiences.',
+    examples: [
+      'Lawful Good: Superman, Paladins defending the innocent',
+      'Chaotic Good: Robin Hood, breaking laws for the greater good',
+      'Lawful Evil: Tyrants who use law to oppress',
+      'Chaotic Evil: Demons, pure destruction and malice',
+      'True Neutral: Druids maintaining balance',
+      'Alignment shift: A good character who commits evil acts may become neutral or evil'
+    ],
+    table: {
+      headers: ['Alignment', 'Description', 'Example'],
+      rows: [
+        ['Lawful Good', 'Honor, compassion, order', 'Noble paladin'],
+        ['Neutral Good', 'Kindness without bias', 'Benevolent cleric'],
+        ['Chaotic Good', 'Freedom and kindness', 'Robin Hood'],
+        ['Lawful Neutral', 'Order above all', 'Judge, soldier'],
+        ['True Neutral', 'Balance, pragmatism', 'Druid, merchant'],
+        ['Chaotic Neutral', 'Personal freedom', 'Wandering rogue'],
+        ['Lawful Evil', 'Tyranny, control', 'Cruel dictator'],
+        ['Neutral Evil', 'Selfishness, malice', 'Mercenary killer'],
+        ['Chaotic Evil', 'Destruction, chaos', 'Demon lord']
+      ]
+    },
+    relatedRules: ['role-playing', 'character-creation'],
+  },
+  'languages': {
+    id: 'languages',
+    name: 'Languages',
+    category: 'general',
+    summary: 'Languages your character can speak, read, and write. Determined by race, class, and background.',
+    description: 'All characters know Common, the trade language of most civilized lands. Your race grants additional languages (Elves know Elvish, Dwarves know Dwarvish, etc.). Your background may grant more languages. High Intelligence characters can choose bonus languages during creation. Exotic languages (Draconic, Infernal, Celestial) require special training. Some creatures understand languages but can\'t speak (like beasts). Speaking the same language allows full communication; without it, you can only use gestures and simple pantomime.',
+    examples: [
+      'Human Fighter: Common, Dwarvish (from background)',
+      'Elf Wizard (INT 16): Common, Elvish, Draconic, Sylvan',
+      'Tiefling Warlock: Common, Infernal (racial)',
+      'Can\'t understand Goblin: Need an interpreter or magic',
+      'Comprehend Languages spell: Understand any spoken language'
+    ],
+    table: {
+      headers: ['Language', 'Typical Speakers'],
+      rows: [
+        ['Common', 'Humans, most civilized races'],
+        ['Dwarvish', 'Dwarves'],
+        ['Elvish', 'Elves'],
+        ['Giant', 'Ogres, giants'],
+        ['Gnomish', 'Gnomes'],
+        ['Goblin', 'Goblinoids'],
+        ['Halfling', 'Halflings'],
+        ['Orc', 'Orcs'],
+        ['Draconic', 'Dragons, dragonborn, kobolds'],
+        ['Infernal', 'Devils, tieflings'],
+        ['Celestial', 'Angels, aasimar'],
+        ['Abyssal', 'Demons'],
+        ['Sylvan', 'Fey creatures']
+      ]
+    },
+    relatedRules: ['character-creation', 'role-playing'],
+  },
   'death-saves': {
     id: 'death-saves',
     name: 'Death Saving Throws',
