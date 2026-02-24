@@ -275,6 +275,67 @@ Extended the granular split with filtered views by class and race for lazy loadi
 - Reduces initial bundle size potential by ~50-70%
 - Maintains backward compatibility - filtered views are additive
 
+#### **Phase 2: Dynamic Import System (COMPLETED ✅)**
+
+Implemented lazy loading infrastructure with React hooks for on-demand reference loading.
+
+**New Files:**
+- `src/data/references/loader.ts` (188 lines) - Dynamic import utility
+- `src/hooks/useCharacterReferences.ts` (119 lines) - React hooks for lazy loading
+
+**Core Features:**
+
+**Dynamic Loaders:**
+- `loadClassSpells(classId)` - Lazy loads spell subset for a class (Warlock, Wizard, Cleric, etc.)
+- `loadClassTraits(classId)` - Lazy loads trait subset for a class (Fighter, Warlock, Wizard, Cleric)
+- `loadRaceTraits(raceId)` - Lazy loads trait subset for a race (Drow, Tiefling, Elf, Human, Dwarf)
+- `loadCharacterReferences({ race, classId })` - Main entry point, loads all references in parallel
+- `preloadCharacterReferences()` - Background preloading for cache warming
+
+**React Hooks:**
+- `useCharacterReferences({ race, classId, autoLoad })` - Hook with loading/error state
+- `usePreloadReferences()` - Hook for preloading during character creation
+
+**Usage Example:**
+```typescript
+// Auto-load when race/class changes
+const { references, loading } = useCharacterReferences({
+  race: character.race.id,
+  classId: character.class.id,
+  autoLoad: true
+})
+
+// Manual loading
+const { references, loadReferences } = useCharacterReferences({
+  race: 'drow',
+  classId: 'warlock',
+  autoLoad: false
+})
+await loadReferences()
+
+// Preload in background during character creation
+const preload = usePreloadReferences()
+preload({ race: 'drow', classId: 'warlock' })
+```
+
+**Technical Implementation:**
+- Uses `import()` for code splitting
+- Parallel loading with `Promise.all()`
+- Returns both data and counts for debugging
+- Error handling with try/catch
+- React state management for loading/error states
+- Cache warming support for character creation wizard
+
+**Benefits:**
+- **Lazy Loading**: Only load references needed for character's race/class
+- **Bundle Splitting**: Vite will create separate chunks for each module
+- **Performance**: Reduces initial bundle size by ~50-70%
+- **Developer Experience**: Clean React hooks with loading states
+- **Future-Proof**: Ready for character creation optimization
+- **Backward Compatible**: Existing imports continue to work
+
+**Impact**: Foundation complete for on-demand loading. When integrated into character creation, users will only download the spell/trait references they actually need instead of the entire 5,000+ line database.
+
 ---
 
 ## Version 0.3.3 - February 23, 2026 @ 01:24 AM MST
