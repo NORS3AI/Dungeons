@@ -96,7 +96,7 @@ export function CharacterSheetPage() {
   const [showClassSpellSelector, setShowClassSpellSelector] = useState(false)
   const [showAlignmentSelector, setShowAlignmentSelector] = useState(false)
   const [weaponRolls, setWeaponRolls] = useState<Record<string, { hit?: number; damage?: number }>>({})
-  const [spellRolls, setSpellRolls] = useState<Record<string, { hit?: number; damage?: number }>>({})
+  const [spellRolls, setSpellRolls] = useState<Record<string, { hit?: number; damage?: number; healing?: number }>>({})
   const [showDMAbilityEditor, setShowDMAbilityEditor] = useState(false)
   const [lastHealingRoll, setLastHealingRoll] = useState<{ itemId: string; amount: number } | null>(null)
   const [showMigrationSuccess, setShowMigrationSuccess] = useState(false)
@@ -691,6 +691,26 @@ export function CharacterSheetPage() {
         const newRolls = { ...prev }
         if (newRolls[spellId]) {
           delete newRolls[spellId].damage
+        }
+        return newRolls
+      })
+    }, 5000)
+  }
+
+  const handleRollSpellHealing = (spellId: string, healingDice: string) => {
+    const roll = rollDice(healingDice)
+    if (!roll) return
+    setSpellRolls(prev => ({
+      ...prev,
+      [spellId]: { ...prev[spellId], healing: roll.grandTotal }
+    }))
+
+    // Clear after 5 seconds
+    setTimeout(() => {
+      setSpellRolls(prev => {
+        const newRolls = { ...prev }
+        if (newRolls[spellId]) {
+          delete newRolls[spellId].healing
         }
         return newRolls
       })
@@ -2322,16 +2342,25 @@ export function CharacterSheetPage() {
                                     H
                                   </button>
                                 )}
-                                {(spell.damage || spell.healing) && (
+                                {spell.damage && (
                                   <button
-                                    onClick={() => handleRollSpellDamage(spell.id, spell.damage?.dice || spell.healing?.dice || '1d6')}
+                                    onClick={() => handleRollSpellDamage(spell.id, spell.damage?.dice || '1d8')}
                                     className="w-7 h-7 bg-red-700 hover:bg-red-600 text-white rounded text-xs flex items-center justify-center transition-colors"
-                                    title={`Roll ${spell.damage ? 'damage' : 'healing'} (${spell.damage?.dice || spell.healing?.dice})`}
+                                    title={`Roll damage (${spell.damage?.dice || '1d8'})`}
                                   >
                                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                       <path d="M10 2L2 6v4c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V6l-8-4zm0 2.18l6 3v3.82c0 4.52-3.12 8.75-7 9.86V4.18z"/>
                                       <circle cx="10" cy="10" r="2"/>
                                     </svg>
+                                  </button>
+                                )}
+                                {spell.healing && (
+                                  <button
+                                    onClick={() => handleRollSpellHealing(spell.id, spell.healing?.dice || '1d8')}
+                                    className="w-7 h-7 bg-green-600 hover:bg-green-500 text-white rounded text-xs flex items-center justify-center transition-colors"
+                                    title={`Roll healing (${spell.healing?.dice || '1d8'})`}
+                                  >
+                                    ❤️
                                   </button>
                                 )}
                               </div>
@@ -2382,10 +2411,10 @@ export function CharacterSheetPage() {
                               {spell.healing && (
                                 <div className="flex items-center gap-2">
                                   <span className="text-green-400 font-bold">Healing:</span>
-                                  <span className="text-white">{spell.healing.dice}</span>
-                                  {spellRolls[spell.id]?.damage !== undefined && (
+                                  <span className="text-white">{spell.healing.dice} HP</span>
+                                  {spellRolls[spell.id]?.healing !== undefined && (
                                     <span className="ml-2 px-2 py-0.5 bg-green-600 text-white rounded font-bold animate-pulse">
-                                      {spellRolls[spell.id].damage} HP
+                                      ❤️ {spellRolls[spell.id].healing} HP
                                     </span>
                                   )}
                                 </div>
