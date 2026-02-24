@@ -1379,6 +1379,7 @@ export function CharacterSheetPage() {
                     onClick={() => {
                       if (!character.dailyIncome) return
 
+                      // Earn daily income
                       const earned: Partial<Currency> = {}
                       if (character.dailyIncome.currency === 'gold') earned.gold = character.dailyIncome.amount
                       else if (character.dailyIncome.currency === 'silver') earned.silver = character.dailyIncome.amount
@@ -1389,10 +1390,16 @@ export function CharacterSheetPage() {
                         newCurrency[key as keyof Currency] += value
                       }
                       updateCurrency(newCurrency)
+
+                      // Consume 1 food ration per day
+                      if (character.foodRations > 0) {
+                        addFoodRations(-1)
+                      }
+
                       saveCharacter()
                     }}
                     className="px-3 py-1 text-sm bg-blue-700 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                    title={character.dailyIncome ? `Collect ${character.dailyIncome.amount} ${character.dailyIncome.currency === 'gold' ? 'GP' : character.dailyIncome.currency === 'silver' ? 'SP' : 'CP'} from ${character.dailyIncome.professionName}` : 'New Day'}
+                    title={character.dailyIncome ? `Collect ${character.dailyIncome.amount} ${character.dailyIncome.currency === 'gold' ? 'GP' : character.dailyIncome.currency === 'silver' ? 'SP' : 'CP'} from ${character.dailyIncome.professionName} (Consumes 1 food)` : 'New Day'}
                   >
                     New Day
                   </button>
@@ -1456,6 +1463,102 @@ export function CharacterSheetPage() {
                   {character.materials?.reduce((total, mat) => total + (mat.weight * mat.quantity), 0).toFixed(1) || '0'} lbs from materials
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Food & Water Supplies */}
+          <div className="card bg-gradient-to-br from-green-900/30 to-teal-900/30 border-2 border-green-600 p-4 sm:p-6">
+            <h3 className="text-xl sm:text-2xl font-bold text-green-400 mb-3 sm:mb-4">🍖 Food & Water Supplies</h3>
+            <p className="text-sm sm:text-base text-gray-300 mb-4">
+              Track your food rations and water supply. Each day consumes 1 unit of food.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Food Rations */}
+              <div className="p-4 bg-green-900/40 border-2 border-green-600 rounded-lg">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">🥖</span>
+                    <div>
+                      <h4 className="font-bold text-green-300">Food Rations</h4>
+                      <p className="text-xs text-gray-400">Days of food remaining</p>
+                    </div>
+                  </div>
+                  <div className="text-3xl font-bold text-green-200">
+                    {character.foodRations}
+                  </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      if (character.foodRations > 0) {
+                        addFoodRations(-1)
+                        saveCharacter()
+                      }
+                    }}
+                    className="flex-1 px-3 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg font-medium transition-colors text-sm"
+                    disabled={character.foodRations <= 0}
+                  >
+                    − Remove 1
+                  </button>
+                  <button
+                    onClick={() => {
+                      addFoodRations(1)
+                      saveCharacter()
+                    }}
+                    className="flex-1 px-3 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg font-medium transition-colors text-sm"
+                  >
+                    + Add 1
+                  </button>
+                </div>
+              </div>
+
+              {/* Water Supply */}
+              <div className="p-4 bg-teal-900/40 border-2 border-teal-600 rounded-lg">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">💧</span>
+                    <div>
+                      <h4 className="font-bold text-teal-300">Water Supply</h4>
+                      <p className="text-xs text-gray-400">Days of water remaining</p>
+                    </div>
+                  </div>
+                  <div className="text-3xl font-bold text-teal-200">
+                    {character.waterSupply}
+                  </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      if (character.waterSupply > 0) {
+                        addWaterSupply(-1)
+                        saveCharacter()
+                      }
+                    }}
+                    className="flex-1 px-3 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg font-medium transition-colors text-sm"
+                    disabled={character.waterSupply <= 0}
+                  >
+                    − Remove 1
+                  </button>
+                  <button
+                    onClick={() => {
+                      addWaterSupply(1)
+                      saveCharacter()
+                    }}
+                    className="flex-1 px-3 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-lg font-medium transition-colors text-sm"
+                  >
+                    + Add 1
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 p-3 bg-green-900/20 border border-green-700/30 rounded-lg">
+              <p className="text-xs sm:text-sm text-green-300">
+                <span className="font-bold">💡 Tip:</span> Food rations are automatically consumed when you click "New Day" in the Currency section above!
+              </p>
             </div>
           </div>
 
