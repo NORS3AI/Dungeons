@@ -33,16 +33,83 @@ Cleaned up inventory display to prevent duplicate item listings.
 - **Cleaner Interface**: No more duplicate listings of food/water items
 - **Filter Implementation**: ID-based filtering removes 'waterskin' and 'rations' from backpack view
 
+### 🧙 Death Knight Spell Support
+
+Death Knight spells can now be selected during character creation and level up.
+
+#### **Complete Spell Lists**
+- **2 Cantrips**: Icy Touch (cold damage + slow), Blood Tap (drain vitality)
+- **2 Level 1 Spells**: Death Grip (pull enemies), Blood Strike (melee + heal)
+- **2 Level 3 Spells**: Frost Fever (cold DOT), Rune Strike (weapon buff)
+- **2 Level 5 Spells**: Obliterate (massive damage), Vampiric Blood (lifesteal)
+- **2 Level 7 Spells**: Summon Frost Wyrm, Anti-Magic Shell
+- **2 Level 9 Spells**: Summon Val'kyr, Apocalypse (Four Horsemen)
+
+#### **Spell Selector Integration**
+- Death Knight spells appear in spell selector during character creation
+- Level-based progression for third caster spell access
+- Constitution-based spellcasting (Death Knight theme)
+- Fixed: Death Knight characters can now properly select their class spells
+
+### ❤️ Healing Spell Roll Buttons
+
+Healing spells now have dedicated roll buttons with heart icon in Actions tab.
+
+#### **Separate Healing Rolls**
+- **Green Heart Button (❤️)**: Roll healing for healing spells
+- **Red Dice Button**: Roll damage for damage spells (unchanged)
+- **Separate Tracking**: Healing and damage rolls tracked independently
+- **Visual Feedback**: Healing results display with heart icon and "HP" label
+- **Auto-Clear**: Roll results clear after 5 seconds
+
+#### **Healing Spell Support**
+- Works for all spells with `healing` property (Cure Wounds, Healing Word, etc.)
+- Shows healing dice amount (e.g., "2d8+2 HP")
+- Roll results appear inline with animated badge
+- Perfect for Clerics, Paladins, and other healers
+
+### 💧 Daily Water Consumption
+
+Water supply now decreases automatically on long rests, matching food consumption.
+
+#### **Survival Mechanics**
+- **Daily Consumption**: 1 water supply consumed per long rest
+- **Matches Food**: Water consumption works identically to food rations
+- **Minimum Zero**: Water supply cannot go below 0
+- **Automatic Tracking**: No manual tracking required
+
+#### **Survival System**
+- Both food and water now decrease daily on long rest
+- Encourages players to manage supplies and restock
+- Integrates with existing Food & Water Supplies tracking
+
 ### 🛠️ Technical Changes
+
+#### **Files Added**
+- `src/data/spells/death-knight.ts` - Complete Death Knight spell lists with proper Spell type structure
 
 #### **Files Modified**
 - `src/pages/CharacterSheetPage.tsx`
   - Updated currency display to use responsive grid layout (lines 1408-1479)
   - Added waterskin and rations filters to backpack section (lines 1917-1948)
+  - Added handleRollSpellHealing function for healing spell rolls
+  - Updated spellRolls state to include healing property
+  - Split spell roll buttons into separate damage and healing buttons
+  - Fixed healing display to use spellRolls.healing instead of .damage
 
 - `src/stores/characterStore.ts`
   - Set default foodRations to 10 in createEmptyCharacter()
   - Set default waterSupply to 10 in createEmptyCharacter()
+  - Added daily water consumption to longRest() function
+  - Added daily food consumption to longRest() function
+
+- `src/data/spells/index.ts`
+  - Exported death-knight spell module
+
+- `src/components/SpellSelector.tsx`
+  - Added Death Knight cantrips and spell arrays to imports
+  - Added death-knight case to availableCantrips useMemo
+  - Added death-knight spell progression logic (levels 1, 7, 13, 17, 19)
 
 ---
 
