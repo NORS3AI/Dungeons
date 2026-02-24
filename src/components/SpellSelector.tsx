@@ -22,6 +22,9 @@ import {
   PALADIN_LEVEL_1_SPELLS,
   PALADIN_LEVEL_2_SPELLS,
   PALADIN_LEVEL_3_SPELLS,
+  RANGER_LEVEL_1_SPELLS,
+  RANGER_LEVEL_2_SPELLS,
+  RANGER_LEVEL_3_SPELLS,
   SORCERER_CANTRIPS,
   SORCERER_LEVEL_1_SPELLS,
   WARLOCK_CANTRIPS,
@@ -101,6 +104,23 @@ export function SpellSelector({
       // TODO: Add higher level spell arrays when available
       // Level 13-16: PALADIN_LEVEL_4_SPELLS
       // Level 17-20: PALADIN_LEVEL_5_SPELLS
+      return spells
+    }
+
+    // Ranger spells - half-caster with level-based progression
+    if (characterClass?.id === 'ranger') {
+      if (level >= 2) {
+        spells.push(...RANGER_LEVEL_1_SPELLS)
+      }
+      if (level >= 5) {
+        spells.push(...RANGER_LEVEL_2_SPELLS)
+      }
+      if (level >= 9) {
+        spells.push(...RANGER_LEVEL_3_SPELLS)
+      }
+      // TODO: Add higher level spell arrays when available
+      // Level 13-16: RANGER_LEVEL_4_SPELLS
+      // Level 17-20: RANGER_LEVEL_5_SPELLS
       return spells
     }
 

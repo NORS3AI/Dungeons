@@ -139,6 +139,38 @@ Paladins can now select their divine spells during character creation and level 
 
 **Why This Matters**: Completes Phase 2 of missing spell implementations. Paladins are now fully playable with divine spellcasting and iconic Smite spells. Half-caster progression properly implemented (no cantrips, starts at L2). Higher level spells (4-5) will be added in Phase 5.
 
+### 🏹 Ranger Spell Support - Phase 3 Complete
+
+Rangers can now select their primal magic spells during character creation and level up.
+
+#### **Complete Spell Lists (Levels 1-3)**
+- **12 Level 1 Spells**: Hunter's Mark (signature spell), Animal Friendship, Cure Wounds, Goodberry, Speak with Animals, Alarm, Fog Cloud, Longstrider, and more
+- **10 Level 2 Spells**: Pass without Trace, Spike Growth, Animal Messenger, Barkskin, Darkvision, Lesser Restoration, Locate Object, and more
+- **8 Level 3 Spells**: Conjure Animals, Lightning Arrow, Conjure Barrage, Plant Growth, Protection from Energy, Water Breathing, and more
+- **Total**: 30 spells implemented across levels 1-3
+
+#### **Half-Caster Progression**
+- No cantrips (primal magic from nature bond, not study)
+- Spellcasting starts at level 2 (1st level spells)
+- 2nd level spells unlock at character level 5
+- 3rd level spells unlock at character level 9
+- Wisdom-based spellcasting (nature magic)
+
+#### **Spell Selector Integration**
+- Ranger spells appear in spell selector with proper level gating
+- Includes signature Hunter's Mark for tracking quarry
+- Nature-themed utility (Goodberry, Speak with Animals, Pass without Trace)
+- Mix of combat (Lightning Arrow, Conjure Barrage), healing (Cure Wounds), and exploration
+
+#### **Code Architecture**
+- Created `/src/data/spells/ranger.ts` with Ranger spell data
+- Created `/src/data/references/spells/ranger.ts` for reference filtering
+- Updated SpellSelector with half-caster progression logic (mirrors Paladin)
+- Added Ranger to dynamic loader and Vite chunk splitting
+- Vite config creates separate `spells-ranger` chunk (0.23 kB)
+
+**Why This Matters**: Completes Phase 3 of missing spell implementations. Rangers are now fully playable with primal spellcasting and wilderness utility. Half-caster progression properly implemented (no cantrips, starts at L2). All three missing classes (Bard, Paladin, Ranger) now have working spell systems. Higher level spells (4-5) will be added in Phase 5.
+
 ### ❤️ Healing Spell Roll Buttons
 
 Healing spells now have dedicated roll buttons with heart icon in Actions tab.
