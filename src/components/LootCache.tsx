@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { generateLoot, generateLegendaryLoot, getClassLootSuggestions, getRaceLootSuggestions, RARITY_COLORS, type LootItem, type LootRarity } from '../data/lootGenerator'
+import { generateLoot, generateLegendaryLoot, RARITY_COLORS, type LootItem, type LootRarity } from '../data/lootGenerator'
 import type { Character } from '../types'
 
 interface LootCacheProps {
@@ -68,9 +68,6 @@ export function LootCache({ character, onAddToInventory }: LootCacheProps) {
     }, 500)
   }
 
-  const classSuggestions = getClassLootSuggestions(character.class?.name)
-  const raceSuggestions = getRaceLootSuggestions(character.race?.name)
-
   return (
     <div className="space-y-6">
       {/* Legendary Loot Generator (DM Only) */}
@@ -84,18 +81,18 @@ export function LootCache({ character, onAddToInventory }: LootCacheProps) {
         {/* Rarity Selection */}
         <div className="mb-4">
           <label className="text-sm text-gray-400 mb-2 block">Rarity</label>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2">
             {RARITY_OPTIONS.map(({ rarity, label, hint }) => (
               <button
                 key={rarity}
                 onClick={() => setSelectedRarity(rarity)}
-                className={`p-3 rounded-lg border-2 transition-all hover:scale-105 ${
+                className={`p-2 sm:p-3 rounded-lg border-2 transition-all hover:scale-105 ${
                   selectedRarity === rarity
                     ? `${RARITY_COLORS[rarity].border} ${RARITY_COLORS[rarity].bg} ${RARITY_COLORS[rarity].glow} ring-2 ring-offset-2 ring-offset-gray-900 ring-dnd-gold`
                     : `${RARITY_COLORS[rarity].border} ${RARITY_COLORS[rarity].bg} ${RARITY_COLORS[rarity].glow} opacity-60`
                 }`}
               >
-                <div className={`text-sm font-bold ${RARITY_COLORS[rarity].text}`}>{label}</div>
+                <div className={`text-xs sm:text-sm font-bold ${RARITY_COLORS[rarity].text}`}>{label}</div>
                 <div className="text-xs text-gray-400 mt-1">{hint}</div>
               </button>
             ))}
@@ -151,37 +148,34 @@ export function LootCache({ character, onAddToInventory }: LootCacheProps) {
               Clear All
             </button>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {legendaryLoot.map((item) => (
               <div
                 key={item.id}
-                className={`p-4 rounded-lg border-2 ${RARITY_COLORS[item.rarity].border} ${RARITY_COLORS[item.rarity].bg} ${RARITY_COLORS[item.rarity].glow} transition-all hover:scale-105`}
+                className={`p-3 sm:p-4 rounded-lg border-2 ${RARITY_COLORS[item.rarity].border} ${RARITY_COLORS[item.rarity].bg} ${RARITY_COLORS[item.rarity].glow} transition-all hover:scale-105`}
               >
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex-1">
-                    <div className={`font-bold ${RARITY_COLORS[item.rarity].text}`}>{item.name}</div>
+                <div className="flex items-start justify-between mb-2 flex-wrap gap-2">
+                  <div className="flex-1 min-w-0">
+                    <div className={`font-bold text-sm sm:text-base ${RARITY_COLORS[item.rarity].text} break-words`}>{item.name}</div>
                     <div className={`text-xs uppercase font-bold mt-1 ${RARITY_COLORS[item.rarity].text}`}>
                       {item.rarity}
                     </div>
                   </div>
-                  <span className="text-xs bg-gray-900 px-2 py-1 rounded text-gray-400">
+                  <span className="text-xs bg-gray-900 px-2 py-1 rounded text-gray-400 whitespace-nowrap">
                     {item.category}
                   </span>
                 </div>
 
-                <p className="text-sm text-gray-300 mb-3">{item.description}</p>
+                <p className="text-xs sm:text-sm text-gray-300 mb-3 break-words">{item.description}</p>
 
-                <div className="flex items-center justify-between">
-                  <div className="text-sm">
-                    <span className="text-yellow-500 font-medium">{item.value} gp</span>
-                    {item.quantity && (
-                      <span className="text-gray-400 ml-2">x{item.quantity}</span>
-                    )}
-                  </div>
+                <div className="flex items-center justify-between gap-2">
+                  {item.quantity && (
+                    <div className="text-sm text-gray-400">Qty: {item.quantity}</div>
+                  )}
 
                   <button
                     onClick={() => handleAddLegendaryToInventory(item)}
-                    className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded transition-all"
+                    className="px-3 py-1.5 sm:py-1 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded transition-all whitespace-nowrap ml-auto"
                   >
                     + Add
                   </button>
@@ -233,89 +227,41 @@ export function LootCache({ character, onAddToInventory }: LootCacheProps) {
         </div>
       </div>
 
-      {/* Class/Race Preferences */}
-      <div className="grid md:grid-cols-2 gap-4">
-        {classSuggestions.length > 0 && (
-          <div className="card bg-gray-800 border-gray-700 p-4">
-            <h3 className="text-lg font-semibold text-blue-400 mb-3">
-              {character.class?.name} Preferences
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {classSuggestions.slice(0, 8).map((suggestion, idx) => (
-                <span
-                  key={idx}
-                  className="px-2 py-1 bg-blue-900/30 border border-blue-700/50 rounded text-xs text-blue-300"
-                >
-                  {suggestion}
-                </span>
-              ))}
-            </div>
-            <p className="text-xs text-gray-500 mt-2">
-              Items your class typically uses
-            </p>
-          </div>
-        )}
-
-        {raceSuggestions.length > 0 && (
-          <div className="card bg-gray-800 border-gray-700 p-4">
-            <h3 className="text-lg font-semibold text-green-400 mb-3">
-              {character.race?.name} Preferences
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {raceSuggestions.map((suggestion, idx) => (
-                <span
-                  key={idx}
-                  className="px-2 py-1 bg-green-900/30 border border-green-700/50 rounded text-xs text-green-300"
-                >
-                  {suggestion}
-                </span>
-              ))}
-            </div>
-            <p className="text-xs text-gray-500 mt-2">
-              Cultural items for your race
-            </p>
-          </div>
-        )}
-      </div>
-
       {/* Generated Loot */}
       {generatedLoot.length > 0 && (
-        <div className="card bg-gray-800 border-gray-700 p-6">
-          <h3 className="text-xl font-bold text-white mb-4">Generated Loot</h3>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="card bg-gray-800 border-gray-700 p-4 sm:p-6">
+          <h3 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">Generated Loot</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {generatedLoot.map((item) => {
               // Handle old rarities that don't exist in new system
               const rarityColors = RARITY_COLORS[item.rarity] || RARITY_COLORS.common
               return (
                 <div
                   key={item.id}
-                  className={`p-4 rounded-lg border-2 ${rarityColors.border} ${rarityColors.bg} ${rarityColors.glow} transition-all hover:scale-105`}
+                  className={`p-3 sm:p-4 rounded-lg border-2 ${rarityColors.border} ${rarityColors.bg} ${rarityColors.glow} transition-all hover:scale-105`}
                 >
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <div className={`font-semibold ${rarityColors.text}`}>{item.name}</div>
+                  <div className="flex items-start justify-between mb-2 flex-wrap gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className={`font-semibold text-sm sm:text-base ${rarityColors.text} break-words`}>{item.name}</div>
                       <div className={`text-xs uppercase font-medium mt-1 ${rarityColors.text}`}>
                         {item.rarity}
                       </div>
                     </div>
-                    <span className="text-xs bg-gray-900 px-2 py-1 rounded text-gray-400">
+                    <span className="text-xs bg-gray-900 px-2 py-1 rounded text-gray-400 whitespace-nowrap">
                       {item.category}
                     </span>
                   </div>
 
-                  <p className="text-sm text-gray-300 mb-3">{item.description}</p>
+                  <p className="text-xs sm:text-sm text-gray-300 mb-3 break-words">{item.description}</p>
 
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm">
-                      <span className="text-yellow-500 font-medium">{item.value} gp</span>
-                      {item.quantity && (
-                        <span className="text-gray-400 ml-2">x{item.quantity}</span>
-                      )}
-                    </div>
+                  <div className="flex items-center justify-between gap-2">
+                    {item.quantity && (
+                      <div className="text-sm text-gray-400">Qty: {item.quantity}</div>
+                    )}
 
                     <button
                       onClick={() => handleAddToInventory(item)}
-                      className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-xs rounded transition-all"
+                      className="px-3 py-1.5 sm:py-1 bg-green-600 hover:bg-green-700 text-white text-xs rounded transition-all whitespace-nowrap ml-auto"
                     >
                       + Add
                     </button>

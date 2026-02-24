@@ -103,6 +103,7 @@ export function CharacterSheetPage() {
   const [showLevelUpHPModal, setShowLevelUpHPModal] = useState(false)
   const [levelUpHPRoll, setLevelUpHPRoll] = useState<{ rolls: number[]; highest: number; isRolling: boolean } | null>(null)
   const [restNotification, setRestNotification] = useState<{ type: 'short' | 'long' | 'trance'; message: string } | null>(null)
+  const [sellConfirmation, setSellConfirmation] = useState<{ itemName: string; value: number; currencyType: 'cp' | 'sp' | 'gp' | 'pp'; onConfirm: () => void } | null>(null)
   const [abilityNotification, setAbilityNotification] = useState<{ featureName: string; message: string } | null>(null)
 
   useEffect(() => {
@@ -436,14 +437,38 @@ export function CharacterSheetPage() {
       copperValue = (rarityPrices[item.rarity] || 0) * (item.quantity || 1)
     }
 
-    // Add currency to character
-    const currentCurrency = { ...character.currency }
-    currentCurrency.copper += copperValue
-    updateCurrency(autoConvertCurrency(currentCurrency))
+    // Convert to appropriate currency type
+    let value = copperValue
+    let currencyType: 'cp' | 'sp' | 'gp' | 'pp' = 'cp'
 
-    // Remove item from inventory
-    removeEquipment(itemId)
-    saveCharacter()
+    if (copperValue >= 10000) {
+      value = copperValue / 10000
+      currencyType = 'pp'
+    } else if (copperValue >= 100) {
+      value = copperValue / 100
+      currencyType = 'gp'
+    } else if (copperValue >= 10) {
+      value = copperValue / 10
+      currencyType = 'sp'
+    }
+
+    // Show confirmation modal
+    setSellConfirmation({
+      itemName: item.name,
+      value,
+      currencyType,
+      onConfirm: () => {
+        // Add currency to character
+        const currentCurrency = { ...character.currency }
+        currentCurrency.copper += copperValue
+        updateCurrency(autoConvertCurrency(currentCurrency))
+
+        // Remove item from inventory
+        removeEquipment(itemId)
+        saveCharacter()
+        setSellConfirmation(null)
+      }
+    })
   }
 
   const handleSellMaterial = (materialId: string) => {
@@ -470,14 +495,38 @@ export function CharacterSheetPage() {
       copperValue = (rarityPrices[material.rarity] || 0) * material.quantity
     }
 
-    // Add currency to character
-    const currentCurrency = { ...character.currency }
-    currentCurrency.copper += copperValue
-    updateCurrency(autoConvertCurrency(currentCurrency))
+    // Convert to appropriate currency type
+    let value = copperValue
+    let currencyType: 'cp' | 'sp' | 'gp' | 'pp' = 'cp'
 
-    // Remove material from inventory
-    removeMaterial(materialId)
-    saveCharacter()
+    if (copperValue >= 10000) {
+      value = copperValue / 10000
+      currencyType = 'pp'
+    } else if (copperValue >= 100) {
+      value = copperValue / 100
+      currencyType = 'gp'
+    } else if (copperValue >= 10) {
+      value = copperValue / 10
+      currencyType = 'sp'
+    }
+
+    // Show confirmation modal
+    setSellConfirmation({
+      itemName: material.name,
+      value,
+      currencyType,
+      onConfirm: () => {
+        // Add currency to character
+        const currentCurrency = { ...character.currency }
+        currentCurrency.copper += copperValue
+        updateCurrency(autoConvertCurrency(currentCurrency))
+
+        // Remove material from inventory
+        removeMaterial(materialId)
+        saveCharacter()
+        setSellConfirmation(null)
+      }
+    })
   }
 
   // Parse healing amount from potion description
@@ -1379,6 +1428,7 @@ export function CharacterSheetPage() {
                     onClick={() => {
                       if (!character.dailyIncome) return
 
+                      // Earn daily income
                       const earned: Partial<Currency> = {}
                       if (character.dailyIncome.currency === 'gold') earned.gold = character.dailyIncome.amount
                       else if (character.dailyIncome.currency === 'silver') earned.silver = character.dailyIncome.amount
@@ -1389,10 +1439,16 @@ export function CharacterSheetPage() {
                         newCurrency[key as keyof Currency] += value
                       }
                       updateCurrency(newCurrency)
+
+                      // Consume 1 food ration per day
+                      if (character.foodRations > 0) {
+                        addFoodRations(-1)
+                      }
+
                       saveCharacter()
                     }}
                     className="px-3 py-1 text-sm bg-blue-700 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                    title={character.dailyIncome ? `Collect ${character.dailyIncome.amount} ${character.dailyIncome.currency === 'gold' ? 'GP' : character.dailyIncome.currency === 'silver' ? 'SP' : 'CP'} from ${character.dailyIncome.professionName}` : 'New Day'}
+                    title={character.dailyIncome ? `Collect ${character.dailyIncome.amount} ${character.dailyIncome.currency === 'gold' ? 'GP' : character.dailyIncome.currency === 'silver' ? 'SP' : 'CP'} from ${character.dailyIncome.professionName} (Consumes 1 food)` : 'New Day'}
                   >
                     New Day
                   </button>
@@ -1435,6 +1491,124 @@ export function CharacterSheetPage() {
                 </div>
               </div>
             )}
+          </div>
+
+          {/* Total Carrying Weight */}
+          <div className="card bg-gradient-to-br from-amber-900/30 to-orange-900/30 border-2 border-orange-600 p-4">
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <div>
+                <h3 className="text-lg font-bold text-orange-400">⚖️ Total Carrying Weight</h3>
+                <p className="text-xs text-gray-400 mt-1">Combined weight of all equipped and inventory items</p>
+              </div>
+              <div className="text-right">
+                <div className="text-3xl font-bold text-orange-300">
+                  {character.equipment.reduce((total, item) => {
+                    const itemWeight = item.weight || 0
+                    const quantity = item.quantity || 1
+                    return total + (itemWeight * quantity)
+                  }, 0).toFixed(1)} lbs
+                </div>
+                <div className="text-xs text-gray-500 mt-1">
+                  {character.materials?.reduce((total, mat) => total + (mat.weight * mat.quantity), 0).toFixed(1) || '0'} lbs from materials
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Food & Water Supplies */}
+          <div className="card bg-gradient-to-br from-green-900/30 to-teal-900/30 border-2 border-green-600 p-4 sm:p-6">
+            <h3 className="text-xl sm:text-2xl font-bold text-green-400 mb-3 sm:mb-4">🍖 Food & Water Supplies</h3>
+            <p className="text-sm sm:text-base text-gray-300 mb-4">
+              Track your food rations and water supply. Each day consumes 1 unit of food.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Food Rations */}
+              <div className="p-4 bg-green-900/40 border-2 border-green-600 rounded-lg">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">🥖</span>
+                    <div>
+                      <h4 className="font-bold text-green-300">Food Rations</h4>
+                      <p className="text-xs text-gray-400">Days of food remaining</p>
+                    </div>
+                  </div>
+                  <div className="text-3xl font-bold text-green-200">
+                    {character.foodRations}
+                  </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      if (character.foodRations > 0) {
+                        addFoodRations(-1)
+                        saveCharacter()
+                      }
+                    }}
+                    className="flex-1 px-3 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg font-medium transition-colors text-sm"
+                    disabled={character.foodRations <= 0}
+                  >
+                    − Remove 1
+                  </button>
+                  <button
+                    onClick={() => {
+                      addFoodRations(1)
+                      saveCharacter()
+                    }}
+                    className="flex-1 px-3 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg font-medium transition-colors text-sm"
+                  >
+                    + Add 1
+                  </button>
+                </div>
+              </div>
+
+              {/* Water Supply */}
+              <div className="p-4 bg-teal-900/40 border-2 border-teal-600 rounded-lg">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">💧</span>
+                    <div>
+                      <h4 className="font-bold text-teal-300">Water Supply</h4>
+                      <p className="text-xs text-gray-400">Days of water remaining</p>
+                    </div>
+                  </div>
+                  <div className="text-3xl font-bold text-teal-200">
+                    {character.waterSupply}
+                  </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      if (character.waterSupply > 0) {
+                        addWaterSupply(-1)
+                        saveCharacter()
+                      }
+                    }}
+                    className="flex-1 px-3 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg font-medium transition-colors text-sm"
+                    disabled={character.waterSupply <= 0}
+                  >
+                    − Remove 1
+                  </button>
+                  <button
+                    onClick={() => {
+                      addWaterSupply(1)
+                      saveCharacter()
+                    }}
+                    className="flex-1 px-3 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-lg font-medium transition-colors text-sm"
+                  >
+                    + Add 1
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 p-3 bg-green-900/20 border border-green-700/30 rounded-lg">
+              <p className="text-xs sm:text-sm text-green-300">
+                <span className="font-bold">💡 Tip:</span> Food rations are automatically consumed when you click "New Day" in the Currency section above!
+              </p>
+            </div>
           </div>
 
           {/* Mats (Crafting Materials) */}
@@ -3038,6 +3212,55 @@ export function CharacterSheetPage() {
         />
       )}
 
+      {/* Sell Confirmation Modal */}
+      {sellConfirmation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+          <div className="bg-gray-900 border-2 border-yellow-600 rounded-xl max-w-md w-full shadow-2xl">
+            <div className="bg-gradient-to-r from-yellow-600 to-orange-600 p-6">
+              <h2 className="text-2xl font-bold text-white">💰 Confirm Sale</h2>
+            </div>
+
+            <div className="p-6">
+              <p className="text-lg text-gray-300 mb-4">
+                Do you really want to sell <span className="font-bold text-white">"{sellConfirmation.itemName}"</span>?
+              </p>
+
+              <div className="p-4 bg-yellow-900/20 border-2 border-yellow-600 rounded-lg mb-6">
+                <div className="text-center">
+                  <div className="text-sm text-gray-400 mb-1">You will receive:</div>
+                  <div className="text-3xl font-bold text-yellow-300">
+                    {sellConfirmation.value} {
+                      sellConfirmation.currencyType === 'cp' ? 'Copper' :
+                      sellConfirmation.currencyType === 'sp' ? 'Silver' :
+                      sellConfirmation.currencyType === 'gp' ? 'Gold' :
+                      'Platinum'
+                    }
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    ({sellConfirmation.currencyType.toUpperCase()})
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setSellConfirmation(null)}
+                  className="flex-1 px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={sellConfirmation.onConfirm}
+                  className="flex-1 px-4 py-3 bg-yellow-600 hover:bg-yellow-500 text-white rounded-lg font-medium transition-colors"
+                >
+                  Sell Item
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Manual Spell Adder Modal */}
       {showManualSpellAdd && (
         <ManualSpellAdderModal
@@ -3223,13 +3446,13 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
     const attackBonus = attackMod + profBonus
 
     return (
-      <div className={`p-3 rounded-lg flex items-center justify-between group ${
+      <div className={`p-3 rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between group gap-3 ${
         isEquipped ? 'bg-green-900/30 border border-green-600/50' : 'bg-gray-900'
       }`}>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
           <EquipToggle equipped={!!isEquipped} onToggle={onToggleEquip} canEquip={canEquip} />
-          <div>
-            <div className="flex items-center gap-2">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="font-medium text-white hover:text-dnd-gold">
                 {weapon.name}
               </span>
@@ -3243,7 +3466,7 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 justify-between sm:justify-end">
           <div className="text-right">
             <div className="text-dnd-gold font-medium">
               +{attackBonus} to hit
@@ -3274,13 +3497,13 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
 
   if (isArmor(item)) {
     return (
-      <div className={`p-3 rounded-lg flex items-center justify-between group ${
+      <div className={`p-3 rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between group gap-3 ${
         isEquipped ? 'bg-blue-900/30 border border-blue-600/50' : 'bg-gray-900'
       }`}>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
           <EquipToggle equipped={!!isEquipped} onToggle={onToggleEquip} canEquip={canEquip} />
-          <div>
-            <div className="flex items-center gap-2">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="font-medium text-white">{item.name}</span>
               {isEquipped && <span className="text-xs text-blue-400 bg-blue-900/50 px-1.5 py-0.5 rounded">Equipped</span>}
             </div>
@@ -3289,7 +3512,7 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 justify-between sm:justify-end">
           <div className="text-right">
             <div className="text-xs text-gray-500">{item.weight} lb</div>
           </div>
@@ -3317,13 +3540,13 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
 
   if (isShield(item)) {
     return (
-      <div className={`p-3 rounded-lg flex items-center justify-between group ${
+      <div className={`p-3 rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between group gap-3 ${
         isEquipped ? 'bg-purple-900/30 border border-purple-600/50' : 'bg-gray-900'
       }`}>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
           <EquipToggle equipped={!!isEquipped} onToggle={onToggleEquip} canEquip={canEquip} />
-          <div>
-            <div className="flex items-center gap-2">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="font-medium text-white">{item.name}</span>
               {isEquipped && <span className="text-xs text-purple-400 bg-purple-900/50 px-1.5 py-0.5 rounded">Equipped</span>}
             </div>
@@ -3332,7 +3555,7 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 justify-between sm:justify-end">
           <div className="text-right">
             <div className="text-xs text-gray-500">{item.weight} lb</div>
           </div>
@@ -3360,18 +3583,18 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
 
   if (isCloak(item)) {
     return (
-      <div className={`p-3 rounded-lg flex items-center justify-between group ${
+      <div className={`p-3 rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between group gap-3 ${
         isEquipped ? 'bg-indigo-900/30 border border-indigo-600/50' : 'bg-gray-900'
       }`}>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
           <EquipToggle equipped={!!isEquipped} onToggle={onToggleEquip} canEquip={canEquip} />
-          <div>
-            <div className="flex items-center gap-2">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="font-medium text-white">{item.name}</span>
               {isEquipped && <span className="text-xs text-indigo-400 bg-indigo-900/50 px-1.5 py-0.5 rounded">Equipped</span>}
             </div>
             {item.description && (
-              <div className="text-sm text-gray-400">{item.description}</div>
+              <div className="text-sm text-gray-400 break-words">{item.description}</div>
             )}
             {item.acBonus && (
               <div className="text-sm text-gray-400">
@@ -3380,7 +3603,7 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
             )}
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 justify-between sm:justify-end">
           <div className="text-right">
             <div className="text-xs text-gray-500">{item.weight} lb</div>
           </div>
@@ -3414,13 +3637,13 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
                        item.name.toLowerCase().includes('fortune')
 
   return (
-    <div className={`p-3 rounded-lg flex items-center justify-between group ${
+    <div className={`p-3 rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between group gap-3 ${
       isEquipped ? 'bg-yellow-900/30 border border-yellow-600/50' : 'bg-gray-900'
     }`}>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 flex-1 min-w-0">
         <EquipToggle equipped={!!isEquipped} onToggle={onToggleEquip} canEquip={canEquip} />
-        <div>
-          <div className="flex items-center gap-2">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="font-medium text-white">{item.name}</span>
             {isEquipped && <span className="text-xs text-yellow-400 bg-yellow-900/50 px-1.5 py-0.5 rounded">Equipped</span>}
             {isConsumable && <span className="text-xs text-green-400 bg-green-900/50 px-1.5 py-0.5 rounded">Consumable</span>}
@@ -3428,11 +3651,11 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
           {item.quantity > 1 && (
             <span className="text-gray-500 ml-1">x{item.quantity}</span>
           )}
-          <div className="text-sm text-gray-400">{item.description}</div>
+          <div className="text-sm text-gray-400 break-words">{item.description}</div>
           <div className="text-xs text-gray-500 mt-1 capitalize">{item.category.replace(/([A-Z])/g, ' $1').trim()}</div>
         </div>
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 justify-between sm:justify-end flex-shrink-0">
         <div className="text-right">
           <div className="text-xs text-gray-500">{item.weight} lb</div>
         </div>
