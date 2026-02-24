@@ -50,6 +50,10 @@ export async function loadClassSpells(classId: string): Promise<{ spells: Record
         const { BARD_SPELLS, BARD_SPELL_COUNT } = await import('./spells/bard')
         return { spells: BARD_SPELLS, count: BARD_SPELL_COUNT }
       }
+      case 'paladin': {
+        const { PALADIN_SPELLS, PALADIN_SPELL_COUNT } = await import('./spells/paladin')
+        return { spells: PALADIN_SPELLS, count: PALADIN_SPELL_COUNT }
+      }
       default:
         console.warn(`No spell subset found for class: ${classId}`)
         return { spells: {}, count: 0 }

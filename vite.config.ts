@@ -35,6 +35,7 @@ export default defineConfig({
             if (id.includes('/spells/sorcerer.ts')) return 'spells-sorcerer'
             if (id.includes('/spells/druid.ts')) return 'spells-druid'
             if (id.includes('/spells/bard.ts')) return 'spells-bard'
+            if (id.includes('/spells/paladin.ts')) return 'spells-paladin'
             if (id.includes('/spells/index.ts')) return 'spells-index'
 
             // Main trait database - lazy loaded when needed

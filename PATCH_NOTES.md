@@ -107,6 +107,38 @@ Bards can now select their full spell repertoire during character creation and l
 
 **Why This Matters**: Completes Phase 1 of missing spell implementations. Bards are now fully playable as spellcasters with their complete PHB 2024 spell list (levels 0-3). Higher level spells (4-9) will be added in Phase 5.
 
+### ⚔️ Paladin Spell Support - Phase 2 Complete
+
+Paladins can now select their divine spells during character creation and level up.
+
+#### **Complete Spell Lists (Levels 1-3)**
+- **15 Level 1 Spells**: Bless, Command, Compelled Duel, Cure Wounds, Detect Evil and Good, Detect Magic, Divine Favor, Heroism, Shield of Faith, Searing/Thunderous/Wrathful Smite, and more
+- **8 Level 2 Spells**: Aid, Branding Smite, Find Steed, Lesser Restoration, Locate Object, Magic Weapon, Protection from Poison, Zone of Truth
+- **10 Level 3 Spells**: Aura of Vitality, Blinding Smite, Create Food and Water, Crusader's Mantle, Daylight, Dispel Magic, Elemental Weapon, Magic Circle, Remove Curse, Revivify
+- **Total**: 33 spells implemented across levels 1-3
+
+#### **Half-Caster Progression**
+- No cantrips (divine power flows from oath, not study)
+- Spellcasting starts at level 2 (1st level spells)
+- 2nd level spells unlock at character level 5
+- 3rd level spells unlock at character level 9
+- Charisma-based spellcasting (oath-driven magic)
+
+#### **Spell Selector Integration**
+- Paladin spells appear in spell selector with proper level gating
+- Includes signature Smite spells (Searing, Thunderous, Wrathful, Branding, Blinding)
+- Mix of combat buffs, healing, and utility reflecting holy warrior theme
+- Support for concentration-based buffs (Shield of Faith, Bless, etc.)
+
+#### **Code Architecture**
+- Created `/src/data/spells/paladin.ts` with Paladin spell data
+- Created `/src/data/references/spells/paladin.ts` for reference filtering
+- Updated SpellSelector with half-caster progression logic
+- Added Paladin to dynamic loader and Vite chunk splitting
+- Vite config creates separate `spells-paladin` chunk (0.24 kB)
+
+**Why This Matters**: Completes Phase 2 of missing spell implementations. Paladins are now fully playable with divine spellcasting and iconic Smite spells. Half-caster progression properly implemented (no cantrips, starts at L2). Higher level spells (4-5) will be added in Phase 5.
+
 ### ❤️ Healing Spell Roll Buttons
 
 Healing spells now have dedicated roll buttons with heart icon in Actions tab.

@@ -19,6 +19,9 @@ import {
   DRUID_LEVEL_2_SPELLS,
   NECROMANCER_CANTRIPS,
   NECROMANCER_LEVEL_1_SPELLS,
+  PALADIN_LEVEL_1_SPELLS,
+  PALADIN_LEVEL_2_SPELLS,
+  PALADIN_LEVEL_3_SPELLS,
   SORCERER_CANTRIPS,
   SORCERER_LEVEL_1_SPELLS,
   WARLOCK_CANTRIPS,
@@ -81,6 +84,23 @@ export function SpellSelector({
       // Level 7-8: BARD_LEVEL_4_SPELLS
       // Level 9-10: BARD_LEVEL_5_SPELLS
       // etc.
+      return spells
+    }
+
+    // Paladin spells - half-caster with level-based progression
+    if (characterClass?.id === 'paladin') {
+      if (level >= 2) {
+        spells.push(...PALADIN_LEVEL_1_SPELLS)
+      }
+      if (level >= 5) {
+        spells.push(...PALADIN_LEVEL_2_SPELLS)
+      }
+      if (level >= 9) {
+        spells.push(...PALADIN_LEVEL_3_SPELLS)
+      }
+      // TODO: Add higher level spell arrays when available
+      // Level 13-16: PALADIN_LEVEL_4_SPELLS
+      // Level 17-20: PALADIN_LEVEL_5_SPELLS
       return spells
     }
 
