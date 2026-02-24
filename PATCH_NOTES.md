@@ -1,5 +1,51 @@
 # Dungeons - Patch Notes
 
+## Version 0.3.4 - February 24, 2026
+
+### 📱 Mobile UI Improvements
+
+Improved mobile experience with better responsive layouts.
+
+#### **Currency Display Mobile Fix**
+- **Responsive Grid Layout**: Changed from flex to grid (2 columns on mobile, 4 on desktop)
+- **Better Button Wrapping**: Currency action buttons now wrap properly on small screens
+- **Larger Mobile Text**: Currency values display at 2xl on mobile (vs xl on desktop)
+- **Consistent Spacing**: Improved gap spacing between currency boxes
+- **Header Responsiveness**: Header switches from column to row layout at sm breakpoint
+
+### 🍖 Starting Supplies System
+
+New characters now begin their adventure properly equipped with survival supplies.
+
+#### **Default Food & Water**
+- **10 Days of Food**: All new characters start with 10 food rations
+- **10 Days of Water**: All new characters start with 10 water supply
+- **Survival Ready**: Players can track consumption from day one
+- **Integration**: Works with existing Food & Water Supplies tracking system
+
+### 🎒 Inventory Organization
+
+Cleaned up inventory display to prevent duplicate item listings.
+
+#### **Food & Water Item Filtering**
+- **Removed from Backpack**: Waterskin and rations no longer show in "Backpack & Misc Items"
+- **Dedicated Section**: These items still tracked in "Food & Water Supplies" section
+- **Cleaner Interface**: No more duplicate listings of food/water items
+- **Filter Implementation**: ID-based filtering removes 'waterskin' and 'rations' from backpack view
+
+### 🛠️ Technical Changes
+
+#### **Files Modified**
+- `src/pages/CharacterSheetPage.tsx`
+  - Updated currency display to use responsive grid layout (lines 1408-1479)
+  - Added waterskin and rations filters to backpack section (lines 1917-1948)
+
+- `src/stores/characterStore.ts`
+  - Set default foodRations to 10 in createEmptyCharacter()
+  - Set default waterSupply to 10 in createEmptyCharacter()
+
+---
+
 ## Version 0.3.3 - February 23, 2026 @ 01:24 AM MST
 
 ### 🧙 Death Knight Spell System
