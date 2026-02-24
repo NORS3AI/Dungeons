@@ -40,6 +40,7 @@ export function EquipmentSelector({ characterClass, race, onSubmit, onBack }: Eq
   useEffect(() => {
     const startingGear: Equipment[] = []
 
+    // Add standard starting gear
     STANDARD_STARTING_GEAR.forEach(({ id, quantity }) => {
       const item = ADVENTURING_GEAR.find((g) => g.id === id)
       if (item) {
@@ -47,8 +48,16 @@ export function EquipmentSelector({ characterClass, race, onSubmit, onBack }: Eq
       }
     })
 
+    // Auto-add thieves' tools for Rogues
+    if (characterClass?.name === 'Rogue') {
+      const thievesTools = ADVENTURING_GEAR.find((g) => g.id === 'thieves-tools')
+      if (thievesTools) {
+        startingGear.push({ ...thievesTools, quantity: 1 })
+      }
+    }
+
     setSelectedEquipment(startingGear)
-  }, [])
+  }, [characterClass])
 
   // Filter weapons based on class AND racial proficiencies
   const availableWeapons = useMemo(() => {
@@ -332,7 +341,13 @@ export function EquipmentSelector({ characterClass, race, onSubmit, onBack }: Eq
 
         {activeTab === 'gear' && (
           <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2">
-            {ADVENTURING_GEAR.map((item) => (
+            {ADVENTURING_GEAR.filter((item) => {
+              // Hide thieves' tools from non-Rogues (Rogues get it auto-added)
+              if (item.id === 'thieves-tools' && characterClass?.name !== 'Rogue') {
+                return false
+              }
+              return true
+            }).map((item) => (
               <button
                 key={item.id}
                 onClick={() => toggleEquipment(item)}
