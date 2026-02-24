@@ -83,6 +83,38 @@ Water supply now decreases automatically on long rests, matching food consumptio
 - Encourages players to manage supplies and restock
 - Integrates with existing Food & Water Supplies tracking
 
+### 🧬 Racial Ability References
+
+Racial spell names in Actions tab now clickable with detailed tooltips.
+
+#### **QuickRefTooltip Integration**
+- **Clickable Spell Names**: All racial abilities (Dancing Lights, Faerie Fire, Darkness, etc.)
+- **Hover to Learn**: See full spell details without leaving the page
+- **New Player Friendly**: Explains what each racial ability does
+- **Consistent UI**: Matches spell reference system elsewhere in app
+
+### 📊 Combat Stat References
+
+Combat statistics now have detailed quick references explaining game mechanics.
+
+#### **New Stat References**
+- **Armor Class (AC)**: How AC works, armor types, DEX modifiers
+- **Initiative**: Turn order determination, DEX modifier usage
+- **Hit Dice**: HP recovery, class-specific dice sizes, rest mechanics
+- **Speed**: Movement rules, special speeds (fly, swim), difficult terrain
+- **Proficiency Bonus**: Level scaling table, where it applies
+
+#### **Character Info References**
+- **Alignment**: All nine alignments with descriptions and examples
+- **Darkvision**: Vision range, color limitations, magical darkness
+- **Languages**: Common languages table, typical speakers
+
+#### **User Experience**
+- All stat labels now clickable with hover effect
+- Tooltips open on click showing comprehensive information
+- Perfect for new players learning D&D rules
+- Reduces need to look up rules externally
+
 ### 🛠️ Technical Changes
 
 #### **Files Added**
@@ -96,12 +128,24 @@ Water supply now decreases automatically on long rests, matching food consumptio
   - Updated spellRolls state to include healing property
   - Split spell roll buttons into separate damage and healing buttons
   - Fixed healing display to use spellRolls.healing instead of .damage
+  - Added QuickRefTooltip to racial ability spell names
+  - Added QuickRefTooltip to AC, Initiative, Hit Die, Speed, Proficiency Bonus
+  - Added QuickRefTooltip to Alignment, Vision, Languages
 
 - `src/stores/characterStore.ts`
   - Set default foodRations to 10 in createEmptyCharacter()
   - Set default waterSupply to 10 in createEmptyCharacter()
   - Added daily water consumption to longRest() function
   - Added daily food consumption to longRest() function
+
+- `src/data/quickReference.ts`
+  - Added 'armor-class' rule with AC calculation examples
+  - Added 'initiative' rule with turn order mechanics
+  - Added 'hit-die' rule with HD table by class
+  - Added 'speed' rule with movement types
+  - Added 'darkvision' rule with vision mechanics
+  - Added 'alignment' rule with 9 alignment descriptions
+  - Added 'languages' rule with language table
 
 - `src/data/spells/index.ts`
   - Exported death-knight spell module
