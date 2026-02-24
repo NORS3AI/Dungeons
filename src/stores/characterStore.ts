@@ -1268,6 +1268,10 @@ export const useCharacterStore = create<CharacterState>()(
             }
           }
 
+          // Consume daily food and water (1 day each)
+          const foodRations = Math.max(0, currentCharacter.foodRations - 1)
+          const waterSupply = Math.max(0, currentCharacter.waterSupply - 1)
+
           set({
             currentCharacter: {
               ...currentCharacter,
@@ -1276,6 +1280,8 @@ export const useCharacterStore = create<CharacterState>()(
               spellSlots,
               hitPoints,
               currency,
+              foodRations,
+              waterSupply,
               deathSaves: { successes: 0, failures: 0 },
             },
           })
