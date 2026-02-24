@@ -17,7 +17,7 @@ interface EquipmentSelectorProps {
   onBack: () => void
 }
 
-type EquipmentTab = 'weapons' | 'armor' | 'gear'
+type EquipmentTab = 'weapons' | 'armor'
 
 /**
  * Standard starting equipment auto-added to all characters
@@ -188,7 +188,6 @@ export function EquipmentSelector({ characterClass, race, onSubmit, onBack }: Eq
   const tabs: { id: EquipmentTab; label: string }[] = [
     { id: 'weapons', label: 'Weapons' },
     { id: 'armor', label: 'Armor' },
-    { id: 'gear', label: 'Gear' },
   ]
 
   return (
@@ -337,40 +336,6 @@ export function EquipmentSelector({ characterClass, race, onSubmit, onBack }: Eq
               })
             )}
             </div>
-          </div>
-        )}
-
-        {activeTab === 'gear' && (
-          <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2">
-            {ADVENTURING_GEAR.filter((item) => {
-              // Hide thieves' tools from non-Rogues (Rogues get it auto-added)
-              if (item.id === 'thieves-tools' && characterClass?.name !== 'Rogue') {
-                return false
-              }
-              // Hide holy symbol and arcane focus (everyone gets component pouch)
-              if (item.id === 'holy-symbol' || item.id === 'arcane-focus') {
-                return false
-              }
-              return true
-            }).map((item) => (
-              <button
-                key={item.id}
-                onClick={() => toggleEquipment(item)}
-                className={`w-full p-4 rounded-xl border text-left transition-all ${
-                  isSelected(item.id)
-                    ? 'border-dnd-gold bg-dnd-gold/10'
-                    : 'border-gray-700 bg-gray-800 hover:border-gray-600'
-                }`}
-              >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-bold text-white">{item.name}</h3>
-                    <p className="text-sm text-gray-400">{item.description}</p>
-                  </div>
-                  <p className="text-xs text-gray-500">{item.weight} lb</p>
-                </div>
-              </button>
-            ))}
           </div>
         )}
       </div>
