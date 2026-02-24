@@ -6403,6 +6403,84 @@ export const RULES: Record<string, RuleRef> = {
     ],
     relatedRules: ['dash', 'difficult-terrain', 'combat'],
   },
+  'darkvision': {
+    id: 'darkvision',
+    name: 'Darkvision',
+    category: 'general',
+    summary: 'See in darkness up to a certain distance. Darkness appears as dim light (black and white).',
+    description: 'Many creatures have darkvision, allowing them to see in dim light within a specific range (usually 60 feet) as if it were bright light, and in darkness as if it were dim light. In darkness, you can\'t discern color, only shades of gray. Darkvision doesn\'t let you see through magical darkness or invisible creatures. Common races with darkvision: Dwarves (60 ft), Elves (60 ft), Half-Orcs (60 ft), Tieflings (60 ft), Drow (120 ft).',
+    examples: [
+      'Elf in dark cave: Can see 60 ft as if dimly lit',
+      'Beyond 60 ft: Pitch black, can\'t see',
+      'Drow in darkness: Can see 120 ft (superior darkvision)',
+      'Colors: Everything appears in shades of gray',
+      'Magical darkness: Darkvision doesn\'t work'
+    ],
+    relatedRules: ['superior-darkvision', 'light'],
+  },
+  'alignment': {
+    id: 'alignment',
+    name: 'Alignment',
+    category: 'general',
+    summary: 'Your character\'s moral and ethical stance. Describes how they approach good vs evil, law vs chaos.',
+    description: 'Alignment represents your character\'s moral compass and worldview. It\'s a combination of two axes: Good vs Evil (morality) and Lawful vs Chaotic (order). The nine alignments are: Lawful Good (crusader), Neutral Good (benefactor), Chaotic Good (rebel), Lawful Neutral (judge), True Neutral (undecided), Chaotic Neutral (free spirit), Lawful Evil (dominator), Neutral Evil (malefactor), Chaotic Evil (destroyer). Alignment can change based on your actions and experiences.',
+    examples: [
+      'Lawful Good: Superman, Paladins defending the innocent',
+      'Chaotic Good: Robin Hood, breaking laws for the greater good',
+      'Lawful Evil: Tyrants who use law to oppress',
+      'Chaotic Evil: Demons, pure destruction and malice',
+      'True Neutral: Druids maintaining balance',
+      'Alignment shift: A good character who commits evil acts may become neutral or evil'
+    ],
+    table: {
+      headers: ['Alignment', 'Description', 'Example'],
+      rows: [
+        ['Lawful Good', 'Honor, compassion, order', 'Noble paladin'],
+        ['Neutral Good', 'Kindness without bias', 'Benevolent cleric'],
+        ['Chaotic Good', 'Freedom and kindness', 'Robin Hood'],
+        ['Lawful Neutral', 'Order above all', 'Judge, soldier'],
+        ['True Neutral', 'Balance, pragmatism', 'Druid, merchant'],
+        ['Chaotic Neutral', 'Personal freedom', 'Wandering rogue'],
+        ['Lawful Evil', 'Tyranny, control', 'Cruel dictator'],
+        ['Neutral Evil', 'Selfishness, malice', 'Mercenary killer'],
+        ['Chaotic Evil', 'Destruction, chaos', 'Demon lord']
+      ]
+    },
+    relatedRules: ['role-playing', 'character-creation'],
+  },
+  'languages': {
+    id: 'languages',
+    name: 'Languages',
+    category: 'general',
+    summary: 'Languages your character can speak, read, and write. Determined by race, class, and background.',
+    description: 'All characters know Common, the trade language of most civilized lands. Your race grants additional languages (Elves know Elvish, Dwarves know Dwarvish, etc.). Your background may grant more languages. High Intelligence characters can choose bonus languages during creation. Exotic languages (Draconic, Infernal, Celestial) require special training. Some creatures understand languages but can\'t speak (like beasts). Speaking the same language allows full communication; without it, you can only use gestures and simple pantomime.',
+    examples: [
+      'Human Fighter: Common, Dwarvish (from background)',
+      'Elf Wizard (INT 16): Common, Elvish, Draconic, Sylvan',
+      'Tiefling Warlock: Common, Infernal (racial)',
+      'Can\'t understand Goblin: Need an interpreter or magic',
+      'Comprehend Languages spell: Understand any spoken language'
+    ],
+    table: {
+      headers: ['Language', 'Typical Speakers'],
+      rows: [
+        ['Common', 'Humans, most civilized races'],
+        ['Dwarvish', 'Dwarves'],
+        ['Elvish', 'Elves'],
+        ['Giant', 'Ogres, giants'],
+        ['Gnomish', 'Gnomes'],
+        ['Goblin', 'Goblinoids'],
+        ['Halfling', 'Halflings'],
+        ['Orc', 'Orcs'],
+        ['Draconic', 'Dragons, dragonborn, kobolds'],
+        ['Infernal', 'Devils, tieflings'],
+        ['Celestial', 'Angels, aasimar'],
+        ['Abyssal', 'Demons'],
+        ['Sylvan', 'Fey creatures']
+      ]
+    },
+    relatedRules: ['character-creation', 'role-playing'],
+  },
   'death-saves': {
     id: 'death-saves',
     name: 'Death Saving Throws',

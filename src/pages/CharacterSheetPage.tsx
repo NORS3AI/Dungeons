@@ -1283,7 +1283,9 @@ export function CharacterSheetPage() {
               <div className="space-y-3 text-sm">
                 {/* Alignment */}
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-500">Alignment</span>
+                  <QuickRefTooltip type="rule" id="alignment">
+                    <span className="text-gray-500 cursor-pointer hover:text-gray-300">Alignment</span>
+                  </QuickRefTooltip>
                   <div className="flex items-center gap-2">
                     <span className={character.alignment ? "text-gray-300" : "text-red-400 italic"}>
                       {character.alignment
@@ -1326,7 +1328,12 @@ export function CharacterSheetPage() {
                 )}
                 {character.race?.vision && (
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Vision</span>
+                    <QuickRefTooltip
+                      type="rule"
+                      id={character.race.vision === 'superiorDarkvision' ? 'superior-darkvision' : 'darkvision'}
+                    >
+                      <span className="text-gray-500 cursor-pointer hover:text-gray-300">Vision</span>
+                    </QuickRefTooltip>
                     <span className="text-gray-300">
                       {character.race.vision === 'superiorDarkvision'
                         ? `Superior Darkvision (${character.race.visionRange} ft)`
@@ -1338,7 +1345,9 @@ export function CharacterSheetPage() {
                 )}
                 {character.race?.languages && (
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Languages</span>
+                    <QuickRefTooltip type="rule" id="languages">
+                      <span className="text-gray-500 cursor-pointer hover:text-gray-300">Languages</span>
+                    </QuickRefTooltip>
                     <span className="text-gray-300">{character.race.languages.join(', ')}</span>
                   </div>
                 )}
