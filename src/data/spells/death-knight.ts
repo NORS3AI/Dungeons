@@ -1,0 +1,217 @@
+import type { Spell } from '../../types'
+
+/**
+ * Death Knight Spells
+ * WoW-themed frost and blood magic for the Death Knight class
+ */
+
+// Death Knight Cantrips
+export const DEATH_KNIGHT_CANTRIPS: Spell[] = [
+  {
+    id: 'icy-touch',
+    name: 'Icy Touch',
+    description: 'You channel frozen death through your hand. Make a melee spell attack against the target. On a hit, the target takes 1d8 cold damage and its speed is reduced by 10 feet until the start of your next turn. The spell\'s damage increases by 1d8 when you reach 5th level (2d8), 11th level (3d8), and 17th level (4d8).',
+    level: 0,
+    school: 'necromancy',
+    castingTime: { amount: 1, unit: 'action' },
+    range: { type: 'touch' },
+    components: { verbal: true, somatic: true, material: false },
+    duration: { type: 'instantaneous' },
+    damage: { dice: '1d8', type: 'cold' },
+    attackRoll: true,
+    ritual: false,
+    concentration: false,
+    classes: ['death-knight'],
+  },
+  {
+    id: 'blood-tap',
+    name: 'Blood Tap',
+    description: 'You drain vitality from a creature you can see within range. Make a ranged spell attack. On a hit, the target takes 1d6 necrotic damage and you gain temporary hit points equal to half the damage dealt (minimum 1). The spell\'s damage increases by 1d6 when you reach 5th level (2d6), 11th level (3d6), and 17th level (4d6).',
+    level: 0,
+    school: 'necromancy',
+    castingTime: { amount: 1, unit: 'action' },
+    range: { type: 'ranged', distance: 60 },
+    components: { verbal: true, somatic: true, material: false },
+    duration: { type: 'instantaneous' },
+    damage: { dice: '1d6', type: 'necrotic' },
+    attackRoll: true,
+    ritual: false,
+    concentration: false,
+    classes: ['death-knight'],
+  },
+]
+
+// Death Knight 1st Level Spells
+export const DEATH_KNIGHT_LEVEL_1_SPELLS: Spell[] = [
+  {
+    id: 'death-grip',
+    name: 'Death Grip',
+    description: 'You harness the power of unholy magic to pull a creature toward you. Choose one Large or smaller creature you can see within range. The target must make a Strength saving throw. On a failed save, the creature is pulled up to 20 feet straight toward you, and its speed is reduced to 0 until the end of your next turn.',
+    atHigherLevels: 'When you cast this spell using a spell slot of 2nd level or higher, you can target one additional creature for each slot level above 1st.',
+    level: 1,
+    school: 'necromancy',
+    castingTime: { amount: 1, unit: 'action' },
+    range: { type: 'ranged', distance: 30 },
+    components: { verbal: true, somatic: true, material: false },
+    duration: { type: 'instantaneous' },
+    savingThrow: { ability: 'strength', effect: 'negates' },
+    ritual: false,
+    concentration: false,
+    classes: ['death-knight'],
+  },
+  {
+    id: 'blood-strike',
+    name: 'Blood Strike',
+    description: 'As part of the action used to cast this spell, you make a melee weapon attack with a weapon you hold. On a hit, the target suffers the weapon attack\'s normal effects plus an additional 1d8 necrotic damage, and you regain hit points equal to half the necrotic damage dealt.',
+    atHigherLevels: 'The necrotic damage increases by 1d8 for each slot level above 1st.',
+    level: 1,
+    school: 'necromancy',
+    castingTime: { amount: 1, unit: 'action' },
+    range: { type: 'self' },
+    components: { verbal: true, somatic: true, material: true, materialDescription: 'a weapon' },
+    duration: { type: 'instantaneous' },
+    damage: { dice: '1d8', type: 'necrotic' },
+    ritual: false,
+    concentration: false,
+    classes: ['death-knight'],
+  },
+]
+
+// Death Knight 3rd Level Spells
+export const DEATH_KNIGHT_LEVEL_3_SPELLS: Spell[] = [
+  {
+    id: 'frost-fever',
+    name: 'Frost Fever',
+    description: 'You inflict a debilitating cold plague on a creature you can see within range. The target must make a Constitution saving throw. On a failed save, it takes 2d8 cold damage and its speed is reduced by 15 feet for the duration. At the start of each of its turns, the target takes 1d8 cold damage and can repeat the saving throw, ending the effect on a success.',
+    atHigherLevels: 'The initial damage increases by 1d8 for each slot level above 3rd.',
+    level: 3,
+    school: 'necromancy',
+    castingTime: { amount: 1, unit: 'action' },
+    range: { type: 'ranged', distance: 60 },
+    components: { verbal: true, somatic: true, material: false },
+    duration: { type: 'concentration', amount: 1, unit: 'minute' },
+    damage: { dice: '2d8', type: 'cold' },
+    savingThrow: { ability: 'constitution', effect: 'half' },
+    ritual: false,
+    concentration: true,
+    classes: ['death-knight'],
+  },
+  {
+    id: 'rune-strike',
+    name: 'Rune Strike',
+    description: 'You empower your runic weapons with dark magic. For the duration, your melee weapon attacks deal an extra 1d8 necrotic damage and you can add your Constitution modifier (minimum of +1) to the damage roll.',
+    atHigherLevels: 'The necrotic damage increases by 1d8 for each slot level above 3rd.',
+    level: 3,
+    school: 'evocation',
+    castingTime: { amount: 1, unit: 'bonusAction' },
+    range: { type: 'self' },
+    components: { verbal: true, somatic: true, material: false },
+    duration: { type: 'concentration', amount: 1, unit: 'minute' },
+    damage: { dice: '1d8', type: 'necrotic' },
+    ritual: false,
+    concentration: true,
+    classes: ['death-knight'],
+  },
+]
+
+// Death Knight 5th Level Spells
+export const DEATH_KNIGHT_LEVEL_5_SPELLS: Spell[] = [
+  {
+    id: 'obliterate',
+    name: 'Obliterate',
+    description: 'You strike with overwhelming force, channeling death magic into a single devastating blow. Make a melee spell attack against a target within range. On a hit, the target takes 6d10 necrotic damage. If this damage reduces the target to 0 hit points, it is disintegrated into ash.',
+    atHigherLevels: 'The damage increases by 1d10 for each slot level above 5th.',
+    level: 5,
+    school: 'necromancy',
+    castingTime: { amount: 1, unit: 'action' },
+    range: { type: 'ranged', distance: 30 },
+    components: { verbal: true, somatic: true, material: true, materialDescription: 'a weapon' },
+    duration: { type: 'instantaneous' },
+    damage: { dice: '6d10', type: 'necrotic' },
+    attackRoll: true,
+    ritual: false,
+    concentration: false,
+    classes: ['death-knight'],
+  },
+  {
+    id: 'vampiric-blood',
+    name: 'Vampiric Blood',
+    description: 'You call upon your vampiric nature, flooding your body with unholy vitality. You gain 30 temporary hit points. For the duration, whenever you hit a creature with a melee attack, you regain hit points equal to half the damage dealt.',
+    atHigherLevels: 'The temporary hit points increase by 10 for each slot level above 5th.',
+    level: 5,
+    school: 'necromancy',
+    castingTime: { amount: 1, unit: 'action' },
+    range: { type: 'self' },
+    components: { verbal: true, somatic: true, material: false },
+    duration: { type: 'timed', amount: 1, unit: 'minute' },
+    ritual: false,
+    concentration: false,
+    classes: ['death-knight'],
+  },
+]
+
+// Death Knight 7th Level Spells
+export const DEATH_KNIGHT_LEVEL_7_SPELLS: Spell[] = [
+  {
+    id: 'summon-frost-wyrm',
+    name: 'Summon Frost Wyrm',
+    description: 'You summon an undead frost wyrm from the frozen wastes. The wyrm appears in an unoccupied space you can see within range. It uses the frost dragon wyrmling stat block, except it is undead, has 120 hit points, and its breath weapon deals cold damage. It obeys your verbal commands (no action required). If you don\'t issue any, it defends itself. The wyrm disappears when it drops to 0 hit points or when the spell ends.',
+    level: 7,
+    school: 'necromancy',
+    castingTime: { amount: 1, unit: 'action' },
+    range: { type: 'ranged', distance: 90 },
+    components: { verbal: true, somatic: true, material: true, materialDescription: 'a dragon scale frozen in ice' },
+    duration: { type: 'concentration', amount: 1, unit: 'hour' },
+    ritual: false,
+    concentration: true,
+    classes: ['death-knight'],
+  },
+  {
+    id: 'anti-magic-shell',
+    name: 'Anti-Magic Shell',
+    description: 'A shimmering barrier of unholy energy surrounds you. You have advantage on the saving throw against the triggering spell. If you succeed on the save and the spell dealt damage, you take no damage instead of half damage, and you absorb some of the spell\'s power, gaining 2d6 Runic Power (if you have that feature) or temporary hit points equal to twice the spell\'s level.',
+    level: 7,
+    school: 'abjuration',
+    castingTime: { amount: 1, unit: 'reaction' },
+    range: { type: 'self' },
+    components: { verbal: true, somatic: true, material: false },
+    duration: { type: 'instantaneous' },
+    ritual: false,
+    concentration: false,
+    classes: ['death-knight'],
+  },
+]
+
+// Death Knight 9th Level Spells
+export const DEATH_KNIGHT_LEVEL_9_SPELLS: Spell[] = [
+  {
+    id: 'summon-valkyr',
+    name: 'Summon Val\'kyr',
+    description: 'You call forth a Val\'kyr, a powerful angelic agent of death. The Val\'kyr appears in an unoccupied space within range. It uses the planetar stat block, except it deals necrotic damage instead of radiant damage. It is friendly to you and your companions and obeys your commands. The Val\'kyr acts on your initiative. When the spell ends or the Val\'kyr drops to 0 hit points, it returns to the Shadowlands.',
+    level: 9,
+    school: 'necromancy',
+    castingTime: { amount: 1, unit: 'action' },
+    range: { type: 'ranged', distance: 60 },
+    components: { verbal: true, somatic: true, material: true, materialDescription: 'a relic blessed by the Lich King worth at least 1,000 gp', materialCost: 1000 },
+    duration: { type: 'concentration', amount: 1, unit: 'hour' },
+    ritual: false,
+    concentration: true,
+    classes: ['death-knight'],
+  },
+  {
+    id: 'apocalypse',
+    name: 'Apocalypse',
+    description: 'You call upon the Four Horsemen of Death to devastate your enemies. Four spectral riders appear and charge in a 60-foot cone emanating from you. Each creature in the area must make a Constitution saving throw. On a failed save, a creature takes 12d10 necrotic damage and is frightened for 1 minute. On a successful save, it takes half damage and isn\'t frightened. A frightened creature can repeat the saving throw at the end of each of its turns, ending the effect on a success.',
+    level: 9,
+    school: 'necromancy',
+    castingTime: { amount: 1, unit: 'action' },
+    range: { type: 'self', shape: 'cone', shapeSize: 60 },
+    components: { verbal: true, somatic: true, material: true, materialDescription: 'a rune carved from bone' },
+    duration: { type: 'instantaneous' },
+    damage: { dice: '12d10', type: 'necrotic' },
+    savingThrow: { ability: 'constitution', effect: 'half' },
+    ritual: false,
+    concentration: false,
+    classes: ['death-knight'],
+  },
+]

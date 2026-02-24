@@ -96,7 +96,7 @@ export function CharacterSheetPage() {
   const [showClassSpellSelector, setShowClassSpellSelector] = useState(false)
   const [showAlignmentSelector, setShowAlignmentSelector] = useState(false)
   const [weaponRolls, setWeaponRolls] = useState<Record<string, { hit?: number; damage?: number }>>({})
-  const [spellRolls, setSpellRolls] = useState<Record<string, { hit?: number; damage?: number }>>({})
+  const [spellRolls, setSpellRolls] = useState<Record<string, { hit?: number; damage?: number; healing?: number }>>({})
   const [showDMAbilityEditor, setShowDMAbilityEditor] = useState(false)
   const [lastHealingRoll, setLastHealingRoll] = useState<{ itemId: string; amount: number } | null>(null)
   const [showMigrationSuccess, setShowMigrationSuccess] = useState(false)
@@ -691,6 +691,26 @@ export function CharacterSheetPage() {
         const newRolls = { ...prev }
         if (newRolls[spellId]) {
           delete newRolls[spellId].damage
+        }
+        return newRolls
+      })
+    }, 5000)
+  }
+
+  const handleRollSpellHealing = (spellId: string, healingDice: string) => {
+    const roll = rollDice(healingDice)
+    if (!roll) return
+    setSpellRolls(prev => ({
+      ...prev,
+      [spellId]: { ...prev[spellId], healing: roll.grandTotal }
+    }))
+
+    // Clear after 5 seconds
+    setTimeout(() => {
+      setSpellRolls(prev => {
+        const newRolls = { ...prev }
+        if (newRolls[spellId]) {
+          delete newRolls[spellId].healing
         }
         return newRolls
       })
@@ -1407,9 +1427,9 @@ export function CharacterSheetPage() {
         <div className="space-y-6">
           {/* Currency */}
           <div className="card bg-gray-800 border-gray-700 p-4">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
               <h3 className="text-lg font-bold text-white">Currency</h3>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 {!character.dailyIncome ? (
                   <button
                     onClick={() => setShowIncomeRoller(true)}
@@ -1462,18 +1482,18 @@ export function CharacterSheetPage() {
                 </button>
               </div>
             </div>
-            <div className="flex flex-wrap gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
                 { key: 'platinum', label: 'PP', color: 'text-gray-300', bgColor: 'bg-gray-600/20' },
                 { key: 'gold', label: 'GP', color: 'text-yellow-400', bgColor: 'bg-yellow-600/20' },
                 { key: 'silver', label: 'SP', color: 'text-gray-400', bgColor: 'bg-gray-500/20' },
                 { key: 'copper', label: 'CP', color: 'text-orange-400', bgColor: 'bg-orange-600/20' },
               ].map(({ key, label, color, bgColor }) => (
-                <div key={key} className={`${bgColor} bg-gray-900 rounded-lg px-4 py-2 text-center min-w-[80px]`}>
-                  <div className={`text-xl font-bold ${color}`}>
+                <div key={key} className={`${bgColor} bg-gray-900 rounded-lg px-4 py-3 text-center`}>
+                  <div className={`text-2xl sm:text-xl font-bold ${color}`}>
                     {character.currency[key as keyof typeof character.currency]}
                   </div>
-                  <div className="text-xs text-gray-500">{label}</div>
+                  <div className="text-xs text-gray-500 mt-1">{label}</div>
                 </div>
               ))}
             </div>
@@ -1924,7 +1944,9 @@ export function CharacterSheetPage() {
               item.category !== 'consumable' &&
               !item.name.toLowerCase().includes('potion') &&
               !item.name.toLowerCase().includes('scroll') &&
-              !item.name.toLowerCase().includes('elixir')
+              !item.name.toLowerCase().includes('elixir') &&
+              item.id !== 'waterskin' &&
+              item.id !== 'rations'
             ).length === 0 ? (
               <p className="text-gray-400 text-center py-4">Backpack is empty.</p>
             ) : (
@@ -1940,7 +1962,9 @@ export function CharacterSheetPage() {
                     item.category !== 'consumable' &&
                     !item.name.toLowerCase().includes('potion') &&
                     !item.name.toLowerCase().includes('scroll') &&
-                    !item.name.toLowerCase().includes('elixir')
+                    !item.name.toLowerCase().includes('elixir') &&
+                    item.id !== 'waterskin' &&
+                    item.id !== 'rations'
                   )
                   .map((item) => (
                     <EquipmentItem
@@ -2203,11 +2227,13 @@ export function CharacterSheetPage() {
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <h4 className={`font-bold text-base sm:text-lg ${
-                          isUnlocked ? 'text-emerald-300' : 'text-gray-500'
-                        }`}>
-                          {racialSpell.spellName}
-                        </h4>
+                        <QuickRefTooltip type="spell" id={racialSpell.spellId}>
+                          <h4 className={`font-bold text-base sm:text-lg cursor-pointer hover:text-emerald-200 ${
+                            isUnlocked ? 'text-emerald-300' : 'text-gray-500'
+                          }`}>
+                            {racialSpell.spellName}
+                          </h4>
+                        </QuickRefTooltip>
                         {!isUnlocked && (
                           <span className="text-xs px-2 py-0.5 bg-gray-700 text-gray-400 rounded">
                             Lv {racialSpell.levelGained}
@@ -2318,16 +2344,25 @@ export function CharacterSheetPage() {
                                     H
                                   </button>
                                 )}
-                                {(spell.damage || spell.healing) && (
+                                {spell.damage && (
                                   <button
-                                    onClick={() => handleRollSpellDamage(spell.id, spell.damage?.dice || spell.healing?.dice || '1d6')}
+                                    onClick={() => handleRollSpellDamage(spell.id, spell.damage?.dice || '1d8')}
                                     className="w-7 h-7 bg-red-700 hover:bg-red-600 text-white rounded text-xs flex items-center justify-center transition-colors"
-                                    title={`Roll ${spell.damage ? 'damage' : 'healing'} (${spell.damage?.dice || spell.healing?.dice})`}
+                                    title={`Roll damage (${spell.damage?.dice || '1d8'})`}
                                   >
                                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                       <path d="M10 2L2 6v4c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V6l-8-4zm0 2.18l6 3v3.82c0 4.52-3.12 8.75-7 9.86V4.18z"/>
                                       <circle cx="10" cy="10" r="2"/>
                                     </svg>
+                                  </button>
+                                )}
+                                {spell.healing && (
+                                  <button
+                                    onClick={() => handleRollSpellHealing(spell.id, spell.healing?.dice || '1d8')}
+                                    className="w-7 h-7 bg-green-600 hover:bg-green-500 text-white rounded text-xs flex items-center justify-center transition-colors"
+                                    title={`Roll healing (${spell.healing?.dice || '1d8'})`}
+                                  >
+                                    ❤️
                                   </button>
                                 )}
                               </div>
@@ -2378,10 +2413,10 @@ export function CharacterSheetPage() {
                               {spell.healing && (
                                 <div className="flex items-center gap-2">
                                   <span className="text-green-400 font-bold">Healing:</span>
-                                  <span className="text-white">{spell.healing.dice}</span>
-                                  {spellRolls[spell.id]?.damage !== undefined && (
+                                  <span className="text-white">{spell.healing.dice} HP</span>
+                                  {spellRolls[spell.id]?.healing !== undefined && (
                                     <span className="ml-2 px-2 py-0.5 bg-green-600 text-white rounded font-bold animate-pulse">
-                                      {spellRolls[spell.id].damage} HP
+                                      ❤️ {spellRolls[spell.id].healing} HP
                                     </span>
                                   )}
                                 </div>
