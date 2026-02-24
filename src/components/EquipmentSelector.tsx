@@ -30,6 +30,7 @@ const STANDARD_STARTING_GEAR = [
   { id: 'rope-hemp', quantity: 1 },
   { id: 'tinderbox', quantity: 1 },
   { id: 'torch', quantity: 10 },
+  { id: 'component-pouch', quantity: 1 }, // For spellcasting
 ]
 
 export function EquipmentSelector({ characterClass, race, onSubmit, onBack }: EquipmentSelectorProps) {
@@ -344,6 +345,10 @@ export function EquipmentSelector({ characterClass, race, onSubmit, onBack }: Eq
             {ADVENTURING_GEAR.filter((item) => {
               // Hide thieves' tools from non-Rogues (Rogues get it auto-added)
               if (item.id === 'thieves-tools' && characterClass?.name !== 'Rogue') {
+                return false
+              }
+              // Hide holy symbol and arcane focus (everyone gets component pouch)
+              if (item.id === 'holy-symbol' || item.id === 'arcane-focus') {
                 return false
               }
               return true
