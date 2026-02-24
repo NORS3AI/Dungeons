@@ -208,6 +208,7 @@ export function CharacterCreatePage() {
           <StatAllocator
             initialScores={currentCharacter?.abilityScores}
             race={currentCharacter?.race}
+            charClass={currentCharacter?.class}
             background={currentCharacter?.background}
             onSubmit={handleStatsSubmit}
             onBack={handleBack}
@@ -405,15 +406,9 @@ export function CharacterCreatePage() {
                                 onClick={() => {
                                   initializeHP(hpRoll.highest)
                                 }}
-                                className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg font-medium transition-colors"
+                                className="px-6 py-3 bg-green-600 hover:bg-green-500 text-white rounded-lg font-bold text-lg transition-colors"
                               >
-                                Accept
-                              </button>
-                              <button
-                                onClick={() => setHpRoll(null)}
-                                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors"
-                              >
-                                Roll Again
+                                Accept & Continue
                               </button>
                             </div>
                           </div>

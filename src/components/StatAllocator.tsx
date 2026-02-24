@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import type { AbilityScores, Race } from '../types'
+import type { AbilityScores, Race, Class } from '../types'
 import type { Background } from '../types/background'
 import { STANDARD_ARRAY, POINT_BUY_COSTS, DEFAULT_ABILITY_SCORES, calculateModifier } from '../types'
 
@@ -15,6 +15,67 @@ const ABILITIES: { key: AbilityKey; name: string; abbr: string }[] = [
   { key: 'charisma', name: 'Charisma', abbr: 'CHA' },
 ]
 
+/**
+ * Get suggested ability score priority based on class
+ */
+function getClassAbilityPriority(className: string | undefined): AbilityKey[] {
+  if (!className) return ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma']
+
+  const priorityMap: Record<string, AbilityKey[]> = {
+    'Barbarian': ['strength', 'constitution', 'dexterity', 'wisdom', 'charisma', 'intelligence'],
+    'Bard': ['charisma', 'dexterity', 'constitution', 'wisdom', 'intelligence', 'strength'],
+    'Cleric': ['wisdom', 'constitution', 'strength', 'charisma', 'dexterity', 'intelligence'],
+    'Druid': ['wisdom', 'constitution', 'dexterity', 'intelligence', 'strength', 'charisma'],
+    'Fighter': ['strength', 'constitution', 'dexterity', 'wisdom', 'charisma', 'intelligence'],
+    'Monk': ['dexterity', 'wisdom', 'constitution', 'strength', 'intelligence', 'charisma'],
+    'Paladin': ['strength', 'charisma', 'constitution', 'dexterity', 'wisdom', 'intelligence'],
+    'Ranger': ['dexterity', 'wisdom', 'constitution', 'strength', 'intelligence', 'charisma'],
+    'Rogue': ['dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma', 'strength'],
+    'Sorcerer': ['charisma', 'constitution', 'dexterity', 'intelligence', 'wisdom', 'strength'],
+    'Warlock': ['charisma', 'constitution', 'dexterity', 'wisdom', 'intelligence', 'strength'],
+    'Wizard': ['intelligence', 'constitution', 'dexterity', 'wisdom', 'charisma', 'strength'],
+  }
+
+  return priorityMap[className] || ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma']
+}
+
+/**
+ * Adjust ability priority based on racial bonuses
+ */
+function getAdjustedAbilityPriority(
+  className: string | undefined,
+  race: Race | null | undefined
+): AbilityKey[] {
+  const classPriority = getClassAbilityPriority(className)
+
+  // If no race or no bonuses, return class priority as-is
+  if (!race?.abilityBonuses) return classPriority
+
+  // Get abilities that receive racial bonuses, sorted by bonus amount (highest first)
+  const bonusedAbilities = Object.entries(race.abilityBonuses)
+    .filter(([, bonus]) => bonus > 0)
+    .sort(([, a], [, b]) => (b as number) - (a as number))
+    .map(([ability]) => ability as AbilityKey)
+
+  if (bonusedAbilities.length === 0) return classPriority
+
+  // Create new priority list: bonused abilities first (maintaining class order among them),
+  // then remaining abilities in class order
+  const result: AbilityKey[] = []
+  const remaining: AbilityKey[] = []
+
+  for (const ability of classPriority) {
+    if (bonusedAbilities.includes(ability)) {
+      result.push(ability)
+    } else {
+      remaining.push(ability)
+    }
+  }
+
+  // Add remaining abilities
+  return [...result, ...remaining]
+}
+
 const POINT_BUY_TOTAL = 27
 const POINT_BUY_MIN = 8
 const POINT_BUY_MAX = 15
@@ -22,6 +83,7 @@ const POINT_BUY_MAX = 15
 interface StatAllocatorProps {
   initialScores?: AbilityScores
   race?: Race | null
+  charClass?: Class | null
   background?: Background | null
   onSubmit: (scores: AbilityScores) => void
   onBack: () => void
@@ -76,7 +138,7 @@ function calculatePointsSpent(scores: AbilityScores): number {
  * Stat Allocator Component
  * Allows users to allocate ability scores using three methods
  */
-export function StatAllocator({ initialScores, race, background, onSubmit, onBack }: StatAllocatorProps) {
+export function StatAllocator({ initialScores, race, charClass, background, onSubmit, onBack }: StatAllocatorProps) {
   // Default to roll method, standard and point buy are disabled for now
   const [method, setMethod] = useState<AllocationMethod>('roll')
   const [baseScores, setBaseScores] = useState<AbilityScores>(
@@ -283,6 +345,69 @@ export function StatAllocator({ initialScores, race, background, onSubmit, onBac
           </button>
         ))}
       </div>
+
+      {/* Ability Score Suggestions */}
+      {(charClass || race) && (
+        <div className="mb-6 p-4 bg-gradient-to-br from-blue-900/30 to-purple-900/30 rounded-lg border-2 border-blue-600">
+          <div className="flex items-start gap-3 mb-3">
+            <span className="text-2xl">💡</span>
+            <div className="flex-1">
+              <h3 className="text-lg font-bold text-blue-300 mb-1">
+                Suggested Ability Score Priority
+                {charClass && race && ` for ${race.name} ${charClass.name}`}
+                {charClass && !race && ` for ${charClass.name}`}
+                {!charClass && race && ` for ${race.name}`}
+              </h3>
+              <p className="text-xs text-gray-400">
+                Based on your {charClass ? 'class' : 'race'}{charClass && race ? ' and race' : ''}, prioritize these abilities from highest to lowest:
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {getAdjustedAbilityPriority(charClass?.name, race).map((abilityKey, index) => {
+              const abilityInfo = ABILITIES.find(a => a.key === abilityKey)
+              const racialBonus = getRacialBonus(race, abilityKey)
+              const isHighPriority = index < 2
+              const isMediumPriority = index >= 2 && index < 4
+
+              return (
+                <div
+                  key={abilityKey}
+                  className={`px-3 py-2 rounded-lg font-medium flex items-center gap-2 ${
+                    isHighPriority
+                      ? 'bg-green-600/20 border-2 border-green-500 text-green-300'
+                      : isMediumPriority
+                        ? 'bg-blue-600/20 border-2 border-blue-500 text-blue-300'
+                        : 'bg-gray-700/50 border-2 border-gray-600 text-gray-400'
+                  }`}
+                >
+                  <span className="font-bold">{index + 1}.</span>
+                  <span>{abilityInfo?.abbr}</span>
+                  {racialBonus > 0 && (
+                    <span className="text-xs px-1.5 py-0.5 bg-dnd-gold/20 text-dnd-gold rounded">
+                      +{racialBonus}
+                    </span>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+          <div className="mt-3 flex gap-4 text-xs">
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded bg-green-600/20 border border-green-500"></div>
+              <span className="text-gray-400">Highest Priority</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded bg-blue-600/20 border border-blue-500"></div>
+              <span className="text-gray-400">Medium Priority</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded bg-gray-700/50 border border-gray-600"></div>
+              <span className="text-gray-400">Lower Priority</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Racial Bonuses Display */}
       {race && (

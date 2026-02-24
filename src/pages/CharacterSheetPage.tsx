@@ -100,8 +100,6 @@ export function CharacterSheetPage() {
   const [showDMAbilityEditor, setShowDMAbilityEditor] = useState(false)
   const [lastHealingRoll, setLastHealingRoll] = useState<{ itemId: string; amount: number } | null>(null)
   const [showMigrationSuccess, setShowMigrationSuccess] = useState(false)
-  const [showLevelUpHPModal, setShowLevelUpHPModal] = useState(false)
-  const [levelUpHPRoll, setLevelUpHPRoll] = useState<{ rolls: number[]; highest: number; isRolling: boolean } | null>(null)
   const [restNotification, setRestNotification] = useState<{ type: 'short' | 'long' | 'trance'; message: string } | null>(null)
   const [sellConfirmation, setSellConfirmation] = useState<{ itemName: string; value: number; currencyType: 'cp' | 'sp' | 'gp' | 'pp'; onConfirm: () => void } | null>(null)
   const [abilityNotification, setAbilityNotification] = useState<{ featureName: string; message: string } | null>(null)
@@ -788,23 +786,19 @@ export function CharacterSheetPage() {
   }
 
   const handleLevelUp = () => {
-    // Show HP rolling modal instead of immediately leveling up
-    setLevelUpHPRoll(null)
-    setShowLevelUpHPModal(true)
-  }
-
-  const handleAcceptLevelUpHP = (hpRoll: number) => {
     const newLevel = character.level + 1
     const conModifier = calculateModifier(character.abilityScores.constitution)
-    const hpIncrease = Math.max(1, hpRoll + conModifier)
+
+    // Calculate HP increase: use average of hit die (rounded up) + CON modifier
+    // Hit dice: d6=4, d8=5, d10=6, d12=7
+    const hitDie = character.class?.hitDie || '1d8'
+    const dieSize = parseInt(hitDie.match(/\d+$/)?.[0] || '8')
+    const avgRoll = Math.ceil(dieSize / 2) + 1
+    const hpIncrease = Math.max(1, avgRoll + conModifier)
     const newMaxHP = character.hitPoints.maximum + hpIncrease
 
     // Update level and HP
     setLevelWithHP(newLevel, newMaxHP)
-
-    // Close the modal
-    setShowLevelUpHPModal(false)
-    setLevelUpHPRoll(null)
 
     // Save immediately to persist the level change
     saveCharacter()
@@ -3041,117 +3035,6 @@ export function CharacterSheetPage() {
           onUpdateHP={handleUpdateHP}
           onClose={() => setShowHPEditor(false)}
         />
-      )}
-
-      {/* Level Up HP Rolling Modal */}
-      {showLevelUpHPModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <div className="bg-gray-900 border-2 border-red-600 rounded-xl max-w-2xl w-full shadow-2xl">
-            {/* Header */}
-            <div className="bg-gradient-to-r from-red-600 to-orange-600 p-6">
-              <h2 className="text-3xl font-bold text-white">Level Up - Roll Hit Points</h2>
-              <p className="text-red-100 mt-2">
-                Roll your hit die 3 times and choose the highest roll!
-              </p>
-            </div>
-
-            {/* Content */}
-            <div className="p-6">
-              <div className="text-center">
-                <div className="text-lg text-gray-300 mb-4">
-                  Hit Die: <span className="text-dnd-gold font-bold">{character.class?.hitDie || '1d8'}</span>
-                  {' + '}
-                  <span className="text-blue-400">
-                    {calculateModifier(character.abilityScores.constitution) >= 0 ? '+' : ''}
-                    {calculateModifier(character.abilityScores.constitution)} CON
-                  </span>
-                </div>
-
-                {levelUpHPRoll?.isRolling ? (
-                  <div className="text-4xl text-dnd-gold animate-bounce my-8">🎲</div>
-                ) : levelUpHPRoll?.highest ? (
-                  <div className="space-y-4">
-                    <div className="text-lg text-gray-400 mb-3 text-center">
-                      You rolled 3 times:
-                    </div>
-                    <div className="flex gap-3 justify-center mb-4">
-                      {levelUpHPRoll.rolls.map((roll, index) => (
-                        <div
-                          key={index}
-                          className={`px-5 py-4 rounded-lg font-bold text-3xl ${
-                            roll === levelUpHPRoll.highest
-                              ? 'bg-green-600 text-white border-2 border-green-400'
-                              : 'bg-gray-800 text-gray-400'
-                          }`}
-                        >
-                          {roll}
-                        </div>
-                      ))}
-                    </div>
-                    <div className="text-center text-sm text-green-400 mb-4">
-                      ⭐ Highest roll: {levelUpHPRoll.highest}
-                    </div>
-                    <div className="text-xl text-gray-400 text-center mb-4">
-                      HP Increase: <span className="text-red-400 font-bold">
-                        {Math.max(1, levelUpHPRoll.highest + calculateModifier(character.abilityScores.constitution))}
-                      </span>
-                      {' '}({levelUpHPRoll.highest} + {calculateModifier(character.abilityScores.constitution)} CON)
-                    </div>
-                    <div className="text-lg text-gray-300 text-center mb-6">
-                      New Max HP: <span className="text-red-400 font-bold text-2xl">
-                        {character.hitPoints.maximum + Math.max(1, levelUpHPRoll.highest + calculateModifier(character.abilityScores.constitution))}
-                      </span>
-                    </div>
-                    <div className="flex gap-3 justify-center">
-                      <button
-                        onClick={() => handleAcceptLevelUpHP(levelUpHPRoll.highest)}
-                        className="px-6 py-3 bg-green-600 hover:bg-green-500 text-white rounded-lg font-medium transition-colors"
-                      >
-                        Accept & Level Up
-                      </button>
-                      <button
-                        onClick={() => setLevelUpHPRoll(null)}
-                        className="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors"
-                      >
-                        Roll Again
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => {
-                      setLevelUpHPRoll({ rolls: [], highest: 0, isRolling: true })
-                      setTimeout(() => {
-                        const hitDie = character.class?.hitDie || '1d8'
-                        const rolls: number[] = []
-                        for (let i = 0; i < 3; i++) {
-                          const roll = rollDice(hitDie)
-                          if (roll) {
-                            rolls.push(roll.grandTotal)
-                          }
-                        }
-                        const highest = Math.max(...rolls)
-                        setLevelUpHPRoll({ rolls, highest, isRolling: false })
-                      }, 1000)
-                    }}
-                    className="px-8 py-4 bg-red-600 hover:bg-red-500 text-white text-xl font-bold rounded-lg transition-colors"
-                  >
-                    🎲 Roll Hit Die (3 times)
-                  </button>
-                )}
-
-                {!levelUpHPRoll && (
-                  <button
-                    onClick={() => setShowLevelUpHPModal(false)}
-                    className="mt-6 text-sm text-gray-500 hover:text-gray-300 underline"
-                  >
-                    Cancel Level Up
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
       )}
 
       {/* Level Up Spell Selector */}
