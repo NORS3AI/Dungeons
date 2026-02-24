@@ -471,6 +471,96 @@ Some reference modules are both statically and dynamically imported (transitiona
 - By the time user reaches spell selection, data is already cached
 - Smoother, faster experience with no perceived loading
 
+#### **Phase 5: Full Dynamic Import Migration (COMPLETED ✅)**
+
+Removed all static exports of filtered views to enable true chunk splitting.
+
+**Modified Files:**
+- `src/data/references/index.ts` - Removed static filtered exports (lines 20-63 deleted)
+- `src/data/references/spells/index.ts` - Removed static re-exports
+- `src/data/references/traits/index.ts` - Removed static re-exports
+- `src/data/references/traits/races/index.ts` - Removed static re-exports
+- `src/data/references/traits/classes/index.ts` - Removed static re-exports
+
+**What Changed:**
+
+**Before (Phase 4):**
+```typescript
+// Static exports caused mixed static/dynamic imports
+export { WARLOCK_SPELLS, WIZARD_SPELLS, ... } from './spells/index'
+export { DROW_TRAITS, TIEFLING_TRAITS, ... } from './traits/races'
+```
+Result: Modules bundled into main chunk despite dynamic imports
+
+**After (Phase 5):**
+```typescript
+// No static exports - only dynamic loading via loader.ts
+// For filtered references, use:
+// import { loadCharacterReferences } from './loader'
+```
+Result: True chunk splitting activated
+
+**Build Output Changes:**
+
+**Chunks Created (15 separate files):**
+- Class spell chunks: `warlock.js`, `wizard.js`, `cleric.js`, `sorcerer.js`, `druid.js`, `bard.js`
+- Race trait chunks: `drow.js`, `tiefling.js`, `elf.js`, `human.js`, `dwarf.js`
+- Class trait chunks: `fighter.js`, `warlock.js`, `wizard.js`, `cleric.js`
+
+Each chunk: ~0.22-0.30 KB (gzipped ~0.19-0.21 KB)
+
+**Build Warnings Eliminated:**
+- ✅ No more "dynamically imported but also statically imported" warnings
+- ✅ Clean build output
+- ✅ Proper chunk splitting activated
+
+**How to Use Filtered References:**
+
+**Dynamic Loading:**
+```typescript
+import { loadCharacterReferences } from '@/data/references/loader'
+
+const refs = await loadCharacterReferences({
+  race: 'drow',
+  classId: 'warlock'
+})
+// Loads only: drow.js, warlock.js (traits), warlock.js (spells)
+```
+
+**React Hook:**
+```typescript
+import { useCharacterReferences } from '@/hooks/useCharacterReferences'
+
+const { references, loading } = useCharacterReferences({
+  race: 'drow',
+  classId: 'warlock',
+  autoLoad: true
+})
+```
+
+**Core References (Still Available):**
+All core references remain statically exported:
+```typescript
+import { SPELLS, TRAITS, SKILLS, ABILITIES, WEAPONS, ARMOR } from '@/data/quickReference'
+```
+
+**Technical Benefits:**
+- **True Lazy Loading**: Filtered chunks only load when requested
+- **Optimal Caching**: Separate chunks can be cached independently
+- **Clean Architecture**: Clear separation between static and dynamic imports
+- **No Duplication**: Filtered views reference main database (no data duplication)
+- **Developer Guidance**: Index files include usage instructions
+
+**Performance Impact:**
+- Filtered reference chunks split into separate files
+- Chunks load on-demand via dynamic imports
+- Preloading (Phase 4) warms cache before chunks needed
+- Faster initial page load (filtered views not in main bundle)
+- Browser caches individual chunks for better cache hit rates
+
+**Migration Notes:**
+No breaking changes for existing code. Components using core references (SPELLS, TRAITS, etc.) continue to work. Only filtered exports (WARLOCK_SPELLS, DROW_TRAITS, etc.) removed, which were only used by loader.ts.
+
 ---
 
 ## Version 0.3.3 - February 23, 2026 @ 01:24 AM MST

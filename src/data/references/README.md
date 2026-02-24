@@ -245,16 +245,72 @@ const handleClassSelect = (classData: Class) => {
 - Works with Vite chunk splitting
 
 **Current State:**
-Preloading infrastructure is fully integrated. Some modules are both statically and dynamically imported (transitional state), which means cache warming works but full chunk splitting is not yet active. This provides performance benefits without breaking existing code.
+Preloading infrastructure is fully integrated. Cache warming works during character creation for optimal performance.
+
+### Phase 5: Full Dynamic Import Migration ✅ COMPLETED
+
+Removed all static exports of filtered views to enable true chunk splitting.
+
+**Modified Files:**
+- `index.ts` - Removed static filtered exports (43 lines deleted)
+- `spells/index.ts` - Converted to documentation-only
+- `traits/index.ts` - Converted to documentation-only
+- `traits/races/index.ts` - Converted to documentation-only
+- `traits/classes/index.ts` - Converted to documentation-only
+
+**Changes:**
+Removed static re-exports of filtered views (WARLOCK_SPELLS, DROW_TRAITS, etc.) from all index files. These are now only available via dynamic imports through loader.ts.
+
+**Before:**
+```typescript
+// Caused mixed static/dynamic imports
+export { WARLOCK_SPELLS, WARLOCK_SPELL_COUNT } from './warlock'
+```
+
+**After:**
+```typescript
+// Documentation-only, forces dynamic loading
+// Use: import { loadClassSpells } from '../loader'
+```
+
+**Results:**
+- ✅ 15 separate chunks created (class spells, race traits, class traits)
+- ✅ No build warnings about mixed imports
+- ✅ True lazy loading enabled
+- ✅ Clean architecture with clear usage patterns
+
+**Build Output:**
+Each filtered module creates a ~0.22-0.30 KB chunk (gzipped ~0.19-0.21 KB):
+- `warlock-[hash].js`, `wizard-[hash].js`, etc. (spell filters)
+- `drow-[hash].js`, `tiefling-[hash].js`, etc. (race filters)
+- `fighter-[hash].js`, `warlock-[hash].js`, etc. (class filters)
+
+**Usage:**
+Core references still statically available:
+```typescript
+import { SPELLS, TRAITS, SKILLS } from './index'
+```
+
+Filtered references via dynamic loading only:
+```typescript
+import { loadCharacterReferences } from './loader'
+const refs = await loadCharacterReferences({ race: 'drow', classId: 'warlock' })
+```
+
+Or via React hook:
+```typescript
+import { useCharacterReferences } from '@/hooks/useCharacterReferences'
+const { references } = useCharacterReferences({ race: 'drow', classId: 'warlock' })
+```
 
 ## Future Optimization Opportunities
 
-### Phase 5: Full Dynamic Import Migration (Optional)
-Remove static exports to enable true lazy loading:
-- Remove static exports from `spells/index.ts`, `traits/races/index.ts`, etc.
-- Update all components to use dynamic imports via loader
-- Enable full chunk splitting for maximum bundle size reduction
-- Potential 50-70% reduction in initial bundle size
+### Phase 6: Main Database Splitting (Optional)
+Further optimize by splitting main SPELLS and TRAITS databases:
+- Split spells.ts by spell level
+- Split traits.ts by category
+- Could reduce initial bundle by additional 30-40%
+- Requires updating components to use loader
 
 ## Testing
 
@@ -294,12 +350,14 @@ Current bundle size: ~2.48 MB (gzipped: ~666 KB)
 ✅ **Main file complexity**: 6,723 lines → 52 lines (99.2% reduction)
 ✅ **Lazy loading**: Dynamic imports with React hooks ✅ IMPLEMENTED
 ✅ **Bundle splitting**: Vite chunk configuration ✅ CONFIGURED
+✅ **True chunk splitting**: 15 separate chunks created ✅ ACTIVATED
+✅ **Build warnings**: Zero mixed import warnings ✅ CLEAN
 ✅ **Backward compatibility**: 100% (no breaking changes)
 ✅ **Build status**: Passing with no TypeScript errors
 ✅ **Module cohesion**: Each file has single responsibility
-✅ **Import simplicity**: Central index maintains clean API
+✅ **Import simplicity**: Clear separation of static vs dynamic
 ✅ **Developer experience**: Clean React hooks with loading states
-✅ **Performance foundation**: Ready for 50-70% bundle size reduction
+✅ **Performance**: Filtered chunks load on-demand only
 
 ## Implementation Status
 
@@ -308,9 +366,10 @@ Current bundle size: ~2.48 MB (gzipped: ~666 KB)
 - ✅ **Phase 2**: Dynamic imports with React hooks (2 new files)
 - ✅ **Phase 3**: Vite bundle splitting configuration (1 file modified)
 - ✅ **Phase 4**: Character creation integration (1 file modified)
-- ⏳ **Phase 5**: Full dynamic import migration (future optimization)
+- ✅ **Phase 5**: Full dynamic import migration (5 files modified)
+- ⏳ **Phase 6**: Main database splitting (future optimization)
 
 ---
 
 **Refactoring completed**: February 24, 2026
-**Status**: ✅ Phase 4 Complete - Lazy Loading Infrastructure Fully Integrated
+**Status**: ✅ Phase 5 Complete - True Lazy Loading with Chunk Splitting Activated

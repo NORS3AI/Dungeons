@@ -1,6 +1,10 @@
 /**
  * Reference System Index
  * Central export point for all reference data modules
+ *
+ * Note: Class/race-specific filtered views (WARLOCK_SPELLS, DROW_TRAITS, etc.)
+ * are intentionally NOT exported from this index to enable true lazy loading.
+ * Use the dynamic import loader from './loader' to access filtered references.
  */
 
 // Export types
@@ -14,50 +18,13 @@ export { ARMOR } from './armor'
 export { CONDITIONS } from './conditions'
 export { RULES } from './rules'
 
-// Export all spells (main)
+// Export all spells (main database)
 export { SPELLS } from './spells'
 
-// Export class-specific spell subsets (for lazy loading)
-export {
-  WARLOCK_SPELLS,
-  WIZARD_SPELLS,
-  CLERIC_SPELLS,
-  SORCERER_SPELLS,
-  DRUID_SPELLS,
-  BARD_SPELLS,
-  WARLOCK_SPELL_COUNT,
-  WIZARD_SPELL_COUNT,
-  CLERIC_SPELL_COUNT,
-  SORCERER_SPELL_COUNT,
-  DRUID_SPELL_COUNT,
-  BARD_SPELL_COUNT,
-} from './spells/index'
-
-// Export all traits (main)
+// Export all traits (main database)
 export { TRAITS } from './traits'
 
-// Export race-specific trait subsets (for lazy loading)
-export {
-  DROW_TRAITS,
-  TIEFLING_TRAITS,
-  ELF_TRAITS,
-  HUMAN_TRAITS,
-  DWARF_TRAITS,
-  DROW_TRAIT_COUNT,
-  TIEFLING_TRAIT_COUNT,
-  ELF_TRAIT_COUNT,
-  HUMAN_TRAIT_COUNT,
-  DWARF_TRAIT_COUNT,
-} from './traits/races'
-
-// Export class-specific trait subsets (for lazy loading)
-export {
-  FIGHTER_TRAITS,
-  WARLOCK_TRAITS,
-  WIZARD_TRAITS,
-  CLERIC_TRAITS,
-  FIGHTER_TRAIT_COUNT,
-  WARLOCK_TRAIT_COUNT,
-  WIZARD_TRAIT_COUNT,
-  CLERIC_TRAIT_COUNT,
-} from './traits/classes'
+// For lazy loading of class/race-specific references, use:
+// import { loadCharacterReferences } from './loader'
+// Or use the React hook:
+// import { useCharacterReferences } from '@/hooks/useCharacterReferences'
