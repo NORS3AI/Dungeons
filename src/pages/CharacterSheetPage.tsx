@@ -2227,11 +2227,13 @@ export function CharacterSheetPage() {
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <h4 className={`font-bold text-base sm:text-lg ${
-                          isUnlocked ? 'text-emerald-300' : 'text-gray-500'
-                        }`}>
-                          {racialSpell.spellName}
-                        </h4>
+                        <QuickRefTooltip type="spell" id={racialSpell.spellId}>
+                          <h4 className={`font-bold text-base sm:text-lg cursor-pointer hover:text-emerald-200 ${
+                            isUnlocked ? 'text-emerald-300' : 'text-gray-500'
+                          }`}>
+                            {racialSpell.spellName}
+                          </h4>
+                        </QuickRefTooltip>
                         {!isUnlocked && (
                           <span className="text-xs px-2 py-0.5 bg-gray-700 text-gray-400 rounded">
                             Lv {racialSpell.levelGained}
