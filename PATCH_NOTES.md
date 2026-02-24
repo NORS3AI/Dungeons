@@ -21,6 +21,16 @@ Improved mobile experience with better responsive layouts.
 
 **Why This Matters**: Mobile players can now properly view and manage their currency without text overlap or buttons disappearing off-screen.
 
+#### **Inventory Button Mobile Optimization**
+- **Smaller Mobile Buttons**: Backpack action buttons (Equip All, Unequip All, Add Item) now use compact sizing on mobile
+- **Stacked Layout**: Buttons stack below the title on mobile instead of side-by-side
+- **Flexible Wrapping**: Buttons wrap naturally if space is tight
+- **Icon Scaling**: Icons scale down to 3x3 on mobile (vs 4x4 on desktop)
+- **Text Scaling**: Button text uses xs font on mobile (vs sm on desktop)
+- **Padding Reduction**: Smaller padding (px-2 py-1.5) on mobile saves space
+
+**Why This Matters**: Inventory buttons no longer float off-screen on mobile devices. The sleeker design maximizes usable screen space while maintaining full functionality.
+
 ### 🍖 Starting Supplies System
 
 New characters now begin their adventure properly equipped with survival supplies.
@@ -63,7 +73,14 @@ Death Knight spells can now be selected during character creation and level up.
 - Constitution-based spellcasting (Death Knight theme)
 - Fixed: Death Knight characters can now properly select their class spells
 
-**Why This Matters**: Death Knights were previously unable to select spells. Now fully playable with WoW-themed frost and blood magic.
+#### **Death Knight Spell Slot Fix**
+- **Fixed 0/0 Display**: Death Knights now show correct cantrips and spell slots
+- **Cantrips Known**: 2 at level 1-9, increases to 3 at level 10+
+- **Spells Known**: Scales from 2 (L1) to 9 (L19-20) following third caster progression
+- **Third Caster Arrays**: Added `cantripsKnown` and `spellsKnown` arrays to Death Knight class definition
+- **Proper Progression**: Matches Eldritch Knight/Arcane Trickster spell scaling
+
+**Why This Matters**: Death Knights were previously unable to select spells and showed 0/0 slots. Now fully playable with proper spell progression and WoW-themed frost and blood magic.
 
 ### ❤️ Healing Spell Roll Buttons
 
@@ -82,7 +99,13 @@ Healing spells now have dedicated roll buttons with heart icon in Actions tab.
 - Roll results appear inline with animated badge
 - Perfect for Clerics, Paladins, and other healers
 
-**Why This Matters**: Healers no longer need to manually calculate healing amounts. Click the heart, see the result instantly. Streamlines support gameplay.
+#### **Cleric Healing Spell Fix**
+- **Fixed Missing Buttons**: Cleric Cure Wounds and Healing Word now display green heart buttons
+- **Added Healing Property**: Updated Cleric spell definitions to include `healing: { dice: '1d8' }` property
+- **Proper Type Usage**: Using correct `healing` property instead of `damage` with type 'healing'
+- **Actions Tab Display**: Healing buttons now appear correctly in the Actions tab for all Clerics
+
+**Why This Matters**: Healers no longer need to manually calculate healing amounts. Click the heart, see the result instantly. Streamlines support gameplay for Clerics and other healing classes.
 
 ### 💧 Daily Water Consumption
 
@@ -177,6 +200,33 @@ Combat statistics now have detailed quick references explaining game mechanics. 
   - Added Death Knight cantrips and spell arrays to imports
   - Added death-knight case to availableCantrips useMemo
   - Added death-knight spell progression logic (levels 1, 7, 13, 17, 19)
+
+### 📚 Reference System Refactoring (Foundation)
+
+Began refactoring the massive quickReference.ts file (6,723 lines) for better maintainability.
+
+#### **Analysis & Planning**
+- **File Size**: Current reference file is 6,723 lines total
+- **Largest Sections**: SPELLS (3,940 lines, 59%), TRAITS (1,100 lines, 16%)
+- **Created Foundation**: New `src/data/references/` directory structure
+- **Type Definitions**: Extracted all interfaces to `references/types.ts`
+- **Implementation Plan**: Created detailed README with 4-phase refactoring strategy
+
+#### **Benefits of Split**
+- **Maintainability**: Easier to find and update specific references
+- **Performance**: Potential for lazy loading references by class/race
+- **Organization**: Logical grouping by content type (spells, traits, rules)
+- **Collaboration**: Multiple developers can work on different reference files
+- **Bundle Size**: Tree-shaking can remove unused references in production
+
+#### **Next Steps** (Documented in README)
+- Phase 2: Split SPELLS (3,940 lines) into `references/spells.ts`
+- Phase 3: Split TRAITS (1,100 lines) into `references/traits.ts`
+- Phase 4: Split RULES (736 lines) into `references/rules.ts`
+- Phase 5: Create `references/common.ts` for skills, abilities, weapons, armor, conditions
+- Final: Update `quickReference.ts` to re-export from split files (~50 lines)
+
+**Why This Matters**: The reference system was becoming unmaintainable at nearly 7,000 lines. This refactoring will reduce the main file by 98% while improving organization and enabling future optimizations like per-class/race reference loading.
 
 ---
 
