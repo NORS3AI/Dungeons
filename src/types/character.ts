@@ -106,6 +106,17 @@ export interface FeatureCharge {
 }
 
 /**
+ * Resource pool tracking (class-specific resources)
+ */
+export interface ResourcePool {
+  id: string
+  name: string
+  current: number
+  maximum: number
+  rechargeOn: 'shortRest' | 'longRest'
+}
+
+/**
  * Character alignment
  */
 export type Alignment =
@@ -210,6 +221,7 @@ export interface Character {
   // Features & Spellcasting
   featureCharges: FeatureCharge[]
   itemFeatures: ClassFeature[] // Features granted by magical items/equipment
+  resourcePools: ResourcePool[] // Class-specific resources (Ki, Sorcery Points, Runic Power, etc.)
   spellSlots: SpellSlots
   knownSpells: Spell[]
   preparedSpells: string[] // Spell IDs
