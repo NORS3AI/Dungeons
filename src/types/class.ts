@@ -2250,6 +2250,8 @@ export const DEATH_KNIGHT: Class = {
   subclassName: 'Death Knight Specialization',
   spellcasting: 'third',
   spellcastingAbility: 'constitution',
+  cantripsKnown: [2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+  spellsKnown: [2, 3, 4, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7, 8, 8, 8, 9, 9],
   features: [
     { id: 'runic-power', name: 'Runic Power', description: 'Pool of 4 + level. Regain half on short rest, all on long rest. Regenerate 1 point on critical hit.', level: 1 },
     { id: 'rune-weapon', name: 'Rune Weapon', description: 'Costs 2 Runic Power. Bonus action: infuse weapon for 1 minute, +1d4 necrotic damage.', level: 1 },

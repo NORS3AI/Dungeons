@@ -1904,18 +1904,18 @@ export function CharacterSheetPage() {
 
           {/* Backpack (Everything Else) */}
           <div className="card bg-gray-800 border-gray-700 p-4">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex flex-col gap-3 mb-4 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
               <h3 className="text-lg font-bold text-white">🎒 Backpack & Misc Items</h3>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => {
                     equipAll()
                     saveCharacter()
                   }}
-                  className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors flex items-center gap-2"
+                  className="px-2 py-1.5 sm:px-4 sm:py-2 bg-green-600 hover:bg-green-700 text-white text-xs sm:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1 sm:gap-2"
                   title="Equip all items (respects armor/shield/cloak limits)"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   Equip All
@@ -1925,10 +1925,10 @@ export function CharacterSheetPage() {
                     unequipAll()
                     saveCharacter()
                   }}
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors flex items-center gap-2"
+                  className="px-2 py-1.5 sm:px-4 sm:py-2 bg-red-600 hover:bg-red-700 text-white text-xs sm:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1 sm:gap-2"
                   title="Unequip all items"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   Unequip All
@@ -1945,10 +1945,10 @@ export function CharacterSheetPage() {
                     })
                     setShowEquipmentEditor(true)
                   }}
-                  className="px-4 py-2 bg-dnd-gold hover:bg-yellow-600 text-gray-900 font-semibold rounded-lg transition-colors flex items-center gap-2"
+                  className="px-2 py-1.5 sm:px-4 sm:py-2 bg-dnd-gold hover:bg-yellow-600 text-gray-900 text-xs sm:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1 sm:gap-2"
                   title="Add custom item to inventory"
                 >
-                  <span className="text-lg font-bold">+</span>
+                  <span className="text-base sm:text-lg font-bold">+</span>
                   Add Item
                 </button>
               </div>
