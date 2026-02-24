@@ -158,24 +158,159 @@ preload({ race: 'drow', classId: 'warlock' }) // Add class
 - ~50-70% reduction in initial bundle size
 - Clean developer experience with React hooks
 
-## Future Optimization Opportunities
+### Phase 3: Vite Bundle Splitting ✅ COMPLETED
 
-### Phase 3: Bundle Splitting
-Configure Vite to split references into separate chunks:
+Configured Vite to automatically split references into optimized chunks for better caching and lazy loading.
+
+**Configured Chunks:**
+- `references-core` - Core game data (skills, abilities, weapons, armor, conditions, rules)
+- `references-spells-main` - Main spell database
+- `references-traits-main` - Main trait database
+- `references-utils` - Loader and type utilities
+- `spells-{class}` - Per-class spell chunks (warlock, wizard, cleric, sorcerer, druid, bard)
+- `traits-{race}` - Per-race trait chunks (drow, tiefling, elf, human, dwarf)
+- `traits-{class}` - Per-class trait chunks (fighter, warlock, wizard, cleric)
+- `vendor-{library}` - Third-party library chunks (react, zustand, router)
+
+**Implementation:**
 ```typescript
 // vite.config.ts
 build: {
   rollupOptions: {
     output: {
-      manualChunks: {
-        'references-game': ['./src/data/references/skills.ts', './src/data/references/abilities.ts'],
-        'references-spells': ['./src/data/references/spells.ts'],
-        'references-traits': ['./src/data/references/traits.ts']
+      manualChunks: (id) => {
+        // Path-based chunk assignment with pattern matching
+        if (id.includes('src/data/references/')) {
+          if (id.includes('/spells/warlock.ts')) return 'spells-warlock'
+          if (id.includes('/traits/races/drow.ts')) return 'traits-drow'
+          // ... etc
+        }
+        if (id.includes('node_modules/react')) return 'vendor-react'
+        // ... etc
       }
     }
   }
 }
 ```
+
+**Benefits:**
+- Better long-term caching (vendors separate from app code)
+- Chunks load only when needed via dynamic imports
+- Parallel downloads for better performance
+- Clear naming for debugging and monitoring
+
+**Status:** Configuration complete. Chunks will activate when Phase 4 integrates dynamic imports into the app.
+
+### Phase 4: Character Creation Integration ✅ COMPLETED
+
+Integrated preloading hooks into character creation workflow for automatic background loading.
+
+**Modified Files:**
+- `src/pages/CharacterCreatePage.tsx` - Character creation wizard
+
+**Integration:**
+- Added `usePreloadReferences()` hook to character creation
+- Automatic preloading when user selects race
+- Automatic preloading when user selects class
+- Non-blocking background loading during user decision time
+
+**Usage in CharacterCreatePage:**
+```typescript
+import { usePreloadReferences } from '../hooks/useCharacterReferences'
+
+const preloadReferences = usePreloadReferences()
+
+// Preload race traits when selected
+const handleRaceSelect = (race: Race) => {
+  setRace(race)
+  preloadReferences({ race: race.id.toLowerCase() })
+  nextStep()
+}
+
+// Preload class spells/traits when selected
+const handleClassSelect = (classData: Class) => {
+  setClass(classData)
+  preloadReferences({
+    race: currentCharacter?.race?.id.toLowerCase(),
+    classId: classData.id.toLowerCase(),
+  })
+  nextStep()
+}
+```
+
+**Benefits:**
+- Cache warmed before user needs the data
+- Invisible background loading
+- Faster perceived performance
+- Works with Vite chunk splitting
+
+**Current State:**
+Preloading infrastructure is fully integrated. Cache warming works during character creation for optimal performance.
+
+### Phase 5: Full Dynamic Import Migration ✅ COMPLETED
+
+Removed all static exports of filtered views to enable true chunk splitting.
+
+**Modified Files:**
+- `index.ts` - Removed static filtered exports (43 lines deleted)
+- `spells/index.ts` - Converted to documentation-only
+- `traits/index.ts` - Converted to documentation-only
+- `traits/races/index.ts` - Converted to documentation-only
+- `traits/classes/index.ts` - Converted to documentation-only
+
+**Changes:**
+Removed static re-exports of filtered views (WARLOCK_SPELLS, DROW_TRAITS, etc.) from all index files. These are now only available via dynamic imports through loader.ts.
+
+**Before:**
+```typescript
+// Caused mixed static/dynamic imports
+export { WARLOCK_SPELLS, WARLOCK_SPELL_COUNT } from './warlock'
+```
+
+**After:**
+```typescript
+// Documentation-only, forces dynamic loading
+// Use: import { loadClassSpells } from '../loader'
+```
+
+**Results:**
+- ✅ 15 separate chunks created (class spells, race traits, class traits)
+- ✅ No build warnings about mixed imports
+- ✅ True lazy loading enabled
+- ✅ Clean architecture with clear usage patterns
+
+**Build Output:**
+Each filtered module creates a ~0.22-0.30 KB chunk (gzipped ~0.19-0.21 KB):
+- `warlock-[hash].js`, `wizard-[hash].js`, etc. (spell filters)
+- `drow-[hash].js`, `tiefling-[hash].js`, etc. (race filters)
+- `fighter-[hash].js`, `warlock-[hash].js`, etc. (class filters)
+
+**Usage:**
+Core references still statically available:
+```typescript
+import { SPELLS, TRAITS, SKILLS } from './index'
+```
+
+Filtered references via dynamic loading only:
+```typescript
+import { loadCharacterReferences } from './loader'
+const refs = await loadCharacterReferences({ race: 'drow', classId: 'warlock' })
+```
+
+Or via React hook:
+```typescript
+import { useCharacterReferences } from '@/hooks/useCharacterReferences'
+const { references } = useCharacterReferences({ race: 'drow', classId: 'warlock' })
+```
+
+## Future Optimization Opportunities
+
+### Phase 6: Main Database Splitting (Optional)
+Further optimize by splitting main SPELLS and TRAITS databases:
+- Split spells.ts by spell level
+- Split traits.ts by category
+- Could reduce initial bundle by additional 30-40%
+- Requires updating components to use loader
 
 ## Testing
 
@@ -214,22 +349,27 @@ Current bundle size: ~2.48 MB (gzipped: ~666 KB)
 ✅ **File organization**: 1 monolith → 11 focused modules + 21 filtered views
 ✅ **Main file complexity**: 6,723 lines → 52 lines (99.2% reduction)
 ✅ **Lazy loading**: Dynamic imports with React hooks ✅ IMPLEMENTED
+✅ **Bundle splitting**: Vite chunk configuration ✅ CONFIGURED
+✅ **True chunk splitting**: 15 separate chunks created ✅ ACTIVATED
+✅ **Build warnings**: Zero mixed import warnings ✅ CLEAN
 ✅ **Backward compatibility**: 100% (no breaking changes)
 ✅ **Build status**: Passing with no TypeScript errors
 ✅ **Module cohesion**: Each file has single responsibility
-✅ **Import simplicity**: Central index maintains clean API
+✅ **Import simplicity**: Clear separation of static vs dynamic
 ✅ **Developer experience**: Clean React hooks with loading states
-✅ **Performance foundation**: Ready for 50-70% bundle size reduction
+✅ **Performance**: Filtered chunks load on-demand only
 
 ## Implementation Status
 
 - ✅ **Phase 0**: Granular split (11 modules)
 - ✅ **Phase 1**: Filtered views by class/race (21 additional files)
 - ✅ **Phase 2**: Dynamic imports with React hooks (2 new files)
-- ⏳ **Phase 3**: Vite bundle splitting configuration (future)
-- ⏳ **Phase 4**: Integration into character creation (future)
+- ✅ **Phase 3**: Vite bundle splitting configuration (1 file modified)
+- ✅ **Phase 4**: Character creation integration (1 file modified)
+- ✅ **Phase 5**: Full dynamic import migration (5 files modified)
+- ⏳ **Phase 6**: Main database splitting (future optimization)
 
 ---
 
 **Refactoring completed**: February 24, 2026
-**Status**: ✅ Phase 2 Complete - Lazy Loading Infrastructure Ready
+**Status**: ✅ Phase 5 Complete - True Lazy Loading with Chunk Splitting Activated

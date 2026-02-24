@@ -1,15 +1,17 @@
 /**
  * Spell references by class
- * Enables lazy loading of class-specific spell subsets
+ *
+ * Class-specific spell subsets (WARLOCK_SPELLS, WIZARD_SPELLS, etc.) are NOT
+ * statically exported to enable true lazy loading and chunk splitting.
+ *
+ * To access class-specific spells, use the dynamic loader:
+ * import { loadClassSpells } from '../loader'
+ * const { spells } = await loadClassSpells('warlock')
+ *
+ * Or use the React hook:
+ * import { useCharacterReferences } from '@/hooks/useCharacterReferences'
+ * const { references } = useCharacterReferences({ classId: 'warlock' })
  */
 
-// Re-export all spells (for backward compatibility)
-export { SPELLS } from '../spells'
-
-// Class-specific spell subsets
-export { WARLOCK_SPELLS, WARLOCK_SPELL_COUNT } from './warlock'
-export { WIZARD_SPELLS, WIZARD_SPELL_COUNT } from './wizard'
-export { CLERIC_SPELLS, CLERIC_SPELL_COUNT } from './cleric'
-export { SORCERER_SPELLS, SORCERER_SPELL_COUNT } from './sorcerer'
-export { DRUID_SPELLS, DRUID_SPELL_COUNT } from './druid'
-export { BARD_SPELLS, BARD_SPELL_COUNT } from './bard'
+// This file is intentionally minimal to prevent static imports
+// Individual class spell files are loaded dynamically via loader.ts

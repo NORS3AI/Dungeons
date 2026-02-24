@@ -1,10 +1,17 @@
 /**
  * Racial trait references
- * Enables lazy loading of race-specific trait subsets
+ *
+ * Race-specific trait subsets (DROW_TRAITS, TIEFLING_TRAITS, etc.) are NOT
+ * statically exported to enable true lazy loading and chunk splitting.
+ *
+ * To access race-specific traits, use the dynamic loader:
+ * import { loadRaceTraits } from '../../loader'
+ * const { traits } = await loadRaceTraits('drow')
+ *
+ * Or use the React hook:
+ * import { useCharacterReferences } from '@/hooks/useCharacterReferences'
+ * const { references } = useCharacterReferences({ race: 'drow' })
  */
 
-export { DROW_TRAITS, DROW_TRAIT_COUNT } from './drow'
-export { TIEFLING_TRAITS, TIEFLING_TRAIT_COUNT } from './tiefling'
-export { ELF_TRAITS, ELF_TRAIT_COUNT } from './elf'
-export { HUMAN_TRAITS, HUMAN_TRAIT_COUNT } from './human'
-export { DWARF_TRAITS, DWARF_TRAIT_COUNT } from './dwarf'
+// This file is intentionally minimal to prevent static imports
+// Individual race trait files are loaded dynamically via loader.ts

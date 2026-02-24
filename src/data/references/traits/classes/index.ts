@@ -1,9 +1,17 @@
 /**
  * Class trait references
- * Enables lazy loading of class-specific trait subsets
+ *
+ * Class-specific trait subsets (FIGHTER_TRAITS, WARLOCK_TRAITS, etc.) are NOT
+ * statically exported to enable true lazy loading and chunk splitting.
+ *
+ * To access class-specific traits, use the dynamic loader:
+ * import { loadClassTraits } from '../../loader'
+ * const { traits } = await loadClassTraits('fighter')
+ *
+ * Or use the React hook:
+ * import { useCharacterReferences } from '@/hooks/useCharacterReferences'
+ * const { references } = useCharacterReferences({ classId: 'fighter' })
  */
 
-export { FIGHTER_TRAITS, FIGHTER_TRAIT_COUNT } from './fighter'
-export { WARLOCK_TRAITS, WARLOCK_TRAIT_COUNT } from './warlock'
-export { WIZARD_TRAITS, WIZARD_TRAIT_COUNT } from './wizard'
-export { CLERIC_TRAITS, CLERIC_TRAIT_COUNT } from './cleric'
+// This file is intentionally minimal to prevent static imports
+// Individual class trait files are loaded dynamically via loader.ts

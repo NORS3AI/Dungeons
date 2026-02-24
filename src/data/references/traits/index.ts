@@ -1,13 +1,18 @@
 /**
  * Trait references organized by race and class
- * Enables lazy loading of specific trait subsets
+ *
+ * Race and class-specific trait subsets are NOT statically exported to enable
+ * true lazy loading and chunk splitting.
+ *
+ * To access filtered traits, use the dynamic loader:
+ * import { loadRaceTraits, loadClassTraits } from '../loader'
+ * const { traits: raceTraits } = await loadRaceTraits('drow')
+ * const { traits: classTraits } = await loadClassTraits('fighter')
+ *
+ * Or use the React hook:
+ * import { useCharacterReferences } from '@/hooks/useCharacterReferences'
+ * const { references } = useCharacterReferences({ race: 'drow', classId: 'fighter' })
  */
 
-// Re-export all traits (for backward compatibility)
-export { TRAITS } from '../traits'
-
-// Race-specific traits
-export * from './races'
-
-// Class-specific traits
-export * from './classes'
+// This file is intentionally minimal to prevent static imports
+// Individual trait files are loaded dynamically via loader.ts
