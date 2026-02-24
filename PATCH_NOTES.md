@@ -336,6 +336,70 @@ preload({ race: 'drow', classId: 'warlock' })
 
 **Impact**: Foundation complete for on-demand loading. When integrated into character creation, users will only download the spell/trait references they actually need instead of the entire 5,000+ line database.
 
+#### **Phase 3: Vite Bundle Splitting (COMPLETED ✅)**
+
+Configured Vite to split reference modules into optimized chunks for better caching and lazy loading.
+
+**Configuration Added to `vite.config.ts`:**
+
+**Reference Chunks:**
+- `references-core` - Core references needed by all characters (skills, abilities, weapons, armor, conditions, rules)
+- `references-spells-main` - Main spell database (401 spells)
+- `references-traits-main` - Main trait database (100+ traits)
+- `references-utils` - Loader utilities and types
+
+**Class-Specific Spell Chunks:**
+- `spells-warlock` - Warlock spell subset
+- `spells-wizard` - Wizard spell subset
+- `spells-cleric` - Cleric spell subset
+- `spells-sorcerer` - Sorcerer spell subset
+- `spells-druid` - Druid spell subset
+- `spells-bard` - Bard spell subset
+- `spells-index` - Spell export coordination
+
+**Race-Specific Trait Chunks:**
+- `traits-drow` - Drow racial traits
+- `traits-tiefling` - Tiefling racial traits
+- `traits-elf` - Elf/Half-Elf racial traits
+- `traits-human` - Human racial traits
+- `traits-dwarf` - Dwarf racial traits
+- `traits-races-index` - Race trait export coordination
+
+**Class-Specific Trait Chunks:**
+- `traits-fighter` - Fighter class features
+- `traits-warlock` - Warlock class features
+- `traits-wizard` - Wizard class features
+- `traits-cleric` - Cleric class features
+- `traits-classes-index` - Class trait export coordination
+
+**Vendor Chunks:**
+- `vendor-react` - React and ReactDOM
+- `vendor-zustand` - Zustand state management
+- `vendor-router` - React Router
+- `vendor-other` - Other dependencies
+
+**Technical Implementation:**
+- Uses Rollup's `manualChunks` function for fine-grained control
+- Path-based chunk assignment with pattern matching
+- Increased `chunkSizeWarningLimit` to 1000 KB (intentional large chunks)
+- Optimized for long-term caching (vendors change less frequently than app code)
+
+**Benefits:**
+- **Better Caching**: Vendors and core references cached separately from app code
+- **Lazy Loading Ready**: Individual chunks load only when needed via dynamic imports
+- **Parallel Downloads**: Browser can download multiple small chunks simultaneously
+- **Optimal Cache Invalidation**: Only changed chunks need re-download on updates
+- **Development Clarity**: Clear chunk naming shows what's being loaded
+
+**Current Status:**
+Configuration is complete and ready. Chunks will activate when Phase 4 integrates the dynamic import system into character creation. Currently, the app uses static imports, so Vite bundles everything together (expected behavior). Once dynamic imports are used, the configured chunks will automatically split.
+
+**Example Future Loading Pattern:**
+When a user creates a Drow Warlock:
+1. Initial load: `vendor-react`, `vendor-router`, `references-core`, main app code
+2. Character creation: `traits-drow`, `spells-warlock`, `traits-warlock` (lazy loaded)
+3. NOT loaded: Wizard spells, Cleric traits, Tiefling traits, etc. (~70% bundle savings)
+
 ---
 
 ## Version 0.3.3 - February 23, 2026 @ 01:24 AM MST

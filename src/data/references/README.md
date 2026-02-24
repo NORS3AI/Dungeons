@@ -158,24 +158,57 @@ preload({ race: 'drow', classId: 'warlock' }) // Add class
 - ~50-70% reduction in initial bundle size
 - Clean developer experience with React hooks
 
-## Future Optimization Opportunities
+### Phase 3: Vite Bundle Splitting ✅ COMPLETED
 
-### Phase 3: Bundle Splitting
-Configure Vite to split references into separate chunks:
+Configured Vite to automatically split references into optimized chunks for better caching and lazy loading.
+
+**Configured Chunks:**
+- `references-core` - Core game data (skills, abilities, weapons, armor, conditions, rules)
+- `references-spells-main` - Main spell database
+- `references-traits-main` - Main trait database
+- `references-utils` - Loader and type utilities
+- `spells-{class}` - Per-class spell chunks (warlock, wizard, cleric, sorcerer, druid, bard)
+- `traits-{race}` - Per-race trait chunks (drow, tiefling, elf, human, dwarf)
+- `traits-{class}` - Per-class trait chunks (fighter, warlock, wizard, cleric)
+- `vendor-{library}` - Third-party library chunks (react, zustand, router)
+
+**Implementation:**
 ```typescript
 // vite.config.ts
 build: {
   rollupOptions: {
     output: {
-      manualChunks: {
-        'references-game': ['./src/data/references/skills.ts', './src/data/references/abilities.ts'],
-        'references-spells': ['./src/data/references/spells.ts'],
-        'references-traits': ['./src/data/references/traits.ts']
+      manualChunks: (id) => {
+        // Path-based chunk assignment with pattern matching
+        if (id.includes('src/data/references/')) {
+          if (id.includes('/spells/warlock.ts')) return 'spells-warlock'
+          if (id.includes('/traits/races/drow.ts')) return 'traits-drow'
+          // ... etc
+        }
+        if (id.includes('node_modules/react')) return 'vendor-react'
+        // ... etc
       }
     }
   }
 }
 ```
+
+**Benefits:**
+- Better long-term caching (vendors separate from app code)
+- Chunks load only when needed via dynamic imports
+- Parallel downloads for better performance
+- Clear naming for debugging and monitoring
+
+**Status:** Configuration complete. Chunks will activate when Phase 4 integrates dynamic imports into the app.
+
+## Future Optimization Opportunities
+
+### Phase 4: Character Creation Integration
+Integrate dynamic loading into character creation flow:
+- Load race traits when user selects race
+- Load class traits/spells when user selects class
+- Preload in background as user progresses through wizard
+- Show loading states during reference fetching
 
 ## Testing
 
@@ -214,6 +247,7 @@ Current bundle size: ~2.48 MB (gzipped: ~666 KB)
 ✅ **File organization**: 1 monolith → 11 focused modules + 21 filtered views
 ✅ **Main file complexity**: 6,723 lines → 52 lines (99.2% reduction)
 ✅ **Lazy loading**: Dynamic imports with React hooks ✅ IMPLEMENTED
+✅ **Bundle splitting**: Vite chunk configuration ✅ CONFIGURED
 ✅ **Backward compatibility**: 100% (no breaking changes)
 ✅ **Build status**: Passing with no TypeScript errors
 ✅ **Module cohesion**: Each file has single responsibility
@@ -226,10 +260,10 @@ Current bundle size: ~2.48 MB (gzipped: ~666 KB)
 - ✅ **Phase 0**: Granular split (11 modules)
 - ✅ **Phase 1**: Filtered views by class/race (21 additional files)
 - ✅ **Phase 2**: Dynamic imports with React hooks (2 new files)
-- ⏳ **Phase 3**: Vite bundle splitting configuration (future)
+- ✅ **Phase 3**: Vite bundle splitting configuration (1 file modified)
 - ⏳ **Phase 4**: Integration into character creation (future)
 
 ---
 
 **Refactoring completed**: February 24, 2026
-**Status**: ✅ Phase 2 Complete - Lazy Loading Infrastructure Ready
+**Status**: ✅ Phase 3 Complete - Bundle Splitting Configured and Ready
