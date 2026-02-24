@@ -3223,13 +3223,13 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
     const attackBonus = attackMod + profBonus
 
     return (
-      <div className={`p-3 rounded-lg flex items-center justify-between group ${
+      <div className={`p-3 rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between group gap-3 ${
         isEquipped ? 'bg-green-900/30 border border-green-600/50' : 'bg-gray-900'
       }`}>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
           <EquipToggle equipped={!!isEquipped} onToggle={onToggleEquip} canEquip={canEquip} />
-          <div>
-            <div className="flex items-center gap-2">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="font-medium text-white hover:text-dnd-gold">
                 {weapon.name}
               </span>
@@ -3243,7 +3243,7 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 justify-between sm:justify-end">
           <div className="text-right">
             <div className="text-dnd-gold font-medium">
               +{attackBonus} to hit
@@ -3274,13 +3274,13 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
 
   if (isArmor(item)) {
     return (
-      <div className={`p-3 rounded-lg flex items-center justify-between group ${
+      <div className={`p-3 rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between group gap-3 ${
         isEquipped ? 'bg-blue-900/30 border border-blue-600/50' : 'bg-gray-900'
       }`}>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
           <EquipToggle equipped={!!isEquipped} onToggle={onToggleEquip} canEquip={canEquip} />
-          <div>
-            <div className="flex items-center gap-2">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="font-medium text-white">{item.name}</span>
               {isEquipped && <span className="text-xs text-blue-400 bg-blue-900/50 px-1.5 py-0.5 rounded">Equipped</span>}
             </div>
@@ -3289,7 +3289,7 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 justify-between sm:justify-end">
           <div className="text-right">
             <div className="text-xs text-gray-500">{item.weight} lb</div>
           </div>
@@ -3317,13 +3317,13 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
 
   if (isShield(item)) {
     return (
-      <div className={`p-3 rounded-lg flex items-center justify-between group ${
+      <div className={`p-3 rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between group gap-3 ${
         isEquipped ? 'bg-purple-900/30 border border-purple-600/50' : 'bg-gray-900'
       }`}>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
           <EquipToggle equipped={!!isEquipped} onToggle={onToggleEquip} canEquip={canEquip} />
-          <div>
-            <div className="flex items-center gap-2">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="font-medium text-white">{item.name}</span>
               {isEquipped && <span className="text-xs text-purple-400 bg-purple-900/50 px-1.5 py-0.5 rounded">Equipped</span>}
             </div>
@@ -3332,7 +3332,7 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 justify-between sm:justify-end">
           <div className="text-right">
             <div className="text-xs text-gray-500">{item.weight} lb</div>
           </div>
@@ -3360,18 +3360,18 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
 
   if (isCloak(item)) {
     return (
-      <div className={`p-3 rounded-lg flex items-center justify-between group ${
+      <div className={`p-3 rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between group gap-3 ${
         isEquipped ? 'bg-indigo-900/30 border border-indigo-600/50' : 'bg-gray-900'
       }`}>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
           <EquipToggle equipped={!!isEquipped} onToggle={onToggleEquip} canEquip={canEquip} />
-          <div>
-            <div className="flex items-center gap-2">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="font-medium text-white">{item.name}</span>
               {isEquipped && <span className="text-xs text-indigo-400 bg-indigo-900/50 px-1.5 py-0.5 rounded">Equipped</span>}
             </div>
             {item.description && (
-              <div className="text-sm text-gray-400">{item.description}</div>
+              <div className="text-sm text-gray-400 break-words">{item.description}</div>
             )}
             {item.acBonus && (
               <div className="text-sm text-gray-400">
@@ -3380,7 +3380,7 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
             )}
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 justify-between sm:justify-end">
           <div className="text-right">
             <div className="text-xs text-gray-500">{item.weight} lb</div>
           </div>
@@ -3414,13 +3414,13 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
                        item.name.toLowerCase().includes('fortune')
 
   return (
-    <div className={`p-3 rounded-lg flex items-center justify-between group ${
+    <div className={`p-3 rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between group gap-3 ${
       isEquipped ? 'bg-yellow-900/30 border border-yellow-600/50' : 'bg-gray-900'
     }`}>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 flex-1 min-w-0">
         <EquipToggle equipped={!!isEquipped} onToggle={onToggleEquip} canEquip={canEquip} />
-        <div>
-          <div className="flex items-center gap-2">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="font-medium text-white">{item.name}</span>
             {isEquipped && <span className="text-xs text-yellow-400 bg-yellow-900/50 px-1.5 py-0.5 rounded">Equipped</span>}
             {isConsumable && <span className="text-xs text-green-400 bg-green-900/50 px-1.5 py-0.5 rounded">Consumable</span>}
@@ -3428,11 +3428,11 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
           {item.quantity > 1 && (
             <span className="text-gray-500 ml-1">x{item.quantity}</span>
           )}
-          <div className="text-sm text-gray-400">{item.description}</div>
+          <div className="text-sm text-gray-400 break-words">{item.description}</div>
           <div className="text-xs text-gray-500 mt-1 capitalize">{item.category.replace(/([A-Z])/g, ' $1').trim()}</div>
         </div>
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 justify-between sm:justify-end flex-shrink-0">
         <div className="text-right">
           <div className="text-xs text-gray-500">{item.weight} lb</div>
         </div>
