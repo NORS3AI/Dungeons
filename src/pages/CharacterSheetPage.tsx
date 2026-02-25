@@ -1330,7 +1330,11 @@ export function CharacterSheetPage() {
                   <div className="flex justify-between">
                     <QuickRefTooltip
                       type="rule"
-                      id={character.race.vision === 'superiorDarkvision' ? 'superior-darkvision' : 'darkvision'}
+                      id={
+                        character.race.vision === 'superiorDarkvision' ? 'superior-darkvision' :
+                        character.race.vision === 'darkvision' ? 'darkvision' :
+                        'vision'
+                      }
                     >
                       <span className="text-gray-500 cursor-pointer hover:text-gray-300">Vision</span>
                     </QuickRefTooltip>
@@ -1743,12 +1747,47 @@ export function CharacterSheetPage() {
           )}
 
           {/* Equipped Weapons */}
-          {character.equipment.filter(item => isWeapon(item) && item.equipped !== false).length > 0 && (
+          {character.equipment.filter(item => isWeapon(item) && item.equipped === true).length > 0 && (
             <div className="card bg-gray-800 border-gray-700 p-4">
               <h3 className="text-lg font-bold text-white mb-4">⚔️ Equipped Weapons</h3>
               <div className="space-y-2">
                 {character.equipment
-                  .filter((item): item is Weapon => isWeapon(item) && item.equipped !== false)
+                  .filter((item): item is Weapon => isWeapon(item) && item.equipped === true)
+                  .map((item) => (
+                    <EquipmentItem
+                      key={item.id}
+                      item={item}
+                      character={character}
+                      onRemove={() => {
+                        removeEquipment(item.id)
+                        saveCharacter()
+                      }}
+                      onToggleEquip={() => {
+                        toggleEquipment(item.id)
+                        saveCharacter()
+                      }}
+                      onChangeQuantity={(change) => {
+                        changeEquipmentQuantity(item.id, change)
+                        saveCharacter()
+                      }}
+                      onUse={() => handleUseConsumable(item)}
+                      onRename={(newName) => {
+                        renameEquipment(item.id, newName)
+                        saveCharacter()
+                      }}
+                    />
+                  ))}
+              </div>
+            </div>
+          )}
+
+          {/* Unequipped Weapons */}
+          {character.equipment.filter(item => isWeapon(item) && item.equipped !== true).length > 0 && (
+            <div className="card bg-gray-800 border-gray-700 p-4">
+              <h3 className="text-lg font-bold text-gray-400 mb-4">⚔️ Unequipped Weapons</h3>
+              <div className="space-y-2">
+                {character.equipment
+                  .filter((item): item is Weapon => isWeapon(item) && item.equipped !== true)
                   .map((item) => (
                     <EquipmentItem
                       key={item.id}
@@ -1778,12 +1817,47 @@ export function CharacterSheetPage() {
           )}
 
           {/* Equipped Armor & Cloaks */}
-          {character.equipment.filter(item => (isArmor(item) || item.category === 'cloak') && item.equipped !== false).length > 0 && (
+          {character.equipment.filter(item => (isArmor(item) || item.category === 'cloak') && item.equipped === true).length > 0 && (
             <div className="card bg-gray-800 border-gray-700 p-4">
               <h3 className="text-lg font-bold text-white mb-4">🛡️ Equipped Armor & Cloaks</h3>
               <div className="space-y-2">
                 {character.equipment
-                  .filter((item) => (isArmor(item) || item.category === 'cloak') && item.equipped !== false)
+                  .filter((item) => (isArmor(item) || item.category === 'cloak') && item.equipped === true)
+                  .map((item) => (
+                    <EquipmentItem
+                      key={item.id}
+                      item={item}
+                      character={character}
+                      onRemove={() => {
+                        removeEquipment(item.id)
+                        saveCharacter()
+                      }}
+                      onToggleEquip={() => {
+                        toggleEquipment(item.id)
+                        saveCharacter()
+                      }}
+                      onChangeQuantity={(change) => {
+                        changeEquipmentQuantity(item.id, change)
+                        saveCharacter()
+                      }}
+                      onUse={() => handleUseConsumable(item)}
+                      onRename={(newName) => {
+                        renameEquipment(item.id, newName)
+                        saveCharacter()
+                      }}
+                    />
+                  ))}
+              </div>
+            </div>
+          )}
+
+          {/* Unequipped Armor & Cloaks */}
+          {character.equipment.filter(item => (isArmor(item) || item.category === 'cloak') && item.equipped !== true).length > 0 && (
+            <div className="card bg-gray-800 border-gray-700 p-4">
+              <h3 className="text-lg font-bold text-gray-400 mb-4">🛡️ Unequipped Armor & Cloaks</h3>
+              <div className="space-y-2">
+                {character.equipment
+                  .filter((item) => (isArmor(item) || item.category === 'cloak') && item.equipped !== true)
                   .map((item) => (
                     <EquipmentItem
                       key={item.id}
@@ -1814,7 +1888,7 @@ export function CharacterSheetPage() {
 
           {/* Equipped Shields */}
           {character.equipment.filter(item =>
-            item.equipped &&
+            item.equipped === true &&
             item.category === 'shield'
           ).length > 0 && (
             <div className="card bg-gray-800 border-gray-700 p-4">
@@ -1822,7 +1896,48 @@ export function CharacterSheetPage() {
               <div className="space-y-2">
                 {character.equipment
                   .filter(item =>
-                    item.equipped &&
+                    item.equipped === true &&
+                    item.category === 'shield'
+                  )
+                  .map((item) => (
+                    <EquipmentItem
+                      key={item.id}
+                      item={item}
+                      character={character}
+                      onRemove={() => {
+                        removeEquipment(item.id)
+                        saveCharacter()
+                      }}
+                      onToggleEquip={() => {
+                        toggleEquipment(item.id)
+                        saveCharacter()
+                      }}
+                      onChangeQuantity={(change) => {
+                        changeEquipmentQuantity(item.id, change)
+                        saveCharacter()
+                      }}
+                      onUse={() => handleUseConsumable(item)}
+                      onRename={(newName) => {
+                        renameEquipment(item.id, newName)
+                        saveCharacter()
+                      }}
+                    />
+                  ))}
+              </div>
+            </div>
+          )}
+
+          {/* Unequipped Shields */}
+          {character.equipment.filter(item =>
+            item.equipped !== true &&
+            item.category === 'shield'
+          ).length > 0 && (
+            <div className="card bg-gray-800 border-gray-700 p-4">
+              <h3 className="text-lg font-bold text-gray-400 mb-4">🛡 Unequipped Shields</h3>
+              <div className="space-y-2">
+                {character.equipment
+                  .filter(item =>
+                    item.equipped !== true &&
                     item.category === 'shield'
                   )
                   .map((item) => (
@@ -1855,7 +1970,7 @@ export function CharacterSheetPage() {
 
           {/* Jewelry & Trinkets */}
           {character.equipment.filter(item =>
-            item.equipped &&
+            item.equipped === true &&
             (item.category === 'jewelry' || item.category === 'trinket')
           ).length > 0 && (
             <div className="card bg-gray-800 border-gray-700 p-4">
@@ -1863,7 +1978,7 @@ export function CharacterSheetPage() {
               <div className="space-y-2">
                 {character.equipment
                   .filter(item =>
-                    item.equipped &&
+                    item.equipped === true &&
                     (item.category === 'jewelry' || item.category === 'trinket')
                   )
                   .map((item) => (
@@ -2478,10 +2593,10 @@ export function CharacterSheetPage() {
           {/* Weapon Attacks */}
           <div className="card bg-gray-800 border-gray-700 p-6">
             <h3 className="text-2xl font-bold text-white mb-4">🗡️ Weapon Attacks</h3>
-            {character.equipment.filter(item => isWeapon(item) && item.equipped !== false).length > 0 ? (
+            {character.equipment.filter(item => isWeapon(item) && item.equipped === true).length > 0 ? (
               <div className="grid md:grid-cols-2 gap-4">
                 {character.equipment
-                  .filter((item): item is Weapon => isWeapon(item) && item.equipped !== false)
+                  .filter((item): item is Weapon => isWeapon(item) && item.equipped === true)
                   .map((weapon) => {
                     const attackBonus = weapon.properties?.includes('finesse')
                       ? Math.max(
