@@ -631,6 +631,35 @@ export const RULES: Record<string, RuleRef> = {
     ],
     relatedRules: ['attack-rolls'],
   },
+  'resistance': {
+    id: 'resistance',
+    name: 'Damage Resistance',
+    category: 'combat',
+    summary: 'Take half damage from specific damage types.',
+    description: 'Resistance means you take half damage from a specific damage type. Many races and class features grant resistance to certain damage types (like fire, cold, poison, etc.). If you have resistance to a damage type, you take half damage from that source, rounding down. Resistance from multiple sources doesn\'t stack - you either have it or you don\'t. Resistance is applied after all other damage modifiers.',
+    examples: [
+      'Tiefling with Hellish Resistance takes 20 fire damage → takes 10 damage',
+      'Dwarf with poison resistance takes 15 poison damage → takes 7 damage (rounds down)',
+      'Bear Totem Barbarian raging: Resistance to all damage except psychic',
+      'Fire Elemental hits with 12 fire damage, but target has fire resistance → takes 6 damage'
+    ],
+    table: {
+      headers: ['Damage Type', 'Common Sources of Resistance'],
+      rows: [
+        ['Fire', 'Tiefling racial trait, Fire Elemental'],
+        ['Cold', 'Some Dragonborn, Frost Giant heritage'],
+        ['Poison', 'Dwarf racial trait, Warforged, Stout Halfling'],
+        ['Acid', 'Black/Copper Dragonborn'],
+        ['Lightning', 'Blue/Bronze Dragonborn'],
+        ['Thunder', 'Storm Sorcerer features'],
+        ['Psychic', 'Thought Shield (Warlock), Kalashtar'],
+        ['Necrotic', 'Aasimar, Shadow Sorcerer'],
+        ['Radiant', 'Aasimar, Divine Soul Sorcerer'],
+        ['Slashing/Piercing/Bludgeoning', 'Raging Barbarian (non-magical)']
+      ]
+    },
+    relatedRules: ['damage-types', 'vulnerability', 'immunity'],
+  },
   'difficult-terrain': {
     id: 'difficult-terrain',
     name: 'Difficult Terrain',
