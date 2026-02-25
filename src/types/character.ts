@@ -186,6 +186,7 @@ export interface Character {
   id: string
   name: string
   playerName: string
+  gender?: 'male' | 'female' | 'other'
 
   // Basic info
   age: string
