@@ -5,6 +5,7 @@ import type { Character } from '../types'
 interface LootCacheProps {
   character: Character
   onAddToInventory?: (item: LootItem) => void
+  dmModeEnabled?: boolean
 }
 
 const QUANTITY_OPTIONS = [1, 3, 5, 10, 25] as const
@@ -18,7 +19,7 @@ const RARITY_OPTIONS: { rarity: LootRarity; label: string; hint: string }[] = [
   { rarity: 'trash', label: 'TRASH', hint: 'Worthless' },
 ]
 
-export function LootCache({ character, onAddToInventory }: LootCacheProps) {
+export function LootCache({ character, onAddToInventory, dmModeEnabled = false }: LootCacheProps) {
   const [generatedLoot, setGeneratedLoot] = useState<LootItem[]>([])
   const [lootCount, setLootCount] = useState(3)
   const [isGenerating, setIsGenerating] = useState(false)
@@ -71,6 +72,7 @@ export function LootCache({ character, onAddToInventory }: LootCacheProps) {
   return (
     <div className="space-y-6">
       {/* Legendary Loot Generator (DM Only) */}
+      {dmModeEnabled && (
       <div className="card bg-gradient-to-br from-purple-900/30 to-red-900/30 border-2 border-dnd-gold p-6">
         <h2 className="text-3xl font-bold text-dnd-gold mb-2">✨ Legendary Loot Generator</h2>
         <p className="text-gray-300 mb-4">
@@ -135,9 +137,10 @@ export function LootCache({ character, onAddToInventory }: LootCacheProps) {
           </div>
         )}
       </div>
+      )}
 
       {/* Legendary Loot Display */}
-      {legendaryLoot.length > 0 && (
+      {dmModeEnabled && legendaryLoot.length > 0 && (
         <div className="card bg-gray-800 border-2 border-dnd-gold p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-2xl font-bold text-dnd-gold">⚡ Legendary Loot</h3>
