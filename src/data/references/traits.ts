@@ -76,6 +76,20 @@ export const TRAITS: Record<string, TraitRef> = {
     description: 'On your turn, you can take one additional action. Once you use this feature, you must finish a short or long rest before you can use it again. Starting at 17th level, you can use it twice before a rest, but only once per turn.',
     mechanics: 'Gain one additional action. Recharges on short/long rest.',
   },
+  'divine-sense': {
+    id: 'divine-sense',
+    name: 'Divine Sense',
+    source: 'Paladin (Level 1)',
+    description: 'The presence of strong evil registers on your senses like a noxious odor, and powerful good rings like heavenly music in your ears. As an action, you can open your awareness to detect such forces. Until the end of your next turn, you know the location of any celestial, fiend, or undead within 60 feet of you that is not behind total cover. You know the type (celestial, fiend, or undead) of any being whose presence you sense, but not its identity. Within the same radius, you also detect the presence of any place or object that has been consecrated or desecrated. You can use this feature a number of times equal to 1 + your Charisma modifier. When you finish a long rest, you regain all expended uses.',
+    mechanics: 'Action: Detect celestials, fiends, and undead within 60 feet for 1 round. Uses = 1 + CHA modifier. Recharges on long rest.',
+  },
+  'lay-on-hands': {
+    id: 'lay-on-hands',
+    name: 'Lay on Hands',
+    source: 'Paladin (Level 1)',
+    description: 'Your blessed touch can heal wounds. You have a pool of healing power that replenishes when you take a long rest. With that pool, you can restore a total number of hit points equal to your paladin level × 5. As an action, you can touch a creature and draw power from the pool to restore a number of hit points to that creature, up to the maximum amount remaining in your pool. Alternatively, you can expend 5 hit points from your pool of healing to cure the target of one disease or neutralize one poison affecting it. You can cure multiple diseases and neutralize multiple poisons with a single use of Lay on Hands, expending hit points separately for each one.',
+    mechanics: 'Action: Heal HP from pool (Paladin level × 5). OR expend 5 HP to cure disease/poison. Recharges on long rest.',
+  },
   'awakened-mind': {
     id: 'awakened-mind',
     name: 'Awakened Mind',

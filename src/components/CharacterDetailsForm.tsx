@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, KeyboardEvent } from 'react'
 
 interface CharacterDetails {
   name: string
+  gender?: 'male' | 'female' | 'other'
   age: string
   height: string
   weight: string
@@ -27,6 +28,7 @@ export function CharacterDetailsForm({
 }: CharacterDetailsFormProps) {
   const [details, setDetails] = useState<CharacterDetails>({
     name: initialValues.name ?? '',
+    gender: initialValues.gender,
     age: initialValues.age ?? '',
     height: initialValues.height ?? '',
     weight: initialValues.weight ?? '',
@@ -46,12 +48,15 @@ export function CharacterDetailsForm({
     inputRefs.current[0]?.focus()
   }, [])
 
-  const validateField = (field: keyof CharacterDetails, value: string | number): string | undefined => {
+  const validateField = (field: keyof CharacterDetails, value: string | number | undefined): string | undefined => {
     switch (field) {
       case 'name':
         if (typeof value === 'string' && !value.trim()) return 'Character name is required'
         if (typeof value === 'string' && value.length < 2) return 'Name must be at least 2 characters'
         if (typeof value === 'string' && value.length > 50) return 'Name must be 50 characters or less'
+        break
+      case 'gender':
+        // Gender is optional, no validation needed
         break
       case 'age':
         if (value && (isNaN(Number(value)) || Number(value) < 0)) {
@@ -77,7 +82,7 @@ export function CharacterDetailsForm({
     return undefined
   }
 
-  const handleChange = (field: keyof CharacterDetails, value: string | number) => {
+  const handleChange = (field: keyof CharacterDetails, value: string | number | undefined) => {
     setDetails((prev) => ({ ...prev, [field]: value }))
 
     // Clear error when user starts typing
@@ -127,6 +132,7 @@ export function CharacterDetailsForm({
     setErrors(newErrors)
     setTouched({
       name: true,
+      gender: true,
       age: true,
       height: true,
       weight: true,
@@ -217,6 +223,54 @@ export function CharacterDetailsForm({
               {errors.startingLevel}
             </p>
           )}
+        </div>
+
+        {/* Gender */}
+        <div>
+          <label className={labelClass}>
+            Gender
+          </label>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => handleChange('gender', 'male')}
+              className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all duration-200
+                         focus:outline-none focus:ring-2 focus:ring-dnd-gold
+                         ${
+                           details.gender === 'male'
+                             ? 'bg-dnd-gold text-gray-900'
+                             : 'bg-gray-800 text-gray-300 border border-gray-600 hover:border-gray-500'
+                         }`}
+            >
+              Male
+            </button>
+            <button
+              type="button"
+              onClick={() => handleChange('gender', 'female')}
+              className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all duration-200
+                         focus:outline-none focus:ring-2 focus:ring-dnd-gold
+                         ${
+                           details.gender === 'female'
+                             ? 'bg-dnd-gold text-gray-900'
+                             : 'bg-gray-800 text-gray-300 border border-gray-600 hover:border-gray-500'
+                         }`}
+            >
+              Female
+            </button>
+            <button
+              type="button"
+              onClick={() => handleChange('gender', 'other')}
+              className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all duration-200
+                         focus:outline-none focus:ring-2 focus:ring-dnd-gold
+                         ${
+                           details.gender === 'other'
+                             ? 'bg-dnd-gold text-gray-900'
+                             : 'bg-gray-800 text-gray-300 border border-gray-600 hover:border-gray-500'
+                         }`}
+            >
+              Other
+            </button>
+          </div>
         </div>
 
         {/* Age */}

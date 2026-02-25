@@ -2660,7 +2660,11 @@ export function CharacterSheetPage() {
                       }`}
                     >
                       <div className="flex items-start justify-between mb-2">
-                        <h4 className="font-bold text-base sm:text-lg text-yellow-400">{feature.name}</h4>
+                        <QuickRefTooltip type="trait" id={feature.id}>
+                          <h4 className="font-bold text-base sm:text-lg text-yellow-400 cursor-pointer hover:text-yellow-300">
+                            {feature.name}
+                          </h4>
+                        </QuickRefTooltip>
                         <div className={`text-xl sm:text-2xl font-bold ${
                           isUsable ? 'text-yellow-300' : 'text-gray-500'
                         }`}>

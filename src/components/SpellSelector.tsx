@@ -302,89 +302,104 @@ export function SpellSelector({
         </div>
       )}
 
-      {/* Cantrips Section */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-bold text-white">
-            Cantrips
-            <span className="text-sm font-normal text-gray-400 ml-2">
-              (Choose {cantripsKnown})
+      {/* Cantrips Section - Only show if class has cantrips */}
+      {cantripsKnown > 0 && (
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-bold text-white">
+              Cantrips
+              <span className="text-sm font-normal text-gray-400 ml-2">
+                (Choose {cantripsKnown})
+              </span>
+            </h3>
+            <span className={`text-sm ${selectedCantrips.length === cantripsKnown ? 'text-green-400' : 'text-dnd-gold'}`}>
+              {selectedCantrips.length} / {cantripsKnown} selected
             </span>
-          </h3>
-          <span className={`text-sm ${selectedCantrips.length === cantripsKnown ? 'text-green-400' : 'text-dnd-gold'}`}>
-            {selectedCantrips.length} / {cantripsKnown} selected
-          </span>
-        </div>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {availableCantrips.map((spell) => (
-            <SpellCard
-              key={spell.id}
-              spell={spell}
-              isSelected={selectedCantrips.some((s) => s.id === spell.id)}
-              onToggle={handleCantripToggle}
-              disabled={
-                selectedCantrips.length >= cantripsKnown &&
-                !selectedCantrips.some((s) => s.id === spell.id)
-              }
-            />
-          ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {availableCantrips.map((spell) => (
+              <SpellCard
+                key={spell.id}
+                spell={spell}
+                isSelected={selectedCantrips.some((s) => s.id === spell.id)}
+                onToggle={handleCantripToggle}
+                disabled={
+                  selectedCantrips.length >= cantripsKnown &&
+                  !selectedCantrips.some((s) => s.id === spell.id)
+                }
+              />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Half-caster early level message */}
+      {characterClass.spellcasting === 'half' && level < 2 && (
+        <div className="mb-8 p-6 bg-gray-800/50 rounded-lg border border-gray-700">
+          <h3 className="text-lg font-semibold text-white mb-2">{characterClass.name} Spellcasting</h3>
+          <p className="text-gray-400">
+            {characterClass.name}s gain the Spellcasting feature at <span className="text-dnd-gold font-medium">level 2</span>.
+            You'll learn your first spells when you reach that level.
+          </p>
+        </div>
+      )}
 
       {/* Spells Section - Group by level */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-bold text-white">
-            Spells
-            <span className="text-sm font-normal text-gray-400 ml-2">
-              (Choose {spellsKnown} total)
+      {spellsKnown > 0 && availableSpells.length > 0 && (
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-bold text-white">
+              Spells
+              <span className="text-sm font-normal text-gray-400 ml-2">
+                (Choose {spellsKnown} total)
+              </span>
+            </h3>
+            <span className={`text-sm ${selectedSpells.length === spellsKnown ? 'text-green-400' : 'text-dnd-gold'}`}>
+              {selectedSpells.length} / {spellsKnown} selected
             </span>
-          </h3>
-          <span className={`text-sm ${selectedSpells.length === spellsKnown ? 'text-green-400' : 'text-dnd-gold'}`}>
-            {selectedSpells.length} / {spellsKnown} selected
-          </span>
-        </div>
+          </div>
 
-        {/* Group spells by level and display each level separately */}
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((spellLevel) => {
-          const spellsOfLevel = availableSpells.filter((s) => s.level === spellLevel)
-          if (spellsOfLevel.length === 0) return null
+          {/* Group spells by level and display each level separately */}
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((spellLevel) => {
+            const spellsOfLevel = availableSpells.filter((s) => s.level === spellLevel)
+            if (spellsOfLevel.length === 0) return null
 
-          return (
-            <div key={spellLevel} className="mb-6">
-              <h4 className="text-lg font-semibold text-dnd-gold mb-3">
-                {spellLevel === 1 ? '1st' : spellLevel === 2 ? '2nd' : spellLevel === 3 ? '3rd' : `${spellLevel}th`} Level Spells
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {spellsOfLevel.map((spell) => {
-            const isExpanded = subclass?.expandedSpells?.some((es) =>
-              es.spells.includes(spell.id)
-            )
             return (
-              <div key={spell.id} className="relative">
-                {isExpanded && (
-                  <div className="absolute -top-2 -right-2 z-10 px-2 py-0.5 bg-purple-600 text-white text-xs rounded-full">
-                    Expanded
-                  </div>
-                )}
-                <SpellCard
-                  spell={spell}
-                  isSelected={selectedSpells.some((s) => s.id === spell.id)}
-                  onToggle={handleSpellToggle}
-                  disabled={
-                    selectedSpells.length >= spellsKnown &&
-                    !selectedSpells.some((s) => s.id === spell.id)
-                  }
-                />
+              <div key={spellLevel} className="mb-6">
+                <h4 className="text-lg font-semibold text-dnd-gold mb-3">
+                  {spellLevel === 1 ? '1st' : spellLevel === 2 ? '2nd' : spellLevel === 3 ? '3rd' : `${spellLevel}th`} Level Spells
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {spellsOfLevel.map((spell) => {
+              const isExpanded = subclass?.expandedSpells?.some((es) =>
+                es.spells.includes(spell.id)
+              )
+              return (
+                <div key={spell.id} className="relative">
+                  {isExpanded && (
+                    <div className="absolute -top-2 -right-2 z-10 px-2 py-0.5 bg-purple-600 text-white text-xs rounded-full">
+                      Expanded
+                    </div>
+                  )}
+                  <SpellCard
+                    spell={spell}
+                    isSelected={selectedSpells.some((s) => s.id === spell.id)}
+                    onToggle={handleSpellToggle}
+                    disabled={
+                      selectedSpells.length >= spellsKnown &&
+                      !selectedSpells.some((s) => s.id === spell.id)
+                    }
+                  />
+                </div>
+              )
+            })}
+                </div>
               </div>
             )
           })}
-              </div>
-            </div>
-          )
-        })}
-      </div>
+        </div>
+      )}
 
       {/* Pact Magic Info */}
       {characterClass.spellcasting === 'pact' && (
