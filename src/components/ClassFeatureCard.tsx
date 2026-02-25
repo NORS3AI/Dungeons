@@ -20,7 +20,6 @@ export function ClassFeatureCard({
   const isActive = feature.charges && currentCharges !== undefined && maxCharges !== undefined
   const isPassive = !feature.charges
   const canUse = isActive && currentCharges! > 0
-  const isAvailable = !isActive || canUse
 
   // Calculate Sneak Attack damage for Rogues
   const getSneakAttackDamage = () => {

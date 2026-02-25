@@ -1,5 +1,46 @@
 # Dungeons - Patch Notes
 
+## Version 0.3.7-alpha - February 25, 2026
+
+**Alpha Release Notice**: This version introduces the Class Features system to the Actions tab, bringing actionable class abilities to life with charge tracking, automatic unlocking, and visual feedback.
+
+### ⚡ Class Features in Actions Tab
+
+All class features from your character's class now appear as actionable cards in the Actions tab, with automatic unlocking based on level, charge tracking for limited-use abilities, and instant visual feedback.
+
+#### **New Class Features System**
+- **Automatic Display**: Class features automatically appear in the Actions tab when you reach the required level
+- **Action Type Badges**: Visual indicators show whether a feature is an Action, Bonus Action, Reaction, or Passive ability
+- **Charge Tracking**: Features with limited uses (Second Wind, Action Surge, Rage, etc.) display current/max charges
+- **Recharge Indicators**: Shows whether abilities recharge on Short Rest, Long Rest, or Dawn
+- **Use Buttons**: One-click buttons to expend charges on active abilities
+- **Visual States**: Features change appearance based on availability (active, exhausted, passive)
+- **Level-Based Filtering**: Only shows features you've unlocked at your current level
+
+#### **Special Feature Displays**
+- **Sneak Attack (Rogue)**: Automatically calculates and displays current damage dice (1d6 at Level 1, scaling to 10d6 at Level 19)
+- **Trait Tooltips**: Click feature names to view full descriptions from the quick reference system
+- **Conditional Abilities**: Reactions and situational features marked clearly with appropriate badges
+
+#### **Supported Classes**
+- **Rogue**: Sneak Attack, Cunning Action, Uncanny Dodge, Evasion, Reliable Talent, Blindsense, Slippery Mind, Elusive, Stroke of Luck
+- **Fighter**: Second Wind, Action Surge, Extra Attack, Fighting Style reminders
+- **Barbarian**: Rage, Reckless Attack, Danger Sense, Extra Attack, Fast Movement, Brutal Critical
+- **Monk**: Ki abilities (Flurry of Blows, Patient Defense, Step of Wind), Deflect Missiles, Stunning Strike
+- **Paladin**: Divine Sense, Lay on Hands, Divine Smite, Channel Divinity, Cleansing Touch
+- **And more...**: System supports all classes with features defined in class data
+
+#### **Why This Matters**
+Previously, class features were only visible in the Features tab and had no interactivity. Players had to manually track charges and remember when abilities recharge. Now, the Actions tab becomes a true "combat dashboard" where all actionable abilities - racial, spell, and class features - are accessible with one click. Charge management is automatic, with visual feedback showing what's available and what's expended.
+
+**Example Workflow (Rogue Level 5)**:
+1. Open Actions tab → See Sneak Attack (2d6 damage displayed), Cunning Action (always available), Uncanny Dodge (reaction reminder)
+2. Combat starts → Reference Sneak Attack damage at a glance, use Cunning Action for bonus action options
+3. Enemy attacks → Uncanny Dodge reminder visible in red "Reaction" badge
+4. After combat → No manual tracking needed, everything persists automatically
+
+---
+
 ## Version 0.3.6-alpha - February 25, 2026
 
 **Alpha Release Notice**: This version improves spell combat interface, adds comprehensive trait references, enhances DM tools, and fixes spell selection.
