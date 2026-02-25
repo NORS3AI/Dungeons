@@ -1424,7 +1424,7 @@ export function CharacterSheetPage() {
           {/* Spell Action Buttons */}
           <div className="flex justify-end gap-3">
             {/* Choose Class Spells - only for spellcasting classes */}
-            {character.class && character.class.spellcasting !== 'none' && (
+            {character.class && character.class.spellcasting !== 'none' ? (
               <button
                 onClick={() => setShowClassSpellSelector(true)}
                 className="px-4 py-2 bg-blue-700 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors flex items-center gap-2"
@@ -1433,7 +1433,12 @@ export function CharacterSheetPage() {
                 <span className="text-lg">📚</span>
                 Choose Class Spells
               </button>
-            )}
+            ) : character.class ? (
+              <div className="px-4 py-2 bg-gray-700 text-gray-400 rounded-lg flex items-center gap-2" title={`${character.class.name} is not a spellcasting class`}>
+                <span className="text-lg">📚</span>
+                <span className="text-sm">No Spellcasting (non-caster class)</span>
+              </div>
+            ) : null}
             {/* Add Any Spell - for shops or other sources */}
             <button
               onClick={() => setShowManualSpellAdd(true)}
@@ -1447,7 +1452,10 @@ export function CharacterSheetPage() {
 
           {character.knownSpells.length === 0 ? (
             <div className="card bg-gray-800 border-gray-700 p-8 text-center">
-              <p className="text-gray-400">No spells known.</p>
+              <p className="text-gray-400 mb-4">No spells known.</p>
+              {character.class && character.class.spellcasting !== 'none' && (
+                <p className="text-gray-500 text-sm">Click "Choose Class Spells" above to add spells from your class spell list.</p>
+              )}
             </div>
           ) : (
             <>
@@ -1458,17 +1466,60 @@ export function CharacterSheetPage() {
                   <div className="grid md:grid-cols-2 gap-3">
                     {character.knownSpells
                       .filter((s) => s.level === 0)
-                      .map((spell) => (
-                        <div key={spell.id} className="p-3 bg-gray-900 rounded-lg border border-gray-700 hover:border-purple-500/50 transition-all flex items-center justify-between group">
-                          <QuickRefTooltip type="spell" id={spell.id}>
-                            <div className="cursor-pointer flex-1">
-                              <div className="font-medium text-purple-400 hover:text-purple-300">{spell.name}</div>
-                              <div className="text-xs text-gray-500">{spell.school} cantrip</div>
-                            </div>
-                          </QuickRefTooltip>
-                          <TrashIcon onClick={() => { removeSpell(spell.id); saveCharacter(); }} />
-                        </div>
-                      ))}
+                      .map((spell) => {
+                        const spellcastingAbility = character.class?.spellcastingAbility || 'intelligence'
+                        return (
+                          <div key={spell.id} className="p-3 bg-gray-900 rounded-lg border border-gray-700 hover:border-purple-500/50 transition-all relative group">
+                            {/* Action buttons */}
+                            {(spell.attackRoll || spell.damage || spell.healing) && (
+                              <div className="absolute top-2 right-2 flex gap-1">
+                                {spell.attackRoll && (
+                                  <button
+                                    onClick={() => handleRollSpellAttack(spell.id, spellcastingAbility)}
+                                    className="w-6 h-6 bg-green-700 hover:bg-green-600 text-white rounded font-bold text-xs flex items-center justify-center transition-colors"
+                                    title="Roll spell attack"
+                                  >
+                                    H
+                                  </button>
+                                )}
+                                {spell.damage && (
+                                  <button
+                                    onClick={() => handleRollSpellDamage(spell.id, spell.damage?.dice || '1d8')}
+                                    className="w-6 h-6 bg-red-700 hover:bg-red-600 text-white rounded text-xs flex items-center justify-center transition-colors"
+                                    title={`Roll damage (${spell.damage?.dice})`}
+                                  >
+                                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                      <path d="M10 2L2 6v4c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V6l-8-4zm0 2.18l6 3v3.82c0 4.52-3.12 8.75-7 9.86V4.18z"/>
+                                      <circle cx="10" cy="10" r="2"/>
+                                    </svg>
+                                  </button>
+                                )}
+                                {spell.healing && (
+                                  <button
+                                    onClick={() => handleRollSpellHealing(spell.id, spell.healing?.dice || '1d8')}
+                                    className="w-6 h-6 bg-green-600 hover:bg-green-500 text-white rounded text-xs flex items-center justify-center transition-colors"
+                                    title={`Roll healing (${spell.healing?.dice})`}
+                                  >
+                                    ❤️
+                                  </button>
+                                )}
+                                <TrashIcon onClick={() => { removeSpell(spell.id); saveCharacter(); }} />
+                              </div>
+                            )}
+                            {!(spell.attackRoll || spell.damage || spell.healing) && (
+                              <div className="absolute top-2 right-2">
+                                <TrashIcon onClick={() => { removeSpell(spell.id); saveCharacter(); }} />
+                              </div>
+                            )}
+                            <QuickRefTooltip type="spell" id={spell.id}>
+                              <div className="cursor-pointer flex-1 pr-20">
+                                <div className="font-medium text-purple-400 hover:text-purple-300">{spell.name}</div>
+                                <div className="text-xs text-gray-500">{spell.school} cantrip</div>
+                              </div>
+                            </QuickRefTooltip>
+                          </div>
+                        )
+                      })}
                   </div>
                 </div>
               )}
@@ -1481,19 +1532,62 @@ export function CharacterSheetPage() {
                   <div key={level} className="card bg-gray-800 border-gray-700 p-4">
                     <h3 className="text-lg font-bold text-white mb-4">Level {level} Spells</h3>
                     <div className="grid md:grid-cols-2 gap-3">
-                      {spellsAtLevel.map((spell) => (
-                        <div key={spell.id} className="p-3 bg-gray-900 rounded-lg border border-gray-700 hover:border-purple-500/50 transition-all flex items-center justify-between group">
-                          <QuickRefTooltip type="spell" id={spell.id}>
-                            <div className="cursor-pointer flex-1">
-                              <div className="font-medium text-purple-400 hover:text-purple-300">{spell.name}</div>
-                              <div className="text-xs text-gray-500">
-                                {spell.school} | {spell.castingTime.amount} {spell.castingTime.unit}
+                      {spellsAtLevel.map((spell) => {
+                        const spellcastingAbility = character.class?.spellcastingAbility || 'intelligence'
+                        return (
+                          <div key={spell.id} className="p-3 bg-gray-900 rounded-lg border border-gray-700 hover:border-purple-500/50 transition-all relative group">
+                            {/* Action buttons */}
+                            {(spell.attackRoll || spell.damage || spell.healing) && (
+                              <div className="absolute top-2 right-2 flex gap-1">
+                                {spell.attackRoll && (
+                                  <button
+                                    onClick={() => handleRollSpellAttack(spell.id, spellcastingAbility)}
+                                    className="w-6 h-6 bg-green-700 hover:bg-green-600 text-white rounded font-bold text-xs flex items-center justify-center transition-colors"
+                                    title="Roll spell attack"
+                                  >
+                                    H
+                                  </button>
+                                )}
+                                {spell.damage && (
+                                  <button
+                                    onClick={() => handleRollSpellDamage(spell.id, spell.damage?.dice || '1d8')}
+                                    className="w-6 h-6 bg-red-700 hover:bg-red-600 text-white rounded text-xs flex items-center justify-center transition-colors"
+                                    title={`Roll damage (${spell.damage?.dice})`}
+                                  >
+                                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                      <path d="M10 2L2 6v4c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V6l-8-4zm0 2.18l6 3v3.82c0 4.52-3.12 8.75-7 9.86V4.18z"/>
+                                      <circle cx="10" cy="10" r="2"/>
+                                    </svg>
+                                  </button>
+                                )}
+                                {spell.healing && (
+                                  <button
+                                    onClick={() => handleRollSpellHealing(spell.id, spell.healing?.dice || '1d8')}
+                                    className="w-6 h-6 bg-green-600 hover:bg-green-500 text-white rounded text-xs flex items-center justify-center transition-colors"
+                                    title={`Roll healing (${spell.healing?.dice})`}
+                                  >
+                                    ❤️
+                                  </button>
+                                )}
+                                <TrashIcon onClick={() => { removeSpell(spell.id); saveCharacter(); }} />
                               </div>
-                            </div>
-                          </QuickRefTooltip>
-                          <TrashIcon onClick={() => { removeSpell(spell.id); saveCharacter(); }} />
-                        </div>
-                      ))}
+                            )}
+                            {!(spell.attackRoll || spell.damage || spell.healing) && (
+                              <div className="absolute top-2 right-2">
+                                <TrashIcon onClick={() => { removeSpell(spell.id); saveCharacter(); }} />
+                              </div>
+                            )}
+                            <QuickRefTooltip type="spell" id={spell.id}>
+                              <div className="cursor-pointer flex-1 pr-20">
+                                <div className="font-medium text-purple-400 hover:text-purple-300">{spell.name}</div>
+                                <div className="text-xs text-gray-500">
+                                  {spell.school} | {spell.castingTime.amount} {spell.castingTime.unit}
+                                </div>
+                              </div>
+                            </QuickRefTooltip>
+                          </div>
+                        )
+                      })}
                     </div>
                   </div>
                 )
