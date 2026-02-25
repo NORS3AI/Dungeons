@@ -243,6 +243,7 @@ export function CharacterSheetPage() {
   const handleSaveDetails = (details: {
     name: string
     playerName: string
+    gender?: 'male' | 'female' | 'other'
     age: string
     height: string
     weight: string
@@ -1277,35 +1278,9 @@ export function CharacterSheetPage() {
                 }}
               />
             )}
-
-            {/* Skills */}
-            <div className="card bg-gray-800 border-gray-700 p-4">
-              <h3 className="text-lg font-bold text-white mb-4">Skills</h3>
-              <div className="space-y-1 max-h-80 overflow-y-auto pr-2">
-                {SKILLS.map((skill) => (
-                  <div
-                    key={skill.key}
-                    className="flex items-center justify-between py-1 px-2 rounded bg-gray-900/50 hover:bg-gray-900"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full ${
-                        isSkillProficient(skill.key) ? 'bg-dnd-gold' : 'bg-gray-600'
-                      }`} />
-                      <QuickRefTooltip type="skill" id={skill.refId}>
-                        <span className="text-gray-300 text-sm">
-                          {skill.name}
-                        </span>
-                      </QuickRefTooltip>
-                      <span className="text-xs text-gray-600">({ABILITY_NAMES[skill.ability]})</span>
-                    </div>
-                    <span className="text-white font-medium">{formatMod(getSkillMod(skill))}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
 
-          {/* Right Column - Info & Dice */}
+          {/* Right Column - Info & Skills */}
           <div className="space-y-6">
             {/* Character Info */}
             <div className="card bg-gray-800 border-gray-700 p-4">
@@ -1336,6 +1311,12 @@ export function CharacterSheetPage() {
                   <div className="flex justify-between">
                     <span className="text-gray-500">Player</span>
                     <span className="text-gray-300">{character.playerName}</span>
+                  </div>
+                )}
+                {character.gender && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Gender</span>
+                    <span className="text-gray-300 capitalize">{character.gender}</span>
                   </div>
                 )}
                 {character.age && (
@@ -1405,6 +1386,32 @@ export function CharacterSheetPage() {
                     </span>
                   </div>
                 )}
+              </div>
+            </div>
+
+            {/* Skills */}
+            <div className="card bg-gray-800 border-gray-700 p-4">
+              <h3 className="text-lg font-bold text-white mb-4">Skills</h3>
+              <div className="space-y-1 max-h-80 overflow-y-auto pr-2">
+                {SKILLS.map((skill) => (
+                  <div
+                    key={skill.key}
+                    className="flex items-center justify-between py-1 px-2 rounded bg-gray-900/50 hover:bg-gray-900"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className={`w-2 h-2 rounded-full ${
+                        isSkillProficient(skill.key) ? 'bg-dnd-gold' : 'bg-gray-600'
+                      }`} />
+                      <QuickRefTooltip type="skill" id={skill.refId}>
+                        <span className="text-gray-300 text-sm">
+                          {skill.name}
+                        </span>
+                      </QuickRefTooltip>
+                      <span className="text-xs text-gray-600">({ABILITY_NAMES[skill.ability]})</span>
+                    </div>
+                    <span className="text-white font-medium">{formatMod(getSkillMod(skill))}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>

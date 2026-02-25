@@ -439,6 +439,36 @@ export const RULES: Record<string, RuleRef> = {
     ],
     relatedRules: ['superior-darkvision', 'light'],
   },
+  'superior-darkvision': {
+    id: 'superior-darkvision',
+    name: 'Superior Darkvision',
+    category: 'general',
+    summary: 'Enhanced darkvision allowing you to see twice as far in darkness (typically 120 feet).',
+    description: 'Superior darkvision is an enhanced version of darkvision that extends the range to 120 feet instead of the standard 60 feet. This trait is most commonly found in creatures that live in complete darkness, such as the Drow (dark elves) who inhabit the Underdark. Like normal darkvision, you see in dim light within this range as if it were bright light, and in darkness as if it were dim light. You can\'t discern color in darkness, only shades of gray. Superior darkvision does not allow you to see through magical darkness.',
+    examples: [
+      'Drow in pitch-black cave: Can see 120 ft clearly (in grayscale)',
+      'Drow vs Elf sight: Drow sees 120 ft, Elf sees only 60 ft',
+      'Surface world: Superior darkvision provides no benefit in daylight',
+      'Magical darkness: Superior darkvision doesn\'t work',
+      'Color perception: Everything appears in shades of gray in darkness'
+    ],
+    relatedRules: ['darkvision', 'light', 'sunlight-sensitivity'],
+  },
+  'vision': {
+    id: 'vision',
+    name: 'Normal Vision',
+    category: 'general',
+    summary: 'Standard sight that relies on light sources. Cannot see in complete darkness.',
+    description: 'Normal vision is the standard way most humanoid creatures perceive the world. Unlike darkvision, normal vision requires a light source to see clearly. In bright light, you can see normally and identify colors, details, and distance accurately. In dim light (such as torchlight or twilight), you have disadvantage on Wisdom (Perception) checks that rely on sight. In complete darkness, you are effectively blinded and cannot see at all. Most humans and halflings have normal vision and must rely on torches, lanterns, or spells like Light to navigate dark areas.',
+    examples: [
+      'Human in sunlight: Can see clearly, full color vision',
+      'Human with torch: 20 ft bright light, 20 ft additional dim light',
+      'Human in darkness: Completely blind, cannot see',
+      'Dim light: Disadvantage on Perception checks relying on sight',
+      'Navigating dungeons: Humans need light sources'
+    ],
+    relatedRules: ['darkvision', 'light', 'blinded'],
+  },
   'alignment': {
     id: 'alignment',
     name: 'Alignment',
