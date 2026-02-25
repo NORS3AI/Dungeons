@@ -90,6 +90,20 @@ export const TRAITS: Record<string, TraitRef> = {
     description: 'Your blessed touch can heal wounds. You have a pool of healing power that replenishes when you take a long rest. With that pool, you can restore a total number of hit points equal to your paladin level × 5. As an action, you can touch a creature and draw power from the pool to restore a number of hit points to that creature, up to the maximum amount remaining in your pool. Alternatively, you can expend 5 hit points from your pool of healing to cure the target of one disease or neutralize one poison affecting it. You can cure multiple diseases and neutralize multiple poisons with a single use of Lay on Hands, expending hit points separately for each one.',
     mechanics: 'Action: Heal HP from pool (Paladin level × 5). OR expend 5 HP to cure disease/poison. Recharges on long rest.',
   },
+  'divine-smite': {
+    id: 'divine-smite',
+    name: 'Divine Smite',
+    source: 'Paladin (Level 2)',
+    description: 'When you hit a creature with a melee weapon attack, you can expend one spell slot to deal radiant damage to the target, in addition to the weapon\'s damage. The extra damage is 2d8 for a 1st-level spell slot, plus 1d8 for each spell level higher than 1st, to a maximum of 5d8. The damage increases by 1d8 if the target is an undead or a fiend, to a maximum of 6d8.',
+    mechanics: 'On hit with melee weapon: Expend spell slot for 2d8 + 1d8 per slot level radiant damage (max 5d8, or 6d8 vs undead/fiend).',
+  },
+  'divine-health': {
+    id: 'divine-health',
+    name: 'Divine Health',
+    source: 'Paladin (Level 3)',
+    description: 'The divine magic flowing through you makes you immune to disease.',
+    mechanics: 'Immune to all diseases.',
+  },
   'awakened-mind': {
     id: 'awakened-mind',
     name: 'Awakened Mind',
