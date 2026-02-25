@@ -58,6 +58,7 @@ export const DEATH_KNIGHT_LEVEL_1_SPELLS: Spell[] = [
     ritual: false,
     concentration: false,
     classes: ['death-knight'],
+    runicPowerCost: 1,
   },
   {
     id: 'blood-strike',
@@ -74,6 +75,7 @@ export const DEATH_KNIGHT_LEVEL_1_SPELLS: Spell[] = [
     ritual: false,
     concentration: false,
     classes: ['death-knight'],
+    runicPowerCost: 1,
   },
 ]
 

@@ -171,7 +171,9 @@ interface CharacterState {
   deleteCharacter: (id: string) => void
   importCharacter: (character: Character) => void
   migrateCurrentCharacter: () => void
+  migrateCharacterById: (id: string) => void
   needsMigration: () => boolean
+  needsMigrationById: (id: string) => boolean
 
   // Creation wizard
   setCreationStep: (step: CreationStep) => void
@@ -336,6 +338,30 @@ export const useCharacterStore = create<CharacterState>()(
         needsMigration: () => {
           const { currentCharacter } = get()
           return currentCharacter ? needsMigration(currentCharacter) : false
+        },
+
+        migrateCharacterById: (id: string) => {
+          const { characters } = get()
+          const character = characters.find((c) => c.id === id)
+          if (!character) return
+
+          // Migrate the character
+          const migrated = migrateCharacter(character)
+
+          // Update in characters array
+          const updatedCharacters = characters.map((c) =>
+            c.id === migrated.id ? migrated : c
+          )
+
+          set({
+            characters: updatedCharacters,
+          })
+        },
+
+        needsMigrationById: (id: string) => {
+          const { characters } = get()
+          const character = characters.find((c) => c.id === id)
+          return character ? needsMigration(character) : false
         },
 
         setCreationStep: (step: CreationStep) => {

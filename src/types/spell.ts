@@ -108,6 +108,9 @@ export interface Spell {
 
   // Higher level casting
   atHigherLevels?: string
+
+  // Resource costs (for Death Knight Runic Power, etc.)
+  runicPowerCost?: number
 }
 
 /**
