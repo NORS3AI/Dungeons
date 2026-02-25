@@ -206,6 +206,10 @@ interface CharacterState {
   setDailyIncome: (professionName: string, amount: number, currency: 'copper' | 'silver' | 'gold') => void
   setFightingStance: (stance: FightingStance) => void
 
+  // DM Tools - Grant items to any character
+  grantItemToCharacter: (characterId: string, item: Equipment) => void
+  grantItemToAllCharacters: (item: Equipment) => void
+
   // Carrying Capacity & Supplies
   updateCarryingCapacity: () => void // Recalculate based on STR and equipment weight
   addFoodRations: (days: number) => void
@@ -863,6 +867,50 @@ export const useCharacterStore = create<CharacterState>()(
             },
             history: addToHistory(history, currentCharacter),
           })
+        },
+
+        // DM Tools - Grant items to any character
+        grantItemToCharacter: (characterId: string, item: Equipment) => {
+          const { characters } = get()
+          const targetCharacter = characters.find((c) => c.id === characterId)
+          if (!targetCharacter) return
+
+          const updatedCharacter = {
+            ...targetCharacter,
+            equipment: [...targetCharacter.equipment, { ...item, id: crypto.randomUUID() }],
+          }
+
+          const updatedCharacters = characters.map((c) =>
+            c.id === characterId ? updatedCharacter : c
+          )
+
+          set({ characters: updatedCharacters })
+
+          // Also update currentCharacter if it's the target
+          const { currentCharacter } = get()
+          if (currentCharacter?.id === characterId) {
+            set({ currentCharacter: updatedCharacter })
+          }
+        },
+
+        grantItemToAllCharacters: (item: Equipment) => {
+          const { characters } = get()
+
+          const updatedCharacters = characters.map((character) => ({
+            ...character,
+            equipment: [...character.equipment, { ...item, id: crypto.randomUUID() }],
+          }))
+
+          set({ characters: updatedCharacters })
+
+          // Also update currentCharacter if it exists
+          const { currentCharacter } = get()
+          if (currentCharacter) {
+            const updatedCurrent = updatedCharacters.find((c) => c.id === currentCharacter.id)
+            if (updatedCurrent) {
+              set({ currentCharacter: updatedCurrent })
+            }
+          }
         },
 
         updateCarryingCapacity: () => {
