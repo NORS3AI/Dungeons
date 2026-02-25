@@ -8,6 +8,7 @@ interface CharacterEditModalProps {
   onSave: (details: {
     name: string
     playerName: string
+    gender?: 'male' | 'female' | 'other'
     age: string
     height: string
     weight: string
@@ -19,6 +20,7 @@ export function CharacterEditModal({ character, isOpen, onClose, onSave }: Chara
   const [formData, setFormData] = useState({
     name: character.name,
     playerName: character.playerName,
+    gender: character.gender,
     age: character.age,
     height: character.height,
     weight: character.weight,
@@ -30,6 +32,7 @@ export function CharacterEditModal({ character, isOpen, onClose, onSave }: Chara
     setFormData({
       name: character.name,
       playerName: character.playerName,
+      gender: character.gender,
       age: character.age,
       height: character.height,
       weight: character.weight,
@@ -127,6 +130,54 @@ export function CharacterEditModal({ character, isOpen, onClose, onSave }: Chara
                        focus:ring-dnd-gold focus:border-transparent"
               placeholder="Enter player name"
             />
+          </div>
+
+          {/* Gender */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Gender
+            </label>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => handleChange('gender', 'male')}
+                className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all duration-200
+                           focus:outline-none focus:ring-2 focus:ring-dnd-gold
+                           ${
+                             formData.gender === 'male'
+                               ? 'bg-dnd-gold text-gray-900'
+                               : 'bg-gray-800 text-gray-300 border border-gray-600 hover:border-gray-500'
+                           }`}
+              >
+                Male
+              </button>
+              <button
+                type="button"
+                onClick={() => handleChange('gender', 'female')}
+                className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all duration-200
+                           focus:outline-none focus:ring-2 focus:ring-dnd-gold
+                           ${
+                             formData.gender === 'female'
+                               ? 'bg-dnd-gold text-gray-900'
+                               : 'bg-gray-800 text-gray-300 border border-gray-600 hover:border-gray-500'
+                           }`}
+              >
+                Female
+              </button>
+              <button
+                type="button"
+                onClick={() => handleChange('gender', 'other')}
+                className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all duration-200
+                           focus:outline-none focus:ring-2 focus:ring-dnd-gold
+                           ${
+                             formData.gender === 'other'
+                               ? 'bg-dnd-gold text-gray-900'
+                               : 'bg-gray-800 text-gray-300 border border-gray-600 hover:border-gray-500'
+                           }`}
+              >
+                Other
+              </button>
+            </div>
           </div>
 
           {/* Age, Height, Weight (Grid) */}
