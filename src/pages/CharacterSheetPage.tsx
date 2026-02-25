@@ -1424,7 +1424,7 @@ export function CharacterSheetPage() {
           {/* Spell Action Buttons */}
           <div className="flex justify-end gap-3">
             {/* Choose Class Spells - only for spellcasting classes */}
-            {character.class && character.class.spellcasting !== 'none' && (
+            {character.class && character.class.spellcasting !== 'none' ? (
               <button
                 onClick={() => setShowClassSpellSelector(true)}
                 className="px-4 py-2 bg-blue-700 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors flex items-center gap-2"
@@ -1433,7 +1433,12 @@ export function CharacterSheetPage() {
                 <span className="text-lg">📚</span>
                 Choose Class Spells
               </button>
-            )}
+            ) : character.class ? (
+              <div className="px-4 py-2 bg-gray-700 text-gray-400 rounded-lg flex items-center gap-2" title={`${character.class.name} is not a spellcasting class`}>
+                <span className="text-lg">📚</span>
+                <span className="text-sm">No Spellcasting (non-caster class)</span>
+              </div>
+            ) : null}
             {/* Add Any Spell - for shops or other sources */}
             <button
               onClick={() => setShowManualSpellAdd(true)}
@@ -1447,7 +1452,10 @@ export function CharacterSheetPage() {
 
           {character.knownSpells.length === 0 ? (
             <div className="card bg-gray-800 border-gray-700 p-8 text-center">
-              <p className="text-gray-400">No spells known.</p>
+              <p className="text-gray-400 mb-4">No spells known.</p>
+              {character.class && character.class.spellcasting !== 'none' && (
+                <p className="text-gray-500 text-sm">Click "Choose Class Spells" above to add spells from your class spell list.</p>
+              )}
             </div>
           ) : (
             <>

@@ -1,5 +1,123 @@
 # Dungeons - Patch Notes
 
+## Version 0.3.6-alpha - February 25, 2026
+
+**Alpha Release Notice**: This version improves spell combat interface, adds comprehensive trait references, enhances DM tools, and fixes spell selection.
+
+### ✨ Spell Action Buttons in Spells Tab
+
+All damage, attack, and healing spells now have quick-action buttons directly in the Spells tab for faster combat resolution.
+
+#### **New Spell Action Buttons**
+- **Attack Roll Button (H)**: Green button for spells requiring spell attack rolls (Fire Bolt, Guiding Bolt, etc.)
+- **Damage Roll Button (⚔️)**: Red sword icon for spells dealing damage (Fireball, Magic Missile, Meteor Swarm, etc.)
+- **Healing Roll Button (❤️)**: Heart icon for healing spells (Cure Wounds, Healing Word, Mass Cure Wounds, etc.)
+- **Automatic Detection**: Buttons only appear for spells with the relevant properties
+- **Quick Access**: No need to switch to Overview tab - cast spells directly from Spells tab
+
+**Why This Matters**: Previously, spell attack/damage/healing rolls were only available in the Overview tab. Now players can manage their entire spellbook and roll attacks/damage without navigating between tabs. Especially useful for spellcasters with large spell lists.
+
+### 📚 Complete Trait References - Dwarf & Rogue
+
+Added comprehensive trait references for all Dwarf racial features and Rogue class features across all levels and subclasses.
+
+#### **Dwarf Racial Traits Added**
+- **Dwarven Toughness** (Hill Dwarf): +1 HP per character level
+- **Dwarven Armor Training** (Mountain Dwarf): Proficiency with light and medium armor
+- **Dwarven Resilience**: Already existed (advantage vs poison, poison resistance)
+- **Dwarven Combat Training**: Already existed (weapon proficiencies)
+- **Stonecunning**: Already existed (expertise with stonework history)
+
+#### **Rogue Class Features Added (Base Class)**
+- **Expertise** (Level 1): Double proficiency for 2 skills, 2 more at level 6
+- **Sneak Attack** (Level 1): Extra damage scaling from 1d6 to 10d6
+- **Thieves' Cant** (Level 1): Secret rogue language
+- **Cunning Action** (Level 2): Bonus action Dash/Disengage/Hide
+- **Uncanny Dodge** (Level 5): Reaction to halve attack damage
+- **Evasion** (Level 7): No damage on successful DEX saves
+- **Reliable Talent** (Level 11): Minimum roll of 10 on proficient checks
+- **Blindsense** (Level 14): Detect hidden/invisible creatures within 10 ft
+- **Slippery Mind** (Level 15): Gain Wisdom save proficiency
+- **Elusive** (Level 18): No attack rolls have advantage against you
+- **Stroke of Luck** (Level 20): Turn miss into hit or failed check into natural 20
+
+#### **Thief Subclass Features Added**
+- **Fast Hands** (Level 3): Enhanced Cunning Action options
+- **Second-Story Work** (Level 3): Enhanced climbing and jumping
+- **Supreme Sneak** (Level 9): Advantage on Stealth when moving slowly
+- **Use Magic Device** (Level 13): Ignore class/race/level requirements on magic items
+- **Thief's Reflexes** (Level 17): Take two turns in first round of combat
+
+#### **Assassin Subclass Features Added**
+- **Assassinate** (Level 3): Advantage vs creatures that haven't acted, auto-crit on surprised
+- **Infiltration Expertise** (Level 9): Create false identities
+- **Impostor** (Level 13): Perfectly mimic another person
+- **Death Strike** (Level 17): Double damage on surprised creatures (CON save)
+
+**Why This Matters**: Players can now click any Rogue or Dwarf trait to see full descriptions, mechanics, and examples. Essential for new players learning how their abilities work, especially complex features like Sneak Attack scaling and Reliable Talent.
+
+### 🛡️ Resistance Reference Added
+
+Added comprehensive damage resistance rule reference accessible from character sheets.
+
+#### **Resistance Rule Details**
+- **Mechanics**: Take half damage (rounded down) from specific damage types
+- **Stacking**: Multiple resistances don't stack - you either have it or don't
+- **Application**: Applied after all other damage modifiers
+- **Reference Table**: Shows all damage types and common sources of resistance
+  - Fire (Tiefling, Fire Elemental)
+  - Poison (Dwarf, Warforged, Stout Halfling)
+  - Cold, Acid, Lightning, Thunder (various Dragonborn)
+  - Psychic (Thought Shield, Kalashtar)
+  - Necrotic/Radiant (Aasimar, Divine/Shadow Sorcerer)
+  - Physical damage (Raging Barbarian)
+- **Examples**: Practical scenarios showing resistance calculations
+
+**Why This Matters**: Resistances were displayed on character sheets but had no reference explaining how they work. Now players can click "Resistances" to understand the mechanic, see examples, and learn which races/classes grant resistance.
+
+### 🎯 Improved Spell Selection
+
+Enhanced spell selection interface to clearly show whether characters can choose class spells.
+
+#### **Spell Selection Improvements**
+- **Clear Indicator**: Shows "Choose Class Spells" button for spellcasting classes
+- **Non-Caster Feedback**: Shows "No Spellcasting (non-caster class)" message for non-casters
+- **Helpful Tips**: Empty spell list now shows hint to click "Choose Class Spells" for spellcasters
+- **Always Accessible**: "Add Spell" button always available for items from shops/loot
+
+**Why This Matters**: Players were confused about how to add spells to their characters. Now the interface clearly indicates whether their class can learn spells and provides guidance on how to add them.
+
+### 🎲 DM Item Granting System
+
+Added system for Dungeon Masters to grant items, weapons, armor, and potions to characters.
+
+#### **DM Item Granter Features**
+- **Item Creation**: Full interface for creating weapons, armor, potions, gear, and custom items
+- **Weapon Properties**: Damage dice, damage type, weapon properties
+- **Armor Properties**: Armor type, base AC, stealth disadvantage
+- **Character Selection**: Choose specific characters or grant to all party members
+- **Mass Distribution**: "Grant to All" button sends items to entire party
+- **Individual Grants**: Select specific characters with checkboxes
+- **Rarity Support**: Common, Uncommon, Rare, Very Rare, Legendary items
+- **Quantity Control**: Specify item quantities for consumables
+
+**Why This Matters**: DMs can now easily reward party members with loot without manually editing each character's inventory. Essential for session rewards, quest completion, and maintaining party progression.
+
+### 🔍 Campaign Page Character Switching
+
+Campaign Page already has tab navigation for Party, Initiative, NPCs, Encounters, and Dice rolling.
+
+#### **DM Campaign Tools Structure**
+- **Party Tab**: View all party character cards with quick access to character sheets
+- **Initiative Tab**: Track initiative order during combat
+- **NPCs Tab**: Manage NPC library and create custom NPCs
+- **Encounter Tab**: Build and run combat encounters
+- **Dice Tab**: Quick dice rolling for DM needs
+
+**Why This Matters**: DMs have a centralized hub for all campaign management tools. Easy tab navigation allows quick switching between party management, combat tracking, and NPC creation.
+
+---
+
 ## Version 0.3.5-alpha - February 24, 2026
 
 **Alpha Release Notice**: This version contains new features for higher-level gameplay, DM tools, and improved character information display.
