@@ -6,6 +6,9 @@ import {
   BARD_LEVEL_1_SPELLS,
   BARD_LEVEL_2_SPELLS,
   BARD_LEVEL_3_SPELLS,
+  BARD_LEVEL_4_SPELLS,
+  BARD_LEVEL_5_SPELLS,
+  BARD_LEVEL_6_SPELLS,
   CLERIC_CANTRIPS,
   CLERIC_LEVEL_1_SPELLS,
   DEATH_KNIGHT_CANTRIPS,
@@ -19,6 +22,16 @@ import {
   DRUID_LEVEL_2_SPELLS,
   NECROMANCER_CANTRIPS,
   NECROMANCER_LEVEL_1_SPELLS,
+  PALADIN_LEVEL_1_SPELLS,
+  PALADIN_LEVEL_2_SPELLS,
+  PALADIN_LEVEL_3_SPELLS,
+  PALADIN_LEVEL_4_SPELLS,
+  PALADIN_LEVEL_5_SPELLS,
+  RANGER_LEVEL_1_SPELLS,
+  RANGER_LEVEL_2_SPELLS,
+  RANGER_LEVEL_3_SPELLS,
+  RANGER_LEVEL_4_SPELLS,
+  RANGER_LEVEL_5_SPELLS,
   SORCERER_CANTRIPS,
   SORCERER_LEVEL_1_SPELLS,
   WARLOCK_CANTRIPS,
@@ -77,10 +90,59 @@ export function SpellSelector({
       if (level >= 5) {
         spells.push(...BARD_LEVEL_3_SPELLS)
       }
+      if (level >= 7) {
+        spells.push(...BARD_LEVEL_4_SPELLS)
+      }
+      if (level >= 9) {
+        spells.push(...BARD_LEVEL_5_SPELLS)
+      }
+      if (level >= 11) {
+        spells.push(...BARD_LEVEL_6_SPELLS)
+      }
       // TODO: Add higher level spell arrays when available
-      // Level 7-8: BARD_LEVEL_4_SPELLS
-      // Level 9-10: BARD_LEVEL_5_SPELLS
-      // etc.
+      // Level 13-14: BARD_LEVEL_7_SPELLS
+      // Level 15-16: BARD_LEVEL_8_SPELLS
+      // Level 17-20: BARD_LEVEL_9_SPELLS
+      return spells
+    }
+
+    // Paladin spells - half-caster with level-based progression
+    if (characterClass?.id === 'paladin') {
+      if (level >= 2) {
+        spells.push(...PALADIN_LEVEL_1_SPELLS)
+      }
+      if (level >= 5) {
+        spells.push(...PALADIN_LEVEL_2_SPELLS)
+      }
+      if (level >= 9) {
+        spells.push(...PALADIN_LEVEL_3_SPELLS)
+      }
+      if (level >= 13) {
+        spells.push(...PALADIN_LEVEL_4_SPELLS)
+      }
+      if (level >= 17) {
+        spells.push(...PALADIN_LEVEL_5_SPELLS)
+      }
+      return spells
+    }
+
+    // Ranger spells - half-caster with level-based progression
+    if (characterClass?.id === 'ranger') {
+      if (level >= 2) {
+        spells.push(...RANGER_LEVEL_1_SPELLS)
+      }
+      if (level >= 5) {
+        spells.push(...RANGER_LEVEL_2_SPELLS)
+      }
+      if (level >= 9) {
+        spells.push(...RANGER_LEVEL_3_SPELLS)
+      }
+      if (level >= 13) {
+        spells.push(...RANGER_LEVEL_4_SPELLS)
+      }
+      if (level >= 17) {
+        spells.push(...RANGER_LEVEL_5_SPELLS)
+      }
       return spells
     }
 

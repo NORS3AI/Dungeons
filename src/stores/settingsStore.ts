@@ -24,12 +24,15 @@ interface SettingsState {
   fontSize: FontSize
   fontFamily: FontFamily
   showQuickRefTooltips: boolean
+  dmModeEnabled: boolean
 
   // Actions
   setTheme: (theme: Theme) => void
   setFontSize: (size: FontSize) => void
   setFontFamily: (family: FontFamily) => void
   toggleQuickRefTooltips: () => void
+  unlockDMMode: (code: string) => boolean
+  setDMMode: (enabled: boolean) => void
   resetAllCache: () => void
 }
 
@@ -75,6 +78,7 @@ export const useSettingsStore = create<SettingsState>()(
       fontSize: 'medium',
       fontFamily: 'default',
       showQuickRefTooltips: true,
+      dmModeEnabled: false,
 
       setTheme: (theme: Theme) => {
         set({ theme })
@@ -93,6 +97,19 @@ export const useSettingsStore = create<SettingsState>()(
 
       toggleQuickRefTooltips: () => {
         set((state) => ({ showQuickRefTooltips: !state.showQuickRefTooltips }))
+      },
+
+      unlockDMMode: (code: string) => {
+        // Secret code to unlock DM features
+        if (code === '0220') {
+          set({ dmModeEnabled: true })
+          return true
+        }
+        return false
+      },
+
+      setDMMode: (enabled: boolean) => {
+        set({ dmModeEnabled: enabled })
       },
 
       resetAllCache: () => {

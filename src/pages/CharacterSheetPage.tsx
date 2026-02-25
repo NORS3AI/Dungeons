@@ -1351,6 +1351,26 @@ export function CharacterSheetPage() {
                     <span className="text-gray-300">{character.race.languages.join(', ')}</span>
                   </div>
                 )}
+                {character.race?.damageResistances && character.race.damageResistances.length > 0 && (
+                  <div className="flex justify-between">
+                    <QuickRefTooltip type="rule" id="resistance">
+                      <span className="text-gray-500 cursor-pointer hover:text-gray-300">Resistances</span>
+                    </QuickRefTooltip>
+                    <span className="text-green-400 font-medium capitalize">
+                      {character.race.damageResistances.join(', ')}
+                    </span>
+                  </div>
+                )}
+                {character.race?.conditionImmunities && character.race.conditionImmunities.length > 0 && (
+                  <div className="flex justify-between">
+                    <QuickRefTooltip type="rule" id="immunity">
+                      <span className="text-gray-500 cursor-pointer hover:text-gray-300">Immunities</span>
+                    </QuickRefTooltip>
+                    <span className="text-blue-400 font-medium capitalize">
+                      {character.race.conditionImmunities.join(', ')}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
