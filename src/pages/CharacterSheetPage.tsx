@@ -34,6 +34,7 @@ import { NinthLevelSpellSelector } from '../components/NinthLevelSpellSelector'
 import { SpellSelector } from '../components/SpellSelector'
 import { AlignmentSelector } from '../components/AlignmentSelector'
 import { EquipmentEditor } from '../components/EquipmentEditor'
+import { ClassFeatureCard } from '../components/ClassFeatureCard'
 import { FIGHTING_STANCES } from '../data/fightingStances'
 import type { LootItem } from '../data/lootGenerator'
 import type { Spell } from '../types'
@@ -746,6 +747,11 @@ export function CharacterSheetPage() {
         return newRolls
       })
     }, 5000)
+  }
+
+  const handleUseFeature = (featureId: string) => {
+    useFeatureCharge(featureId)
+    saveCharacter()
   }
 
   const handleUpdateHP = (hp: Partial<Character['hitPoints']>) => {
@@ -2715,6 +2721,39 @@ export function CharacterSheetPage() {
                     {(character.class?.id === 'cleric' || character.class?.id === 'druid' ||
                       character.class?.id === 'paladin' || character.class?.id === 'wizard') &&
                       ' Remember to prepare your spells each day.'}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Class Features */}
+          {character.class?.features && character.class.features.length > 0 && (
+            <div className="card bg-gray-800 border-gray-700 p-6">
+              <h3 className="text-2xl font-bold text-white mb-4">⚡ Class Features</h3>
+              {character.class.features.filter(feature => character.level >= feature.level).length > 0 ? (
+                <div className="grid md:grid-cols-2 gap-4">
+                  {character.class.features
+                    .filter(feature => character.level >= feature.level)
+                    .map((feature) => {
+                      const featureCharge = character.featureCharges.find(fc => fc.id === feature.id)
+                      return (
+                        <ClassFeatureCard
+                          key={feature.id}
+                          feature={feature}
+                          character={character}
+                          currentCharges={featureCharge?.current}
+                          maxCharges={featureCharge?.maximum}
+                          onUse={featureCharge ? () => handleUseFeature(feature.id) : undefined}
+                        />
+                      )
+                    })}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-gray-400">No class features unlocked yet.</p>
+                  <p className="text-sm text-gray-500 mt-2">
+                    Class features will appear here as you level up.
                   </p>
                 </div>
               )}
