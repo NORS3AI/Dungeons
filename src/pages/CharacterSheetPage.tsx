@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useCharacterStore } from '../stores/characterStore'
+import { useSettingsStore } from '../stores/settingsStore'
 import { DiceRollerButton, DiceRollerModal } from '../components/DiceRoller'
 import { calculateModifier, calculateProficiencyBonus, rollDice } from '../types/dice'
 import { isWeapon, isArmor, isShield, isCloak, autoConvertCurrency, EMPTY_CURRENCY } from '../types/equipment'
@@ -75,6 +76,7 @@ export function CharacterSheetPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { characters, loadCharacter, currentCharacter, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, changeEquipmentQuantity, renameEquipment, setFightingStance, addEquipment, addMaterial, removeMaterial, changeMaterialQuantity, updateHitPoints, addSpell, removeSpell, saveCharacter, addFoodRations, addWaterSupply, addItemFeature, setAlignment, setAbilityScores, migrateCurrentCharacter, needsMigration, setLevelWithHP, shortRest, longRest, initializeResourcePools, initializeFeatureCharges, useFeatureCharge } = useCharacterStore()
+  const { dmModeEnabled } = useSettingsStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
   const [activeTab, setActiveTab] = useState<'main' | 'actions' | 'spells' | 'inventory' | 'features' | 'story' | 'loot'>('main')
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
@@ -348,9 +350,23 @@ export function CharacterSheetPage() {
     // Items with special abilities (like invisibility cloak) -> add to Features
     if (lootItem.feature) {
       addItemFeature(lootItem.feature)
-      // Still add to inventory so player can see they have it
-      setEditingLootItem(lootItem)
-      setShowEquipmentEditor(true)
+      // Auto-add the item to inventory without opening editor
+      const featureItem: Equipment = {
+        id: lootItem.id + '-' + Date.now(),
+        name: lootItem.name,
+        description: lootItem.description,
+        category: lootItem.category as any || 'adventuringGear',
+        equipped: false,
+        rarity: lootItem.rarity,
+        quantity: lootItem.quantity || 1,
+        weight: 1,
+        cost: {
+          ...EMPTY_CURRENCY,
+          gold: lootItem.value || 0,
+        },
+      }
+      addEquipment(featureItem)
+      saveCharacter()
       return
     }
 
@@ -394,9 +410,23 @@ export function CharacterSheetPage() {
       return
     }
 
-    // Open equipment editor for all other items
-    setEditingLootItem(lootItem)
-    setShowEquipmentEditor(true)
+    // Auto-add all other items (weapons, armor, shields, etc.) directly to inventory
+    const genericItem: Equipment = {
+      id: lootItem.id + '-' + Date.now(),
+      name: lootItem.name,
+      description: lootItem.description,
+      category: lootItem.category as any || 'adventuringGear',
+      equipped: false,
+      rarity: lootItem.rarity,
+      quantity: lootItem.quantity || 1,
+      weight: 1,
+      cost: {
+        ...EMPTY_CURRENCY,
+        gold: lootItem.value || 0,
+      },
+    }
+    addEquipment(genericItem)
+    saveCharacter()
   }
 
   const handleSaveEquipment = (equipment: Equipment) => {
@@ -3182,6 +3212,7 @@ export function CharacterSheetPage() {
         <LootCache
           character={character}
           onAddToInventory={handleAddLootToInventory}
+          dmModeEnabled={dmModeEnabled}
         />
       )}
 
