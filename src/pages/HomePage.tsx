@@ -5,6 +5,7 @@ import { exportCharacterToJSON, importCharacterFromJSON, exportAllCharactersToJS
 import { ContentReferenceModal } from '../components/ContentReferenceModal'
 import { QuickDiceRoller, QuickDiceRollerButton } from '../components/QuickDiceRoller'
 import { DMUnlockModal } from '../components/DMUnlockModal'
+import { DMItemGranter } from '../components/DMItemGranter'
 import { useSettingsStore } from '../stores/settingsStore'
 
 export function HomePage() {
@@ -14,6 +15,7 @@ export function HomePage() {
   const [showFullContent, setShowFullContent] = useState(false)
   const [showDiceRoller, setShowDiceRoller] = useState(false)
   const [showDMUnlock, setShowDMUnlock] = useState(false)
+  const [showDMItemGranter, setShowDMItemGranter] = useState(false)
   const [referenceModal, setReferenceModal] = useState<{ type: 'class' | 'race' | null; name: string | null }>({ type: null, name: null })
   const { characters, loadCharacter, deleteCharacter, importCharacter, migrateCharacterById, needsMigrationById } = useCharacterStore()
   const { dmModeEnabled } = useSettingsStore()
@@ -92,7 +94,7 @@ export function HomePage() {
         </p>
 
         {/* DM Mode Toggle Button */}
-        <div className="mt-6 flex justify-center">
+        <div className="mt-6 flex justify-center gap-4">
           <button
             onClick={() => setShowDMUnlock(true)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold shadow-lg
@@ -112,6 +114,22 @@ export function HomePage() {
             </svg>
             {dmModeEnabled ? 'DM Mode' : 'DM Tools'}
           </button>
+
+          {/* DM Item Granter Button - Only shown when DM Mode is active */}
+          {dmModeEnabled && (
+            <button
+              onClick={() => setShowDMItemGranter(true)}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold shadow-lg
+                         bg-dnd-gold text-gray-900 hover:bg-yellow-500
+                         transition-all duration-200 transform hover:scale-105"
+              title="Grant items to characters"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Grant Items
+            </button>
+          )}
         </div>
       </div>
 
@@ -495,6 +513,12 @@ export function HomePage() {
       <DMUnlockModal
         isOpen={showDMUnlock}
         onClose={() => setShowDMUnlock(false)}
+      />
+
+      {/* DM Item Granter Modal */}
+      <DMItemGranter
+        isOpen={showDMItemGranter}
+        onClose={() => setShowDMItemGranter(false)}
       />
 
       {/* Quick Dice Roller */}
