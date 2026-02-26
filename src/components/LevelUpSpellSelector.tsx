@@ -1,6 +1,77 @@
 import { useState } from 'react'
 import type { Character, Spell } from '../types'
-import { WARLOCK_CANTRIPS, WARLOCK_LEVEL_1_SPELLS } from '../data/spells/warlock'
+import {
+  BARD_CANTRIPS,
+  BARD_LEVEL_1_SPELLS,
+  BARD_LEVEL_2_SPELLS,
+  BARD_LEVEL_3_SPELLS,
+  BARD_LEVEL_4_SPELLS,
+  BARD_LEVEL_5_SPELLS,
+  BARD_LEVEL_6_SPELLS,
+  BARD_LEVEL_7_SPELLS,
+  BARD_LEVEL_8_SPELLS,
+  BARD_LEVEL_9_SPELLS,
+  CLERIC_CANTRIPS,
+  CLERIC_LEVEL_1_SPELLS,
+  CLERIC_LEVEL_2_SPELLS,
+  CLERIC_LEVEL_3_SPELLS,
+  CLERIC_LEVEL_4_SPELLS,
+  CLERIC_LEVEL_5_SPELLS,
+  CLERIC_LEVEL_6_SPELLS,
+  CLERIC_LEVEL_7_SPELLS,
+  CLERIC_LEVEL_8_SPELLS,
+  CLERIC_LEVEL_9_SPELLS,
+  DRUID_CANTRIPS,
+  DRUID_LEVEL_1_SPELLS,
+  DRUID_LEVEL_2_SPELLS,
+  DRUID_LEVEL_3_SPELLS,
+  DRUID_LEVEL_4_SPELLS,
+  DRUID_LEVEL_5_SPELLS,
+  DRUID_LEVEL_6_SPELLS,
+  DRUID_LEVEL_7_SPELLS,
+  DRUID_LEVEL_8_SPELLS,
+  DRUID_LEVEL_9_SPELLS,
+  NECROMANCER_CANTRIPS,
+  NECROMANCER_LEVEL_1_SPELLS,
+  NECROMANCER_LEVEL_2_SPELLS,
+  NECROMANCER_LEVEL_3_SPELLS,
+  NECROMANCER_LEVEL_4_SPELLS,
+  NECROMANCER_LEVEL_5_SPELLS,
+  NECROMANCER_LEVEL_6_SPELLS,
+  NECROMANCER_LEVEL_7_SPELLS,
+  NECROMANCER_LEVEL_8_SPELLS,
+  NECROMANCER_LEVEL_9_SPELLS,
+  SORCERER_CANTRIPS,
+  SORCERER_LEVEL_1_SPELLS,
+  SORCERER_LEVEL_2_SPELLS,
+  SORCERER_LEVEL_3_SPELLS,
+  SORCERER_LEVEL_4_SPELLS,
+  SORCERER_LEVEL_5_SPELLS,
+  SORCERER_LEVEL_6_SPELLS,
+  SORCERER_LEVEL_7_SPELLS,
+  SORCERER_LEVEL_8_SPELLS,
+  SORCERER_LEVEL_9_SPELLS,
+  WARLOCK_CANTRIPS,
+  WARLOCK_LEVEL_1_SPELLS,
+  WARLOCK_LEVEL_2_SPELLS,
+  WARLOCK_LEVEL_3_SPELLS,
+  WARLOCK_LEVEL_4_SPELLS,
+  WARLOCK_LEVEL_5_SPELLS,
+  WARLOCK_LEVEL_6_SPELLS,
+  WARLOCK_LEVEL_7_SPELLS,
+  WARLOCK_LEVEL_8_SPELLS,
+  WARLOCK_LEVEL_9_SPELLS,
+  WIZARD_CANTRIPS,
+  WIZARD_LEVEL_1_SPELLS,
+  WIZARD_LEVEL_2_SPELLS,
+  WIZARD_LEVEL_3_SPELLS,
+  WIZARD_LEVEL_4_SPELLS,
+  WIZARD_LEVEL_5_SPELLS,
+  WIZARD_LEVEL_6_SPELLS,
+  WIZARD_LEVEL_7_SPELLS,
+  WIZARD_LEVEL_8_SPELLS,
+  WIZARD_LEVEL_9_SPELLS,
+} from '../data/spells'
 
 interface LevelUpSpellSelectorProps {
   character: Character
@@ -13,18 +84,74 @@ interface LevelUpSpellSelectorProps {
  * Get the number of spells/cantrips a character should know at a given level
  */
 function getSpellsKnown(characterClass: string, level: number): { cantrips: number; spells: number } {
-  // Warlock progression (PHB 2024)
-  const warlockCantrips = [2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
-  const warlockSpells = [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15]
+  const className = characterClass.toLowerCase()
 
-  if (characterClass.toLowerCase().includes('warlock')) {
+  // Bard progression (PHB 2024)
+  if (className.includes('bard')) {
+    const bardCantrips = [2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
+    const bardSpells = [4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 15, 16, 18, 19, 19, 20, 22, 22, 22]
+    return {
+      cantrips: bardCantrips[level - 1] || 0,
+      spells: bardSpells[level - 1] || 0,
+    }
+  }
+
+  // Cleric progression (PHB 2024) - prepares spells = level + WIS modifier
+  if (className.includes('cleric')) {
+    const clericCantrips = [3, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]
+    return {
+      cantrips: clericCantrips[level - 1] || 0,
+      spells: 0, // Clerics prepare spells, not learn them
+    }
+  }
+
+  // Druid progression (PHB 2024) - prepares spells = level + WIS modifier
+  if (className.includes('druid')) {
+    const druidCantrips = [2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
+    return {
+      cantrips: druidCantrips[level - 1] || 0,
+      spells: 0, // Druids prepare spells, not learn them
+    }
+  }
+
+  // Sorcerer progression (PHB 2024)
+  if (className.includes('sorcerer')) {
+    const sorcererCantrips = [4, 4, 4, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]
+    const sorcererSpells = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 12, 13, 13, 14, 14, 15, 15, 15, 15]
+    return {
+      cantrips: sorcererCantrips[level - 1] || 0,
+      spells: sorcererSpells[level - 1] || 0,
+    }
+  }
+
+  // Wizard progression (PHB 2024) - learns 2 spells per level
+  if (className.includes('wizard')) {
+    const wizardCantrips = [3, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]
+    return {
+      cantrips: wizardCantrips[level - 1] || 0,
+      spells: level === 1 ? 6 : 2, // 6 at level 1, then 2 per level
+    }
+  }
+
+  // Necromancer progression (PHB 2024) - same as Wizard
+  if (className.includes('necromancer')) {
+    const necromancerCantrips = [3, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]
+    return {
+      cantrips: necromancerCantrips[level - 1] || 0,
+      spells: level === 1 ? 6 : 2, // 6 at level 1, then 2 per level
+    }
+  }
+
+  // Warlock progression (PHB 2024)
+  if (className.includes('warlock')) {
+    const warlockCantrips = [2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
+    const warlockSpells = [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15]
     return {
       cantrips: warlockCantrips[level - 1] || 0,
       spells: warlockSpells[level - 1] || 0,
     }
   }
 
-  // TODO: Add other spellcaster classes
   return { cantrips: 0, spells: 0 }
 }
 
@@ -33,23 +160,127 @@ function getSpellsKnown(characterClass: string, level: number): { cantrips: numb
  */
 function getAvailableSpells(characterClass: string, level: number, includeCantrips: boolean): Spell[] {
   const className = characterClass.toLowerCase()
+  const spells: Spell[] = []
 
-  if (className.includes('warlock')) {
-    const spells: Spell[] = []
-
+  // Bard spells - full caster with standard progression
+  if (className.includes('bard')) {
     if (includeCantrips) {
-      spells.push(...WARLOCK_CANTRIPS)
+      spells.push(...BARD_CANTRIPS)
     }
-
-    // Add spells up to the highest level they can cast
-    // For now, only level 1 spells are available
-    if (level >= 1) spells.push(...WARLOCK_LEVEL_1_SPELLS)
-    // TODO: Add level 2+ spells when available
-
+    if (level >= 1) spells.push(...BARD_LEVEL_1_SPELLS)
+    if (level >= 3) spells.push(...BARD_LEVEL_2_SPELLS)
+    if (level >= 5) spells.push(...BARD_LEVEL_3_SPELLS)
+    if (level >= 7) spells.push(...BARD_LEVEL_4_SPELLS)
+    if (level >= 9) spells.push(...BARD_LEVEL_5_SPELLS)
+    if (level >= 11) spells.push(...BARD_LEVEL_6_SPELLS)
+    if (level >= 13) spells.push(...BARD_LEVEL_7_SPELLS)
+    if (level >= 15) spells.push(...BARD_LEVEL_8_SPELLS)
+    if (level >= 17) spells.push(...BARD_LEVEL_9_SPELLS)
     return spells
   }
 
-  // TODO: Add other classes
+  // Cleric spells - full caster with standard progression
+  if (className.includes('cleric')) {
+    if (includeCantrips) {
+      spells.push(...CLERIC_CANTRIPS)
+    }
+    if (level >= 1) spells.push(...CLERIC_LEVEL_1_SPELLS)
+    if (level >= 3) spells.push(...CLERIC_LEVEL_2_SPELLS)
+    if (level >= 5) spells.push(...CLERIC_LEVEL_3_SPELLS)
+    if (level >= 7) spells.push(...CLERIC_LEVEL_4_SPELLS)
+    if (level >= 9) spells.push(...CLERIC_LEVEL_5_SPELLS)
+    if (level >= 11) spells.push(...CLERIC_LEVEL_6_SPELLS)
+    if (level >= 13) spells.push(...CLERIC_LEVEL_7_SPELLS)
+    if (level >= 15) spells.push(...CLERIC_LEVEL_8_SPELLS)
+    if (level >= 17) spells.push(...CLERIC_LEVEL_9_SPELLS)
+    return spells
+  }
+
+  // Druid spells - full caster with standard progression
+  if (className.includes('druid')) {
+    if (includeCantrips) {
+      spells.push(...DRUID_CANTRIPS)
+    }
+    if (level >= 1) spells.push(...DRUID_LEVEL_1_SPELLS)
+    if (level >= 3) spells.push(...DRUID_LEVEL_2_SPELLS)
+    if (level >= 5) spells.push(...DRUID_LEVEL_3_SPELLS)
+    if (level >= 7) spells.push(...DRUID_LEVEL_4_SPELLS)
+    if (level >= 9) spells.push(...DRUID_LEVEL_5_SPELLS)
+    if (level >= 11) spells.push(...DRUID_LEVEL_6_SPELLS)
+    if (level >= 13) spells.push(...DRUID_LEVEL_7_SPELLS)
+    if (level >= 15) spells.push(...DRUID_LEVEL_8_SPELLS)
+    if (level >= 17) spells.push(...DRUID_LEVEL_9_SPELLS)
+    return spells
+  }
+
+  // Sorcerer spells - full caster with standard progression
+  if (className.includes('sorcerer')) {
+    if (includeCantrips) {
+      spells.push(...SORCERER_CANTRIPS)
+    }
+    if (level >= 1) spells.push(...SORCERER_LEVEL_1_SPELLS)
+    if (level >= 3) spells.push(...SORCERER_LEVEL_2_SPELLS)
+    if (level >= 5) spells.push(...SORCERER_LEVEL_3_SPELLS)
+    if (level >= 7) spells.push(...SORCERER_LEVEL_4_SPELLS)
+    if (level >= 9) spells.push(...SORCERER_LEVEL_5_SPELLS)
+    if (level >= 11) spells.push(...SORCERER_LEVEL_6_SPELLS)
+    if (level >= 13) spells.push(...SORCERER_LEVEL_7_SPELLS)
+    if (level >= 15) spells.push(...SORCERER_LEVEL_8_SPELLS)
+    if (level >= 17) spells.push(...SORCERER_LEVEL_9_SPELLS)
+    return spells
+  }
+
+  // Wizard spells - full caster with standard progression
+  if (className.includes('wizard')) {
+    if (includeCantrips) {
+      spells.push(...WIZARD_CANTRIPS)
+    }
+    if (level >= 1) spells.push(...WIZARD_LEVEL_1_SPELLS)
+    if (level >= 3) spells.push(...WIZARD_LEVEL_2_SPELLS)
+    if (level >= 5) spells.push(...WIZARD_LEVEL_3_SPELLS)
+    if (level >= 7) spells.push(...WIZARD_LEVEL_4_SPELLS)
+    if (level >= 9) spells.push(...WIZARD_LEVEL_5_SPELLS)
+    if (level >= 11) spells.push(...WIZARD_LEVEL_6_SPELLS)
+    if (level >= 13) spells.push(...WIZARD_LEVEL_7_SPELLS)
+    if (level >= 15) spells.push(...WIZARD_LEVEL_8_SPELLS)
+    if (level >= 17) spells.push(...WIZARD_LEVEL_9_SPELLS)
+    return spells
+  }
+
+  // Necromancer spells - full caster with standard progression (same as Wizard)
+  if (className.includes('necromancer')) {
+    if (includeCantrips) {
+      spells.push(...NECROMANCER_CANTRIPS)
+    }
+    if (level >= 1) spells.push(...NECROMANCER_LEVEL_1_SPELLS)
+    if (level >= 3) spells.push(...NECROMANCER_LEVEL_2_SPELLS)
+    if (level >= 5) spells.push(...NECROMANCER_LEVEL_3_SPELLS)
+    if (level >= 7) spells.push(...NECROMANCER_LEVEL_4_SPELLS)
+    if (level >= 9) spells.push(...NECROMANCER_LEVEL_5_SPELLS)
+    if (level >= 11) spells.push(...NECROMANCER_LEVEL_6_SPELLS)
+    if (level >= 13) spells.push(...NECROMANCER_LEVEL_7_SPELLS)
+    if (level >= 15) spells.push(...NECROMANCER_LEVEL_8_SPELLS)
+    if (level >= 17) spells.push(...NECROMANCER_LEVEL_9_SPELLS)
+    return spells
+  }
+
+  // Warlock spells - pact magic with standard progression
+  if (className.includes('warlock')) {
+    if (includeCantrips) {
+      spells.push(...WARLOCK_CANTRIPS)
+    }
+    if (level >= 1) spells.push(...WARLOCK_LEVEL_1_SPELLS)
+    if (level >= 3) spells.push(...WARLOCK_LEVEL_2_SPELLS)
+    if (level >= 5) spells.push(...WARLOCK_LEVEL_3_SPELLS)
+    if (level >= 7) spells.push(...WARLOCK_LEVEL_4_SPELLS)
+    if (level >= 9) spells.push(...WARLOCK_LEVEL_5_SPELLS)
+    if (level >= 11) spells.push(...WARLOCK_LEVEL_6_SPELLS)
+    if (level >= 13) spells.push(...WARLOCK_LEVEL_7_SPELLS)
+    if (level >= 15) spells.push(...WARLOCK_LEVEL_8_SPELLS)
+    if (level >= 17) spells.push(...WARLOCK_LEVEL_9_SPELLS)
+    return spells
+  }
+
   return []
 }
 

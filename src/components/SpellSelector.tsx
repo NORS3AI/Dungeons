@@ -9,8 +9,19 @@ import {
   BARD_LEVEL_4_SPELLS,
   BARD_LEVEL_5_SPELLS,
   BARD_LEVEL_6_SPELLS,
+  BARD_LEVEL_7_SPELLS,
+  BARD_LEVEL_8_SPELLS,
+  BARD_LEVEL_9_SPELLS,
   CLERIC_CANTRIPS,
   CLERIC_LEVEL_1_SPELLS,
+  CLERIC_LEVEL_2_SPELLS,
+  CLERIC_LEVEL_3_SPELLS,
+  CLERIC_LEVEL_4_SPELLS,
+  CLERIC_LEVEL_5_SPELLS,
+  CLERIC_LEVEL_6_SPELLS,
+  CLERIC_LEVEL_7_SPELLS,
+  CLERIC_LEVEL_8_SPELLS,
+  CLERIC_LEVEL_9_SPELLS,
   DEATH_KNIGHT_CANTRIPS,
   DEATH_KNIGHT_LEVEL_1_SPELLS,
   DEATH_KNIGHT_LEVEL_3_SPELLS,
@@ -20,8 +31,23 @@ import {
   DRUID_CANTRIPS,
   DRUID_LEVEL_1_SPELLS,
   DRUID_LEVEL_2_SPELLS,
+  DRUID_LEVEL_3_SPELLS,
+  DRUID_LEVEL_4_SPELLS,
+  DRUID_LEVEL_5_SPELLS,
+  DRUID_LEVEL_6_SPELLS,
+  DRUID_LEVEL_7_SPELLS,
+  DRUID_LEVEL_8_SPELLS,
+  DRUID_LEVEL_9_SPELLS,
   NECROMANCER_CANTRIPS,
   NECROMANCER_LEVEL_1_SPELLS,
+  NECROMANCER_LEVEL_2_SPELLS,
+  NECROMANCER_LEVEL_3_SPELLS,
+  NECROMANCER_LEVEL_4_SPELLS,
+  NECROMANCER_LEVEL_5_SPELLS,
+  NECROMANCER_LEVEL_6_SPELLS,
+  NECROMANCER_LEVEL_7_SPELLS,
+  NECROMANCER_LEVEL_8_SPELLS,
+  NECROMANCER_LEVEL_9_SPELLS,
   PALADIN_LEVEL_1_SPELLS,
   PALADIN_LEVEL_2_SPELLS,
   PALADIN_LEVEL_3_SPELLS,
@@ -34,10 +60,34 @@ import {
   RANGER_LEVEL_5_SPELLS,
   SORCERER_CANTRIPS,
   SORCERER_LEVEL_1_SPELLS,
+  SORCERER_LEVEL_2_SPELLS,
+  SORCERER_LEVEL_3_SPELLS,
+  SORCERER_LEVEL_4_SPELLS,
+  SORCERER_LEVEL_5_SPELLS,
+  SORCERER_LEVEL_6_SPELLS,
+  SORCERER_LEVEL_7_SPELLS,
+  SORCERER_LEVEL_8_SPELLS,
+  SORCERER_LEVEL_9_SPELLS,
   WARLOCK_CANTRIPS,
   WARLOCK_LEVEL_1_SPELLS,
+  WARLOCK_LEVEL_2_SPELLS,
+  WARLOCK_LEVEL_3_SPELLS,
+  WARLOCK_LEVEL_4_SPELLS,
+  WARLOCK_LEVEL_5_SPELLS,
+  WARLOCK_LEVEL_6_SPELLS,
+  WARLOCK_LEVEL_7_SPELLS,
+  WARLOCK_LEVEL_8_SPELLS,
+  WARLOCK_LEVEL_9_SPELLS,
   WIZARD_CANTRIPS,
   WIZARD_LEVEL_1_SPELLS,
+  WIZARD_LEVEL_2_SPELLS,
+  WIZARD_LEVEL_3_SPELLS,
+  WIZARD_LEVEL_4_SPELLS,
+  WIZARD_LEVEL_5_SPELLS,
+  WIZARD_LEVEL_6_SPELLS,
+  WIZARD_LEVEL_7_SPELLS,
+  WIZARD_LEVEL_8_SPELLS,
+  WIZARD_LEVEL_9_SPELLS,
   GOO_EXPANDED_SPELLS,
 } from '../data/spells'
 
@@ -99,10 +149,15 @@ export function SpellSelector({
       if (level >= 11) {
         spells.push(...BARD_LEVEL_6_SPELLS)
       }
-      // TODO: Add higher level spell arrays when available
-      // Level 13-14: BARD_LEVEL_7_SPELLS
-      // Level 15-16: BARD_LEVEL_8_SPELLS
-      // Level 17-20: BARD_LEVEL_9_SPELLS
+      if (level >= 13) {
+        spells.push(...BARD_LEVEL_7_SPELLS)
+      }
+      if (level >= 15) {
+        spells.push(...BARD_LEVEL_8_SPELLS)
+      }
+      if (level >= 17) {
+        spells.push(...BARD_LEVEL_9_SPELLS)
+      }
       return spells
     }
 
@@ -146,9 +201,33 @@ export function SpellSelector({
       return spells
     }
 
-    // Warlock spells with subclass expanded spells
+    // Warlock spells with subclass expanded spells - Pact Magic progression
     if (characterClass?.id === 'warlock') {
       spells.push(...WARLOCK_LEVEL_1_SPELLS)
+      if (level >= 3) {
+        spells.push(...WARLOCK_LEVEL_2_SPELLS)
+      }
+      if (level >= 5) {
+        spells.push(...WARLOCK_LEVEL_3_SPELLS)
+      }
+      if (level >= 7) {
+        spells.push(...WARLOCK_LEVEL_4_SPELLS)
+      }
+      if (level >= 9) {
+        spells.push(...WARLOCK_LEVEL_5_SPELLS)
+      }
+      if (level >= 11) {
+        spells.push(...WARLOCK_LEVEL_6_SPELLS)
+      }
+      if (level >= 13) {
+        spells.push(...WARLOCK_LEVEL_7_SPELLS)
+      }
+      if (level >= 15) {
+        spells.push(...WARLOCK_LEVEL_8_SPELLS)
+      }
+      if (level >= 17) {
+        spells.push(...WARLOCK_LEVEL_9_SPELLS)
+      }
       // Add expanded spells from subclass
       if (subclass?.id === 'great-old-one') {
         spells.push(...GOO_EXPANDED_SPELLS)
@@ -156,16 +235,33 @@ export function SpellSelector({
       return spells
     }
 
-    // Druid spells - add spell levels based on character level
+    // Druid spells - full caster with level-based progression
     if (characterClass?.id === 'druid') {
       spells.push(...DRUID_LEVEL_1_SPELLS)
       if (level >= 3) {
         spells.push(...DRUID_LEVEL_2_SPELLS)
       }
-      // TODO: Add higher level spell arrays when character level allows
-      // Level 5-6: DRUID_LEVEL_3_SPELLS
-      // Level 7-8: DRUID_LEVEL_4_SPELLS
-      // etc.
+      if (level >= 5) {
+        spells.push(...DRUID_LEVEL_3_SPELLS)
+      }
+      if (level >= 7) {
+        spells.push(...DRUID_LEVEL_4_SPELLS)
+      }
+      if (level >= 9) {
+        spells.push(...DRUID_LEVEL_5_SPELLS)
+      }
+      if (level >= 11) {
+        spells.push(...DRUID_LEVEL_6_SPELLS)
+      }
+      if (level >= 13) {
+        spells.push(...DRUID_LEVEL_7_SPELLS)
+      }
+      if (level >= 15) {
+        spells.push(...DRUID_LEVEL_8_SPELLS)
+      }
+      if (level >= 17) {
+        spells.push(...DRUID_LEVEL_9_SPELLS)
+      }
       return spells
     }
 
@@ -187,18 +283,124 @@ export function SpellSelector({
       return spells
     }
 
-    // Other classes - currently only level 1 spells (TODO: Add level-based progression)
+    // Cleric spells - full caster with level-based progression
     if (characterClass?.id === 'cleric') {
-      return [...CLERIC_LEVEL_1_SPELLS]
+      spells.push(...CLERIC_LEVEL_1_SPELLS)
+      if (level >= 3) {
+        spells.push(...CLERIC_LEVEL_2_SPELLS)
+      }
+      if (level >= 5) {
+        spells.push(...CLERIC_LEVEL_3_SPELLS)
+      }
+      if (level >= 7) {
+        spells.push(...CLERIC_LEVEL_4_SPELLS)
+      }
+      if (level >= 9) {
+        spells.push(...CLERIC_LEVEL_5_SPELLS)
+      }
+      if (level >= 11) {
+        spells.push(...CLERIC_LEVEL_6_SPELLS)
+      }
+      if (level >= 13) {
+        spells.push(...CLERIC_LEVEL_7_SPELLS)
+      }
+      if (level >= 15) {
+        spells.push(...CLERIC_LEVEL_8_SPELLS)
+      }
+      if (level >= 17) {
+        spells.push(...CLERIC_LEVEL_9_SPELLS)
+      }
+      return spells
     }
+
+    // Necromancer spells - full caster with level-based progression
     if (characterClass?.id === 'necromancer') {
-      return [...NECROMANCER_LEVEL_1_SPELLS]
+      spells.push(...NECROMANCER_LEVEL_1_SPELLS)
+      if (level >= 3) {
+        spells.push(...NECROMANCER_LEVEL_2_SPELLS)
+      }
+      if (level >= 5) {
+        spells.push(...NECROMANCER_LEVEL_3_SPELLS)
+      }
+      if (level >= 7) {
+        spells.push(...NECROMANCER_LEVEL_4_SPELLS)
+      }
+      if (level >= 9) {
+        spells.push(...NECROMANCER_LEVEL_5_SPELLS)
+      }
+      if (level >= 11) {
+        spells.push(...NECROMANCER_LEVEL_6_SPELLS)
+      }
+      if (level >= 13) {
+        spells.push(...NECROMANCER_LEVEL_7_SPELLS)
+      }
+      if (level >= 15) {
+        spells.push(...NECROMANCER_LEVEL_8_SPELLS)
+      }
+      if (level >= 17) {
+        spells.push(...NECROMANCER_LEVEL_9_SPELLS)
+      }
+      return spells
     }
+
+    // Sorcerer spells - full caster with level-based progression
     if (characterClass?.id === 'sorcerer') {
-      return [...SORCERER_LEVEL_1_SPELLS]
+      spells.push(...SORCERER_LEVEL_1_SPELLS)
+      if (level >= 3) {
+        spells.push(...SORCERER_LEVEL_2_SPELLS)
+      }
+      if (level >= 5) {
+        spells.push(...SORCERER_LEVEL_3_SPELLS)
+      }
+      if (level >= 7) {
+        spells.push(...SORCERER_LEVEL_4_SPELLS)
+      }
+      if (level >= 9) {
+        spells.push(...SORCERER_LEVEL_5_SPELLS)
+      }
+      if (level >= 11) {
+        spells.push(...SORCERER_LEVEL_6_SPELLS)
+      }
+      if (level >= 13) {
+        spells.push(...SORCERER_LEVEL_7_SPELLS)
+      }
+      if (level >= 15) {
+        spells.push(...SORCERER_LEVEL_8_SPELLS)
+      }
+      if (level >= 17) {
+        spells.push(...SORCERER_LEVEL_9_SPELLS)
+      }
+      return spells
     }
+
+    // Wizard spells - full caster with level-based progression
     if (characterClass?.id === 'wizard') {
-      return [...WIZARD_LEVEL_1_SPELLS]
+      spells.push(...WIZARD_LEVEL_1_SPELLS)
+      if (level >= 3) {
+        spells.push(...WIZARD_LEVEL_2_SPELLS)
+      }
+      if (level >= 5) {
+        spells.push(...WIZARD_LEVEL_3_SPELLS)
+      }
+      if (level >= 7) {
+        spells.push(...WIZARD_LEVEL_4_SPELLS)
+      }
+      if (level >= 9) {
+        spells.push(...WIZARD_LEVEL_5_SPELLS)
+      }
+      if (level >= 11) {
+        spells.push(...WIZARD_LEVEL_6_SPELLS)
+      }
+      if (level >= 13) {
+        spells.push(...WIZARD_LEVEL_7_SPELLS)
+      }
+      if (level >= 15) {
+        spells.push(...WIZARD_LEVEL_8_SPELLS)
+      }
+      if (level >= 17) {
+        spells.push(...WIZARD_LEVEL_9_SPELLS)
+      }
+      return spells
     }
 
     return []

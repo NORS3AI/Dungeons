@@ -82,3 +82,27 @@ export const WARLOCK_LEVEL_1_SPELLS: Spell[] = [
     classes: ['warlock', 'wizard', 'sorcerer'],
   },
 ]
+
+// Warlock 2nd Level Spells
+export const WARLOCK_LEVEL_2_SPELLS: Spell[] = []
+
+// Warlock 3rd Level Spells
+export const WARLOCK_LEVEL_3_SPELLS: Spell[] = []
+
+// Warlock 4th Level Spells
+export const WARLOCK_LEVEL_4_SPELLS: Spell[] = []
+
+// Warlock 5th Level Spells
+export const WARLOCK_LEVEL_5_SPELLS: Spell[] = []
+
+// Warlock 6th Level Spells
+export const WARLOCK_LEVEL_6_SPELLS: Spell[] = []
+
+// Warlock 7th Level Spells
+export const WARLOCK_LEVEL_7_SPELLS: Spell[] = []
+
+// Warlock 8th Level Spells
+export const WARLOCK_LEVEL_8_SPELLS: Spell[] = []
+
+// Warlock 9th Level Spells
+export const WARLOCK_LEVEL_9_SPELLS: Spell[] = []
