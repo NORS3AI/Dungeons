@@ -76,7 +76,7 @@ const SKILLS: { name: string; ability: Ability; key: SkillKey; refId: string }[]
 export function CharacterSheetPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { characters, loadCharacter, currentCharacter, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, changeEquipmentQuantity, renameEquipment, setFightingStance, addEquipment, addMaterial, removeMaterial, changeMaterialQuantity, updateHitPoints, addSpell, removeSpell, saveCharacter, addFoodRations, addWaterSupply, addItemFeature, setAlignment, setAbilityScores, migrateCurrentCharacter, needsMigration, setLevelWithHP, shortRest, longRest, initializeResourcePools, initializeFeatureCharges, useFeatureCharge } = useCharacterStore()
+  const { characters, loadCharacter, currentCharacter, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, changeEquipmentQuantity, renameEquipment, setFightingStance, addEquipment, addMaterial, removeMaterial, changeMaterialQuantity, updateHitPoints, addSpell, removeSpell, saveCharacter, addFoodRations, addWaterSupply, addItemFeature, setAlignment, setAbilityScores, migrateCurrentCharacter, needsMigration, setLevelWithHP, shortRest, longRest, initializeResourcePools, initializeFeatureCharges, useFeatureCharge, spendResource } = useCharacterStore()
   const { dmModeEnabled } = useSettingsStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
   const [activeTab, setActiveTab] = useState<'main' | 'actions' | 'spells' | 'inventory' | 'features' | 'story' | 'loot'>('main')
@@ -684,6 +684,17 @@ export function CharacterSheetPage() {
   }
 
   const handleRollSpellAttack = (spellId: string, spellcastingAbility: string) => {
+    // Death Knights spend 1 Runic Power when casting spells
+    if (character.class?.id === 'death-knight') {
+      const runicPower = character.resourcePools.find(pool => pool.id === 'runic-power')
+      if (!runicPower || runicPower.current < 1) {
+        // Not enough Runic Power
+        return
+      }
+      spendResource('runic-power', 1)
+      saveCharacter()
+    }
+
     const abilityScore = character.abilityScores[spellcastingAbility as keyof typeof character.abilityScores]
     const abilityMod = Math.floor((abilityScore - 10) / 2)
     const profBonus = calculateProficiencyBonus(character.level)
@@ -710,6 +721,17 @@ export function CharacterSheetPage() {
   }
 
   const handleRollSpellDamage = (spellId: string, damageDice: string) => {
+    // Death Knights spend 1 Runic Power when casting spells
+    if (character.class?.id === 'death-knight') {
+      const runicPower = character.resourcePools.find(pool => pool.id === 'runic-power')
+      if (!runicPower || runicPower.current < 1) {
+        // Not enough Runic Power
+        return
+      }
+      spendResource('runic-power', 1)
+      saveCharacter()
+    }
+
     const roll = rollDice(damageDice)
     if (!roll) return
     setSpellRolls(prev => ({
@@ -730,6 +752,17 @@ export function CharacterSheetPage() {
   }
 
   const handleRollSpellHealing = (spellId: string, healingDice: string) => {
+    // Death Knights spend 1 Runic Power when casting spells
+    if (character.class?.id === 'death-knight') {
+      const runicPower = character.resourcePools.find(pool => pool.id === 'runic-power')
+      if (!runicPower || runicPower.current < 1) {
+        // Not enough Runic Power
+        return
+      }
+      spendResource('runic-power', 1)
+      saveCharacter()
+    }
+
     const roll = rollDice(healingDice)
     if (!roll) return
     setSpellRolls(prev => ({
@@ -751,6 +784,11 @@ export function CharacterSheetPage() {
 
   const handleUseFeature = (featureId: string) => {
     useFeatureCharge(featureId)
+    saveCharacter()
+  }
+
+  const handleUseResource = (poolId: string, amount: number) => {
+    spendResource(poolId, amount)
     saveCharacter()
   }
 
@@ -2745,6 +2783,7 @@ export function CharacterSheetPage() {
                           currentCharges={featureCharge?.current}
                           maxCharges={featureCharge?.maximum}
                           onUse={featureCharge ? () => handleUseFeature(feature.id) : undefined}
+                          onUseResource={handleUseResource}
                         />
                       )
                     })}

@@ -7,6 +7,7 @@ interface ClassFeatureCardProps {
   currentCharges?: number
   maxCharges?: number
   onUse?: () => void
+  onUseResource?: (poolId: string, amount: number) => void
 }
 
 export function ClassFeatureCard({
@@ -15,11 +16,23 @@ export function ClassFeatureCard({
   currentCharges,
   maxCharges,
   onUse,
+  onUseResource,
 }: ClassFeatureCardProps) {
+  // Check resource pool availability
+  const resourcePool = feature.resourceCost
+    ? character.resourcePools.find((pool) => pool.id === feature.resourceCost!.poolId)
+    : undefined
+  const hasEnoughResource =
+    !feature.resourceCost ||
+    (resourcePool && resourcePool.current >= feature.resourceCost.amount)
+
   // Determine feature type and styling
   const isActive = feature.charges && currentCharges !== undefined && maxCharges !== undefined
-  const isPassive = !feature.charges
-  const canUse = isActive && currentCharges! > 0
+  const isResourceBased = !!feature.resourceCost && !!resourcePool
+  const isPassive = !feature.charges && !feature.resourceCost
+  const canUse =
+    (isActive && currentCharges! > 0 && hasEnoughResource) ||
+    (isResourceBased && hasEnoughResource && !isActive)
 
   // Calculate Sneak Attack damage for Rogues
   const getSneakAttackDamage = () => {
@@ -99,28 +112,47 @@ export function ClassFeatureCard({
 
       {/* Charges/Availability Display */}
       <div className="flex items-center justify-between">
-        {isActive ? (
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-gray-300">Uses:</span>
-            <span className={`text-lg font-bold ${canUse ? 'text-purple-400' : 'text-gray-500'}`}>
-              {currentCharges}/{maxCharges}
-            </span>
-            {feature.charges?.rechargeOn && (
-              <span className="text-xs text-gray-500">
-                ({feature.charges.rechargeOn === 'shortRest' ? 'Short Rest' : 'Long Rest'})
+        <div className="flex flex-col gap-1">
+          {isActive && (
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-300">Uses:</span>
+              <span className={`text-lg font-bold ${canUse ? 'text-purple-400' : 'text-gray-500'}`}>
+                {currentCharges}/{maxCharges}
               </span>
-            )}
-          </div>
-        ) : (
-          <div className="text-sm text-gray-400">
-            {isPassive ? 'Always Active' : 'Available'}
-          </div>
-        )}
+              {feature.charges?.rechargeOn && (
+                <span className="text-xs text-gray-500">
+                  ({feature.charges.rechargeOn === 'shortRest' ? 'Short Rest' : 'Long Rest'})
+                </span>
+              )}
+            </div>
+          )}
+          {isResourceBased && resourcePool && (
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-300">Cost:</span>
+              <span className={`text-lg font-bold ${hasEnoughResource ? 'text-blue-400' : 'text-red-500'}`}>
+                {feature.resourceCost!.amount} {resourcePool.name}
+              </span>
+              <span className="text-xs text-gray-500">
+                ({resourcePool.current}/{resourcePool.maximum} available)
+              </span>
+            </div>
+          )}
+          {isPassive && (
+            <div className="text-sm text-gray-400">Always Active</div>
+          )}
+        </div>
 
-        {/* Use Button for active abilities */}
-        {isActive && onUse && (
+        {/* Use Button for active abilities or resource-based abilities */}
+        {((isActive && onUse) || (isResourceBased && onUseResource)) && (
           <button
-            onClick={onUse}
+            onClick={() => {
+              if (isActive && onUse) {
+                onUse()
+              }
+              if (isResourceBased && onUseResource && feature.resourceCost) {
+                onUseResource(feature.resourceCost.poolId, feature.resourceCost.amount)
+              }
+            }}
             disabled={!canUse}
             className={`px-3 py-1 rounded font-medium text-sm transition-colors ${
               canUse

@@ -1106,9 +1106,9 @@ export const useCharacterStore = create<CharacterState>()(
           const classId = currentCharacter.class.id
           const level = currentCharacter.level
 
-          // Death Knight - Runic Power
+          // Death Knight - Runic Power (4 at level 1, 4 + level at level 2+)
           if (classId === 'death-knight') {
-            const max = 4 + level
+            const max = level === 1 ? 4 : 4 + level
             resourcePools.push({
               id: 'runic-power',
               name: 'Runic Power',

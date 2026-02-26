@@ -26,6 +26,10 @@ export interface ClassFeature {
     abilityModifier?: Ability
     rechargeOn: 'shortRest' | 'longRest' | 'dawn'
   }
+  resourceCost?: {
+    poolId: string // e.g., 'runic-power', 'ki', 'sorcery-points'
+    amount: number
+  }
 }
 
 /**
@@ -2253,12 +2257,12 @@ export const DEATH_KNIGHT: Class = {
   cantripsKnown: [2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
   spellsKnown: [2, 3, 4, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7, 8, 8, 8, 9, 9],
   features: [
-    { id: 'runic-power', name: 'Runic Power', description: 'Pool of 4 + level. Regain half on short rest, all on long rest. Regenerate 1 point on critical hit.', level: 1 },
-    { id: 'rune-weapon', name: 'Rune Weapon', description: 'Costs 2 Runic Power. Bonus action: infuse weapon for 1 minute, +1d4 necrotic damage.', level: 1 },
-    { id: 'death-grip', name: 'Death Grip', description: 'Costs 3 Runic Power. Pull Large or smaller creature within 20ft. STR save or pulled and speed 0 until end of your next turn.', level: 2 },
+    { id: 'runic-power', name: 'Runic Power', description: 'Pool of 4 Runic Power at level 1, increases to 4 + level at level 2 and beyond. Regain half on short rest, all on long rest. Regenerate 1 point on critical hit.', level: 1 },
+    { id: 'rune-weapon', name: 'Rune Weapon', description: 'Costs 1 Runic Power. Bonus action: infuse weapon for 1 minute, +1d4 necrotic damage.', level: 1, resourceCost: { poolId: 'runic-power', amount: 1 } },
+    { id: 'death-grip', name: 'Death Grip', description: 'Costs 2 Runic Power. Pull Large or smaller creature within 20ft. STR save or pulled and speed 0 until end of your next turn.', level: 2, resourceCost: { poolId: 'runic-power', amount: 2 } },
     { id: 'extra-attack-dk', name: 'Extra Attack', description: 'Attack twice when you take the Attack action.', level: 5 },
     { id: 'lichborne', name: 'Lichborne', description: 'Immune to charm and fear. Advantage on saves vs disease and poison.', level: 7 },
-    { id: 'army-of-the-dead', name: 'Army of the Dead', description: 'Costs 5 Runic Power. Summon 4 ghouls for 1 minute.', level: 14, charges: { amount: 1, rechargeOn: 'longRest' } },
+    { id: 'army-of-the-dead', name: 'Army of the Dead', description: 'Costs 5 Runic Power. Summon 4 ghouls for 1 minute.', level: 14, charges: { amount: 1, rechargeOn: 'longRest' }, resourceCost: { poolId: 'runic-power', amount: 5 } },
   ],
 }
 
@@ -2268,9 +2272,9 @@ export const BLOOD_DEATH_KNIGHT: Subclass = {
   description: 'Vampiric tanks that sustain themselves through the lifeforce of enemies.',
   parentClassId: 'death-knight',
   features: [
-    { id: 'blood-boil', name: 'Blood Boil', description: 'Costs 3 Runic Power. Bonus action: enemies within 10ft take 1d8 necrotic, gain temp HP = half damage dealt. CON save for half damage.', level: 3 },
-    { id: 'vampiric-blood', name: 'Vampiric Blood', description: 'Costs 4 Runic Power. Gain temp HP = level + CON modifier for 1 minute, heal 10% of melee damage dealt.', level: 6 },
-    { id: 'dancing-rune-weapon', name: 'Dancing Rune Weapon', description: 'Costs 5 Runic Power. Summon spectral weapon that mirrors your attacks for 1 minute, dealing half damage.', level: 14, charges: { amount: 1, rechargeOn: 'longRest' } },
+    { id: 'blood-boil', name: 'Blood Boil', description: 'Costs 3 Runic Power. Bonus action: enemies within 10ft take 1d8 necrotic, gain temp HP = half damage dealt. CON save for half damage.', level: 3, resourceCost: { poolId: 'runic-power', amount: 3 } },
+    { id: 'vampiric-blood', name: 'Vampiric Blood', description: 'Costs 4 Runic Power. Gain temp HP = level + CON modifier for 1 minute, heal 10% of melee damage dealt.', level: 6, resourceCost: { poolId: 'runic-power', amount: 4 } },
+    { id: 'dancing-rune-weapon', name: 'Dancing Rune Weapon', description: 'Costs 5 Runic Power. Summon spectral weapon that mirrors your attacks for 1 minute, dealing half damage.', level: 14, charges: { amount: 1, rechargeOn: 'longRest' }, resourceCost: { poolId: 'runic-power', amount: 5 } },
   ],
 }
 
@@ -2280,9 +2284,9 @@ export const FROST_DEATH_KNIGHT: Subclass = {
   description: 'Wield the power of ice and cold, devastating enemies with frozen strikes.',
   parentClassId: 'death-knight',
   features: [
-    { id: 'frost-strike', name: 'Frost Strike', description: 'Costs 2 Runic Power. Add +1d8 cold damage and reduce target speed by 10ft until end of your next turn.', level: 3 },
+    { id: 'frost-strike', name: 'Frost Strike', description: 'Costs 2 Runic Power. Add +1d8 cold damage and reduce target speed by 10ft until end of your next turn.', level: 3, resourceCost: { poolId: 'runic-power', amount: 2 } },
     { id: 'killing-machine', name: 'Killing Machine', description: 'Once per short rest: gain advantage on next attack roll. On crit, regain 2 Runic Power.', level: 6, charges: { amount: 1, rechargeOn: 'shortRest' } },
-    { id: 'breath-of-sindragosa', name: 'Breath of Sindragosa', description: 'Costs 6 Runic Power. 30ft cone, 6d8 cold damage, CON save for half. Failed save = speed halved for 1 round.', level: 14, charges: { amount: 1, rechargeOn: 'longRest' } },
+    { id: 'breath-of-sindragosa', name: 'Breath of Sindragosa', description: 'Costs 6 Runic Power. 30ft cone, 6d8 cold damage, CON save for half. Failed save = speed halved for 1 round.', level: 14, charges: { amount: 1, rechargeOn: 'longRest' }, resourceCost: { poolId: 'runic-power', amount: 6 } },
   ],
 }
 
@@ -2292,9 +2296,9 @@ export const UNHOLY_DEATH_KNIGHT: Subclass = {
   description: 'Spread disease and command undead minions.',
   parentClassId: 'death-knight',
   features: [
-    { id: 'raise-dead', name: 'Raise Dead', description: 'Costs 4 Runic Power. Raise ghoul from corpse for 1 hour. Max ghouls = 1 (increases to 2 at level 11).', level: 3 },
-    { id: 'festering-wound', name: 'Festering Wound', description: 'Costs 2 Runic Power. Target bleeds for 1d4 necrotic per turn for 1 minute. Max 3 wounds. CON save ends effect.', level: 6 },
-    { id: 'summon-gargoyle', name: 'Summon Gargoyle', description: 'Costs 5 Runic Power. Summon gargoyle for 1 minute with 2d8 necrotic ranged attacks.', level: 14, charges: { amount: 1, rechargeOn: 'longRest' } },
+    { id: 'raise-dead', name: 'Raise Dead', description: 'Costs 4 Runic Power. Raise ghoul from corpse for 1 hour. Max ghouls = 1 (increases to 2 at level 11).', level: 3, resourceCost: { poolId: 'runic-power', amount: 4 } },
+    { id: 'festering-wound', name: 'Festering Wound', description: 'Costs 2 Runic Power. Target bleeds for 1d4 necrotic per turn for 1 minute. Max 3 wounds. CON save ends effect.', level: 6, resourceCost: { poolId: 'runic-power', amount: 2 } },
+    { id: 'summon-gargoyle', name: 'Summon Gargoyle', description: 'Costs 5 Runic Power. Summon gargoyle for 1 minute with 2d8 necrotic ranged attacks.', level: 14, charges: { amount: 1, rechargeOn: 'longRest' }, resourceCost: { poolId: 'runic-power', amount: 5 } },
   ],
 }
 
