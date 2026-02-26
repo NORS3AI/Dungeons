@@ -1716,6 +1716,1833 @@ export const TRAITS: Record<string, TraitRef> = {
     description: 'As an action, you can unleash the divine energy within yourself, causing a searing light to radiate from you, pour out of your eyes and mouth, and threaten to char you. Your transformation lasts 1 minute or until you end it as a bonus action. During it, you shed bright light in a 10-foot radius and dim light for an additional 10 feet, and at the end of each of your turns, you and each creature within 10 feet of you take radiant damage equal to half your level (rounded up). In addition, once on each of your turns, you can deal extra radiant damage equal to your proficiency bonus when you deal damage. Once you use this trait, you can\'t use it again until you finish a long rest.',
     mechanics: 'Action: 1 min transformation. 10 ft bright light. End of turn: half level radiant to you and nearby. Add prof bonus as radiant damage once per turn. 1/long rest.',
   },
+
+  // ============================================
+  // ============================================
+  // ADDITIONAL CLASS AND SUBCLASS TRAITS
+  // ============================================
+
+  // ============================================
+  // AMAZON CLASS TRAITS
+  // ============================================
+  'amazon': {
+    id: 'amazon',
+    name: 'Amazon',
+    source: 'Amazon (Class)',
+    description: 'A warrior from the Skovos Isles, master of javelin, bow, and spear combat with elemental magic.',
+    mechanics: 'A warrior from the Skovos Isles, master of javelin, bow, and spear combat with elemental magic.',
+  },
+  'archery': {
+    id: 'archery',
+    name: 'Archery',
+    source: 'Amazon (Level 1)',
+    description: '+2 bonus to ranged attack rolls.',
+    mechanics: '+2 bonus to ranged attack rolls.',
+  },
+  'critical-strike': {
+    id: 'critical-strike',
+    name: 'Critical Strike',
+    source: 'Amazon (Level 1)',
+    description: 'Once per short rest: gain advantage on next attack roll.',
+    mechanics: 'Recharge: short/long rest. Grants advantage.',
+  },
+  'inner-sight': {
+    id: 'inner-sight',
+    name: 'Inner Sight',
+    source: 'Amazon (Level 1)',
+    description: 'Bonus action: target cannot benefit from invisible/hidden against you for 1 minute. Once per short rest.',
+    mechanics: 'Bonus action. Recharge: short/long rest.',
+  },
+  'spear-fighting': {
+    id: 'spear-fighting',
+    name: 'Spear Fighting',
+    source: 'Amazon (Level 1)',
+    description: '+1 attack and damage with spear/javelin + shield.',
+    mechanics: '+1 attack and damage with spear/javelin + shield.',
+  },
+  'thrown-weapon-fighting': {
+    id: 'thrown-weapon-fighting',
+    name: 'Thrown Weapon Fighting',
+    source: 'Amazon (Level 1)',
+    description: '+2 damage with thrown weapons, draw as part of attack.',
+    mechanics: '+2 damage with thrown weapons, draw as part of attack.',
+  },
+  'dodge-reaction': {
+    id: 'dodge-reaction',
+    name: 'Dodge',
+    source: 'Amazon (Level 2)',
+    description: 'Reaction: impose disadvantage on attack against you.',
+    mechanics: 'Reaction. Grants advantage. Impose disadvantage.',
+  },
+  'extra-attack-amazon': {
+    id: 'extra-attack-amazon',
+    name: 'Extra Attack',
+    source: 'Amazon (Level 5)',
+    description: 'Attack twice when you take the Attack action.',
+    mechanics: 'Action.',
+  },
+  'avoid': {
+    id: 'avoid',
+    name: 'Avoid',
+    source: 'Amazon (Level 7)',
+    description: 'Advantage on DEX saves.',
+    mechanics: 'Grants advantage.',
+  },
+  'summon-valkyrie': {
+    id: 'summon-valkyrie',
+    name: 'Summon Valkyrie',
+    source: 'Amazon (Level 11)',
+    description: 'Summon Valkyrie (AC 16, HP = 2x level + 10) for 1 minute.',
+    mechanics: 'Summon Valkyrie (AC 16, HP = 2x level + 10) for 1 minute.',
+  },
+
+  // ============================================
+  // ASSASSIN CLASS TRAITS
+  // ============================================
+  'assassin': {
+    id: 'assassin',
+    name: 'Assassin',
+    source: 'Assassin (Subclass)',
+    description: 'You focus your training on the grim art of death. You are an expert in disguise and deception, as well as sudden, lethal strikes.',
+    mechanics: 'You focus your training on the grim art of death.',
+  },
+
+  // ============================================
+  // BARBARIAN CLASS TRAITS
+  // ============================================
+  'barbarian': {
+    id: 'barbarian',
+    name: 'Barbarian',
+    source: 'Barbarian (Class)',
+    description: 'A fierce warrior who can enter a battle rage.',
+    mechanics: 'A fierce warrior who can enter a battle rage.',
+  },
+
+  // ============================================
+  // BARD CLASS TRAITS
+  // ============================================
+  'bard': {
+    id: 'bard',
+    name: 'Bard',
+    source: 'Bard (Class)',
+    description: 'An inspiring magician whose power echoes the music of creation.',
+    mechanics: 'An inspiring magician whose power echoes the music of creation.',
+  },
+  'bardic-inspiration': {
+    id: 'bardic-inspiration',
+    name: 'Bardic Inspiration',
+    source: 'Bard (Level 1)',
+    description: 'You can inspire others through stirring words or music. A creature can add a d6 to one ability check, attack roll, or saving throw.',
+    mechanics: 'You can inspire others through stirring words or music.',
+  },
+  'jack-of-all-trades': {
+    id: 'jack-of-all-trades',
+    name: 'Jack of All Trades',
+    source: 'Bard (Level 2)',
+    description: 'You can add half your proficiency bonus, rounded down, to any ability check you make that doesn\\',
+    mechanics: 'You can add half your proficiency bonus, rounded down, to any ability check you make that doesn\\.',
+  },
+  'song-of-rest': {
+    id: 'song-of-rest',
+    name: 'Song of Rest',
+    source: 'Bard (Level 2)',
+    description: 'You can use soothing music or oration during a short rest to help revitalize your wounded allies. They regain an extra 1d6 HP.',
+    mechanics: 'Damage: 1d6. Recharge: short/long rest.',
+  },
+  'font-of-inspiration': {
+    id: 'font-of-inspiration',
+    name: 'Font of Inspiration',
+    source: 'Bard (Level 5)',
+    description: 'You regain all expended uses of Bardic Inspiration when you finish a short or long rest.',
+    mechanics: 'Recharge: short/long rest.',
+  },
+  'countercharm': {
+    id: 'countercharm',
+    name: 'Countercharm',
+    source: 'Bard (Level 6)',
+    description: 'As an action, you can start a performance that lasts until the end of your next turn. You and friendly creatures within 30 feet have advantage on saves against being frightened or charmed.',
+    mechanics: 'Action. Grants advantage.',
+  },
+  'magical-secrets': {
+    id: 'magical-secrets',
+    name: 'Magical Secrets',
+    source: 'Bard (Level 10)',
+    description: 'You learn two spells of your choice from any class. They count as bard spells for you.',
+    mechanics: 'You learn two spells of your choice from any class.',
+  },
+  'superior-inspiration': {
+    id: 'superior-inspiration',
+    name: 'Superior Inspiration',
+    source: 'Bard (Level 20)',
+    description: 'When you roll initiative and have no uses of Bardic Inspiration left, you regain one use.',
+    mechanics: 'When you roll initiative and have no uses of Bardic Inspiration left, you regain one use.',
+  },
+
+  // ============================================
+  // BATTLE MASTER CLASS TRAITS
+  // ============================================
+  'battle-master': {
+    id: 'battle-master',
+    name: 'Battle Master',
+    source: 'Battle Master (Subclass)',
+    description: 'Battle Masters employ martial techniques passed down through generations, using superiority dice to fuel powerful maneuvers.',
+    mechanics: 'Battle Masters employ martial techniques passed down through generations, using superiority dice to fuel powerful man...',
+  },
+
+  // ============================================
+  // BEAST MASTER CLASS TRAITS
+  // ============================================
+  'beast-master': {
+    id: 'beast-master',
+    name: 'Beast Master',
+    source: 'Beast Master (Subclass)',
+    description: 'The Beast Master archetype embodies a friendship between the civilized races and the beasts of the world.',
+    mechanics: 'The Beast Master archetype embodies a friendship between the civilized races and the beasts of the world.',
+  },
+  'rangers-companion': {
+    id: 'rangers-companion',
+    name: 'Ranger\\',
+    source: 'Beast Master (Level 3)',
+    description: 'You gain a beast companion that accompanies you on your adventures and fights alongside you.',
+    mechanics: 'You gain a beast companion that accompanies you on your adventures and fights alongside you.',
+  },
+  'exceptional-training': {
+    id: 'exceptional-training',
+    name: 'Exceptional Training',
+    source: 'Beast Master (Level 7)',
+    description: 'Your beast companion can take the Dash, Disengage, or Help action on its turn. Its attacks count as magical.',
+    mechanics: 'Action.',
+  },
+  'bestial-fury': {
+    id: 'bestial-fury',
+    name: 'Bestial Fury',
+    source: 'Beast Master (Level 11)',
+    description: 'Your companion can make two attacks when you command it to use the Attack action.',
+    mechanics: 'Action.',
+  },
+  'share-spells': {
+    id: 'share-spells',
+    name: 'Share Spells',
+    source: 'Beast Master (Level 15)',
+    description: 'When you cast a spell targeting yourself, you can also affect your beast companion if it is within 30 feet.',
+    mechanics: 'When you cast a spell targeting yourself, you can also affect your beast companion if it is within 30 feet.',
+  },
+
+  // ============================================
+  // BLOOD CLASS TRAITS
+  // ============================================
+  'blood-death-knight': {
+    id: 'blood-death-knight',
+    name: 'Blood',
+    source: 'Blood (Subclass)',
+    description: 'Vampiric tanks that sustain themselves through the lifeforce of enemies.',
+    mechanics: 'Vampiric tanks that sustain themselves through the lifeforce of enemies.',
+  },
+  'blood-boil': {
+    id: 'blood-boil',
+    name: 'Blood Boil',
+    source: 'Blood (Level 3)',
+    description: 'Costs 3 Runic Power. Bonus action: enemies within 10ft take 1d8 necrotic, gain temp HP = half damage dealt. CON save for half damage.',
+    mechanics: 'Bonus action. Damage: 1d8.',
+  },
+  'vampiric-blood': {
+    id: 'vampiric-blood',
+    name: 'Vampiric Blood',
+    source: 'Blood (Level 6)',
+    description: 'Costs 4 Runic Power. Gain temp HP = level + CON modifier for 1 minute, heal 10% of melee damage dealt.',
+    mechanics: 'Costs 4 Runic Power.',
+  },
+  'dancing-rune-weapon': {
+    id: 'dancing-rune-weapon',
+    name: 'Dancing Rune Weapon',
+    source: 'Blood (Level 14)',
+    description: 'Costs 5 Runic Power. Summon spectral weapon that mirrors your attacks for 1 minute, dealing half damage.',
+    mechanics: 'Costs 5 Runic Power.',
+  },
+
+  // ============================================
+  // BOW AND CROSSBOW CLASS TRAITS
+  // ============================================
+  'bow-amazon': {
+    id: 'bow-amazon',
+    name: 'Bow and Crossbow',
+    source: 'Bow and Crossbow (Subclass)',
+    description: 'Master elemental arrows infused with fire, ice, and magical energy.',
+    mechanics: 'Master elemental arrows infused with fire, ice, and magical energy.',
+  },
+  'magic-arrow': {
+    id: 'magic-arrow',
+    name: 'Magic Arrow',
+    source: 'Bow and Crossbow (Level 3)',
+    description: 'Ranged attacks deal +1d4 force damage (increases to +1d6 at 11th).',
+    mechanics: 'Damage: 1d4.',
+  },
+  'immolation-arrow': {
+    id: 'immolation-arrow',
+    name: 'Immolation Arrow',
+    source: 'Bow and Crossbow (Level 6)',
+    description: 'Arrow explodes for 3d6 fire in 10ft radius. DEX save for half.',
+    mechanics: 'Damage: 3d6.',
+  },
+  'strafe': {
+    id: 'strafe',
+    name: 'Strafe',
+    source: 'Bow and Crossbow (Level 14)',
+    description: 'Fire at up to 4 creatures, each takes normal weapon damage. DEX save or disadvantage on next attack.',
+    mechanics: 'Grants advantage. Impose disadvantage.',
+  },
+
+  // ============================================
+  // CHAMPION CLASS TRAITS
+  // ============================================
+  'champion': {
+    id: 'champion',
+    name: 'Champion',
+    source: 'Champion (Subclass)',
+    description: 'The archetypal Champion focuses on the development of raw physical power honed to deadly perfection.',
+    mechanics: 'The archetypal Champion focuses on the development of raw physical power honed to deadly perfection.',
+  },
+
+  // ============================================
+  // CIRCLE OF THE LAND CLASS TRAITS
+  // ============================================
+  'land': {
+    id: 'land',
+    name: 'Circle of the Land',
+    source: 'Circle of the Land (Subclass)',
+    description: 'The Circle of the Land is made up of mystics and sages who safeguard ancient knowledge and rites through oral tradition.',
+    mechanics: 'The Circle of the Land is made up of mystics and sages who safeguard ancient knowledge and rites through oral tradition.',
+  },
+  'bonus-cantrip': {
+    id: 'bonus-cantrip',
+    name: 'Bonus Cantrip',
+    source: 'Circle of the Land (Level 2)',
+    description: 'You learn one additional druid cantrip of your choice.',
+    mechanics: 'You learn one additional druid cantrip of your choice.',
+  },
+  'natural-recovery': {
+    id: 'natural-recovery',
+    name: 'Natural Recovery',
+    source: 'Circle of the Land (Level 2)',
+    description: 'During a short rest, you can recover spell slots with a combined level equal to or less than half your druid level (rounded up).',
+    mechanics: 'Recharge: short/long rest.',
+  },
+  'circle-spells': {
+    id: 'circle-spells',
+    name: 'Circle Spells',
+    source: 'Circle of the Land (Level 3)',
+    description: 'Your mystical connection to the land infuses you with the ability to cast certain spells based on your chosen land type.',
+    mechanics: 'Your mystical connection to the land infuses you with the ability to cast certain spells based on your chosen land type.',
+  },
+  'natures-ward': {
+    id: 'natures-ward',
+    name: 'Nature\\',
+    source: 'Circle of the Land (Level 10)',
+    description: 'You can\\',
+    mechanics: 'You can\\.',
+  },
+  'natures-sanctuary': {
+    id: 'natures-sanctuary',
+    name: 'Nature\\',
+    source: 'Circle of the Land (Level 14)',
+    description: 'Creatures of the natural world sense your connection to nature and become hesitant to attack you.',
+    mechanics: 'Creatures of the natural world sense your connection to nature and become hesitant to attack you.',
+  },
+
+  // ============================================
+  // CIRCLE OF THE MOON CLASS TRAITS
+  // ============================================
+  'moon': {
+    id: 'moon',
+    name: 'Circle of the Moon',
+    source: 'Circle of the Moon (Subclass)',
+    description: 'Druids of the Circle of the Moon are fierce guardians of the wilds, shifting into powerful animal forms.',
+    mechanics: 'Druids of the Circle of the Moon are fierce guardians of the wilds, shifting into powerful animal forms.',
+  },
+  'circle-forms': {
+    id: 'circle-forms',
+    name: 'Circle Forms',
+    source: 'Circle of the Moon (Level 2)',
+    description: 'You can transform into beasts with a higher CR than normal (CR 1 at 2nd level, increasing with druid level).',
+    mechanics: 'You can transform into beasts with a higher CR than normal (CR 1 at 2nd level, increasing with druid level).',
+  },
+  'combat-wild-shape': {
+    id: 'combat-wild-shape',
+    name: 'Combat Wild Shape',
+    source: 'Circle of the Moon (Level 2)',
+    description: 'You can use Wild Shape as a bonus action. While transformed, you can expend a spell slot to regain 1d8 HP per slot level.',
+    mechanics: 'Bonus action. Damage: 1d8.',
+  },
+  'primal-strike': {
+    id: 'primal-strike',
+    name: 'Primal Strike',
+    source: 'Circle of the Moon (Level 6)',
+    description: 'Your attacks in beast form count as magical for the purpose of overcoming resistance and immunity to nonmagical attacks.',
+    mechanics: 'Your attacks in beast form count as magical for the purpose of overcoming resistance and immunity to nonmagical attacks.',
+  },
+  'elemental-wild-shape': {
+    id: 'elemental-wild-shape',
+    name: 'Elemental Wild Shape',
+    source: 'Circle of the Moon (Level 10)',
+    description: 'You can expend two uses of Wild Shape to transform into an air elemental, earth elemental, fire elemental, or water elemental.',
+    mechanics: 'You can expend two uses of Wild Shape to transform into an air elemental, earth elemental, fire elemental, or water e...',
+  },
+  'thousand-forms': {
+    id: 'thousand-forms',
+    name: 'Thousand Forms',
+    source: 'Circle of the Moon (Level 14)',
+    description: 'You can cast the alter self spell at will.',
+    mechanics: 'You can cast the alter self spell at will.',
+  },
+
+  // ============================================
+  // CLERIC CLASS TRAITS
+  // ============================================
+  'cleric': {
+    id: 'cleric',
+    name: 'Cleric',
+    source: 'Cleric (Class)',
+    description: 'A priestly champion who wields divine magic in service of a higher power.',
+    mechanics: 'A priestly champion who wields divine magic in service of a higher power.',
+  },
+  'channel-divinity': {
+    id: 'channel-divinity',
+    name: 'Channel Divinity',
+    source: 'Cleric (Level 2)',
+    description: 'You gain the ability to channel divine energy directly from your deity. You start with Turn Undead and gain additional options from your domain.',
+    mechanics: 'You gain the ability to channel divine energy directly from your deity.',
+  },
+  'destroy-undead': {
+    id: 'destroy-undead',
+    name: 'Destroy Undead',
+    source: 'Cleric (Level 5)',
+    description: 'When an undead fails its saving throw against your Turn Undead feature, the creature is instantly destroyed if its CR is at or below a certain threshold.',
+    mechanics: 'When an undead fails its saving throw against your Turn Undead feature, the creature is instantly destroyed if its CR...',
+  },
+  'divine-intervention': {
+    id: 'divine-intervention',
+    name: 'Divine Intervention',
+    source: 'Cleric (Level 10)',
+    description: 'You can call on your deity to intervene on your behalf. Roll a d100; if the number is equal to or lower than your cleric level, your deity intervenes.',
+    mechanics: 'You can call on your deity to intervene on your behalf.',
+  },
+  'improved-divine-intervention': {
+    id: 'improved-divine-intervention',
+    name: 'Improved Divine Intervention',
+    source: 'Cleric (Level 20)',
+    description: 'Your call for divine intervention succeeds automatically.',
+    mechanics: 'Your call for divine intervention succeeds automatically.',
+  },
+
+  // ============================================
+  // COLLEGE OF LORE CLASS TRAITS
+  // ============================================
+  'lore': {
+    id: 'lore',
+    name: 'College of Lore',
+    source: 'College of Lore (Subclass)',
+    description: 'Bards of the College of Lore know something about most things, collecting bits of knowledge from diverse sources.',
+    mechanics: 'Bards of the College of Lore know something about most things, collecting bits of knowledge from diverse sources.',
+  },
+  'cutting-words': {
+    id: 'cutting-words',
+    name: 'Cutting Words',
+    source: 'College of Lore (Level 3)',
+    description: 'When a creature within 60 feet makes an attack roll, ability check, or damage roll, you can use your reaction to expend one Bardic Inspiration die and subtract the number rolled.',
+    mechanics: 'Reaction.',
+  },
+  'additional-magical-secrets': {
+    id: 'additional-magical-secrets',
+    name: 'Additional Magical Secrets',
+    source: 'College of Lore (Level 6)',
+    description: 'You learn two spells of your choice from any class. They must be of a level you can cast.',
+    mechanics: 'You learn two spells of your choice from any class.',
+  },
+  'peerless-skill': {
+    id: 'peerless-skill',
+    name: 'Peerless Skill',
+    source: 'College of Lore (Level 14)',
+    description: 'When you make an ability check, you can expend one Bardic Inspiration die and add the number rolled to your ability check.',
+    mechanics: 'When you make an ability check, you can expend one Bardic Inspiration die and add the number rolled to your ability c...',
+  },
+
+  // ============================================
+  // COLLEGE OF VALOR CLASS TRAITS
+  // ============================================
+  'valor': {
+    id: 'valor',
+    name: 'College of Valor',
+    source: 'College of Valor (Subclass)',
+    description: 'Bards of the College of Valor are daring skalds whose tales keep alive the memory of the great heroes of the past.',
+    mechanics: 'Bards of the College of Valor are daring skalds whose tales keep alive the memory of the great heroes of the past.',
+  },
+  'bonus-proficiencies': {
+    id: 'bonus-proficiencies',
+    name: 'Bonus Proficiencies',
+    source: 'College of Valor (Level 3)',
+    description: 'You gain proficiency with medium armor, shields, and martial weapons.',
+    mechanics: 'You gain proficiency with medium armor, shields, and martial weapons.',
+  },
+  'combat-inspiration': {
+    id: 'combat-inspiration',
+    name: 'Combat Inspiration',
+    source: 'College of Valor (Level 3)',
+    description: 'A creature using your Bardic Inspiration can add the die to a weapon damage roll or to its AC against one attack.',
+    mechanics: 'A creature using your Bardic Inspiration can add the die to a weapon damage roll or to its AC against one attack.',
+  },
+  'battle-magic': {
+    id: 'battle-magic',
+    name: 'Battle Magic',
+    source: 'College of Valor (Level 14)',
+    description: 'When you use your action to cast a bard spell, you can make one weapon attack as a bonus action.',
+    mechanics: 'Bonus action.',
+  },
+
+  // ============================================
+  // DEATH KNIGHT CLASS TRAITS
+  // ============================================
+  'death-knight': {
+    id: 'death-knight',
+    name: 'Death Knight',
+    source: 'Death Knight (Class)',
+    description: 'A fallen champion raised by dark powers, wielding runic magic and commanding the forces of death itself.',
+    mechanics: 'A fallen champion raised by dark powers, wielding runic magic and commanding the forces of death itself.',
+  },
+  'extra-attack-dk': {
+    id: 'extra-attack-dk',
+    name: 'Extra Attack',
+    source: 'Death Knight (Level 5)',
+    description: 'Attack twice when you take the Attack action.',
+    mechanics: 'Action.',
+  },
+
+  // ============================================
+  // DEMON HUNTER CLASS TRAITS
+  // ============================================
+  'demon-hunter': {
+    id: 'demon-hunter',
+    name: 'Demon Hunter',
+    source: 'Demon Hunter (Class)',
+    description: 'A relentless slayer who sacrificed part of their humanity to gain demonic powers.',
+    mechanics: 'A relentless slayer who sacrificed part of their humanity to gain demonic powers.',
+  },
+  'spectral-sight': {
+    id: 'spectral-sight',
+    name: 'Spectral Sight',
+    source: 'Demon Hunter (Level 1)',
+    description: 'See invisible creatures within 30ft. Darkvision extends by 30ft.',
+    mechanics: 'See invisible creatures within 30ft.',
+  },
+  'fel-rush': {
+    id: 'fel-rush',
+    name: 'Fel Rush',
+    source: 'Demon Hunter (Level 3)',
+    description: 'Dash 20ft, creatures you pass take 1d8 fire damage. DEX save for half.',
+    mechanics: 'Damage: 1d8.',
+  },
+  'extra-attack-dh': {
+    id: 'extra-attack-dh',
+    name: 'Extra Attack',
+    source: 'Demon Hunter (Level 5)',
+    description: 'Attack twice when you take the Attack action.',
+    mechanics: 'Action.',
+  },
+  'blade-dance': {
+    id: 'blade-dance',
+    name: 'Blade Dance',
+    source: 'Demon Hunter (Level 6)',
+    description: 'All creatures within 5ft take 2d6 slashing. DEX save for half.',
+    mechanics: 'Damage: 2d6.',
+  },
+  'metamorphosis': {
+    id: 'metamorphosis',
+    name: 'Metamorphosis',
+    source: 'Demon Hunter (Level 9)',
+    description: 'Transform for 1 minute: +1 AC, 30ft fly, +1d6 fire damage on attacks.',
+    mechanics: 'Damage: 1d6.',
+  },
+
+  // ============================================
+  // DRACONIC BLOODLINE CLASS TRAITS
+  // ============================================
+  'draconic': {
+    id: 'draconic',
+    name: 'Draconic Bloodline',
+    source: 'Draconic Bloodline (Subclass)',
+    description: 'Your innate magic comes from draconic magic that was mingled with your blood or that of your ancestors.',
+    mechanics: 'Your innate magic comes from draconic magic that was mingled with your blood or that of your ancestors.',
+  },
+
+  // ============================================
+  // DRUID CLASS TRAITS
+  // ============================================
+  'druid': {
+    id: 'druid',
+    name: 'Druid',
+    source: 'Druid (Class)',
+    description: 'A priest of the Old Faith, wielding the powers of nature and adopting animal forms.',
+    mechanics: 'A priest of the Old Faith, wielding the powers of nature and adopting animal forms.',
+  },
+  'druidic': {
+    id: 'druidic',
+    name: 'Druidic',
+    source: 'Druid (Level 1)',
+    description: 'You know Druidic, the secret language of druids. You can speak the language and use it to leave hidden messages.',
+    mechanics: 'You know Druidic, the secret language of druids.',
+  },
+  'wild-shape': {
+    id: 'wild-shape',
+    name: 'Wild Shape',
+    source: 'Druid (Level 2)',
+    description: 'You can use your action to magically assume the shape of a beast that you have seen before.',
+    mechanics: 'Action.',
+  },
+  'beast-spells': {
+    id: 'beast-spells',
+    name: 'Beast Spells',
+    source: 'Druid (Level 18)',
+    description: 'You can cast many of your druid spells in any shape you assume using Wild Shape.',
+    mechanics: 'You can cast many of your druid spells in any shape you assume using Wild Shape.',
+  },
+  'archdruid': {
+    id: 'archdruid',
+    name: 'Archdruid',
+    source: 'Druid (Level 20)',
+    description: 'You can use your Wild Shape an unlimited number of times. You can ignore verbal and somatic components of druid spells.',
+    mechanics: 'You can use your Wild Shape an unlimited number of times.',
+  },
+
+  // ============================================
+  // ELDRITCH KNIGHT CLASS TRAITS
+  // ============================================
+  'eldritch-knight': {
+    id: 'eldritch-knight',
+    name: 'Eldritch Knight',
+    source: 'Eldritch Knight (Subclass)',
+    description: 'The archetypal Eldritch Knight combines the martial mastery common to all fighters with a careful study of magic.',
+    mechanics: 'The archetypal Eldritch Knight combines the martial mastery common to all fighters with a careful study of magic.',
+  },
+  'weapon-bond': {
+    id: 'weapon-bond',
+    name: 'Weapon Bond',
+    source: 'Eldritch Knight (Level 3)',
+    description: 'You learn a ritual to bond with up to two weapons. Bonded weapons cannot be disarmed and you can summon them as a bonus action.',
+    mechanics: 'Bonus action.',
+  },
+  'war-magic': {
+    id: 'war-magic',
+    name: 'War Magic',
+    source: 'Eldritch Knight (Level 7)',
+    description: 'When you use your action to cast a cantrip, you can make one weapon attack as a bonus action.',
+    mechanics: 'Bonus action.',
+  },
+  'eldritch-strike': {
+    id: 'eldritch-strike',
+    name: 'Eldritch Strike',
+    source: 'Eldritch Knight (Level 10)',
+    description: 'When you hit a creature with a weapon attack, that creature has disadvantage on its next saving throw against a spell you cast before the end of your next turn.',
+    mechanics: 'Grants advantage. Impose disadvantage.',
+  },
+  'arcane-charge': {
+    id: 'arcane-charge',
+    name: 'Arcane Charge',
+    source: 'Eldritch Knight (Level 15)',
+    description: 'When you use Action Surge, you can teleport up to 30 feet to an unoccupied space before or after the additional action.',
+    mechanics: 'Action.',
+  },
+  'improved-war-magic': {
+    id: 'improved-war-magic',
+    name: 'Improved War Magic',
+    source: 'Eldritch Knight (Level 18)',
+    description: 'When you use your action to cast a spell, you can make one weapon attack as a bonus action.',
+    mechanics: 'Bonus action.',
+  },
+
+  // ============================================
+  // FIGHTER CLASS TRAITS
+  // ============================================
+  'fighter': {
+    id: 'fighter',
+    name: 'Fighter',
+    source: 'Fighter (Class)',
+    description: 'A master of martial combat, skilled with a variety of weapons and armor.',
+    mechanics: 'A master of martial combat, skilled with a variety of weapons and armor.',
+  },
+  'dual-two-handed': {
+    id: 'dual-two-handed',
+    name: 'Dual Two-Handed',
+    source: 'Fighter (Level 1)',
+    description: 'Wield two two-handed weapons simultaneously (e.g., two greatswords). -4 AC penalty but roll damage for both weapons.',
+    mechanics: 'Wield two two-handed weapons simultaneously (e.',
+  },
+
+  // ============================================
+  // FROST CLASS TRAITS
+  // ============================================
+  'frost-death-knight': {
+    id: 'frost-death-knight',
+    name: 'Frost',
+    source: 'Frost (Subclass)',
+    description: 'Wield the power of ice and cold, devastating enemies with frozen strikes.',
+    mechanics: 'Wield the power of ice and cold, devastating enemies with frozen strikes.',
+  },
+  'frost-strike': {
+    id: 'frost-strike',
+    name: 'Frost Strike',
+    source: 'Frost (Level 3)',
+    description: 'Costs 2 Runic Power. Add +1d8 cold damage and reduce target speed by 10ft until end of your next turn.',
+    mechanics: 'Damage: 1d8.',
+  },
+  'killing-machine': {
+    id: 'killing-machine',
+    name: 'Killing Machine',
+    source: 'Frost (Level 6)',
+    description: 'Once per short rest: gain advantage on next attack roll. On crit, regain 2 Runic Power.',
+    mechanics: 'Recharge: short/long rest. Grants advantage.',
+  },
+  'breath-of-sindragosa': {
+    id: 'breath-of-sindragosa',
+    name: 'Breath of Sindragosa',
+    source: 'Frost (Level 14)',
+    description: 'Costs 6 Runic Power. 30ft cone, 6d8 cold damage, CON save for half. Failed save = speed halved for 1 round.',
+    mechanics: 'Damage: 6d8.',
+  },
+
+  // ============================================
+  // HAVOC CLASS TRAITS
+  // ============================================
+  'havoc-demon-hunter': {
+    id: 'havoc-demon-hunter',
+    name: 'Havoc',
+    source: 'Havoc (Subclass)',
+    description: 'Melee DPS specialists dealing massive chaotic fel damage.',
+    mechanics: 'Melee DPS specialists dealing massive chaotic fel damage.',
+  },
+  'eye-beam': {
+    id: 'eye-beam',
+    name: 'Eye Beam',
+    source: 'Havoc (Level 3)',
+    description: '40ft line, 4d6 fire damage. DEX save for half.',
+    mechanics: 'Damage: 4d6.',
+  },
+  'momentum': {
+    id: 'momentum',
+    name: 'Momentum',
+    source: 'Havoc (Level 6)',
+    description: 'After Fel Rush, next attack deals +1d6 damage.',
+    mechanics: 'Damage: 1d6.',
+  },
+  'demonic': {
+    id: 'demonic',
+    name: 'Demonic',
+    source: 'Havoc (Level 14)',
+    description: 'Once per long rest: Eye Beam triggers Metamorphosis for 1 minute.',
+    mechanics: 'Recharge: long rest.',
+  },
+
+  // ============================================
+  // HUNTER CLASS TRAITS
+  // ============================================
+  'hunter': {
+    id: 'hunter',
+    name: 'Hunter',
+    source: 'Hunter (Subclass)',
+    description: 'Emulating the Hunter archetype means accepting your place as a bulwark between civilization and the terrors of the wilderness.',
+    mechanics: 'Emulating the Hunter archetype means accepting your place as a bulwark between civilization and the terrors of the wi...',
+  },
+  'hunters-prey': {
+    id: 'hunters-prey',
+    name: 'Hunter\\',
+    source: 'Hunter (Level 3)',
+    description: 'You gain one of the following features: Colossus Slayer, Giant Killer, or Horde Breaker.',
+    mechanics: 'You gain one of the following features: Colossus Slayer, Giant Killer, or Horde Breaker.',
+  },
+  'defensive-tactics': {
+    id: 'defensive-tactics',
+    name: 'Defensive Tactics',
+    source: 'Hunter (Level 7)',
+    description: 'You gain one of the following features: Escape the Horde, Multiattack Defense, or Steel Will.',
+    mechanics: 'You gain one of the following features: Escape the Horde, Multiattack Defense, or Steel Will.',
+  },
+  'multiattack': {
+    id: 'multiattack',
+    name: 'Multiattack',
+    source: 'Hunter (Level 11)',
+    description: 'You gain one of the following features: Volley or Whirlwind Attack.',
+    mechanics: 'You gain one of the following features: Volley or Whirlwind Attack.',
+  },
+  'superior-hunters-defense': {
+    id: 'superior-hunters-defense',
+    name: 'Superior Hunter\\',
+    source: 'Hunter (Level 15)',
+    description: 'You gain one of the following features: Evasion, Stand Against the Tide, or Uncanny Dodge.',
+    mechanics: 'You gain one of the following features: Evasion, Stand Against the Tide, or Uncanny Dodge.',
+  },
+
+  // ============================================
+  // JAVELIN AND SPEAR CLASS TRAITS
+  // ============================================
+  'javelin-amazon': {
+    id: 'javelin-amazon',
+    name: 'Javelin and Spear',
+    source: 'Javelin and Spear (Subclass)',
+    description: 'Lightning-infused thrown weapons and devastating charged strikes.',
+    mechanics: 'Lightning-infused thrown weapons and devastating charged strikes.',
+  },
+  'power-strike': {
+    id: 'power-strike',
+    name: 'Power Strike',
+    source: 'Javelin and Spear (Level 3)',
+    description: 'Add 1d6 lightning damage to javelin/spear attacks.',
+    mechanics: 'Damage: 1d6.',
+  },
+  'charged-strike': {
+    id: 'charged-strike',
+    name: 'Charged Strike',
+    source: 'Javelin and Spear (Level 6)',
+    description: 'On hit, release bolt hitting 1 additional creature within 10ft for 2d6 lightning.',
+    mechanics: 'Damage: 2d6.',
+  },
+  'lightning-fury': {
+    id: 'lightning-fury',
+    name: 'Lightning Fury',
+    source: 'Javelin and Spear (Level 14)',
+    description: '15ft radius, 6d6 lightning damage. DEX save for half.',
+    mechanics: 'Damage: 6d6.',
+  },
+
+  // ============================================
+  // LIFE DOMAIN CLASS TRAITS
+  // ============================================
+  'life-domain': {
+    id: 'life-domain',
+    name: 'Life Domain',
+    source: 'Life Domain (Subclass)',
+    description: 'The Life domain focuses on the vibrant positive energy that sustains all life. Gods of life promote vitality and health through healing the sick and wounded.',
+    mechanics: 'The Life domain focuses on the vibrant positive energy that sustains all life.',
+  },
+  'bonus-proficiency': {
+    id: 'bonus-proficiency',
+    name: 'Bonus Proficiency',
+    source: 'Life Domain (Level 1)',
+    description: 'You gain proficiency with heavy armor.',
+    mechanics: 'You gain proficiency with heavy armor.',
+  },
+  'disciple-of-life': {
+    id: 'disciple-of-life',
+    name: 'Disciple of Life',
+    source: 'Life Domain (Level 1)',
+    description: 'When you use a spell of 1st level or higher to restore hit points, the creature regains additional HP equal to 2 + the spell\\',
+    mechanics: 'When you use a spell of 1st level or higher to restore hit points, the creature regains additional HP equal to 2 + th...',
+  },
+  'channel-divinity-preserve-life': {
+    id: 'channel-divinity-preserve-life',
+    name: 'Channel Divinity: Preserve Life',
+    source: 'Life Domain (Level 2)',
+    description: 'As an action, present your holy symbol and restore HP equal to 5x your cleric level, divided as you choose among creatures within 30 feet.',
+    mechanics: 'Action.',
+  },
+  'blessed-healer': {
+    id: 'blessed-healer',
+    name: 'Blessed Healer',
+    source: 'Life Domain (Level 6)',
+    description: 'When you cast a spell of 1st level or higher that restores HP to another creature, you regain HP equal to 2 + the spell\\',
+    mechanics: 'When you cast a spell of 1st level or higher that restores HP to another creature, you regain HP equal to 2 + the spell\\.',
+  },
+  'divine-strike': {
+    id: 'divine-strike',
+    name: 'Divine Strike',
+    source: 'Life Domain (Level 8)',
+    description: 'Once on each of your turns when you hit a creature with a weapon attack, you deal an extra 1d8 radiant damage (2d8 at 14th level).',
+    mechanics: 'Damage: 1d8.',
+  },
+  'supreme-healing': {
+    id: 'supreme-healing',
+    name: 'Supreme Healing',
+    source: 'Life Domain (Level 17)',
+    description: 'When you would normally roll one or more dice to restore HP with a spell, you instead use the highest number possible for each die.',
+    mechanics: 'When you would normally roll one or more dice to restore HP with a spell, you instead use the highest number possible...',
+  },
+
+  // ============================================
+  // LIGHT DOMAIN CLASS TRAITS
+  // ============================================
+  'light-domain': {
+    id: 'light-domain',
+    name: 'Light Domain',
+    source: 'Light Domain (Subclass)',
+    description: 'Gods of light promote the ideals of rebirth and renewal, truth, vigilance, and beauty. Their clerics are aggressive enemies of undead.',
+    mechanics: 'Gods of light promote the ideals of rebirth and renewal, truth, vigilance, and beauty.',
+  },
+  'warding-flare': {
+    id: 'warding-flare',
+    name: 'Warding Flare',
+    source: 'Light Domain (Level 1)',
+    description: 'When attacked by a creature within 30 feet that you can see, use your reaction to impose disadvantage on the attack roll. Uses WIS modifier per long rest.',
+    mechanics: 'Reaction. Recharge: long rest. Grants advantage. Impose disadvantage.',
+  },
+  'channel-divinity-radiance': {
+    id: 'channel-divinity-radiance',
+    name: 'Channel Divinity: Radiance of the Dawn',
+    source: 'Light Domain (Level 2)',
+    description: 'As an action, dispel magical darkness within 30 feet. Hostile creatures within 30 feet must make CON save or take 2d10 + cleric level radiant damage.',
+    mechanics: 'Action. Damage: 2d10.',
+  },
+  'improved-flare': {
+    id: 'improved-flare',
+    name: 'Improved Flare',
+    source: 'Light Domain (Level 6)',
+    description: 'You can use Warding Flare when a creature attacks a different creature within 30 feet of you.',
+    mechanics: 'You can use Warding Flare when a creature attacks a different creature within 30 feet of you.',
+  },
+  'potent-spellcasting': {
+    id: 'potent-spellcasting',
+    name: 'Potent Spellcasting',
+    source: 'Light Domain (Level 8)',
+    description: 'You add your Wisdom modifier to the damage you deal with any cleric cantrip.',
+    mechanics: 'You add your Wisdom modifier to the damage you deal with any cleric cantrip.',
+  },
+  'corona-of-light': {
+    id: 'corona-of-light',
+    name: 'Corona of Light',
+    source: 'Light Domain (Level 17)',
+    description: 'As an action, activate an aura of sunlight that sheds bright light in a 60-foot radius and dim light for an additional 30 feet. Enemies have disadvantage on saves against fire or radiant damage.',
+    mechanics: 'Action. Grants advantage. Impose disadvantage.',
+  },
+
+  // ============================================
+  // MONK CLASS TRAITS
+  // ============================================
+  'monk': {
+    id: 'monk',
+    name: 'Monk',
+    source: 'Monk (Class)',
+    description: 'A master of martial arts, harnessing the power of the body in pursuit of physical and spiritual perfection.',
+    mechanics: 'A master of martial arts, harnessing the power of the body in pursuit of physical and spiritual perfection.',
+  },
+
+  // ============================================
+  // NECROMANCER CLASS TRAITS
+  // ============================================
+  'necromancer': {
+    id: 'necromancer',
+    name: 'Necromancer',
+    source: 'Necromancer (Class)',
+    description: 'Master of the dark arts who commands undead minions and wields devastating curse magic.',
+    mechanics: 'Master of the dark arts who commands undead minions and wields devastating curse magic.',
+  },
+  'summon-golem': {
+    id: 'summon-golem',
+    name: 'Summon Golem',
+    source: 'Necromancer (Level 11)',
+    description: 'Costs 5 Essence. Summon bone/blood/iron golem for 1 hour. Only one golem at a time.',
+    mechanics: 'Costs 5 Essence.',
+  },
+
+  // ============================================
+  // OATH OF DEVOTION CLASS TRAITS
+  // ============================================
+  'devotion': {
+    id: 'devotion',
+    name: 'Oath of Devotion',
+    source: 'Oath of Devotion (Subclass)',
+    description: 'The Oath of Devotion binds a paladin to the loftiest ideals of justice, virtue, and order.',
+    mechanics: 'The Oath of Devotion binds a paladin to the loftiest ideals of justice, virtue, and order.',
+  },
+  'sacred-weapon': {
+    id: 'sacred-weapon',
+    name: 'Channel Divinity: Sacred Weapon',
+    source: 'Oath of Devotion (Level 3)',
+    description: 'As an action, imbue one weapon you are holding with positive energy. For 1 minute, you add your CHA modifier to attack rolls and the weapon emits bright light.',
+    mechanics: 'Action.',
+  },
+  'turn-the-unholy': {
+    id: 'turn-the-unholy',
+    name: 'Channel Divinity: Turn the Unholy',
+    source: 'Oath of Devotion (Level 3)',
+    description: 'As an action, each fiend or undead within 30 feet must make a WIS save or be turned for 1 minute.',
+    mechanics: 'Action.',
+  },
+  'aura-of-devotion': {
+    id: 'aura-of-devotion',
+    name: 'Aura of Devotion',
+    source: 'Oath of Devotion (Level 7)',
+    description: 'You and friendly creatures within 10 feet can\\',
+    mechanics: 'You and friendly creatures within 10 feet can\\.',
+  },
+  'purity-of-spirit': {
+    id: 'purity-of-spirit',
+    name: 'Purity of Spirit',
+    source: 'Oath of Devotion (Level 15)',
+    description: 'You are always under the effects of a protection from evil and good spell.',
+    mechanics: 'You are always under the effects of a protection from evil and good spell.',
+  },
+  'holy-nimbus': {
+    id: 'holy-nimbus',
+    name: 'Holy Nimbus',
+    source: 'Oath of Devotion (Level 20)',
+    description: 'As an action, you can emanate an aura of sunlight. For 1 minute, bright light shines from you in a 30-foot radius and enemies in it take 10 radiant damage at the start of each of their turns.',
+    mechanics: 'Action.',
+  },
+
+  // ============================================
+  // OATH OF VENGEANCE CLASS TRAITS
+  // ============================================
+  'vengeance': {
+    id: 'vengeance',
+    name: 'Oath of Vengeance',
+    source: 'Oath of Vengeance (Subclass)',
+    description: 'The Oath of Vengeance is a solemn commitment to punish those who have committed grievous sins.',
+    mechanics: 'The Oath of Vengeance is a solemn commitment to punish those who have committed grievous sins.',
+  },
+  'abjure-enemy': {
+    id: 'abjure-enemy',
+    name: 'Channel Divinity: Abjure Enemy',
+    source: 'Oath of Vengeance (Level 3)',
+    description: 'As an action, choose one creature within 60 feet. It must make a WIS save or be frightened for 1 minute. Fiends and undead have disadvantage on this save.',
+    mechanics: 'Action. Grants advantage. Impose disadvantage.',
+  },
+  'vow-of-enmity': {
+    id: 'vow-of-enmity',
+    name: 'Channel Divinity: Vow of Enmity',
+    source: 'Oath of Vengeance (Level 3)',
+    description: 'As a bonus action, you gain advantage on attack rolls against a creature within 10 feet for 1 minute.',
+    mechanics: 'Bonus action. Grants advantage.',
+  },
+  'relentless-avenger': {
+    id: 'relentless-avenger',
+    name: 'Relentless Avenger',
+    source: 'Oath of Vengeance (Level 7)',
+    description: 'When you hit a creature with an opportunity attack, you can move up to half your speed immediately after the attack as part of the same reaction.',
+    mechanics: 'Reaction.',
+  },
+  'soul-of-vengeance': {
+    id: 'soul-of-vengeance',
+    name: 'Soul of Vengeance',
+    source: 'Oath of Vengeance (Level 15)',
+    description: 'When a creature under your Vow of Enmity makes an attack, you can use your reaction to make a melee weapon attack against it.',
+    mechanics: 'Reaction.',
+  },
+  'avenging-angel': {
+    id: 'avenging-angel',
+    name: 'Avenging Angel',
+    source: 'Oath of Vengeance (Level 20)',
+    description: 'As an action, you undergo a transformation. For 1 hour, you have a flying speed of 60 feet and emanate a menacing aura.',
+    mechanics: 'Action.',
+  },
+
+  // ============================================
+  // PALADIN CLASS TRAITS
+  // ============================================
+  'paladin': {
+    id: 'paladin',
+    name: 'Paladin',
+    source: 'Paladin (Class)',
+    description: 'A holy warrior bound to a sacred oath.',
+    mechanics: 'A holy warrior bound to a sacred oath.',
+  },
+  'great-weapon': {
+    id: 'great-weapon',
+    name: 'Great Weapon Fighting',
+    source: 'Paladin (Level 1)',
+    description: 'Reroll 1s and 2s on damage dice for two-handed weapons.',
+    mechanics: 'Reroll 1s and 2s on damage dice for two-handed weapons.',
+  },
+  'protection': {
+    id: 'protection',
+    name: 'Protection',
+    source: 'Paladin (Level 1)',
+    description: 'Use reaction to impose disadvantage on attack against adjacent ally.',
+    mechanics: 'Reaction. Grants advantage. Impose disadvantage.',
+  },
+
+  // ============================================
+  // PASSIVE AND MAGIC CLASS TRAITS
+  // ============================================
+  'passive-magic-amazon': {
+    id: 'passive-magic-amazon',
+    name: 'Passive and Magic',
+    source: 'Passive and Magic (Subclass)',
+    description: 'Focus on defensive techniques and summoning abilities.',
+    mechanics: 'Focus on defensive techniques and summoning abilities.',
+  },
+  'decoy': {
+    id: 'decoy',
+    name: 'Decoy',
+    source: 'Passive and Magic (Level 3)',
+    description: 'Create illusory duplicate within 30ft for 1 minute. WIS save to distinguish.',
+    mechanics: 'Create illusory duplicate within 30ft for 1 minute.',
+  },
+  'improved-dodge': {
+    id: 'improved-dodge',
+    name: 'Improved Dodge',
+    source: 'Passive and Magic (Level 6)',
+    description: 'Dodge has 3 charges per short rest. Move 5ft when you dodge.',
+    mechanics: 'Recharge: short/long rest.',
+  },
+  'blade-guardian': {
+    id: 'blade-guardian',
+    name: 'Blade Guardian',
+    source: 'Passive and Magic (Level 14)',
+    description: 'Spectral blades give +1 AC for 1 minute, auto-attack melee attackers for 1d8 force.',
+    mechanics: 'Damage: 1d8.',
+  },
+
+  // ============================================
+  // PATH OF BLOOD CLASS TRAITS
+  // ============================================
+  'blood-necromancer': {
+    id: 'blood-necromancer',
+    name: 'Path of Blood',
+    source: 'Path of Blood (Subclass)',
+    description: 'Manipulate lifeforce, draining enemies and empowering yourself.',
+    mechanics: 'Manipulate lifeforce, draining enemies and empowering yourself.',
+  },
+  'blood-surge': {
+    id: 'blood-surge',
+    name: 'Blood Surge',
+    source: 'Path of Blood (Level 2)',
+    description: 'Costs 2 Essence. Drain blood from creatures within 15ft for 2d6 necrotic, heal half damage dealt.',
+    mechanics: 'Damage: 2d6.',
+  },
+  'siphon-blood': {
+    id: 'siphon-blood',
+    name: 'Siphon Blood',
+    source: 'Path of Blood (Level 6)',
+    description: 'Passive: Heal for 25% of necrotic spell damage dealt.',
+    mechanics: 'Passive: Heal for 25% of necrotic spell damage dealt.',
+  },
+  'hemorrhage': {
+    id: 'hemorrhage',
+    name: 'Hemorrhage',
+    source: 'Path of Blood (Level 14)',
+    description: 'Costs 5 Essence. Target bleeds for 3d8 + 1d8/turn for 1 minute. CON save ends effect.',
+    mechanics: 'Damage: 3d8 + 1.',
+  },
+
+  // ============================================
+  // PATH OF BONE CLASS TRAITS
+  // ============================================
+  'bone-necromancer': {
+    id: 'bone-necromancer',
+    name: 'Path of Bone',
+    source: 'Path of Bone (Subclass)',
+    description: 'Focus on offensive bone magic, using remains as deadly weapons.',
+    mechanics: 'Focus on offensive bone magic, using remains as deadly weapons.',
+  },
+  'bone-storm': {
+    id: 'bone-storm',
+    name: 'Bone Storm',
+    source: 'Path of Bone (Level 14)',
+    description: 'Costs 5 Essence. Vortex of bones deals 3d6 slashing to creatures within 10ft for 3 rounds.',
+    mechanics: 'Damage: 3d6.',
+  },
+
+  // ============================================
+  // PATH OF THE BERSERKER CLASS TRAITS
+  // ============================================
+  'berserker': {
+    id: 'berserker',
+    name: 'Path of the Berserker',
+    source: 'Path of the Berserker (Subclass)',
+    description: 'For some barbarians, rage is a means to an end—that end being violence. The Path of the Berserker is a path of untrammeled fury.',
+    mechanics: 'For some barbarians, rage is a means to an end—that end being violence.',
+  },
+  'frenzy': {
+    id: 'frenzy',
+    name: 'Frenzy',
+    source: 'Path of the Berserker (Level 3)',
+    description: 'You can go into a frenzy when you rage. You can make a single melee weapon attack as a bonus action on each turn. When your rage ends, you suffer one level of exhaustion.',
+    mechanics: 'Bonus action.',
+  },
+  'mindless-rage': {
+    id: 'mindless-rage',
+    name: 'Mindless Rage',
+    source: 'Path of the Berserker (Level 6)',
+    description: 'You can\\',
+    mechanics: 'You can\\.',
+  },
+  'intimidating-presence': {
+    id: 'intimidating-presence',
+    name: 'Intimidating Presence',
+    source: 'Path of the Berserker (Level 10)',
+    description: 'You can use your action to frighten someone with your menacing presence. WIS save or frightened until end of your next turn.',
+    mechanics: 'Action.',
+  },
+  'retaliation': {
+    id: 'retaliation',
+    name: 'Retaliation',
+    source: 'Path of the Berserker (Level 14)',
+    description: 'When you take damage from a creature within 5 feet, you can use your reaction to make a melee weapon attack against that creature.',
+    mechanics: 'Reaction.',
+  },
+
+  // ============================================
+  // PATH OF THE SUMMONER CLASS TRAITS
+  // ============================================
+  'summoner-necromancer': {
+    id: 'summoner-necromancer',
+    name: 'Path of the Summoner',
+    source: 'Path of the Summoner (Subclass)',
+    description: 'Command vast armies of undead.',
+    mechanics: 'Command vast armies of undead.',
+  },
+  'skeleton-mastery': {
+    id: 'skeleton-mastery',
+    name: 'Skeleton Mastery',
+    source: 'Path of the Summoner (Level 2)',
+    description: 'Increase skeleton limit by 1. Skeletons gain +1 attack and damage.',
+    mechanics: 'Increase skeleton limit by 1.',
+  },
+  'death-lord': {
+    id: 'death-lord',
+    name: 'Death Lord',
+    source: 'Path of the Summoner (Level 14)',
+    description: 'Passive: Undead minions gain +2 AC, +10 HP, and +1d6 necrotic damage.',
+    mechanics: 'Damage: 1d6.',
+  },
+
+  // ============================================
+  // PATH OF THE TOTEM WARRIOR CLASS TRAITS
+  // ============================================
+  'totem-warrior': {
+    id: 'totem-warrior',
+    name: 'Path of the Totem Warrior',
+    source: 'Path of the Totem Warrior (Subclass)',
+    description: 'The Path of the Totem Warrior is a spiritual journey, as the barbarian accepts a spirit animal as guide, protector, and inspiration.',
+    mechanics: 'The Path of the Totem Warrior is a spiritual journey, as the barbarian accepts a spirit animal as guide, protector, a...',
+  },
+  'spirit-seeker': {
+    id: 'spirit-seeker',
+    name: 'Spirit Seeker',
+    source: 'Path of the Totem Warrior (Level 3)',
+    description: 'You gain the ability to cast the beast sense and speak with animals spells, but only as rituals.',
+    mechanics: 'You gain the ability to cast the beast sense and speak with animals spells, but only as rituals.',
+  },
+  'totem-spirit': {
+    id: 'totem-spirit',
+    name: 'Totem Spirit',
+    source: 'Path of the Totem Warrior (Level 3)',
+    description: 'When you adopt this path, you choose a totem spirit (Bear, Eagle, Elk, Tiger, or Wolf) that grants you a feature while raging.',
+    mechanics: 'When you adopt this path, you choose a totem spirit (Bear, Eagle, Elk, Tiger, or Wolf) that grants you a feature whil...',
+  },
+  'aspect-of-the-beast': {
+    id: 'aspect-of-the-beast',
+    name: 'Aspect of the Beast',
+    source: 'Path of the Totem Warrior (Level 6)',
+    description: 'You gain a magical benefit based on the totem animal of your choice (Bear, Eagle, Elk, Tiger, or Wolf).',
+    mechanics: 'You gain a magical benefit based on the totem animal of your choice (Bear, Eagle, Elk, Tiger, or Wolf).',
+  },
+  'spirit-walker': {
+    id: 'spirit-walker',
+    name: 'Spirit Walker',
+    source: 'Path of the Totem Warrior (Level 10)',
+    description: 'You can cast the commune with nature spell, but only as a ritual.',
+    mechanics: 'You can cast the commune with nature spell, but only as a ritual.',
+  },
+  'totemic-attunement': {
+    id: 'totemic-attunement',
+    name: 'Totemic Attunement',
+    source: 'Path of the Totem Warrior (Level 14)',
+    description: 'You gain a magical benefit based on a totem animal of your choice.',
+    mechanics: 'You gain a magical benefit based on a totem animal of your choice.',
+  },
+
+  // ============================================
+  // RANGER CLASS TRAITS
+  // ============================================
+  'ranger': {
+    id: 'ranger',
+    name: 'Ranger',
+    source: 'Ranger (Class)',
+    description: 'A warrior who combats threats on the edges of civilization.',
+    mechanics: 'A warrior who combats threats on the edges of civilization.',
+  },
+  'defense': {
+    id: 'defense',
+    name: 'Defense',
+    source: 'Ranger (Level 1)',
+    description: '+1 bonus to AC while wearing armor.',
+    mechanics: '+1 bonus to AC while wearing armor.',
+  },
+  'dueling': {
+    id: 'dueling',
+    name: 'Dueling',
+    source: 'Ranger (Level 1)',
+    description: '+2 bonus to damage with one-handed melee weapon and no other weapons.',
+    mechanics: '+2 bonus to damage with one-handed melee weapon and no other weapons.',
+  },
+  'favored-enemy': {
+    id: 'favored-enemy',
+    name: 'Favored Enemy',
+    source: 'Ranger (Level 1)',
+    description: 'You have significant experience studying, tracking, hunting, and even talking to a certain type of enemy.',
+    mechanics: 'You have significant experience studying, tracking, hunting, and even talking to a certain type of enemy.',
+  },
+  'natural-explorer': {
+    id: 'natural-explorer',
+    name: 'Natural Explorer',
+    source: 'Ranger (Level 1)',
+    description: 'You are particularly familiar with one type of natural environment and are adept at traveling and surviving in such regions.',
+    mechanics: 'You are particularly familiar with one type of natural environment and are adept at traveling and surviving in such r...',
+  },
+  'two-weapon': {
+    id: 'two-weapon',
+    name: 'Two-Weapon Fighting',
+    source: 'Ranger (Level 1)',
+    description: 'Add ability modifier to off-hand attack damage.',
+    mechanics: 'Add ability modifier to off-hand attack damage.',
+  },
+  'primeval-awareness': {
+    id: 'primeval-awareness',
+    name: 'Primeval Awareness',
+    source: 'Ranger (Level 3)',
+    description: 'You can use an action and expend a spell slot to focus your awareness on the region around you.',
+    mechanics: 'Action.',
+  },
+  'lands-stride': {
+    id: 'lands-stride',
+    name: 'Land\\',
+    source: 'Ranger (Level 8)',
+    description: 'Moving through nonmagical difficult terrain costs you no extra movement.',
+    mechanics: 'Moving through nonmagical difficult terrain costs you no extra movement.',
+  },
+  'hide-in-plain-sight': {
+    id: 'hide-in-plain-sight',
+    name: 'Hide in Plain Sight',
+    source: 'Ranger (Level 10)',
+    description: 'You can spend 1 minute creating camouflage for yourself. You gain a +10 bonus to Stealth checks while remaining there without moving.',
+    mechanics: 'You can spend 1 minute creating camouflage for yourself.',
+  },
+  'vanish': {
+    id: 'vanish',
+    name: 'Vanish',
+    source: 'Ranger (Level 14)',
+    description: 'You can use the Hide action as a bonus action. Also, you can\\',
+    mechanics: 'Bonus action.',
+  },
+  'feral-senses': {
+    id: 'feral-senses',
+    name: 'Feral Senses',
+    source: 'Ranger (Level 18)',
+    description: 'You gain preternatural senses that help you fight creatures you can\\',
+    mechanics: 'You gain preternatural senses that help you fight creatures you can\\.',
+  },
+  'foe-slayer': {
+    id: 'foe-slayer',
+    name: 'Foe Slayer',
+    source: 'Ranger (Level 20)',
+    description: 'You become an unparalleled hunter. Once per turn, you can add your WIS modifier to the attack roll or damage roll against a favored enemy.',
+    mechanics: 'You become an unparalleled hunter.',
+  },
+
+  // ============================================
+  // ROGUE CLASS TRAITS
+  // ============================================
+  'rogue': {
+    id: 'rogue',
+    name: 'Rogue',
+    source: 'Rogue (Class)',
+    description: 'A scoundrel who uses stealth and trickery to overcome obstacles and enemies.',
+    mechanics: 'A scoundrel who uses stealth and trickery to overcome obstacles and enemies.',
+  },
+
+  // ============================================
+  // SCHOOL OF ABJURATION CLASS TRAITS
+  // ============================================
+  'abjuration': {
+    id: 'abjuration',
+    name: 'School of Abjuration',
+    source: 'School of Abjuration (Subclass)',
+    description: 'The School of Abjuration emphasizes magic that blocks, banishes, or protects. You specialize in protective magic.',
+    mechanics: 'The School of Abjuration emphasizes magic that blocks, banishes, or protects.',
+  },
+  'abjuration-savant': {
+    id: 'abjuration-savant',
+    name: 'Abjuration Savant',
+    source: 'School of Abjuration (Level 2)',
+    description: 'The gold and time you must spend to copy an abjuration spell into your spellbook is halved.',
+    mechanics: 'The gold and time you must spend to copy an abjuration spell into your spellbook is halved.',
+  },
+  'arcane-ward': {
+    id: 'arcane-ward',
+    name: 'Arcane Ward',
+    source: 'School of Abjuration (Level 2)',
+    description: 'When you cast an abjuration spell of 1st level or higher, you create a magical ward that has HP equal to twice your wizard level + INT modifier. It absorbs damage you take.',
+    mechanics: 'When you cast an abjuration spell of 1st level or higher, you create a magical ward that has HP equal to twice your w...',
+  },
+  'projected-ward': {
+    id: 'projected-ward',
+    name: 'Projected Ward',
+    source: 'School of Abjuration (Level 6)',
+    description: 'When a creature within 30 feet takes damage, you can use your reaction to cause your Arcane Ward to absorb that damage instead.',
+    mechanics: 'Reaction.',
+  },
+  'improved-abjuration': {
+    id: 'improved-abjuration',
+    name: 'Improved Abjuration',
+    source: 'School of Abjuration (Level 10)',
+    description: 'When you cast an abjuration spell requiring an ability check (like counterspell or dispel magic), you add your proficiency bonus to that check.',
+    mechanics: 'When you cast an abjuration spell requiring an ability check (like counterspell or dispel magic), you add your profic...',
+  },
+  'spell-resistance': {
+    id: 'spell-resistance',
+    name: 'Spell Resistance',
+    source: 'School of Abjuration (Level 14)',
+    description: 'You have advantage on saving throws against spells. You have resistance against the damage of spells.',
+    mechanics: 'Grants advantage.',
+  },
+
+  // ============================================
+  // SCHOOL OF EVOCATION CLASS TRAITS
+  // ============================================
+  'evocation': {
+    id: 'evocation',
+    name: 'School of Evocation',
+    source: 'School of Evocation (Subclass)',
+    description: 'You focus your study on magic that creates powerful elemental effects such as bitter cold, searing flame, rolling thunder, crackling lightning, and burning acid.',
+    mechanics: 'You focus your study on magic that creates powerful elemental effects such as bitter cold, searing flame, rolling thu...',
+  },
+  'evocation-savant': {
+    id: 'evocation-savant',
+    name: 'Evocation Savant',
+    source: 'School of Evocation (Level 2)',
+    description: 'The gold and time you must spend to copy an evocation spell into your spellbook is halved.',
+    mechanics: 'The gold and time you must spend to copy an evocation spell into your spellbook is halved.',
+  },
+  'sculpt-spells': {
+    id: 'sculpt-spells',
+    name: 'Sculpt Spells',
+    source: 'School of Evocation (Level 2)',
+    description: 'When you cast an evocation spell that affects other creatures, you can choose a number of them equal to 1 + the spell\\',
+    mechanics: 'When you cast an evocation spell that affects other creatures, you can choose a number of them equal to 1 + the spell\\.',
+  },
+  'potent-cantrip': {
+    id: 'potent-cantrip',
+    name: 'Potent Cantrip',
+    source: 'School of Evocation (Level 6)',
+    description: 'When a creature succeeds on a saving throw against your cantrip, the creature takes half the cantrip\\',
+    mechanics: 'When a creature succeeds on a saving throw against your cantrip, the creature takes half the cantrip\\.',
+  },
+  'empowered-evocation': {
+    id: 'empowered-evocation',
+    name: 'Empowered Evocation',
+    source: 'School of Evocation (Level 10)',
+    description: 'You can add your Intelligence modifier to one damage roll of any wizard evocation spell you cast.',
+    mechanics: 'You can add your Intelligence modifier to one damage roll of any wizard evocation spell you cast.',
+  },
+  'overchannel': {
+    id: 'overchannel',
+    name: 'Overchannel',
+    source: 'School of Evocation (Level 14)',
+    description: 'When you cast a wizard spell of 1st through 5th level that deals damage, you can deal maximum damage with that spell. After the first use, you take necrotic damage for each subsequent use.',
+    mechanics: 'When you cast a wizard spell of 1st through 5th level that deals damage, you can deal maximum damage with that spell.',
+  },
+
+  // ============================================
+  // SHADOW CLASS TRAITS
+  // ============================================
+  'shadow-demon-hunter': {
+    id: 'shadow-demon-hunter',
+    name: 'Shadow',
+    source: 'Shadow (Subclass)',
+    description: 'Blend stealth and ranged attacks, striking from darkness.',
+    mechanics: 'Blend stealth and ranged attacks, striking from darkness.',
+  },
+  'shadow-power': {
+    id: 'shadow-power',
+    name: 'Shadow Power',
+    source: 'Shadow (Level 3)',
+    description: 'Hide as bonus action once per short rest. First attack from hiding deals +1d8.',
+    mechanics: 'Bonus action. Damage: 1d8. Recharge: short/long rest.',
+  },
+  'multishot': {
+    id: 'multishot',
+    name: 'Multishot',
+    source: 'Shadow (Level 6)',
+    description: '15ft cone, 3d6 piercing. DEX save for half.',
+    mechanics: 'Damage: 3d6.',
+  },
+  'rain-of-vengeance': {
+    id: 'rain-of-vengeance',
+    name: 'Rain of Vengeance',
+    source: 'Shadow (Level 14)',
+    description: '20ft radius, 6d6 piercing. DEX save for half.',
+    mechanics: 'Damage: 6d6.',
+  },
+
+  // ============================================
+  // SORCERER CLASS TRAITS
+  // ============================================
+  'sorcerer': {
+    id: 'sorcerer',
+    name: 'Sorcerer',
+    source: 'Sorcerer (Class)',
+    description: 'A spellcaster who draws on inherent magic from a gift or bloodline.',
+    mechanics: 'A spellcaster who draws on inherent magic from a gift or bloodline.',
+  },
+  'sorcerous-restoration': {
+    id: 'sorcerous-restoration',
+    name: 'Sorcerous Restoration',
+    source: 'Sorcerer (Level 20)',
+    description: 'You regain 4 expended sorcery points whenever you finish a short rest.',
+    mechanics: 'Recharge: short/long rest.',
+  },
+
+  // ============================================
+  // THE ARCHFEY CLASS TRAITS
+  // ============================================
+  'archfey': {
+    id: 'archfey',
+    name: 'The Archfey',
+    source: 'The Archfey (Subclass)',
+    description: 'Your patron is a lord or lady of the fey, a creature of legend who holds secrets that were forgotten before mortal races were born.',
+    mechanics: 'Your patron is a lord or lady of the fey, a creature of legend who holds secrets that were forgotten before mortal ra...',
+  },
+
+  // ============================================
+  // THE CELESTIAL CLASS TRAITS
+  // ============================================
+  'celestial': {
+    id: 'celestial',
+    name: 'The Celestial',
+    source: 'The Celestial (Subclass)',
+    description: 'Your patron is a powerful being of the Upper Planes, such as an empyrean, solar, ki-rin, or unicorn. You have a connection to sacred light and radiance.',
+    mechanics: 'Your patron is a powerful being of the Upper Planes, such as an empyrean, solar, ki-rin, or unicorn.',
+  },
+  'healing-light': {
+    id: 'healing-light',
+    name: 'Healing Light',
+    source: 'The Celestial (Level 1)',
+    description: 'You have a pool of d6s equal to 1 + warlock level. As a bonus action, you can heal a creature within 60 feet by spending dice from the pool.',
+    mechanics: 'Bonus action.',
+  },
+  'celestial-resilience': {
+    id: 'celestial-resilience',
+    name: 'Celestial Resilience',
+    source: 'The Celestial (Level 10)',
+    description: 'You gain temporary HP equal to your warlock level + CHA modifier whenever you finish a short or long rest. Up to 5 allies within 30 feet also gain temporary HP equal to half your warlock level + CHA modifier.',
+    mechanics: 'Recharge: short/long rest.',
+  },
+  'searing-vengeance': {
+    id: 'searing-vengeance',
+    name: 'Searing Vengeance',
+    source: 'The Celestial (Level 14)',
+    description: 'When you make a death saving throw at the start of your turn, you can instead spring back with half your HP, then stand and deal radiant damage to enemies within 30 feet.',
+    mechanics: 'When you make a death saving throw at the start of your turn, you can instead spring back with half your HP, then sta...',
+  },
+
+  // ============================================
+  // THE FIEND CLASS TRAITS
+  // ============================================
+  'fiend': {
+    id: 'fiend',
+    name: 'The Fiend',
+    source: 'The Fiend (Subclass)',
+    description: 'You have made a pact with a fiend from the lower planes of existence. Devils, demons, and other dark powers grant you abilities fueled by fire and destruction.',
+    mechanics: 'You have made a pact with a fiend from the lower planes of existence.',
+  },
+
+  // ============================================
+  // THE GREAT OLD ONE CLASS TRAITS
+  // ============================================
+  'great-old-one': {
+    id: 'great-old-one',
+    name: 'The Great Old One',
+    source: 'The Great Old One (Subclass)',
+    description: 'Your patron is a mysterious entity from the Far Realm or beyond the stars.',
+    mechanics: 'Your patron is a mysterious entity from the Far Realm or beyond the stars.',
+  },
+
+  // ============================================
+  // THE HEXBLADE CLASS TRAITS
+  // ============================================
+  'hexblade': {
+    id: 'hexblade',
+    name: 'The Hexblade',
+    source: 'The Hexblade (Subclass)',
+    description: 'You have made your pact with a mysterious entity from the Shadowfell, a force that manifests in sentient magic weapons carved from the stuff of shadow.',
+    mechanics: 'You have made your pact with a mysterious entity from the Shadowfell, a force that manifests in sentient magic weapon...',
+  },
+  'accursed-specter': {
+    id: 'accursed-specter',
+    name: 'Accursed Specter',
+    source: 'The Hexblade (Level 6)',
+    description: 'When you slay a humanoid, you can curse its soul to rise as a specter that serves you until your next long rest.',
+    mechanics: 'Recharge: long rest.',
+  },
+  'armor-of-hexes': {
+    id: 'armor-of-hexes',
+    name: 'Armor of Hexes',
+    source: 'The Hexblade (Level 10)',
+    description: 'If the target of your Hexblade\\',
+    mechanics: 'If the target of your Hexblade\\.',
+  },
+  'master-of-hexes': {
+    id: 'master-of-hexes',
+    name: 'Master of Hexes',
+    source: 'The Hexblade (Level 14)',
+    description: 'When the creature cursed by your Hexblade\\',
+    mechanics: 'When the creature cursed by your Hexblade\\.',
+  },
+
+  // ============================================
+  // THIEF CLASS TRAITS
+  // ============================================
+  'thief': {
+    id: 'thief',
+    name: 'Thief',
+    source: 'Thief (Subclass)',
+    description: 'You hone your skills in the larcenous arts. Burglars, bandits, cutpurses, and other criminals typically follow this archetype.',
+    mechanics: 'You hone your skills in the larcenous arts.',
+  },
+
+  // ============================================
+  // UNHOLY CLASS TRAITS
+  // ============================================
+  'unholy-death-knight': {
+    id: 'unholy-death-knight',
+    name: 'Unholy',
+    source: 'Unholy (Subclass)',
+    description: 'Spread disease and command undead minions.',
+    mechanics: 'Spread disease and command undead minions.',
+  },
+  'raise-dead': {
+    id: 'raise-dead',
+    name: 'Raise Dead',
+    source: 'Unholy (Level 3)',
+    description: 'Costs 4 Runic Power. Raise ghoul from corpse for 1 hour. Max ghouls = 1 (increases to 2 at level 11).',
+    mechanics: 'Costs 4 Runic Power.',
+  },
+  'festering-wound': {
+    id: 'festering-wound',
+    name: 'Festering Wound',
+    source: 'Unholy (Level 6)',
+    description: 'Costs 2 Runic Power. Target bleeds for 1d4 necrotic per turn for 1 minute. Max 3 wounds. CON save ends effect.',
+    mechanics: 'Damage: 1d4.',
+  },
+  'summon-gargoyle': {
+    id: 'summon-gargoyle',
+    name: 'Summon Gargoyle',
+    source: 'Unholy (Level 14)',
+    description: 'Costs 5 Runic Power. Summon gargoyle for 1 minute with 2d8 necrotic ranged attacks.',
+    mechanics: 'Damage: 2d8.',
+  },
+
+  // ============================================
+  // VENGEANCE CLASS TRAITS
+  // ============================================
+  'vengeance-demon-hunter': {
+    id: 'vengeance-demon-hunter',
+    name: 'Vengeance',
+    source: 'Vengeance (Subclass)',
+    description: 'Tanks who use pain to fuel demonic powers.',
+    mechanics: 'Tanks who use pain to fuel demonic powers.',
+  },
+  'demon-spikes': {
+    id: 'demon-spikes',
+    name: 'Demon Spikes',
+    source: 'Vengeance (Level 3)',
+    description: '+1 AC, attackers take 1d4 piercing for 1 minute.',
+    mechanics: 'Damage: 1d4.',
+  },
+  'infernal-strike': {
+    id: 'infernal-strike',
+    name: 'Infernal Strike',
+    source: 'Vengeance (Level 6)',
+    description: 'Leap 20ft, 2d6 fire damage on landing. DEX save or prone.',
+    mechanics: 'Damage: 2d6.',
+  },
+  'fel-devastation': {
+    id: 'fel-devastation',
+    name: 'Fel Devastation',
+    source: 'Vengeance (Level 14)',
+    description: '20ft cone, 2d6 fire/round for 2 rounds. Heal 10% of damage dealt.',
+    mechanics: 'Damage: 2d6.',
+  },
+
+  // ============================================
+  // WARLOCK CLASS TRAITS
+  // ============================================
+  'warlock': {
+    id: 'warlock',
+    name: 'Warlock',
+    source: 'Warlock (Class)',
+    description: 'A wielder of magic derived from a bargain with an extraplanar entity.',
+    mechanics: 'A wielder of magic derived from a bargain with an extraplanar entity.',
+  },
+  'mystic-arcanum-6': {
+    id: 'mystic-arcanum-6',
+    name: 'Mystic Arcanum (6th level)',
+    source: 'Warlock (Level 11)',
+    description: 'Your patron bestows upon you a magical secret called an arcanum.',
+    mechanics: 'Your patron bestows upon you a magical secret called an arcanum.',
+  },
+  'mystic-arcanum-7': {
+    id: 'mystic-arcanum-7',
+    name: 'Mystic Arcanum (7th level)',
+    source: 'Warlock (Level 13)',
+    description: 'You gain a 7th-level arcanum.',
+    mechanics: 'You gain a 7th-level arcanum.',
+  },
+  'mystic-arcanum-8': {
+    id: 'mystic-arcanum-8',
+    name: 'Mystic Arcanum (8th level)',
+    source: 'Warlock (Level 15)',
+    description: 'You gain an 8th-level arcanum.',
+    mechanics: 'You gain an 8th-level arcanum.',
+  },
+  'mystic-arcanum-9': {
+    id: 'mystic-arcanum-9',
+    name: 'Mystic Arcanum (9th level)',
+    source: 'Warlock (Level 17)',
+    description: 'You gain a 9th-level arcanum.',
+    mechanics: 'You gain a 9th-level arcanum.',
+  },
+
+  // ============================================
+  // WAY OF SHADOW CLASS TRAITS
+  // ============================================
+  'shadow': {
+    id: 'shadow',
+    name: 'Way of Shadow',
+    source: 'Way of Shadow (Subclass)',
+    description: 'Monks of the Way of Shadow follow a tradition that values stealth and subterfuge.',
+    mechanics: 'Monks of the Way of Shadow follow a tradition that values stealth and subterfuge.',
+  },
+  'shadow-arts': {
+    id: 'shadow-arts',
+    name: 'Shadow Arts',
+    source: 'Way of Shadow (Level 3)',
+    description: 'You can use your ki to duplicate the effects of certain spells. You can spend 2 ki points to cast darkness, darkvision, pass without trace, or silence.',
+    mechanics: 'You can use your ki to duplicate the effects of certain spells.',
+  },
+  'shadow-step': {
+    id: 'shadow-step',
+    name: 'Shadow Step',
+    source: 'Way of Shadow (Level 6)',
+    description: 'When you are in dim light or darkness, you can use a bonus action to teleport up to 60 feet to an unoccupied space you can see that is also in dim light or darkness.',
+    mechanics: 'Bonus action.',
+  },
+  'cloak-of-shadows': {
+    id: 'cloak-of-shadows',
+    name: 'Cloak of Shadows',
+    source: 'Way of Shadow (Level 11)',
+    description: 'When you are in an area of dim light or darkness, you can use your action to become invisible. You remain invisible until you make an attack, cast a spell, or are in an area of bright light.',
+    mechanics: 'Action.',
+  },
+  'opportunist': {
+    id: 'opportunist',
+    name: 'Opportunist',
+    source: 'Way of Shadow (Level 17)',
+    description: 'When a creature within 5 feet of you is hit by an attack made by a creature other than you, you can use your reaction to make a melee attack against that creature.',
+    mechanics: 'Reaction.',
+  },
+
+  // ============================================
+  // WAY OF THE OPEN HAND CLASS TRAITS
+  // ============================================
+  'open-hand': {
+    id: 'open-hand',
+    name: 'Way of the Open Hand',
+    source: 'Way of the Open Hand (Subclass)',
+    description: 'Monks of the Way of the Open Hand are the ultimate masters of martial arts combat.',
+    mechanics: 'Monks of the Way of the Open Hand are the ultimate masters of martial arts combat.',
+  },
+  'open-hand-technique': {
+    id: 'open-hand-technique',
+    name: 'Open Hand Technique',
+    source: 'Way of the Open Hand (Level 3)',
+    description: 'When you hit a creature with a Flurry of Blows attack, you can impose one of several effects: knock it prone, push it 15 feet away, or prevent it from taking reactions.',
+    mechanics: 'Reaction.',
+  },
+  'wholeness-of-body': {
+    id: 'wholeness-of-body',
+    name: 'Wholeness of Body',
+    source: 'Way of the Open Hand (Level 6)',
+    description: 'As an action, you can regain HP equal to three times your monk level.',
+    mechanics: 'Action.',
+  },
+  'tranquility': {
+    id: 'tranquility',
+    name: 'Tranquility',
+    source: 'Way of the Open Hand (Level 11)',
+    description: 'At the end of a long rest, you gain the effect of a sanctuary spell that lasts until the start of your next long rest.',
+    mechanics: 'Recharge: long rest.',
+  },
+  'quivering-palm': {
+    id: 'quivering-palm',
+    name: 'Quivering Palm',
+    source: 'Way of the Open Hand (Level 17)',
+    description: 'When you hit a creature with an unarmed strike, you can spend 3 ki points to start imperceptible vibrations. You can then use an action to deal 10d10 necrotic damage or reduce the target to 0 HP.',
+    mechanics: 'Action. Damage: 10d10.',
+  },
+
+  // ============================================
+  // WILD MAGIC CLASS TRAITS
+  // ============================================
+  'wild-magic': {
+    id: 'wild-magic',
+    name: 'Wild Magic',
+    source: 'Wild Magic (Subclass)',
+    description: 'Your innate magic comes from the wild forces of chaos that underlie the order of existence.',
+    mechanics: 'Your innate magic comes from the wild forces of chaos that underlie the order of existence.',
+  },
+  'bend-luck': {
+    id: 'bend-luck',
+    name: 'Bend Luck',
+    source: 'Wild Magic (Level 6)',
+    description: 'When another creature makes an attack roll, ability check, or saving throw, you can use your reaction and spend 2 sorcery points to roll 1d4 and apply the number as a bonus or penalty.',
+    mechanics: 'Reaction. Damage: 1d4.',
+  },
+  'controlled-chaos': {
+    id: 'controlled-chaos',
+    name: 'Controlled Chaos',
+    source: 'Wild Magic (Level 14)',
+    description: 'When you roll on the Wild Magic Surge table, you can roll twice and use either number.',
+    mechanics: 'When you roll on the Wild Magic Surge table, you can roll twice and use either number.',
+  },
+  'spell-bombardment': {
+    id: 'spell-bombardment',
+    name: 'Spell Bombardment',
+    source: 'Wild Magic (Level 18)',
+    description: 'When you roll damage for a spell and roll the highest number possible on any of the dice, you can roll that die again and add it to the damage.',
+    mechanics: 'When you roll damage for a spell and roll the highest number possible on any of the dice, you can roll that die again...',
+  },
+
+  // ============================================
+  // WIZARD CLASS TRAITS
+  // ============================================
+  'wizard': {
+    id: 'wizard',
+    name: 'Wizard',
+    source: 'Wizard (Class)',
+    description: 'A scholarly magic-user capable of manipulating the structures of reality through careful study.',
+    mechanics: 'A scholarly magic-user capable of manipulating the structures of reality through careful study.',
+  },
+  'arcane-recovery': {
+    id: 'arcane-recovery',
+    name: 'Arcane Recovery',
+    source: 'Wizard (Level 1)',
+    description: 'Once per day during a short rest, you can recover spell slots with a combined level equal to or less than half your wizard level (rounded up).',
+    mechanics: 'Recharge: short/long rest.',
+  },
+  'spell-mastery': {
+    id: 'spell-mastery',
+    name: 'Spell Mastery',
+    source: 'Wizard (Level 18)',
+    description: 'Choose a 1st-level and a 2nd-level spell in your spellbook. You can cast those spells at their lowest level without expending a spell slot.',
+    mechanics: 'Choose a 1st-level and a 2nd-level spell in your spellbook.',
+  },
+  'signature-spells': {
+    id: 'signature-spells',
+    name: 'Signature Spells',
+    source: 'Wizard (Level 20)',
+    description: 'Choose two 3rd-level spells in your spellbook. You always have them prepared, they don\\',
+    mechanics: 'Choose two 3rd-level spells in your spellbook.',
+  },
+
+
 }
 
 // RULES DATA - Game mechanics explanations for new players
