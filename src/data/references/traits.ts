@@ -1671,6 +1671,44 @@ export const TRAITS: Record<string, TraitRef> = {
     description: 'You know the Ray of Frost cantrip. When you reach 3rd level, you can cast the Armor of Agathys spell once per long rest as a 2nd-level spell. When you reach 5th level, you can cast the Darkness spell once per long rest. Charisma is your spellcasting ability for these spells.',
     mechanics: 'Ray of Frost cantrip. At 3rd: Armor of Agathys (1/long rest). At 5th: Darkness (1/long rest). CHA spellcasting.',
   },
+  // Shadar-kai Traits
+  'necrotic-resistance': {
+    id: 'necrotic-resistance',
+    name: 'Necrotic Resistance',
+    source: 'Shadar-kai (Elf subrace)',
+    description: 'You have resistance to necrotic damage, a reflection of the lingering shadow magic that permeates Shadar-kai after years living in the Shadowfell. This resistance makes you hardier against the energy of death and undeath.',
+    mechanics: 'Resistance to necrotic damage (half damage from necrotic sources).',
+  },
+  // Aasimar Traits
+  'light-bearer': {
+    id: 'light-bearer',
+    name: 'Light Bearer',
+    source: 'Aasimar',
+    description: 'You know the Light cantrip. Charisma is your spellcasting ability for it. This celestial magic reflects the divine spark within you, allowing you to create light at will as a manifestation of your heavenly heritage.',
+    mechanics: 'Know Light cantrip. CHA is spellcasting ability.',
+  },
+  // Aasimar Subrace Traits
+  'radiant-soul': {
+    id: 'radiant-soul',
+    name: 'Radiant Soul',
+    source: 'Protector Aasimar',
+    description: 'As an action, you can unleash the divine energy within yourself, causing your eyes to glimmer and two luminous wings to sprout from your back. Your transformation lasts for 1 minute or until you end it as a bonus action. During it, you have a flying speed of 30 feet, and once on each of your turns, you can deal extra radiant damage equal to your proficiency bonus when you deal damage with an attack or a spell. Once you use this trait, you can\'t use it again until you finish a long rest.',
+    mechanics: 'Action: 1 min transformation. Fly 30 ft. Add prof bonus as radiant damage once per turn. 1/long rest.',
+  },
+  'necrotic-shroud': {
+    id: 'necrotic-shroud',
+    name: 'Necrotic Shroud',
+    source: 'Fallen Aasimar',
+    description: 'As an action, you can unleash the divine energy within yourself, causing your eyes to turn into pools of darkness and two skeletal, ghostly, flightless wings to sprout from your back. The transformation lasts 1 minute or until you end it as a bonus action. It causes creatures other than your allies within 10 feet of you to make a Charisma saving throw (DC = 8 + proficiency bonus + Charisma modifier). On a failed save, they become frightened until the end of your next turn. Once on each of your turns you can deal extra necrotic damage equal to your proficiency bonus when you deal damage. Once you use this trait, you can\'t use it again until you finish a long rest.',
+    mechanics: 'Action: 1 min transformation. 10 ft CHA save or frightened. Add prof bonus as necrotic damage once per turn. 1/long rest.',
+  },
+  'radiant-consumption': {
+    id: 'radiant-consumption',
+    name: 'Radiant Consumption',
+    source: 'Scourge Aasimar',
+    description: 'As an action, you can unleash the divine energy within yourself, causing a searing light to radiate from you, pour out of your eyes and mouth, and threaten to char you. Your transformation lasts 1 minute or until you end it as a bonus action. During it, you shed bright light in a 10-foot radius and dim light for an additional 10 feet, and at the end of each of your turns, you and each creature within 10 feet of you take radiant damage equal to half your level (rounded up). In addition, once on each of your turns, you can deal extra radiant damage equal to your proficiency bonus when you deal damage. Once you use this trait, you can\'t use it again until you finish a long rest.',
+    mechanics: 'Action: 1 min transformation. 10 ft bright light. End of turn: half level radiant to you and nearby. Add prof bonus as radiant damage once per turn. 1/long rest.',
+  },
 }
 
 // RULES DATA - Game mechanics explanations for new players
