@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { SPELLS, type SpellRef } from '../data/quickReference'
+import { SPELLS } from '../data/references/spells'
+import type { SpellRef } from '../data/quickReference'
 import type { Spell } from '../types'
 import { convertSpellRefToSpell } from '../utils/spellConverter'
 

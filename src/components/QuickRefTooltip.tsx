@@ -344,11 +344,13 @@ export function QuickRefTooltip({ type, id, children, className = '' }: QuickRef
       if (cached) {
         setData(cached)
       } else {
-        const refData = getReference(type, id)
-        if (refData) {
-          cache.current.set(cacheKey, refData)
-          setData(refData)
-        }
+        // getReference is now async, so we need to await it
+        getReference(type, id).then((refData) => {
+          if (refData) {
+            cache.current.set(cacheKey, refData)
+            setData(refData)
+          }
+        })
       }
     }
   }, [isOpen, type, id])

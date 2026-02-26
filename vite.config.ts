@@ -82,7 +82,7 @@ export default defineConfig({
         },
       },
     },
-    // Increase chunk size warning limit since we're intentionally splitting
+    // Increase chunk size warning limit for PDF library (characterIO)
     chunkSizeWarningLimit: 1000,
   },
   test: {

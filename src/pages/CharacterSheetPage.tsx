@@ -23,7 +23,7 @@ import {
 import { CATEGORY_INFO, formatIncome, getProfessionByRoll, type Profession } from '../data/professions'
 import { exportCharacterToJSON, exportCharacterToPDF } from '../utils/characterIO'
 import { QuickRefTooltip } from '../components/QuickRefTooltip'
-import { SPELLS } from '../data/quickReference'
+import { SPELLS } from '../data/references/spells'
 import { CharacterEditModal } from '../components/CharacterEditModal'
 import { DMAbilityScoreEditor } from '../components/DMAbilityScoreEditor'
 import { FightingStanceSelector } from '../components/FightingStanceSelector'
