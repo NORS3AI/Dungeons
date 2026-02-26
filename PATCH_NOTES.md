@@ -1,5 +1,79 @@
 # Dungeons - Patch Notes
 
+## Version 0.3.8-alpha - February 26, 2026
+
+**Alpha Release Notice**: This version streamlines the race selection system by focusing on core D&D races, adds comprehensive racial trait references for all subraces, and reorganizes the race categories.
+
+### 🗑️ Race Cleanup - 26 Races Removed
+
+Removed setting-specific, planar, and exotic races to focus on core PHB 2024 races:
+
+#### **Deleted Races**:
+- **Eberron Races (6)**: Warforged, Changeling, Kalashtar, Shifter (Wildhunt, Longtooth, Beasthide, Swiftstride)
+- **Ravnica Races (3)**: Simic Hybrid, Vedalken, Loxodon
+- **Removed Monstrous (4)**: Minotaur, Centaur, Bugbear, Hobgoblin
+- **Removed Exotic (13)**: Tabaxi, Tortle, Firbolg, Kenku, Lizardfolk, Genasi, Goliath, Aarakocra, Triton, Locathah, Owlin, Fairy
+
+#### **Remaining Races (14 total)**:
+- **Common (9)**: Human, Dwarf, Elf, Halfling, Gnome, Half-Elf, Half-Orc, Dragonborn, Tiefling
+- **Exotic (1)**: Aasimar (moved from 'planar' to 'exotic' category)
+- **Monstrous (4)**: Goblin, Orc, Yuan-ti Pureblood, Kobold
+
+**Why This Matters**: Focuses on core D&D races from PHB 2024, making character creation simpler for new players while keeping monstrous options for DMs running unique campaigns. All removed races were setting-specific (Eberron, Ravnica) or less common in standard D&D games.
+
+### 📚 Comprehensive Racial Trait References (30 traits added)
+
+Added full trait references for all base races and subraces, enabling clickable tooltips in character creation and character sheets.
+
+#### **Orc Traits (2)**:
+- **Aggressive**: Bonus action to charge toward enemies (must end closer)
+- **Primal Intuition**: Proficiency in 2 skills from Animal Handling, Insight, Intimidation, Medicine, Nature, Perception, Survival
+
+#### **Goblin Traits (2)**:
+- **Fury of the Small**: Deal extra damage = your level vs larger creatures (1/short rest)
+- **Nimble Escape**: Bonus action Disengage or Hide
+
+#### **Half-Orc Trait (1)**:
+- **Menacing**: Gain Intimidation proficiency
+
+#### **Elf Subrace Traits (8)**:
+- **High Elf - Cantrip**: Learn 1 wizard cantrip (INT spellcasting)
+- **High Elf - Extra Language**: Learn 1 additional language
+- **Wood Elf - Fleet of Foot**: 35 ft base speed
+- **Wood Elf - Mask of the Wild**: Hide when lightly obscured by natural phenomena
+- **Sea Elf - Child of the Sea**: Swim 30 ft, breathe air and water
+- **Sea Elf - Friend of the Sea**: Communicate with swimming beasts
+- **Eladrin - Shifting Seasons**: Choose seasonal form (Autumn/Winter/Spring/Summer)
+- **Shadar-kai - Blessing of the Raven Queen**: Teleport 30 ft + damage resistance (1/long rest)
+
+#### **Halfling Subrace Traits (3)**:
+- **Lightfoot - Naturally Stealthy**: Hide behind creatures one size larger
+- **Stout - Stout Resilience**: Advantage vs poison, resistance to poison damage
+- **Ghostwise - Silent Speech**: 30 ft telepathy (must share language)
+
+#### **Gnome Subrace Traits (6)**:
+- **Forest Gnome - Natural Illusionist**: Minor Illusion cantrip (INT)
+- **Forest Gnome - Speak with Small Beasts**: Communicate with Small/smaller beasts
+- **Rock Gnome - Artificer's Lore**: Double proficiency on History for magic items/tech
+- **Rock Gnome - Tinker**: Create clockwork devices (Toy, Fire Starter, Music Box)
+- **Deep Gnome - Stone Camouflage**: Advantage on Stealth in rocky terrain
+- **Deep Gnome - Svirfneblin Magic**: Cast Nondetection at will (no components)
+
+#### **Dragonborn Breath Weapons (5)**:
+- **Acid Breath** (Black/Copper): 5x30 ft line, DEX save, 2d6 acid (scales to 5d6)
+- **Fire Breath (Line)** (Brass): 5x30 ft line, DEX save, 2d6 fire (scales to 5d6)
+- **Fire Breath (Cone)** (Gold/Red): 15 ft cone, DEX save, 2d6 fire (scales to 5d6)
+- **Cold Breath** (Silver/White): 15 ft cone, CON save, 2d6 cold (scales to 5d6)
+- **Poison Breath** (Green): 15 ft cone, CON save, 2d6 poison (scales to 5d6)
+
+#### **Tiefling Variant Traits (2)**:
+- **Legacy of Avernus** (Zariel): Thaumaturgy + Searing Smite (3rd) + Branding Smite (5th)
+- **Legacy of Stygia** (Levistus): Ray of Frost + Armor of Agathys (3rd) + Darkness (5th)
+
+**Why This Matters**: All racial traits now have working QuickRefTooltips. Click any trait name during character creation or on your character sheet to see full descriptions, game mechanics, and examples. Essential for understanding subrace differences and making informed choices.
+
+---
+
 ## Version 0.3.7-alpha - February 25, 2026
 
 **Alpha Release Notice**: This version introduces the Class Features system to the Actions tab, bringing actionable class abilities to life with charge tracking, automatic unlocking, and visual feedback.
