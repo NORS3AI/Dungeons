@@ -4,26 +4,32 @@
 
 **Alpha Release Notice**: This version streamlines the race selection system by focusing on core D&D races, adds comprehensive racial trait references for all subraces, and reorganizes the race categories.
 
-### 🗑️ Race Cleanup - 26 Races Removed
+### 🗑️ Race Cleanup - 39 Races Removed
 
-Removed setting-specific, planar, and exotic races to focus on core PHB 2024 races:
+Removed setting-specific, planar, exotic, and draconic races to focus on core PHB 2024 races:
 
 #### **Deleted Races**:
 - **Eberron Races (6)**: Warforged, Changeling, Kalashtar, Shifter (Wildhunt, Longtooth, Beasthide, Swiftstride)
 - **Ravnica Races (3)**: Simic Hybrid, Vedalken, Loxodon
-- **Removed Monstrous (4)**: Minotaur, Centaur, Bugbear, Hobgoblin
+- **Removed Monstrous (7)**: Minotaur, Centaur, Bugbear, Hobgoblin, Yuan-ti Pureblood, Kobold
 - **Removed Exotic (13)**: Tabaxi, Tortle, Firbolg, Kenku, Lizardfolk, Genasi, Goliath, Aarakocra, Triton, Locathah, Owlin, Fairy
+- **Dragonborn (10)**: Base Dragonborn + all 9 subraces (Black, Blue, Brass, Bronze, Copper, Gold, Green, Red, Silver, White)
 
-#### **Remaining Races (14 total)**:
-- **Common (9)**: Human, Dwarf, Elf, Halfling, Gnome, Half-Elf, Half-Orc, Dragonborn, Tiefling
-- **Exotic (1)**: Aasimar (moved from 'planar' to 'exotic' category)
-- **Monstrous (4)**: Goblin, Orc, Yuan-ti Pureblood, Kobold
+#### **Race Category Filters Removed**:
+- **Aerial Races** - Category removed (Aarakocra, Owlin deleted)
+- **Aquatic Races** - Category removed (Triton, Locathah, Sea Elf kept but recategorized)
+- **Planar Races** - Category removed (Aasimar moved to 'exotic')
 
-**Why This Matters**: Focuses on core D&D races from PHB 2024, making character creation simpler for new players while keeping monstrous options for DMs running unique campaigns. All removed races were setting-specific (Eberron, Ravnica) or less common in standard D&D games.
+#### **Remaining Races (11 total)**:
+- **Common (8)**: Human, Dwarf, Elf, Halfling, Gnome, Half-Elf, Half-Orc, Tiefling
+- **Exotic (1)**: Aasimar
+- **Monstrous (2)**: Goblin, Orc
 
-### 📚 Comprehensive Racial Trait References (30 traits added)
+**Why This Matters**: Focuses exclusively on core D&D PHB 2024 humanoid races, making character creation simpler and more streamlined. All removed races were either setting-specific (Eberron, Ravnica), uncommon in standard games, or draconic lineages. Category filters simplified from 6 to 3 categories (Common, Exotic, Monstrous).
 
-Added full trait references for all base races and subraces, enabling clickable tooltips in character creation and character sheets.
+### 📚 Comprehensive Racial Trait References (25 traits added)
+
+Added full trait references for all remaining base races and subraces, enabling clickable tooltips in character creation and character sheets.
 
 #### **Orc Traits (2)**:
 - **Aggressive**: Bonus action to charge toward enemies (must end closer)
@@ -58,13 +64,6 @@ Added full trait references for all base races and subraces, enabling clickable 
 - **Rock Gnome - Tinker**: Create clockwork devices (Toy, Fire Starter, Music Box)
 - **Deep Gnome - Stone Camouflage**: Advantage on Stealth in rocky terrain
 - **Deep Gnome - Svirfneblin Magic**: Cast Nondetection at will (no components)
-
-#### **Dragonborn Breath Weapons (5)**:
-- **Acid Breath** (Black/Copper): 5x30 ft line, DEX save, 2d6 acid (scales to 5d6)
-- **Fire Breath (Line)** (Brass): 5x30 ft line, DEX save, 2d6 fire (scales to 5d6)
-- **Fire Breath (Cone)** (Gold/Red): 15 ft cone, DEX save, 2d6 fire (scales to 5d6)
-- **Cold Breath** (Silver/White): 15 ft cone, CON save, 2d6 cold (scales to 5d6)
-- **Poison Breath** (Green): 15 ft cone, CON save, 2d6 poison (scales to 5d6)
 
 #### **Tiefling Variant Traits (2)**:
 - **Legacy of Avernus** (Zariel): Thaumaturgy + Searing Smite (3rd) + Branding Smite (5th)

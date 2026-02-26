@@ -482,189 +482,6 @@ export const HALF_ORC: Race = {
   skillProficiencies: ['intimidation'],
 }
 
-export const DRAGONBORN: Race = {
-  id: 'dragonborn',
-  name: 'Dragonborn',
-  icon: (
-    <svg className="w-12 h-12 text-red-500/40" viewBox="0 0 100 100" fill="currentColor">
-      <ellipse cx="50" cy="30" rx="18" ry="22" />
-      <path d="M32 50 L50 52 L68 50" />
-      <rect x="32" y="50" width="36" height="40" rx="6" />
-      <rect x="24" y="52" width="10" height="30" rx="4" />
-      <rect x="66" y="52" width="10" height="30" rx="4" />
-      <path d="M36 90 L36 98 M64 90 L64 98" strokeWidth="7" stroke="currentColor" fill="none" />
-      <path d="M35 20 L25 15 Q20 18 25 22 M65 20 L75 15 Q80 18 75 22" className="text-orange-600" fill="currentColor" />
-      <circle cx="42" cy="26" r="3" className="text-yellow-400" fill="currentColor" />
-      <circle cx="58" cy="26" r="3" className="text-yellow-400" fill="currentColor" />
-      <path d="M40 35 Q50 30 60 35" strokeWidth="2" stroke="currentColor" fill="none" />
-    </svg>
-  ),
-  category: 'common',
-  description: 'Dragonborn look very much like dragons standing erect in humanoid form, though they lack wings or a tail. They are tall and strongly built, with dragon-like scales.',
-  sourceBook: { ...SOURCE_BOOKS.PHB2024, page: 156 },
-  abilityBonuses: { strength: 2, charisma: 1 },
-  size: 'medium',
-  speed: 30,
-  vision: 'normal',
-  languages: ['Common', 'Draconic'],
-  traits: [
-    { id: 'breath-weapon', name: 'Breath Weapon', description: 'You can use your action to exhale destructive energy. Your draconic ancestry determines the size, shape, and damage type. DC = 8 + Constitution modifier + proficiency bonus.' },
-    { id: 'damage-resistance', name: 'Damage Resistance', description: 'You have resistance to the damage type associated with your draconic ancestry.' },
-  ],
-  subraces: [
-    {
-      id: 'black-dragonborn',
-      name: 'Black Dragonborn',
-      icon: '🖤',
-      description: 'Black dragonborn breathe acid in a 5 by 30 ft. line.',
-      abilityBonuses: { strength: 2, charisma: 1 },
-      size: 'medium',
-      speed: 30,
-      vision: 'normal',
-      languages: ['Common', 'Draconic'],
-      traits: [
-        { id: 'acid-breath', name: 'Acid Breath', description: '5 by 30 ft. line (Dex. save). 2d6 acid damage, increases with level.' },
-      ],
-      damageResistances: ['acid'],
-    },
-    {
-      id: 'blue-dragonborn',
-      name: 'Blue Dragonborn',
-      icon: '💙',
-      description: 'Blue dragonborn breathe lightning in a 5 by 30 ft. line.',
-      abilityBonuses: { strength: 2, charisma: 1 },
-      size: 'medium',
-      speed: 30,
-      vision: 'normal',
-      languages: ['Common', 'Draconic'],
-      traits: [
-        { id: 'lightning-breath', name: 'Lightning Breath', description: '5 by 30 ft. line (Dex. save). 2d6 lightning damage, increases with level.' },
-      ],
-      damageResistances: ['lightning'],
-    },
-    {
-      id: 'brass-dragonborn',
-      name: 'Brass Dragonborn',
-      icon: '🟤',
-      description: 'Brass dragonborn breathe fire in a 5 by 30 ft. line.',
-      abilityBonuses: { strength: 2, charisma: 1 },
-      size: 'medium',
-      speed: 30,
-      vision: 'normal',
-      languages: ['Common', 'Draconic'],
-      traits: [
-        { id: 'fire-breath-line', name: 'Fire Breath', description: '5 by 30 ft. line (Dex. save). 2d6 fire damage, increases with level.' },
-      ],
-      damageResistances: ['fire'],
-    },
-    {
-      id: 'bronze-dragonborn',
-      name: 'Bronze Dragonborn',
-      icon: '🟠',
-      description: 'Bronze dragonborn breathe lightning in a 5 by 30 ft. line.',
-      abilityBonuses: { strength: 2, charisma: 1 },
-      size: 'medium',
-      speed: 30,
-      vision: 'normal',
-      languages: ['Common', 'Draconic'],
-      traits: [
-        { id: 'lightning-breath', name: 'Lightning Breath', description: '5 by 30 ft. line (Dex. save). 2d6 lightning damage, increases with level.' },
-      ],
-      damageResistances: ['lightning'],
-    },
-    {
-      id: 'copper-dragonborn',
-      name: 'Copper Dragonborn',
-      icon: '🧡',
-      description: 'Copper dragonborn breathe acid in a 5 by 30 ft. line.',
-      abilityBonuses: { strength: 2, charisma: 1 },
-      size: 'medium',
-      speed: 30,
-      vision: 'normal',
-      languages: ['Common', 'Draconic'],
-      traits: [
-        { id: 'acid-breath', name: 'Acid Breath', description: '5 by 30 ft. line (Dex. save). 2d6 acid damage, increases with level.' },
-      ],
-      damageResistances: ['acid'],
-    },
-    {
-      id: 'gold-dragonborn',
-      name: 'Gold Dragonborn',
-      icon: '💛',
-      description: 'Gold dragonborn breathe fire in a 15 ft. cone.',
-      abilityBonuses: { strength: 2, charisma: 1 },
-      size: 'medium',
-      speed: 30,
-      vision: 'normal',
-      languages: ['Common', 'Draconic'],
-      traits: [
-        { id: 'fire-breath-cone', name: 'Fire Breath', description: '15 ft. cone (Dex. save). 2d6 fire damage, increases with level.' },
-      ],
-      damageResistances: ['fire'],
-    },
-    {
-      id: 'green-dragonborn',
-      name: 'Green Dragonborn',
-      icon: '💚',
-      description: 'Green dragonborn breathe poison in a 15 ft. cone.',
-      abilityBonuses: { strength: 2, charisma: 1 },
-      size: 'medium',
-      speed: 30,
-      vision: 'normal',
-      languages: ['Common', 'Draconic'],
-      traits: [
-        { id: 'poison-breath', name: 'Poison Breath', description: '15 ft. cone (Con. save). 2d6 poison damage, increases with level.' },
-      ],
-      damageResistances: ['poison'],
-    },
-    {
-      id: 'red-dragonborn',
-      name: 'Red Dragonborn',
-      icon: '❤️',
-      description: 'Red dragonborn breathe fire in a 15 ft. cone.',
-      abilityBonuses: { strength: 2, charisma: 1 },
-      size: 'medium',
-      speed: 30,
-      vision: 'normal',
-      languages: ['Common', 'Draconic'],
-      traits: [
-        { id: 'fire-breath-cone', name: 'Fire Breath', description: '15 ft. cone (Dex. save). 2d6 fire damage, increases with level.' },
-      ],
-      damageResistances: ['fire'],
-    },
-    {
-      id: 'silver-dragonborn',
-      name: 'Silver Dragonborn',
-      icon: '🤍',
-      description: 'Silver dragonborn breathe cold in a 15 ft. cone.',
-      abilityBonuses: { strength: 2, charisma: 1 },
-      size: 'medium',
-      speed: 30,
-      vision: 'normal',
-      languages: ['Common', 'Draconic'],
-      traits: [
-        { id: 'cold-breath', name: 'Cold Breath', description: '15 ft. cone (Con. save). 2d6 cold damage, increases with level.' },
-      ],
-      damageResistances: ['cold'],
-    },
-    {
-      id: 'white-dragonborn',
-      name: 'White Dragonborn',
-      icon: '🩶',
-      description: 'White dragonborn breathe cold in a 15 ft. cone.',
-      abilityBonuses: { strength: 2, charisma: 1 },
-      size: 'medium',
-      speed: 30,
-      vision: 'normal',
-      languages: ['Common', 'Draconic'],
-      traits: [
-        { id: 'cold-breath', name: 'Cold Breath', description: '15 ft. cone (Con. save). 2d6 cold damage, increases with level.' },
-      ],
-      damageResistances: ['cold'],
-    },
-  ],
-}
-
 export const TIEFLING: Race = {
   id: 'tiefling',
   name: 'Tiefling',
@@ -906,73 +723,6 @@ export const ORC: Race = {
   ],
 }
 
-export const YUAN_TI: Race = {
-  id: 'yuan-ti',
-  name: 'Yuan-ti Pureblood',
-  icon: (
-    <svg className="w-12 h-12 text-green-600/40" viewBox="0 0 100 100" fill="currentColor">
-      <ellipse cx="50" cy="33" rx="15" ry="18" />
-      <path d="M35 49 Q50 59 65 49 L65 86 L35 86 Z" />
-      <rect x="28" y="51" width="8" height="24" rx="3" />
-      <rect x="64" y="51" width="8" height="24" rx="3" />
-      <path d="M38 86 L38 93 M62 86 L62 93" strokeWidth="6" stroke="currentColor" fill="none" />
-      <ellipse cx="43" cy="31" rx="4.5" ry="6" className="text-yellow-400" fill="currentColor" />
-      <ellipse cx="57" cy="31" rx="4.5" ry="6" className="text-yellow-400" fill="currentColor" />
-      <ellipse cx="43" cy="31" rx="1.5" ry="4" className="text-gray-900" fill="currentColor" />
-      <ellipse cx="57" cy="31" rx="1.5" ry="4" className="text-gray-900" fill="currentColor" />
-      <path d="M40 40 Q50 38 60 40" strokeWidth="2" stroke="currentColor" fill="none" />
-      <path d="M45 45 L48 47 L51 45" strokeWidth="1.5" stroke="currentColor" fill="none" className="text-red-500" />
-    </svg>
-  ),
-  category: 'monstrous',
-  description: 'Yuan-ti are serpentine humanoids created through dark rituals. Purebloods appear mostly human but have subtle serpentine features.',
-  abilityBonuses: { charisma: 2, intelligence: 1 },
-  size: 'medium',
-  speed: 30,
-  vision: 'darkvision',
-  visionRange: 60,
-  languages: ['Common', 'Abyssal', 'Draconic'],
-  traits: [
-    { id: 'innate-spellcasting', name: 'Innate Spellcasting', description: 'You know the Poison Spray cantrip. At 3rd level, you can cast Animal Friendship on snakes at will. At 3rd level, you can also cast Suggestion once per long rest.' },
-    { id: 'magic-resistance', name: 'Magic Resistance', description: 'You have advantage on saving throws against spells and other magical effects.' },
-    { id: 'poison-immunity', name: 'Poison Immunity', description: 'You are immune to poison damage and the poisoned condition.' },
-  ],
-  damageResistances: ['poison'],
-  conditionImmunities: ['poisoned'],
-}
-
-export const KOBOLD: Race = {
-  id: 'kobold',
-  name: 'Kobold',
-  icon: (
-    <svg className="w-12 h-12 text-orange-600/40" viewBox="0 0 100 100" fill="currentColor">
-      <ellipse cx="50" cy="38" rx="15" ry="17" />
-      <path d="M35 53 Q50 62 65 53 L65 83 L35 83 Z" />
-      <rect x="29" y="55" width="7" height="19" rx="3" />
-      <rect x="64" y="55" width="7" height="19" rx="3" />
-      <path d="M38 83 L38 91 M62 83 L62 91" strokeWidth="5" stroke="currentColor" fill="none" />
-      <path d="M50 28 L47 20 Q49 22 51 22 Q53 22 55 20 Z" className="text-orange-700" fill="currentColor" />
-      <ellipse cx="43" cy="36" rx="4" ry="5" className="text-yellow-500" fill="currentColor" />
-      <ellipse cx="57" cy="36" rx="4" ry="5" className="text-yellow-500" fill="currentColor" />
-      <ellipse cx="43" cy="36" rx="2" ry="3" className="text-gray-900" fill="currentColor" />
-      <ellipse cx="57" cy="36" rx="2" ry="3" className="text-gray-900" fill="currentColor" />
-      <path d="M43 44 L46 47 L49 44 M51 44 L54 47 L57 44" strokeWidth="2" stroke="currentColor" fill="none" />
-    </svg>
-  ),
-  category: 'monstrous',
-  description: 'Kobolds are small reptilian humanoids who often serve dragons. They are crafty and use traps and ambush tactics.',
-  abilityBonuses: { dexterity: 2 },
-  size: 'small',
-  speed: 30,
-  vision: 'darkvision',
-  visionRange: 60,
-  languages: ['Common', 'Draconic'],
-  traits: [
-    { id: 'draconic-cry', name: 'Draconic Cry', description: 'As a bonus action, you let out a cry. Until the start of your next turn, you and your allies have advantage on attack rolls against enemies within 10 feet of you. You can use this a number of times equal to your proficiency bonus.' },
-    { id: 'kobold-legacy', name: 'Kobold Legacy', description: 'Choose one: Craftiness (proficiency in one skill), Defiance (advantage vs. frightened), or Draconic Sorcery (one sorcerer cantrip).' },
-  ],
-}
-
 // ============================================================================
 // OTHER FANTASY RACES
 // ============================================================================
@@ -990,24 +740,18 @@ export const ALL_RACES: Race[] = [
   GNOME,
   HALF_ELF,
   HALF_ORC,
-  DRAGONBORN,
   TIEFLING,
   // Exotic
   AASIMAR,
   // Monstrous
   GOBLIN,
   ORC,
-  YUAN_TI,
-  KOBOLD,
 ]
 
 export const RACE_CATEGORIES = {
   common: 'Common Races',
   exotic: 'Exotic Races',
-  aerial: 'Aerial Races',
-  aquatic: 'Aquatic Races',
   monstrous: 'Monstrous Races',
-  planar: 'Planar Races',
 }
 
 export function getRacesByCategory(category: string): Race[] {

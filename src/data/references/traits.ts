@@ -626,20 +626,6 @@ export const TRAITS: Record<string, TraitRef> = {
     description: 'You have advantage on all Intelligence, Wisdom, and Charisma saving throws against magic.',
     mechanics: 'Advantage on INT/WIS/CHA saves vs. magic.',
   },
-  'breath-weapon': {
-    id: 'breath-weapon',
-    name: 'Breath Weapon',
-    source: 'Dragonborn',
-    description: 'You can use your action to exhale destructive energy. Your draconic ancestry determines the size, shape, and damage type of the exhalation. Each creature in the area must make a saving throw. The DC equals 8 + your Constitution modifier + your proficiency bonus. A creature takes 2d6 damage on a failed save, and half as much damage on a successful one. The damage increases at higher levels.',
-    mechanics: 'Action: Breath attack based on draconic ancestry. 2d6 damage, DEX or CON save.',
-  },
-  'damage-resistance-draconic': {
-    id: 'damage-resistance-draconic',
-    name: 'Draconic Resistance',
-    source: 'Dragonborn',
-    description: 'You have resistance to the damage type associated with your draconic ancestry.',
-    mechanics: 'Resistance to one damage type based on ancestry.',
-  },
   // === EXTRA ATTACK & CORE CLASS FEATURES ===
   'extra-attack': {
     id: 'extra-attack',
@@ -1669,42 +1655,6 @@ export const TRAITS: Record<string, TraitRef> = {
     source: 'Deep Gnome (Svirfneblin)',
     description: 'You can cast the Nondetection spell on yourself at will, without needing a material component. Deep gnomes use this magic to remain hidden from divination.',
     mechanics: 'Cast Nondetection on self at will (no material component).',
-  },
-  // Dragonborn Subrace Traits (Breath Weapons)
-  'acid-breath': {
-    id: 'acid-breath',
-    name: 'Acid Breath',
-    source: 'Black/Copper Dragonborn',
-    description: 'Your breath weapon is a 5 by 30 ft. line of acid. Each creature in the area must make a Dexterity saving throw (DC = 8 + Constitution modifier + proficiency bonus). A creature takes 2d6 acid damage on a failed save, and half as much on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th level, and 5d6 at 16th level. You can use your breath weapon once per short or long rest.',
-    mechanics: '5x30 ft line. DEX save. 2d6 acid (scales: 3d6/4d6/5d6). Recharge: short/long rest.',
-  },
-  'fire-breath-line': {
-    id: 'fire-breath-line',
-    name: 'Fire Breath (Line)',
-    source: 'Brass Dragonborn',
-    description: 'Your breath weapon is a 5 by 30 ft. line of fire. Each creature in the area must make a Dexterity saving throw. The damage increases as you level up.',
-    mechanics: '5x30 ft line. DEX save. 2d6 fire (scales: 3d6/4d6/5d6). Recharge: short/long rest.',
-  },
-  'fire-breath-cone': {
-    id: 'fire-breath-cone',
-    name: 'Fire Breath (Cone)',
-    source: 'Gold/Red Dragonborn',
-    description: 'Your breath weapon is a 15 ft. cone of fire. Each creature in the area must make a Dexterity saving throw. The damage increases as you level up.',
-    mechanics: '15 ft cone. DEX save. 2d6 fire (scales: 3d6/4d6/5d6). Recharge: short/long rest.',
-  },
-  'cold-breath': {
-    id: 'cold-breath',
-    name: 'Cold Breath',
-    source: 'Silver/White Dragonborn',
-    description: 'Your breath weapon is a 15 ft. cone of cold. Each creature in the area must make a Constitution saving throw. The damage increases as you level up.',
-    mechanics: '15 ft cone. CON save. 2d6 cold (scales: 3d6/4d6/5d6). Recharge: short/long rest.',
-  },
-  'poison-breath': {
-    id: 'poison-breath',
-    name: 'Poison Breath',
-    source: 'Green Dragonborn',
-    description: 'Your breath weapon is a 15 ft. cone of poison gas. Each creature in the area must make a Constitution saving throw. The damage increases as you level up.',
-    mechanics: '15 ft cone. CON save. 2d6 poison (scales: 3d6/4d6/5d6). Recharge: short/long rest.',
   },
   // Tiefling Subrace Traits
   'legacy-of-avernus': {
