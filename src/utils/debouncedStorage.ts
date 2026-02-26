@@ -5,7 +5,7 @@ import type { StateStorage } from 'zustand/middleware'
  * This prevents excessive localStorage writes during rapid state changes
  */
 export function createDebouncedStorage(delay: number = 1000): StateStorage {
-  const pending = new Map<string, number>()
+  const pending = new Map<string, ReturnType<typeof setTimeout>>()
 
   return {
     getItem: (name: string): string | null => {
