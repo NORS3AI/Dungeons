@@ -225,3 +225,27 @@ export const CLERIC_LEVEL_1_SPELLS: Spell[] = [
   },
   DETECT_MAGIC,
 ]
+
+// Cleric 2nd Level Spells
+export const CLERIC_LEVEL_2_SPELLS: Spell[] = []
+
+// Cleric 3rd Level Spells
+export const CLERIC_LEVEL_3_SPELLS: Spell[] = []
+
+// Cleric 4th Level Spells
+export const CLERIC_LEVEL_4_SPELLS: Spell[] = []
+
+// Cleric 5th Level Spells
+export const CLERIC_LEVEL_5_SPELLS: Spell[] = []
+
+// Cleric 6th Level Spells
+export const CLERIC_LEVEL_6_SPELLS: Spell[] = []
+
+// Cleric 7th Level Spells
+export const CLERIC_LEVEL_7_SPELLS: Spell[] = []
+
+// Cleric 8th Level Spells
+export const CLERIC_LEVEL_8_SPELLS: Spell[] = []
+
+// Cleric 9th Level Spells
+export const CLERIC_LEVEL_9_SPELLS: Spell[] = []

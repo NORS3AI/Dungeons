@@ -474,6 +474,9 @@ export const SORCERER_LEVEL_1_SPELLS: Spell[] = [
   DETECT_MAGIC,
 ]
 
+// Sorcerer 2nd Level Spells
+export const SORCERER_LEVEL_2_SPELLS: Spell[] = []
+
 // Sorcerer 3rd Level Spells
 export const SORCERER_LEVEL_3_SPELLS: Spell[] = [
   {
@@ -729,6 +732,9 @@ export const SORCERER_LEVEL_3_SPELLS: Spell[] = [
   },
 ]
 
+// Sorcerer 4th Level Spells
+export const SORCERER_LEVEL_4_SPELLS: Spell[] = []
+
 // Sorcerer 5th Level Spells
 export const SORCERER_LEVEL_5_SPELLS: Spell[] = [
   {
@@ -903,6 +909,9 @@ export const SORCERER_LEVEL_5_SPELLS: Spell[] = [
   },
 ]
 
+// Sorcerer 6th Level Spells
+export const SORCERER_LEVEL_6_SPELLS: Spell[] = []
+
 // Sorcerer 7th Level Spells
 export const SORCERER_LEVEL_7_SPELLS: Spell[] = [
   {
@@ -1028,6 +1037,9 @@ export const SORCERER_LEVEL_7_SPELLS: Spell[] = [
     classes: ['sorcerer', 'bard', 'wizard'],
   },
 ]
+
+// Sorcerer 8th Level Spells
+export const SORCERER_LEVEL_8_SPELLS: Spell[] = []
 
 // Sorcerer 9th Level Spells
 export const SORCERER_LEVEL_9_SPELLS: Spell[] = [

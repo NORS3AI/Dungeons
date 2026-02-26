@@ -788,6 +788,9 @@ export const DRUID_LEVEL_3_SPELLS: Spell[] = [
   },
 ]
 
+// Druid 4th Level Spells
+export const DRUID_LEVEL_4_SPELLS: Spell[] = []
+
 // Druid 5th Level Spells
 export const DRUID_LEVEL_5_SPELLS: Spell[] = [
   {
@@ -1003,6 +1006,9 @@ export const DRUID_LEVEL_5_SPELLS: Spell[] = [
   },
 ]
 
+// Druid 6th Level Spells
+export const DRUID_LEVEL_6_SPELLS: Spell[] = []
+
 // Druid 7th Level Spells
 export const DRUID_LEVEL_7_SPELLS: Spell[] = [
   {
@@ -1081,6 +1087,9 @@ export const DRUID_LEVEL_7_SPELLS: Spell[] = [
     classes: ['druid', 'sorcerer', 'wizard'],
   },
 ]
+
+// Druid 8th Level Spells
+export const DRUID_LEVEL_8_SPELLS: Spell[] = []
 
 // Druid 9th Level Spells
 export const DRUID_LEVEL_9_SPELLS: Spell[] = [

@@ -92,3 +92,27 @@ export const NECROMANCER_LEVEL_1_SPELLS: Spell[] = [
   },
   DETECT_MAGIC,
 ]
+
+// Necromancer 2nd Level Spells
+export const NECROMANCER_LEVEL_2_SPELLS: Spell[] = []
+
+// Necromancer 3rd Level Spells
+export const NECROMANCER_LEVEL_3_SPELLS: Spell[] = []
+
+// Necromancer 4th Level Spells
+export const NECROMANCER_LEVEL_4_SPELLS: Spell[] = []
+
+// Necromancer 5th Level Spells
+export const NECROMANCER_LEVEL_5_SPELLS: Spell[] = []
+
+// Necromancer 6th Level Spells
+export const NECROMANCER_LEVEL_6_SPELLS: Spell[] = []
+
+// Necromancer 7th Level Spells
+export const NECROMANCER_LEVEL_7_SPELLS: Spell[] = []
+
+// Necromancer 8th Level Spells
+export const NECROMANCER_LEVEL_8_SPELLS: Spell[] = []
+
+// Necromancer 9th Level Spells
+export const NECROMANCER_LEVEL_9_SPELLS: Spell[] = []
