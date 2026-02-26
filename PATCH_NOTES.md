@@ -39,6 +39,51 @@ Previously, class features were only visible in the Features tab and had no inte
 3. Enemy attacks → Uncanny Dodge reminder visible in red "Reaction" badge
 4. After combat → No manual tracking needed, everything persists automatically
 
+### 📚 Complete Class Feature References Added
+
+Added 31+ missing trait references for Fighter, Barbarian, Monk, and Paladin class features to enable clickable tooltips in the Actions tab.
+
+#### **Fighter Features Added**
+- **Extra Attack (2)** (Level 11): Attack 3 times with Attack action
+- **Extra Attack (3)** (Level 20): Attack 4 times with Attack action
+
+#### **Barbarian Features Added (11 traits)**
+- **Rage** (Level 1): Bonus action to rage - advantage on STR checks/saves, bonus damage, resistance to physical damage
+- **Unarmored Defense** (Level 1): AC = 10 + DEX + CON without armor
+- **Reckless Attack** (Level 2): Advantage on attacks, but enemies get advantage against you
+- **Danger Sense** (Level 2): Advantage on DEX saves vs visible effects
+- **Fast Movement** (Level 5): +10 ft speed without heavy armor
+- **Feral Instinct** (Level 7): Advantage on initiative, can act when surprised if you rage first
+- **Brutal Critical** (Level 9): +1 weapon die on crits (scales to +3 at 17th)
+- **Relentless Rage** (Level 11): CON save to stay at 1 HP when dropped to 0 while raging
+- **Persistent Rage** (Level 15): Rage only ends if unconscious or you choose
+- **Indomitable Might** (Level 18): STR checks minimum = your STR score
+- **Primal Champion** (Level 20): +4 STR and CON, max 24
+
+#### **Monk Features Added (14 traits)**
+- **Martial Arts** (Level 1): DEX for monk weapons, bonus unarmed strike
+- **Ki** (Level 2): Spend ki points for Flurry of Blows, Patient Defense, Step of Wind
+- **Unarmored Movement** (Level 2): +10 ft speed without armor (scales to +30 ft at 18th)
+- **Deflect Missiles** (Level 3): Reduce ranged attack damage, catch and throw back
+- **Slow Fall** (Level 4): Reduce fall damage by 5 × Monk level
+- **Stunning Strike** (Level 5): Spend 1 ki to attempt stun on hit
+- **Ki-Empowered Strikes** (Level 6): Unarmed strikes count as magical
+- **Stillness of Mind** (Level 7): End charmed/frightened on yourself
+- **Purity of Body** (Level 10): Immune to disease and poison
+- **Tongue of the Sun and Moon** (Level 13): Understand all languages
+- **Diamond Soul** (Level 14): Proficiency in all saves, reroll failures for 1 ki
+- **Timeless Body** (Level 15): No aging, no need for food/water
+- **Empty Body** (Level 18): Invisible + damage resistance or Astral Projection
+- **Perfect Self** (Level 20): Regain 4 ki at start of combat if at 0
+
+#### **Paladin Features Added (4 traits)**
+- **Aura of Protection** (Level 6): Allies within 10 ft get +CHA mod to all saves
+- **Aura of Courage** (Level 10): Allies within 10 ft immune to frightened
+- **Improved Divine Smite** (Level 11): All melee hits deal +1d8 radiant
+- **Cleansing Touch** (Level 14): End one spell on self or touched creature
+
+**Why This Matters**: All class features in the Actions tab now have working tooltips. Click any feature name to see full descriptions, mechanics, and examples. Essential for understanding complex abilities like Rage mechanics, Ki spending options, and Stunning Strike DCs.
+
 ---
 
 ## Version 0.3.6-alpha - February 25, 2026
