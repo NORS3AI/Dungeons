@@ -359,13 +359,15 @@ export const RULES: Record<string, RuleRef> = {
     name: 'Armor Class (AC)',
     category: 'combat',
     summary: 'How hard you are to hit. Higher AC means enemies need to roll higher to damage you.',
-    description: 'Armor Class (AC) represents how difficult you are to hit in combat. When an enemy attacks you, they roll 1d20 and add modifiers. If their total equals or exceeds your AC, they hit. AC is calculated from: armor worn + DEX modifier (limited by armor type) + shield + other bonuses. Unarmored AC = 10 + DEX modifier. Light armor = armor AC + full DEX. Medium armor = armor AC + DEX (max +2). Heavy armor = armor AC only (no DEX).',
+    description: 'Armor Class (AC) represents how difficult you are to hit in combat. When an enemy attacks you, they roll 1d20 and add modifiers — if their total meets or beats your AC, they hit. Your AC is automatically calculated from everything you have equipped: Unarmored = 10 + DEX modifier. Light armor = armor base AC + full DEX modifier. Medium armor = armor base AC + DEX (capped at +2). Heavy armor = armor base AC (no DEX). Shields and magical cloaks add their AC bonus on top. Fighter stances also affect AC: Sword & Board (+2), Dual Two-Handed (-4). The Enraged condition applies a -1 AC penalty.',
     examples: [
-      'Leather armor (AC 11) + DEX +3 = AC 14',
-      'Chain mail (AC 16) + shield (+2) = AC 18',
-      'Unarmored Monk: 10 + DEX +3 + WIS +2 = AC 15',
-      'Enemy rolls 17 vs your AC 16 = they hit you',
-      'Enemy rolls 15 vs your AC 16 = they miss'
+      'Unarmored (DEX +3): 10 + 3 = AC 13',
+      'Leather Armor (AC 11) + DEX +3 = AC 14',
+      'Chainmail (AC 16) + Shield (+2) = AC 18',
+      'Mithril Plate (AC 20) + Cloak of Protection (+1) = AC 21',
+      'Fighter, Sword & Board stance: +2 AC on top of armor',
+      'Fighter, Dual Two-Handed stance: -4 AC (tradeoff for 4d6 damage)',
+      'Enraged (Barbarian): -1 AC while condition is active'
     ],
     relatedRules: ['attack-rolls', 'damage-resistance'],
   },

@@ -1,5 +1,68 @@
 # Dungeons - Patch Notes
 
+## Version 0.4.6-alpha - February 28, 2026
+
+**Alpha Release Notice**: Language selector rewrite, Ranger spell level-ups, potion consume improvements, collapsible loot generator with Mats by Quality, and updated AC reference.
+
+### ✨ Language Selector Rewrite
+
+The character creation language selector has been fully rewritten to fix a bug where it always showed "2/2 Languages Known" and blocked further selection.
+
+#### **Simpler, Cleaner Design**
+- **Common** is always shown as a locked "Always Known" entry — it doesn't take up a choice slot
+- **One bonus language** can be picked freely from the full list: Dwarvish, Elvish, Gnomish, Goblin, Halfling, Orc, Celestial, Abyssal, Deep Speech, Draconic, Infernal, Primordial, Sylvan, Undercommon
+- Selected language highlighted in gold with a checkmark; tap again to deselect
+
+**Why This Matters**: The old complex logic caused a "2/2 Languages Known" lock on new characters. The rewrite makes it reliable and intuitive.
+
+### ✨ Ranger Spell Level-Up Fixed
+
+When a Ranger leveled up, the "Choose New Spells" popup never appeared. Ranger (and Paladin) are now fully supported in the level-up spell selector.
+
+#### **Ranger Spell Progression**
+- Level 2 onwards: level 1 ranger spells unlocked (2 spells known at L2, +1 per level)
+- Level 5+: level 2 ranger spells available
+- Level 9+: level 3, Level 13+: level 4, Level 17+: level 5
+
+**Also fixed**: Three Ranger trait descriptions in the tooltip system that had broken/truncated text: Land's Stride, Vanish, and Feral Senses.
+
+### ✨ Potion Consume Improvements
+
+Two changes to how potions feel when used in combat.
+
+#### **6-Second Consume Timer**
+- Potions now show a "Consuming in 6s…" drain bar (changed from 15s to match the 6-second combat round)
+
+#### **Big Coloured Roll Numbers**
+- **Healing potions**: Roll result displayed in large **green** numbers (e.g. "+14") with "HP Restored" label
+- **Other potions**: Roll result displayed in large **yellow** numbers with "Effect Rolled" label
+- Formula shown below the number in small text
+
+**Why This Matters**: Instant visual feedback — green = heal, yellow = other effect.
+
+### ✨ Loot Generator — Collapsible Sections & Mats by Quality
+
+The Legendary Loot Generator now uses collapsible sections to reduce screen clutter.
+
+#### **Collapsible Sections**
+- **Legendary Loot results**: Show/Hide toggle on the results panel
+- **Standard Generated Loot**: Show/Hide toggle on the results panel
+
+#### **Mats by Quality Reference** (DM Only)
+A new collapsible "Mats by Quality" panel inside the Legendary Loot Generator shows what materials each Work skill uses at each quality tier:
+- ⚒️ **Blacksmithing**: Iron Ore → Silver/Gold → Mithril/Adamantite → Obsidian Steel
+- 🧵 **Tailoring**: Linen/Wool → Silk/Cotton → Enchanted Cloth/Scaled Hide → Void Silk/Dragonscale
+- ⚗️ **Alchemy**: Lavender/Mint → Foxglove/Wolfsbane → Mandrake/Bloodthorn → Starbloom/Soulroot
+- ✨ **Enchanting**: Magical Dust (Common–Rare) → Magical Shard (Epic–Legendary)
+
+**Why This Matters**: DMs can quickly check what mats to award players without switching tabs.
+
+### ✨ AC Reference Updated
+
+The Armor Class tooltip in the Character Overview now shows examples that match the actual system built in this app — including crafted armor values, cloaks, Fighter stances, and the Enraged condition penalty.
+
+---
+
 ## Version 0.4.5-alpha - February 28, 2026
 
 **Alpha Release Notice**: DM Item Granter completely overhauled — 6-tab Quick Add, crafting-aligned weapons/armor/potions, Enchanting Scrolls, and a full D&D 5e Shop.

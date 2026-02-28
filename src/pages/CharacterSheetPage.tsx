@@ -630,7 +630,7 @@ export function CharacterSheetPage() {
 
     const newQuantity = item.quantity && item.quantity > 1 ? item.quantity - 1 : -1
 
-    // Show result immediately; consume the item after 15 seconds
+    // Show result immediately; consume the item after 6 seconds
     setPendingPotionConsume({ itemId, name: item.name, newQuantity, roll: healingRoll, displayFormula })
 
     setTimeout(() => {
@@ -646,7 +646,7 @@ export function CharacterSheetPage() {
         : `${item.name} consumed.`
       setShowConsumableNotification({ message, type: 'success' })
       setTimeout(() => setShowConsumableNotification(null), 3000)
-    }, 15000)
+    }, 6000)
   }
 
   // Roll to hit for weapon attack
@@ -3098,30 +3098,42 @@ export function CharacterSheetPage() {
 
                         {isPending ? (
                           /* Pending consume — show roll result and draining progress bar */
-                          <div className="mb-3">
-                            {pendingPotionConsume.roll !== null ? (
-                              <div className="text-center py-3">
-                                <div className="text-5xl font-bold text-emerald-300 mb-1">
-                                  +{pendingPotionConsume.roll}
-                                </div>
-                                <div className="text-sm text-emerald-400 font-medium">HP Restored</div>
-                                {pendingPotionConsume.displayFormula && (
-                                  <div className="text-xs text-gray-400 mt-1">
-                                    ({pendingPotionConsume.displayFormula})
+                          (() => {
+                            const isHealingPotion =
+                              item.name.toLowerCase().includes('healing') ||
+                              item.description.toLowerCase().includes('heals') ||
+                              item.description.toLowerCase().includes('hit points')
+                            return (
+                              <div className="mb-3">
+                                {pendingPotionConsume.roll !== null ? (
+                                  <div className="text-center py-3">
+                                    <div className={`text-6xl font-extrabold mb-1 drop-shadow-lg ${
+                                      isHealingPotion ? 'text-green-400' : 'text-yellow-300'
+                                    }`}>
+                                      {isHealingPotion ? '+' : ''}{pendingPotionConsume.roll}
+                                    </div>
+                                    <div className={`text-sm font-semibold ${isHealingPotion ? 'text-green-300' : 'text-yellow-400'}`}>
+                                      {isHealingPotion ? 'HP Restored' : 'Effect Rolled'}
+                                    </div>
+                                    {pendingPotionConsume.displayFormula && (
+                                      <div className="text-xs text-gray-400 mt-1">
+                                        ({pendingPotionConsume.displayFormula})
+                                      </div>
+                                    )}
                                   </div>
+                                ) : (
+                                  <p className="text-sm text-gray-300 mb-3">{item.description}</p>
                                 )}
+                                <div className="text-xs text-center text-gray-400 mb-1">Consuming in 6s…</div>
+                                <div className="h-1.5 bg-gray-700 rounded-full overflow-hidden">
+                                  <div
+                                    className="h-full bg-emerald-500 rounded-full"
+                                    style={{ animation: 'consumeDrain 6s linear forwards' }}
+                                  />
+                                </div>
                               </div>
-                            ) : (
-                              <p className="text-sm text-gray-300 mb-3">{item.description}</p>
-                            )}
-                            <div className="text-xs text-center text-gray-400 mb-1">Consuming in 15s…</div>
-                            <div className="h-1.5 bg-gray-700 rounded-full overflow-hidden">
-                              <div
-                                className="h-full bg-emerald-500 rounded-full"
-                                style={{ animation: 'consumeDrain 15s linear forwards' }}
-                              />
-                            </div>
-                          </div>
+                            )
+                          })()
                         ) : (
                           <p className="text-sm text-gray-300 mb-3">{item.description}</p>
                         )}
