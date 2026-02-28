@@ -82,6 +82,7 @@ export function CharacterSheetPage() {
   const [activeTab, setActiveTab] = useState<'main' | 'actions' | 'spells' | 'inventory' | 'features' | 'story' | 'loot'>('main')
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
   const [showIncomeRoller, setShowIncomeRoller] = useState(false)
+  const [showDMReroll, setShowDMReroll] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [showHPEditor, setShowHPEditor] = useState(false)
   const [showSpellSelector, setShowSpellSelector] = useState(false)
@@ -1716,11 +1717,22 @@ export function CharacterSheetPage() {
               ))}
             </div>
             {character.dailyIncome && (
-              <div className="mt-3 p-3 bg-blue-900/20 border border-blue-600/50 rounded-lg">
-                <div className="text-sm text-blue-400 font-medium">{character.dailyIncome.professionName}</div>
-                <div className="text-xs text-gray-400">
-                  Daily Income: {character.dailyIncome.amount} {character.dailyIncome.currency === 'gold' ? 'GP' : character.dailyIncome.currency === 'silver' ? 'SP' : 'CP'}/day
+              <div className="mt-3 p-3 bg-blue-900/20 border border-blue-600/50 rounded-lg flex items-center justify-between gap-2">
+                <div>
+                  <div className="text-sm text-blue-400 font-medium">{character.dailyIncome.professionName}</div>
+                  <div className="text-xs text-gray-400">
+                    Daily Income: {character.dailyIncome.amount} {character.dailyIncome.currency === 'gold' ? 'GP' : character.dailyIncome.currency === 'silver' ? 'SP' : 'CP'}/day
+                  </div>
                 </div>
+                {dmModeEnabled && (
+                  <button
+                    onClick={() => setShowDMReroll(true)}
+                    className="px-2 py-1 text-xs bg-purple-700 text-white rounded hover:bg-purple-600 transition-colors shrink-0"
+                    title="DM: Reroll this character's profession"
+                  >
+                    🎲 Reroll
+                  </button>
+                )}
               </div>
             )}
           </div>
@@ -2319,6 +2331,18 @@ export function CharacterSheetPage() {
                 saveCharacter()
               }}
               onClose={() => setShowIncomeRoller(false)}
+            />
+          )}
+
+          {/* DM Profession Reroller */}
+          {showDMReroll && (
+            <DMRerollModal
+              currentProfession={character.dailyIncome?.professionName}
+              onSetProfession={(professionName, amount, currency) => {
+                setDailyIncome(professionName, amount, currency)
+                saveCharacter()
+              }}
+              onClose={() => setShowDMReroll(false)}
             />
           )}
         </div>
@@ -4120,6 +4144,145 @@ function CurrencyModal({
 }
 
 // Daily Income Roller
+function DMRerollModal({
+  currentProfession,
+  onSetProfession,
+  onClose,
+}: {
+  currentProfession?: string
+  onSetProfession: (professionName: string, amount: number, currency: 'copper' | 'silver' | 'gold') => void
+  onClose: () => void
+}) {
+  const [selectedProfession, setSelectedProfession] = useState<Profession | null>(null)
+  const [rollResult, setRollResult] = useState<number | null>(null)
+  const [isRolling, setIsRolling] = useState(false)
+  const [confirmed, setConfirmed] = useState(false)
+
+  const handleRoll = () => {
+    if (isRolling) return
+    setIsRolling(true)
+    setSelectedProfession(null)
+    setConfirmed(false)
+
+    let count = 0
+    const interval = setInterval(() => {
+      setRollResult(Math.floor(Math.random() * 100) + 1)
+      count++
+      if (count >= 15) {
+        clearInterval(interval)
+        const finalRoll = Math.floor(Math.random() * 100) + 1
+        setRollResult(finalRoll)
+        setSelectedProfession(getProfessionByRoll(finalRoll))
+        setIsRolling(false)
+      }
+    }, 50)
+  }
+
+  const handleConfirm = () => {
+    if (!selectedProfession) return
+    onSetProfession(
+      selectedProfession.name,
+      selectedProfession.dailyIncome.amount,
+      selectedProfession.dailyIncome.currency,
+    )
+    setConfirmed(true)
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div className="bg-gray-800 rounded-xl p-6 w-full max-w-lg border border-purple-700 max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="flex items-center gap-2 mb-1">
+          <span className="text-purple-400 text-lg">🎲</span>
+          <h3 className="text-xl font-bold text-purple-300">DM: Reroll Profession</h3>
+        </div>
+        {currentProfession && (
+          <p className="text-sm text-gray-400 mb-4">
+            Current: <span className="text-blue-400">{currentProfession}</span>
+          </p>
+        )}
+
+        {/* Roll section */}
+        <div className="bg-gray-900 rounded-lg p-4 mb-4">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-white font-medium">Roll d100</span>
+            <button
+              onClick={handleRoll}
+              disabled={isRolling}
+              className="px-4 py-2 bg-purple-700 text-white rounded-lg font-medium hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isRolling ? 'Rolling...' : rollResult !== null ? 'Reroll' : 'Roll d100'}
+            </button>
+          </div>
+          {rollResult !== null && (
+            <div className="text-center">
+              <div className="text-4xl font-bold text-purple-300 mb-2">{rollResult}</div>
+              {selectedProfession && !isRolling && (
+                <div className="text-white">
+                  <span className={CATEGORY_INFO[selectedProfession.category].color}>
+                    {selectedProfession.name}
+                  </span>
+                  <span className="text-gray-400 ml-2">
+                    ({formatIncome(selectedProfession.dailyIncome)}/day)
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Profession details */}
+        {selectedProfession && !isRolling && (
+          <div className="bg-gray-900 rounded-lg p-4 mb-4">
+            <div className="flex items-center justify-between mb-2">
+              <h4 className={`text-lg font-bold ${CATEGORY_INFO[selectedProfession.category].color}`}>
+                {selectedProfession.name}
+              </h4>
+              <span className="text-dnd-gold font-bold">
+                {formatIncome(selectedProfession.dailyIncome)}/day
+              </span>
+            </div>
+            <p className="text-gray-400 text-sm mb-2">{selectedProfession.description}</p>
+            <div className="text-sm">
+              <span className="text-gray-500">Lifestyle: </span>
+              <span className={CATEGORY_INFO[selectedProfession.category].color}>
+                {CATEGORY_INFO[selectedProfession.category].name}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Confirmed state */}
+        {confirmed && (
+          <div className="bg-purple-900/30 border border-purple-600 rounded-lg p-3 mb-4 text-center">
+            <p className="text-purple-300 font-medium text-sm">
+              Profession updated to {selectedProfession?.name}!
+            </p>
+          </div>
+        )}
+
+        {/* Actions */}
+        <div className="flex gap-3">
+          <button
+            onClick={onClose}
+            className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+          >
+            {confirmed ? 'Done' : 'Cancel'}
+          </button>
+          {selectedProfession && !isRolling && !confirmed && (
+            <button
+              onClick={handleConfirm}
+              className="flex-1 px-4 py-2 bg-purple-700 text-white rounded-lg font-medium hover:bg-purple-600 transition-colors"
+            >
+              Set to {selectedProfession.name}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function DailyIncomeRoller({
   onEarn,
   onSetProfession,

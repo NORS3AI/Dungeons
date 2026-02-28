@@ -1,5 +1,24 @@
 # Dungeons - Patch Notes
 
+## Version 0.3.10-alpha - February 28, 2026
+
+**Alpha Release Notice**: DM Tools now includes a profession reroll button on the Currency section, giving DMs instant control over a character's daily income without touching character creation.
+
+### ✨ DM Profession Reroll
+
+When **DM Mode** is enabled, a purple **🎲 Reroll** button appears on the character's profession badge in the Currency section.
+
+#### **How It Works**
+- Click **🎲 Reroll** (only visible in DM Mode) on the current profession badge
+- A modal opens showing the character's current profession
+- Roll d100 — new profession and income tier are resolved immediately with the same animated roll used in initial setup
+- DMs can **reroll as many times as they like** before confirming (no single-roll restriction)
+- Click **Set to [Profession]** to apply the change; the character's daily income updates instantly
+
+**Why This Matters**: DMs can now reassign a character's profession mid-session — useful for story events like a merchant losing their business, a soldier being discharged, or any narrative shift that changes how a character earns their keep each day.
+
+---
+
 ## Version 0.3.9-alpha - February 28, 2026
 
 **Alpha Release Notice**: This version completes the spell system for all 16 classes, adding full spell support for the Amazon and Demon Hunter custom classes.
