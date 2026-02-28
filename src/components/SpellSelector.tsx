@@ -481,13 +481,21 @@ export function SpellSelector({
   const cantripsKnown = characterClass?.cantripsKnown?.[level - 1] || 0
   const spellsKnown = characterClass?.spellsKnown?.[level - 1] || 0
 
+  // Account for spells the character already knows when determining remaining open slots.
+  // This ensures limits are enforced both in character creation (existingSpells=[]) and
+  // when adding spells from the character sheet (existingSpells=current known spells).
+  const existingCantripCount = existingSpells.filter((s) => s.level === 0).length
+  const existingSpellCount = existingSpells.filter((s) => s.level > 0).length
+  const remainingCantripSlots = Math.max(0, cantripsKnown - existingCantripCount)
+  const remainingSpellSlots = Math.max(0, spellsKnown - existingSpellCount)
+
   // Handle cantrip toggle
   const handleCantripToggle = (spell: Spell) => {
-    setSelectedCantrips((prev) => {
-      if (prev.find((s) => s.id === spell.id)) {
-        return prev.filter((s) => s.id !== spell.id)
+    setSelectedCantrips((prev: Spell[]) => {
+      if (prev.find((s: Spell) => s.id === spell.id)) {
+        return prev.filter((s: Spell) => s.id !== spell.id)
       }
-      if (!isCharacterCreation || prev.length < cantripsKnown) {
+      if (prev.length < remainingCantripSlots) {
         return [...prev, spell]
       }
       return prev
@@ -496,11 +504,11 @@ export function SpellSelector({
 
   // Handle spell toggle
   const handleSpellToggle = (spell: Spell) => {
-    setSelectedSpells((prev) => {
-      if (prev.find((s) => s.id === spell.id)) {
-        return prev.filter((s) => s.id !== spell.id)
+    setSelectedSpells((prev: Spell[]) => {
+      if (prev.find((s: Spell) => s.id === spell.id)) {
+        return prev.filter((s: Spell) => s.id !== spell.id)
       }
-      if (!isCharacterCreation || prev.length < spellsKnown) {
+      if (prev.length < remainingSpellSlots) {
         return [...prev, spell]
       }
       return prev
@@ -610,8 +618,7 @@ export function SpellSelector({
                 isSelected={selectedCantrips.some((s) => s.id === spell.id)}
                 onToggle={handleCantripToggle}
                 disabled={
-                  isCharacterCreation &&
-                  selectedCantrips.length >= cantripsKnown &&
+                  selectedCantrips.length >= remainingCantripSlots &&
                   !selectedCantrips.some((s) => s.id === spell.id)
                 }
               />
@@ -675,8 +682,7 @@ export function SpellSelector({
                     isSelected={selectedSpells.some((s) => s.id === spell.id)}
                     onToggle={handleSpellToggle}
                     disabled={
-                      isCharacterCreation &&
-                      selectedSpells.length >= spellsKnown &&
+                      selectedSpells.length >= remainingSpellSlots &&
                       !selectedSpells.some((s) => s.id === spell.id)
                     }
                   />

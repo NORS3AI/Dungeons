@@ -117,6 +117,14 @@ export function migrateCharacter(character: Partial<Character>): Character {
     // Daily Income
     dailyIncome: character.dailyIncome || undefined,
 
+    // Crafting skills (Work tab)
+    craftingSkills: character.craftingSkills || {
+      blacksmithing: 1,
+      tailoring: 1,
+      alchemy: 1,
+      enchanting: 1,
+    },
+
     // Fighter-specific
     fightingStance: character.fightingStance || undefined,
 
@@ -146,6 +154,7 @@ export function needsMigration(character: any): boolean {
     character.carryingCapacity === undefined,
     character.foodRations === undefined,
     character.waterSupply === undefined,
+    character.craftingSkills === undefined,
     !character.skills || typeof character.skills !== 'object',
     !character.savingThrows || typeof character.savingThrows !== 'object',
     !character.featureCharges || !Array.isArray(character.featureCharges),

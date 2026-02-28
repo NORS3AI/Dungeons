@@ -1,5 +1,121 @@
 # Dungeons - Patch Notes
 
+## Version 0.4.0-alpha - February 28, 2026
+
+**Alpha Release Notice**: The Work Tab brings a full crafting system to Dungeons — forge weapons, tailor armor, brew potions, and enchant scrolls using materials gathered from the world.
+
+### ✨ Work Tab — Crafting System
+
+A brand new **Work** tab has been added to the Character Sheet, introducing four crafting professions, each with its own skill progression from 1–100.
+
+#### **Four Crafting Professions**
+- **Blacksmithing** ⚒️ — Forge 50 weapons (Maces, Swords, Axes, Bows, and more) using ores. Skill ranges: Common (1–25), Uncommon (26–50), Rare (51–75), Epic (76–90), Legendary (91–100).
+- **Tailoring** 🧵 — Craft 50 armor pieces (Helmets, Chests, Boots, Hoods, and more) using cloth and hides.
+- **Alchemy** ⚗️ — Brew 20 potions (healing, AC, initiative, invisibility) from herbs.
+- **Enchanting** ✨ — Weave 50 magical scrolls (stat boosts, Windfury, Berserking, Colossus, and more) from Magical Dust and Shards.
+
+#### **Skill Progression**
+Each profession has a skill bar (1–100) that advances +1 per successful craft. Recipes unlock at milestone skill levels — higher tiers require higher skill to access.
+
+#### **Crafting Recipes — 170 Total**
+- 50 weapons across 5 tiers (10 per tier): Mace, Crossbow, Bow, Dagger, Sword, Flail, Pike, Staff, Wand, Axe, Great Axe, Great Sword
+- 50 armor pieces across 5 tiers (10 per tier): Helmet, Shoulder, Chest, Gauntlet, Pants, Boots, Hood, Mantle, Tunic, Sandals
+- 20 potions across 5 tiers (4 per tier): Healing, AC, Initiative, Invisibility
+- 50 scrolls across 5 tiers (10 per tier): DEX/CHA/STR/CON/WIS/INT/AC/Haste/Perception/Stealth, plus Legendary named scrolls (Mongoose, Berserking, Executioner, Power Torrent, Landslide, Windfury, Eternal Stats, Primal Haste, Infinite AC, Colossus)
+
+**Why This Matters**: Characters can now use gathered materials to craft powerful equipment, creating a meaningful progression loop between exploration and preparation.
+
+---
+
+### ✨ Disenchant System
+
+A **Disenchant** button (⚡ lightning bolt) now appears on all Uncommon, Rare, Epic, and Legendary items in the inventory.
+
+- Disenchanting an **Uncommon** or **Rare** item yields **Magical Dust**
+- Disenchanting an **Epic** or **Legendary** item yields **Magical Shards**
+- Dust and Shards are the primary materials for the **Enchanting** profession
+
+**Why This Matters**: Unwanted loot now has a use — break it down and turn it into powerful scrolls.
+
+---
+
+### ✨ New Loot Materials
+
+The loot tables have been expanded with cloth, additional hides, and legendary herbs:
+
+- **Common**: Linen Cloth, Wool Cloth, Light Animal Hide
+- **Uncommon**: Silk Cloth, Cotton Cloth, Thick Leather Hide
+- **Rare**: Enchanted Cloth, Scaled Beast Hide
+- **Epic**: Shadowweave Cloth, Wyvern Hide
+- **Legendary**: Void Silk, Starbloom Petal, Soulroot
+
+All ore "Clump" names have been renamed to "Nugget" for clarity (e.g., Iron Ore Nugget, Mithril Ore Nugget).
+
+---
+
+### ✨ Equipment Selector Overhaul
+
+Starting equipment selection has been simplified — all weapons and armor are now available to **every class**, removing proficiency restrictions during character creation.
+
+#### **Simplified Weapons (12 types)**
+Mace, Hand-Crossbow, Bow, Dagger, Sword, Flail, Pike, Staff, Wand, Axe, Great Axe, Great Sword
+
+#### **Gear Sets (4 options)**
+Rather than picking individual armor pieces, characters now choose a full gear set covering Helmet, Shoulder, Chest, Gauntlet, Pants, and Boots:
+- **Cloth Gear Set** — 8 AC (light armor, full DEX bonus)
+- **Hide Gear Set** — 12 AC (medium armor, DEX max +2)
+- **Chainmail Gear Set** — 15 AC (heavy armor, no DEX bonus, Stealth Disadvantage)
+- **Platemail Gear Set** — 20 AC (heavy armor, no DEX bonus, STR 15 required)
+
+Shields remain unchanged at +2 AC and are available to all classes.
+
+---
+
+## Version 0.3.14-alpha - February 28, 2026
+
+**Alpha Release Notice**: Language selection now enforces a two-language maximum with automatic racial/class grants, and spell selection limits are now always enforced for every class in both character creation and the character sheet.
+
+### ✨ Language Selection — Limits & Automatic Grants
+
+All characters are limited to **2 languages** (Common + 1 free choice), unless their race or class grants extra languages on top.
+
+#### **How it works**
+- **Common** is always included and locked — every character speaks it.
+- **Racial/class grants** are automatically added to your selection and are also locked (shown with a 🔒 and an **orange "Granted"** badge). They do not use up your free choice slot.
+- **1 free choice** is available to every character. This can be any standard or exotic language.
+- The total maximum is `2 + number of granted languages` (e.g., an Elf gets Common + Elvish [granted] + 1 choice = 3).
+
+#### **Granted languages by race/class**
+| Race | Granted |
+|------|---------|
+| Dwarf | Dwarvish |
+| Elf / Drow | Elvish |
+| Halfling | Halfling |
+| Gnome | Gnomish |
+| Dragonborn | Draconic |
+| Tiefling | Infernal |
+| Half-Orc | Orc |
+| Aasimar | Celestial |
+| Druid (class) | Druidic |
+| Rogue (class) | Thieves' Cant |
+
+**Why This Matters**: Previously the selector allowed up to 5 languages with no enforcement. Now the limit is clearly communicated, racial languages are automatic, and the free-choice slot is exactly 1.
+
+---
+
+### ✨ Spell Selection — Limits Always Enforced
+
+Spell and cantrip limits are now enforced **everywhere** — both during character creation and when adding spells from the character sheet. Previously `isCharacterCreation=false` (DM mode) bypassed all limits, allowing any class to select every available spell.
+
+#### **What changed**
+- The "grey out when at limit" and "block toggle past limit" logic no longer depends on `isCharacterCreation` — it always applies.
+- When using the character sheet's spell selector, **already-known spells count against the class limit**. If a Paladin knows 3 spells (their level-4 cap), all remaining spells are greyed out in the selector.
+- Remaining slots = `class limit − already-known spells of that type`.
+
+**Why This Matters**: A Paladin at level 4 could previously select all 15 available spells. Now the 3/3 counter correctly greys out and blocks further selection, matching every other class's behaviour.
+
+---
+
 ## Version 0.3.13-alpha - February 28, 2026
 
 **Alpha Release Notice**: Bag of Holding now actively reduces carry weight, new higher-tier Bags of Holding added to loot, and equipped magic weapon items (+1/+2/+3…) now add their bonus to all dice rolls in the Dice Roller.

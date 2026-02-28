@@ -38,6 +38,7 @@ import { ClassFeatureCard } from '../components/ClassFeatureCard'
 import { FIGHTING_STANCES } from '../data/fightingStances'
 import type { LootItem } from '../data/lootGenerator'
 import type { Spell } from '../types'
+import { WorkTab } from '../components/WorkTab'
 
 const ABILITY_NAMES: Record<Ability, string> = {
   strength: 'STR',
@@ -76,10 +77,10 @@ const SKILLS: { name: string; ability: Ability; key: SkillKey; refId: string }[]
 export function CharacterSheetPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { characters, loadCharacter, currentCharacter, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, changeEquipmentQuantity, renameEquipment, setFightingStance, addEquipment, addMaterial, removeMaterial, changeMaterialQuantity, updateHitPoints, addSpell, removeSpell, saveCharacter, addFoodRations, addWaterSupply, addItemFeature, setAlignment, setAbilityScores, migrateCurrentCharacter, needsMigration, setLevelWithHP, shortRest, longRest, initializeResourcePools, initializeFeatureCharges, useFeatureCharge, spendResource } = useCharacterStore()
+  const { characters, loadCharacter, currentCharacter, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, changeEquipmentQuantity, renameEquipment, setFightingStance, addEquipment, addMaterial, removeMaterial, changeMaterialQuantity, updateHitPoints, addSpell, removeSpell, saveCharacter, addFoodRations, addWaterSupply, addItemFeature, setAlignment, setAbilityScores, migrateCurrentCharacter, needsMigration, setLevelWithHP, shortRest, longRest, initializeResourcePools, initializeFeatureCharges, useFeatureCharge, spendResource, disenchantItem } = useCharacterStore()
   const { dmModeEnabled } = useSettingsStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
-  const [activeTab, setActiveTab] = useState<'main' | 'actions' | 'spells' | 'inventory' | 'features' | 'story' | 'loot'>('main')
+  const [activeTab, setActiveTab] = useState<'main' | 'actions' | 'spells' | 'inventory' | 'features' | 'story' | 'work' | 'loot'>('main')
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
   const [showIncomeRoller, setShowIncomeRoller] = useState(false)
   const [showDMReroll, setShowDMReroll] = useState(false)
@@ -1047,6 +1048,7 @@ export function CharacterSheetPage() {
     { id: 'inventory', label: 'Inventory' },
     { id: 'features', label: 'Features' },
     { id: 'story', label: 'Story' },
+    { id: 'work', label: 'Work' },
     { id: 'loot', label: 'Loot Cache' },
   ] as const
 
@@ -1996,6 +1998,7 @@ export function CharacterSheetPage() {
                         renameEquipment(item.id, newName)
                         saveCharacter()
                       }}
+                      onDisenchant={() => { disenchantItem(item.id); saveCharacter() }}
                     />
                   ))}
               </div>
@@ -2031,6 +2034,7 @@ export function CharacterSheetPage() {
                         renameEquipment(item.id, newName)
                         saveCharacter()
                       }}
+                      onDisenchant={() => { disenchantItem(item.id); saveCharacter() }}
                     />
                   ))}
               </div>
@@ -2066,6 +2070,7 @@ export function CharacterSheetPage() {
                         renameEquipment(item.id, newName)
                         saveCharacter()
                       }}
+                      onDisenchant={() => { disenchantItem(item.id); saveCharacter() }}
                     />
                   ))}
               </div>
@@ -2101,6 +2106,7 @@ export function CharacterSheetPage() {
                         renameEquipment(item.id, newName)
                         saveCharacter()
                       }}
+                      onDisenchant={() => { disenchantItem(item.id); saveCharacter() }}
                     />
                   ))}
               </div>
@@ -2142,6 +2148,7 @@ export function CharacterSheetPage() {
                         renameEquipment(item.id, newName)
                         saveCharacter()
                       }}
+                      onDisenchant={() => { disenchantItem(item.id); saveCharacter() }}
                     />
                   ))}
               </div>
@@ -2183,6 +2190,7 @@ export function CharacterSheetPage() {
                         renameEquipment(item.id, newName)
                         saveCharacter()
                       }}
+                      onDisenchant={() => { disenchantItem(item.id); saveCharacter() }}
                     />
                   ))}
               </div>
@@ -2220,6 +2228,7 @@ export function CharacterSheetPage() {
                         saveCharacter()
                       }}
                       onUse={() => handleUseConsumable(item)}
+                      onDisenchant={() => { disenchantItem(item.id); saveCharacter() }}
                     />
                   ))}
               </div>
@@ -2252,6 +2261,7 @@ export function CharacterSheetPage() {
                       }}
                       onUse={() => handleUseConsumable(item)}
                       onSell={() => handleSellItem(item.id)}
+                      onDisenchant={() => { disenchantItem(item.id); saveCharacter() }}
                     />
                   ))}
               </div>
@@ -2331,6 +2341,7 @@ export function CharacterSheetPage() {
                         saveCharacter()
                       }}
                       onUse={() => handleUseConsumable(item)}
+                      onDisenchant={() => { disenchantItem(item.id); saveCharacter() }}
                     />
                   ))}
               </div>
@@ -3484,6 +3495,10 @@ export function CharacterSheetPage() {
         </div>
       )}
 
+      {activeTab === 'work' && (
+        <WorkTab character={character} />
+      )}
+
       {activeTab === 'loot' && (
         <LootCache
           character={character}
@@ -3794,8 +3809,26 @@ function EquipToggle({ equipped, onToggle, canEquip = true }: { equipped: boolea
 }
 
 
+// Disenchant button component — breaks item into Magical Dust (uncommon/rare) or Shards (epic/legendary)
+function DisenchantIcon({ onClick, rarity }: { onClick: () => void; rarity?: string }) {
+  const canDisenchant = rarity && ['uncommon', 'rare', 'epic', 'legendary'].includes(rarity)
+  if (!canDisenchant) return null
+  const isShards = rarity === 'epic' || rarity === 'legendary'
+  return (
+    <button
+      onClick={onClick}
+      className="p-1.5 text-gray-500 hover:text-purple-400 hover:bg-purple-900/30 rounded transition-colors"
+      title={`Disenchant → ${isShards ? 'Magical Shards' : 'Magical Dust'}`}
+    >
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+      </svg>
+    </button>
+  )
+}
+
 // Equipment item component
-function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuantity, onUse, onSell, onRename }: { item: Equipment; character: Character; onRemove: () => void; onToggleEquip: () => void; onChangeQuantity: (change: number) => void; onUse: () => void; onSell?: () => void; onRename?: (newName: string) => void }) {
+function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuantity, onUse, onSell, onRename, onDisenchant }: { item: Equipment; character: Character; onRemove: () => void; onToggleEquip: () => void; onChangeQuantity: (change: number) => void; onUse: () => void; onSell?: () => void; onRename?: (newName: string) => void; onDisenchant?: () => void }) {
   const getAbilityMod = (ability: Ability): number => {
     return calculateModifier(character.abilityScores[ability])
   }
@@ -3873,6 +3906,7 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
               +
             </button>
           </div>
+          <DisenchantIcon onClick={() => onDisenchant?.()} rarity={item.rarity} />
           <TrashIcon onClick={onRemove} />
         </div>
       </div>
@@ -3932,6 +3966,7 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
               +
             </button>
           </div>
+          <DisenchantIcon onClick={() => onDisenchant?.()} rarity={item.rarity} />
           <TrashIcon onClick={onRemove} />
         </div>
       </div>
@@ -3975,6 +4010,7 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
               +
             </button>
           </div>
+          <DisenchantIcon onClick={() => onDisenchant?.()} rarity={item.rarity} />
           <TrashIcon onClick={onRemove} />
         </div>
       </div>
@@ -4023,6 +4059,7 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
               +
             </button>
           </div>
+          <DisenchantIcon onClick={() => onDisenchant?.()} rarity={item.rarity} />
           <TrashIcon onClick={onRemove} />
         </div>
       </div>
@@ -4097,6 +4134,7 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
             </svg>
           </button>
         )}
+        <DisenchantIcon onClick={() => onDisenchant?.()} rarity={item.rarity} />
         <TrashIcon onClick={onRemove} />
       </div>
     </div>
