@@ -16,6 +16,7 @@ import type {
   FightingStance,
   ClassFeature,
   FeatureCharge,
+  CraftingSkills,
 } from '../types'
 import { DEFAULT_ABILITY_SCORES, EMPTY_CURRENCY, autoConvertCurrency } from '../types'
 import { migrateCharacter, needsMigration } from '../utils/characterMigration'
@@ -114,6 +115,12 @@ function createEmptyCharacter(): Character {
     },
     foodRations: 10, // Start with 10 days of food
     waterSupply: 10, // Start with 10 days of water
+    craftingSkills: {
+      blacksmithing: 1,
+      tailoring: 1,
+      alchemy: 1,
+      enchanting: 1,
+    },
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   }
@@ -203,6 +210,8 @@ interface CharacterState {
   addMaterial: (material: Material) => void // Auto-consolidates if material already exists
   removeMaterial: (materialId: string) => void
   changeMaterialQuantity: (materialId: string, change: number) => void
+  incrementCraftingSkill: (skill: keyof CraftingSkills, amount?: number) => void
+  disenchantItem: (itemId: string) => void // Break down item into Magical Dust or Shards
   setDailyIncome: (professionName: string, amount: number, currency: 'copper' | 'silver' | 'gold') => void
   setFightingStance: (stance: FightingStance) => void
 
@@ -839,6 +848,73 @@ export const useCharacterStore = create<CharacterState>()(
               ...currentCharacter,
               materials,
             },
+            history: addToHistory(history, currentCharacter),
+          })
+        },
+
+        incrementCraftingSkill: (skill: keyof CraftingSkills, amount = 1) => {
+          const { currentCharacter, history } = get()
+          if (!currentCharacter) return
+
+          const current = currentCharacter.craftingSkills?.[skill] ?? 1
+          const next = Math.min(100, current + amount)
+
+          set({
+            currentCharacter: {
+              ...currentCharacter,
+              craftingSkills: {
+                ...currentCharacter.craftingSkills,
+                [skill]: next,
+              },
+            },
+            history: addToHistory(history, currentCharacter),
+          })
+        },
+
+        disenchantItem: (itemId: string) => {
+          const { currentCharacter, history } = get()
+          if (!currentCharacter) return
+
+          const item = currentCharacter.equipment.find((e) => e.id === itemId)
+          if (!item) return
+
+          const rarity = item.rarity
+          if (!rarity || rarity === 'trash' || rarity === 'common') return
+
+          // Determine what material to award
+          const isDust = rarity === 'uncommon' || rarity === 'rare'
+          const materialId = isDust ? 'magical-dust' : 'magical-shard'
+          const materialName = isDust ? 'Magical Dust' : 'Magical Shards'
+          const materialDescription = isDust
+            ? 'Fine enchanting dust harvested from disenchanted magic items'
+            : 'Potent crystalline shards from powerful enchanted items'
+          const materialRarity: Material['rarity'] = isDust ? 'uncommon' : 'epic'
+          const materialCategory: Material['category'] = isDust ? 'dust' : 'shard'
+
+          // Remove the disenchanted item
+          const equipment = currentCharacter.equipment.filter((e) => e.id !== itemId)
+
+          // Add material (auto-consolidate if exists)
+          const existingMat = currentCharacter.materials.find((m) => m.id === materialId)
+          const materials: Material[] = existingMat
+            ? currentCharacter.materials.map((m) =>
+                m.id === materialId ? { ...m, quantity: m.quantity + 1 } : m
+              )
+            : [
+                ...currentCharacter.materials,
+                {
+                  id: materialId,
+                  name: materialName,
+                  description: materialDescription,
+                  category: materialCategory,
+                  quantity: 1,
+                  rarity: materialRarity,
+                  weight: 0.1,
+                },
+              ]
+
+          set({
+            currentCharacter: { ...currentCharacter, equipment, materials },
             history: addToHistory(history, currentCharacter),
           })
         },

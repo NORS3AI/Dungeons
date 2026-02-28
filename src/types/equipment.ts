@@ -239,7 +239,7 @@ export interface Material {
   id: string // Unique identifier for the material type
   name: string
   description: string
-  category: 'herb' | 'ore' | 'leather' | 'hide' | 'gem' | 'other'
+  category: 'herb' | 'ore' | 'leather' | 'hide' | 'cloth' | 'gem' | 'dust' | 'shard' | 'other'
   quantity: number
   rarity: 'trash' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'artifact'
   weight: number // Weight per unit

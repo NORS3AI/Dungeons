@@ -13,6 +13,7 @@ export type {
   Condition,
   FightingStance,
   FightingStanceInfo,
+  CraftingSkills,
   Character,
 } from './character'
 
