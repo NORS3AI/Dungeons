@@ -1,4 +1,18 @@
 import { useState, useMemo } from 'react'
+
+// ⚠️  DO NOT change this to fetch() or any runtime network request.
+//
+// WHY: The deployed site (GitHub Pages) serves files from the `main` branch.
+//   fetch(`${BASE_URL}PATCH_NOTES.md`) silently returns the OLD file from main,
+//   hiding every version added since the last merge — the exact bug that caused
+//   v0.4.1–0.4.8 to vanish from the in-app patch notes.
+//
+// HOW IT WORKS: Vite bundles the markdown content into the JS at build time via
+//   the `?raw` suffix. The built app always contains the correct notes regardless
+//   of what file the server happens to be serving.
+//
+// RULE: `npm run build` will fail if this import is missing or fetch() is used.
+//   See CLAUDE.md § "Critical Technical Constraints" for the full explanation.
 import patchNotesRaw from '../../PATCH_NOTES.md?raw'
 
 interface PatchNotesModalProps {
