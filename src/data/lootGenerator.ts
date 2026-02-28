@@ -38,6 +38,8 @@ export interface LootItem {
   weaponDamageBonus?: number
   /** Bonus added to weapon attack rolls when this item is equipped and a weapon is also equipped */
   attackBonus?: number
+  /** Market value of a single unit (for crafting materials) */
+  worth?: { gold: number; silver: number }
 }
 
 /**
