@@ -12,7 +12,6 @@ interface CharacterDetails {
   weight: string
   backstory: string
   playerName: string
-  startingLevel: number
 }
 
 interface CharacterDetailsFormProps {
@@ -42,7 +41,6 @@ export function CharacterDetailsForm({
     weight: initialValues.weight ?? '',
     backstory: initialValues.backstory ?? '',
     playerName: initialValues.playerName ?? '',
-    startingLevel: initialValues.startingLevel ?? 1,
   })
 
   const [errors, setErrors] = useState<Partial<Record<keyof CharacterDetails, string>>>({})
@@ -92,9 +90,6 @@ export function CharacterDetailsForm({
         break
       case 'playerName':
         if (typeof value === 'string' && value.length > 50) return 'Player name must be 50 characters or less'
-        break
-      case 'startingLevel':
-        if (typeof value === 'number' && (value < 1 || value > 20)) return 'Starting level must be between 1 and 20'
         break
     }
     return undefined
@@ -160,7 +155,7 @@ export function CharacterDetailsForm({
     const newErrors: Partial<Record<keyof CharacterDetails, string>> = {}
     let hasErrors = false
 
-    ;(['firstName', 'surname', 'nickname', 'age', 'height', 'weight', 'backstory', 'playerName', 'startingLevel'] as (keyof CharacterDetails)[]).forEach((field) => {
+    ;(['firstName', 'surname', 'nickname', 'age', 'height', 'weight', 'backstory', 'playerName'] as (keyof CharacterDetails)[]).forEach((field) => {
       const error = validateField(field, details[field])
       if (error) {
         newErrors[field] = error
@@ -169,7 +164,7 @@ export function CharacterDetailsForm({
     })
 
     setErrors(newErrors)
-    setTouched({ firstName: true, surname: true, nickname: true, age: true, height: true, weight: true, backstory: true, playerName: true, startingLevel: true })
+    setTouched({ firstName: true, surname: true, nickname: true, age: true, height: true, weight: true, backstory: true, playerName: true })
 
     if (!hasErrors) {
       onSubmit(details)
@@ -313,31 +308,6 @@ export function CharacterDetailsForm({
           )}
         </div>
 
-        {/* Starting Level */}
-        <div>
-          <label htmlFor="startingLevel" className={labelClass}>
-            Starting Level <span className="text-red-400">*</span>
-          </label>
-          <select
-            ref={(el) => { inputRefs.current[3] = el as HTMLSelectElement }}
-            id="startingLevel"
-            value={details.startingLevel}
-            onChange={(e) => handleChange('startingLevel', parseInt(e.target.value))}
-            onBlur={() => handleBlur('startingLevel')}
-            className={inputClass('startingLevel')}
-            aria-required="true"
-          >
-            {Array.from({ length: 20 }, (_, i) => i + 1).map((level) => (
-              <option key={level} value={level}>
-                Level {level}
-              </option>
-            ))}
-          </select>
-          {errors.startingLevel && touched.startingLevel && (
-            <p className={errorClass} role="alert">{errors.startingLevel}</p>
-          )}
-        </div>
-
         {/* Gender */}
         <div>
           <label className={labelClass}>Gender</label>
@@ -366,13 +336,13 @@ export function CharacterDetailsForm({
           <div>
             <label htmlFor="age" className={labelClass}>Age</label>
             <input
-              ref={(el) => { inputRefs.current[4] = el }}
+              ref={(el) => { inputRefs.current[3] = el }}
               id="age"
               type="text"
               value={details.age}
               onChange={(e) => handleChange('age', e.target.value)}
               onBlur={() => handleBlur('age')}
-              onKeyDown={(e) => handleKeyDown(e, 4)}
+              onKeyDown={(e) => handleKeyDown(e, 3)}
               placeholder="e.g., 25"
               className={inputClass('age')}
             />
@@ -383,13 +353,13 @@ export function CharacterDetailsForm({
           <div>
             <label htmlFor="height" className={labelClass}>Height</label>
             <input
-              ref={(el) => { inputRefs.current[5] = el }}
+              ref={(el) => { inputRefs.current[4] = el }}
               id="height"
               type="text"
               value={details.height}
               onChange={(e) => handleChange('height', e.target.value)}
               onBlur={() => handleBlur('height')}
-              onKeyDown={(e) => handleKeyDown(e, 5)}
+              onKeyDown={(e) => handleKeyDown(e, 4)}
               placeholder="e.g., 5'10&quot;"
               className={inputClass('height')}
             />
@@ -400,13 +370,13 @@ export function CharacterDetailsForm({
           <div>
             <label htmlFor="weight" className={labelClass}>Weight</label>
             <input
-              ref={(el) => { inputRefs.current[6] = el }}
+              ref={(el) => { inputRefs.current[5] = el }}
               id="weight"
               type="text"
               value={details.weight}
               onChange={(e) => handleChange('weight', e.target.value)}
               onBlur={() => handleBlur('weight')}
-              onKeyDown={(e) => handleKeyDown(e, 6)}
+              onKeyDown={(e) => handleKeyDown(e, 5)}
               placeholder="e.g., 150 lbs"
               className={inputClass('weight')}
             />
@@ -420,13 +390,13 @@ export function CharacterDetailsForm({
         <div>
           <label htmlFor="playerName" className={labelClass}>Player Name</label>
           <input
-            ref={(el) => { inputRefs.current[7] = el }}
+            ref={(el) => { inputRefs.current[6] = el }}
             id="playerName"
             type="text"
             value={details.playerName}
             onChange={(e) => handleChange('playerName', e.target.value)}
             onBlur={() => handleBlur('playerName')}
-            onKeyDown={(e) => handleKeyDown(e, 7)}
+            onKeyDown={(e) => handleKeyDown(e, 6)}
             placeholder="Your name (for DM tracking)"
             className={inputClass('playerName')}
           />
@@ -439,7 +409,7 @@ export function CharacterDetailsForm({
         <div>
           <label htmlFor="backstory" className={labelClass}>Background Story / Notes</label>
           <textarea
-            ref={(el) => { inputRefs.current[8] = el }}
+            ref={(el) => { inputRefs.current[7] = el }}
             id="backstory"
             value={details.backstory}
             onChange={(e) => handleChange('backstory', e.target.value)}

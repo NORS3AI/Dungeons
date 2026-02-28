@@ -25,7 +25,7 @@ export function LanguageSelector({
   onChange,
 }: LanguageSelectorProps) {
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>(
-    currentLanguages.length > 0 ? currentLanguages : ['common'],
+    currentLanguages.length > 0 ? currentLanguages.map((l) => l.toLowerCase()) : ['common'],
   )
 
   // Languages unconditionally granted by race/class (auto-selected, cannot be removed)

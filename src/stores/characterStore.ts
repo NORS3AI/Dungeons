@@ -83,7 +83,7 @@ function createEmptyCharacter(): Character {
       wisdom: false,
       charisma: false,
     },
-    languages: ['Common'],
+    languages: ['common'],
     hitPoints: { current: 0, maximum: 0, temporary: 0 },
     armorClass: 10,
     initiative: 0,
@@ -535,10 +535,11 @@ export const useCharacterStore = create<CharacterState>()(
           const { currentCharacter, history } = get()
           if (!currentCharacter) return
 
-          // Ensure Common is always included
-          const languagesWithCommon = languages.includes('Common')
-            ? languages
-            : ['Common', ...languages]
+          // Normalize to lowercase IDs; ensure 'common' is always included
+          const normalized = languages.map((l) => l.toLowerCase())
+          const languagesWithCommon = normalized.includes('common')
+            ? normalized
+            : ['common', ...normalized]
 
           set({
             currentCharacter: { ...currentCharacter, languages: languagesWithCommon },
