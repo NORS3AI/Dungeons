@@ -2,7 +2,15 @@
 
 ## Version 0.4.8-alpha - February 28, 2026
 
-**Alpha Release Notice**: Fix for Export All import crashing on load.
+**Alpha Release Notice**: Fix for Export All import crashing; patch notes now load at runtime so cache-clearing works.
+
+### 🐛 Patch Notes — Now Load at Runtime
+
+Patch notes were previously baked into the JavaScript bundle at build time (`?raw` import), meaning clearing your browser cache had no effect — the content was frozen inside the JS file itself. They now fetch `/PATCH_NOTES.md` from the server each time the modal opens for the first time, so:
+
+- **Clearing cache now works** — you will always see the latest notes after a cache clear
+- **No rebuild required** to see updated patch notes after a deployment
+- Works identically in incognito mode
 
 ### 🐛 Import — Export All Now Works
 
