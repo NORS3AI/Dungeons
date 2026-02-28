@@ -118,14 +118,15 @@ function SkillBar({ value, profession }: { value: number; profession: Profession
   )
 }
 
-function MaterialRow({ mat }: { mat: Material }) {
+function MaterialSlot({ mat }: { mat: Material }) {
   const textColor = RARITY_COLORS[mat.rarity]?.text ?? 'text-white'
+  const borderColor = RARITY_COLORS[mat.rarity]?.border ?? 'border-gray-700'
   return (
-    <div className="flex items-center justify-between px-3 py-1.5 rounded bg-gray-800/50 border border-gray-700">
-      <span className={`text-sm font-medium ${textColor}`}>
-        {mat.name}
+    <div className={`relative flex flex-col items-center justify-center p-3 rounded-lg border ${borderColor} bg-gray-800/60 min-h-[70px]`}>
+      <span className={`text-sm font-medium text-center leading-tight ${textColor}`}>{mat.name}</span>
+      <span className="absolute bottom-1 right-2 text-xs font-bold text-gray-300 bg-gray-900/70 px-1.5 py-0.5 rounded">
+        ×{mat.quantity}
       </span>
-      <span className="text-sm text-gray-400 ml-3">×{mat.quantity}</span>
     </div>
   )
 }
@@ -212,7 +213,7 @@ export function WorkTab({ character }: WorkTabProps) {
     useCharacterStore()
 
   const [activeProfession, setActiveProfession] = useState<Profession>('blacksmithing')
-  const [craftedNotif, setCraftedNotif] = useState<string | null>(null)
+  const [craftedNotif, setCraftedNotif] = useState<{ name: string; bonus: string; tier: CraftingTier } | null>(null)
   const notifTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [collapsedTiers, setCollapsedTiers] = useState<Set<CraftingTier>>(new Set())
   const [haveMatsOnly, setHaveMatsOnly] = useState(false)
@@ -230,10 +231,22 @@ export function WorkTab({ character }: WorkTabProps) {
   const info = PROFESSION_INFO[activeProfession]
   const skillValue = skills[info.skill]
 
-  const ownedMats = useMemo(
-    () => character.materials.filter((m) => info.matCategory.includes(m.category as Material['category'])),
-    [character.materials, info.matCategory]
-  )
+  const ownedMats = useMemo(() => {
+    const filtered = character.materials.filter((m) =>
+      info.matCategory.includes(m.category as Material['category'])
+    )
+    // Consolidate duplicate IDs into single entries
+    const consolidated = new Map<string, Material>()
+    for (const m of filtered) {
+      const existing = consolidated.get(m.id)
+      if (existing) {
+        consolidated.set(m.id, { ...existing, quantity: existing.quantity + m.quantity })
+      } else {
+        consolidated.set(m.id, { ...m })
+      }
+    }
+    return Array.from(consolidated.values())
+  }, [character.materials, info.matCategory])
 
   // Group recipes by tier
   const recipesByTier = useMemo(
@@ -244,11 +257,14 @@ export function WorkTab({ character }: WorkTabProps) {
     [info.recipes]
   )
 
-  // Build a quantity Map for O(1) lookups in CraftCard
-  const materialsMap = useMemo(
-    () => new Map(character.materials.map((m) => [m.id, m.quantity])),
-    [character.materials]
-  )
+  // Build a quantity Map for O(1) lookups in CraftCard — sums duplicates
+  const materialsMap = useMemo(() => {
+    const map = new Map<string, number>()
+    for (const m of character.materials) {
+      map.set(m.id, (map.get(m.id) ?? 0) + m.quantity)
+    }
+    return map
+  }, [character.materials])
 
   function toggleTier(tier: CraftingTier) {
     setCollapsedTiers((prev) => {
@@ -282,19 +298,29 @@ export function WorkTab({ character }: WorkTabProps) {
     incrementCraftingSkill(info.skill, 1)
 
     // Show notification with cleanup
-    setCraftedNotif(`Crafted ${item.name}!`)
+    setCraftedNotif({ name: item.name, bonus: item.bonus, tier: item.tier })
     if (notifTimer.current) clearTimeout(notifTimer.current)
-    notifTimer.current = setTimeout(() => setCraftedNotif(null), 2500)
+    notifTimer.current = setTimeout(() => setCraftedNotif(null), 4000)
   }
 
   return (
     <div className="space-y-6">
-      {/* Notification */}
-      {craftedNotif && (
-        <div className="fixed top-4 right-4 z-50 px-4 py-2 bg-dnd-gold text-gray-900 rounded-lg font-medium shadow-lg">
-          {craftedNotif}
-        </div>
-      )}
+      {/* Crafting Notification */}
+      {craftedNotif && (() => {
+        const colors = TIER_COLORS[craftedNotif.tier]
+        return (
+          <div className={`fixed top-4 right-4 z-50 p-4 rounded-xl border-2 ${colors.border} ${colors.bg} shadow-2xl max-w-xs`}>
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">⚒️</span>
+              <div>
+                <div className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">You crafted</div>
+                <div className={`font-bold text-base ${colors.text}`}>{craftedNotif.name}</div>
+                <div className="text-sm text-gray-300 mt-1">{craftedNotif.bonus}</div>
+              </div>
+            </div>
+          </div>
+        )
+      })()}
 
       {/* Profession tabs */}
       <div className="flex gap-2 flex-wrap">
@@ -332,9 +358,9 @@ export function WorkTab({ character }: WorkTabProps) {
             No {info.matLabel.toLowerCase()} found. Go explore and gather materials!
           </p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
             {ownedMats.map((m) => (
-              <MaterialRow key={m.id} mat={m} />
+              <MaterialSlot key={m.id} mat={m} />
             ))}
           </div>
         )}

@@ -1,5 +1,101 @@
 # Dungeons - Patch Notes
 
+## Version 0.4.7-alpha - February 28, 2026
+
+**Alpha Release Notice**: Materials consolidation and alchemy fix, disenchant popups, rarity color-coding, Bag of Holding window, Armor +X addon system, crafting popup, scroll navigation, enchanting scroll tracker, and patch notes renderer fix.
+
+### 🐛 Alchemy Bug Fix — Mint Leaves Now Work
+
+The alchemy Work tab failed to recognize materials when multiple separate stacks of the same item were stored (e.g., 5 individual "Mint Leaves ×1" entries). The crafting quantity map now **sums duplicate IDs** instead of taking only the last entry.
+
+#### **What was broken**
+- Player had 5 Mint Leaves but the recipe showed "Not enough materials"
+- `changeMaterialQuantity` in the store now consolidates duplicates before applying deductions
+
+**Why This Matters**: Alchemy is now reliable regardless of how materials were acquired.
+
+### ✨ Materials — Consolidated Tile View
+
+Materials in both the **Work tab** and **Inventory tab** are now displayed as grid tiles with a count badge, consolidating all duplicate stacks into a single card.
+
+#### **New Look**
+- Grid of compact tiles instead of a tall list — much less scrolling
+- Quantity shown as `×N` badge on each tile
+- Border color matches material rarity (green = uncommon, blue = rare, etc.)
+- Hover to reveal −/+/Sell buttons on each tile
+
+**Why This Matters**: Going from 30 individual "Copper Ore Nugget" rows to one tile showing ×30.
+
+### ✨ Disenchant Popup + Rarity Color-Coding
+
+When disenchanting an item, a **5-second popup** now appears showing exactly what was received and whether it was Magical Dust or Shards.
+
+#### **Popup Details**
+- ✨ Blue popup for Magical Dust (uncommon/rare items)
+- 💎 Purple popup for Magical Shards (epic/legendary items)
+- Shows item name and what was added to Mats
+
+#### **Rarity Color-Coding**
+Item names in the Inventory tab now display in their rarity color:
+- Common: white, Uncommon: green, Rare: blue, Epic: purple, Legendary: gold, Artifact: red
+
+**Why This Matters**: Players can instantly see item quality at a glance.
+
+### ✨ Crafting Popup — Rich Notification
+
+When crafting an item, a detailed **4-second popup** now appears with:
+- The item's tier color (matching Common/Uncommon/Rare/Epic/Legendary)
+- Item name in the tier color
+- The item's bonus/effect description
+
+**Why This Matters**: Replaces the minimal "Crafted X!" banner with a useful reminder of what the item does.
+
+### ✨ Bag of Holding — Separate Collapsible Window
+
+Bags of Holding (items with weight reduction) are now **removed from the main backpack list** and shown in a dedicated collapsible "Bags of Holding" section under the Weight card. Collapsed by default.
+
+- Shows weight reduction amount for each bag
+- Multiple bags stack (all shown individually)
+- Only reduces displayed weight when present in equipment
+
+### ✨ Armor +X Addon System
+
+Items named "Armor +1" through "Armor +5" are now **automatically detected** and:
+- Excluded from the main Backpack list
+- Shown in a collapsible "Armor Addons" section with total AC bonus
+- Their bonus is **added to calculated AC** automatically
+
+**Why This Matters**: Dropped "Armor +2" items now properly boost AC without cluttering the backpack.
+
+### ✨ Scroll Navigation Buttons
+
+Three sticky buttons appear on the left side of every tab:
+- **↑** — Jump to top of page
+- **§** — Jump to next section heading
+- **↓** — Jump to bottom of page
+
+**Why This Matters**: Long tabs like Inventory and Actions no longer require manual scrolling to navigate.
+
+### ✨ Enchanting Scroll 5-Turn Tracker
+
+When a crafted enchanting scroll is consumed, it now opens a **turn countdown tracker**:
+- Scroll appears in "Active Enchanting Scrolls" panel in the Inventory tab
+- Shows name, effect, and turns remaining (starting at 5)
+- **Turn** button decrements by 1 for a single scroll
+- **End Turn** button decrements all active scrolls by 1
+- Dismisses automatically when turns reach 0
+- Tracker persists across page refreshes (localStorage per character)
+
+**Why This Matters**: Enchanting scrolls have a defined 5-turn window that's now trackable in play.
+
+### 🐛 Patch Notes Renderer Fix
+
+The in-app patch notes modal now correctly:
+- Renders `**bold text**` inside `####` sub-section headers (previously showed literal asterisks)
+- Groups consecutive `- ` list items under a `<ul>` with visible bullet points
+
+---
+
 ## Version 0.4.6-alpha - February 28, 2026
 
 **Alpha Release Notice**: Language selector rewrite, Ranger spell level-ups, potion consume improvements, collapsible loot generator with Mats by Quality, and updated AC reference.

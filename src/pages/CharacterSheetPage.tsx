@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useCharacterStore } from '../stores/characterStore'
 import { useSettingsStore } from '../stores/settingsStore'
@@ -37,6 +37,7 @@ import { EquipmentEditor } from '../components/EquipmentEditor'
 import { ClassFeatureCard } from '../components/ClassFeatureCard'
 import { FIGHTING_STANCES } from '../data/fightingStances'
 import type { LootItem } from '../data/lootGenerator'
+import { RARITY_COLORS } from '../data/lootGenerator'
 import type { Spell } from '../types'
 import { WorkTab } from '../components/WorkTab'
 
@@ -116,6 +117,19 @@ export function CharacterSheetPage() {
   const [abilityNotification, setAbilityNotification] = useState<{ featureName: string; message: string } | null>(null)
   // Gear replacement: id of item being replaced, null when not replacing
   const [replacingItemId, setReplacingItemId] = useState<string | null>(null)
+  // Disenchant notification
+  const [disenchantNotif, setDisenchantNotif] = useState<{ itemName: string; received: string; isShards: boolean } | null>(null)
+  const disenchantNotifTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // Collapsible section state for inventory
+  const [showBagsSection, setShowBagsSection] = useState(false)
+  const [showArmorAddons, setShowArmorAddons] = useState(false)
+  // Enchanting scroll 5-turn tracker
+  const [activeScrolls, setActiveScrolls] = useState<Array<{ id: string; name: string; bonus: string; turnsLeft: number }>>(() => {
+    try {
+      const saved = localStorage.getItem(`scroll-tracker-${id}`)
+      return saved ? JSON.parse(saved) : []
+    } catch { return [] }
+  })
 
   useEffect(() => {
     if (id) {
@@ -214,6 +228,13 @@ export function CharacterSheetPage() {
         baseAC += stance.acModifier
       }
     }
+
+    // Apply Armor +X addon bonuses (items named "Armor +N")
+    const addonBonus = character.equipment.reduce((sum, e) => {
+      const m = e.name.match(/^armor\s*\+(\d+)$/i)
+      return sum + (m ? parseInt(m[1]) : 0)
+    }, 0)
+    baseAC += addonBonus
 
     // Apply enraged condition penalty
     if (character.conditions.includes('enraged')) {
@@ -571,6 +592,18 @@ export function CharacterSheetPage() {
         setSellConfirmation(null)
       }
     })
+  }
+
+  const handleDisenchant = (item: Equipment) => {
+    const rarity = item.rarity
+    if (!rarity || rarity === 'trash' || rarity === 'common') return
+    const isShards = rarity === 'epic' || rarity === 'legendary'
+    const received = isShards ? 'Magical Shards' : 'Magical Dust'
+    disenchantItem(item.id)
+    saveCharacter()
+    if (disenchantNotifTimer.current) clearTimeout(disenchantNotifTimer.current)
+    setDisenchantNotif({ itemName: item.name, received, isShards })
+    disenchantNotifTimer.current = setTimeout(() => setDisenchantNotif(null), 5000)
   }
 
   // Parse healing formula from potion description (raw, may contain "level" as a variable)
@@ -968,6 +1001,24 @@ export function CharacterSheetPage() {
       return
     }
 
+    // Enchanting scrolls (crafted scrolls, not spell scrolls) — 5-turn tracker
+    const nameLowerFull = item.name.toLowerCase()
+    if (nameLowerFull.includes('scroll of') || (nameLowerFull.includes('scroll') && !nameLowerFull.includes('spell scroll'))) {
+      const newScroll = { id: `scroll-${Date.now()}`, name: item.name, bonus: item.description || 'Effect active', turnsLeft: 5 }
+      const updated = [...activeScrolls, newScroll]
+      setActiveScrolls(updated)
+      if (id) localStorage.setItem(`scroll-tracker-${id}`, JSON.stringify(updated))
+      // Consume the item
+      const newQty = (item.quantity || 1) - 1
+      if (newQty <= 0) {
+        removeEquipment(item.id)
+      } else {
+        changeEquipmentQuantity(item.id, -1)
+      }
+      saveCharacter()
+      return
+    }
+
     // Weapon/Armor bonus items
     if (item.name.toLowerCase().includes('weapon +') || item.name.toLowerCase().includes('armor +')) {
       const bonusMatch = item.name.match(/\+(\d+)/)
@@ -1052,6 +1103,40 @@ export function CharacterSheetPage() {
     setTimeout(() => setShowConsumableNotification(null), 3000)
   }
 
+  // Consolidate duplicate material IDs for display and operations
+  const consolidatedMaterials = useMemo(() => {
+    const map = new Map<string, Material>()
+    for (const m of character.materials) {
+      const existing = map.get(m.id)
+      if (existing) {
+        map.set(m.id, { ...existing, quantity: existing.quantity + m.quantity })
+      } else {
+        map.set(m.id, { ...m })
+      }
+    }
+    return Array.from(map.values())
+  }, [character.materials])
+
+  // Detect Bag of Holding items (weightReduction > 0)
+  const bagsOfHolding = useMemo(
+    () => character.equipment.filter((i) => (i.weightReduction ?? 0) > 0),
+    [character.equipment]
+  )
+
+  // Detect Armor +X addon items
+  const armorAddonRegex = /^armor\s*\+(\d+)$/i
+  const armorAddonItems = useMemo(
+    () => character.equipment.filter((i) => armorAddonRegex.test(i.name.trim())),
+    [character.equipment]
+  )
+  const armorAddonBonus = useMemo(
+    () => armorAddonItems.reduce((sum, i) => {
+      const match = i.name.match(/\+(\d+)/)
+      return sum + (match ? parseInt(match[1]) : 0)
+    }, 0),
+    [armorAddonItems]
+  )
+
   const tabs = [
     { id: 'main', label: 'Overview' },
     { id: 'actions', label: 'Actions' },
@@ -1065,6 +1150,25 @@ export function CharacterSheetPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
+      {/* Disenchant notification */}
+      {disenchantNotif && (
+        <div className={`fixed bottom-6 right-6 z-50 p-4 rounded-xl border-2 shadow-2xl max-w-xs animate-pulse ${
+          disenchantNotif.isShards
+            ? 'bg-purple-900/90 border-purple-500'
+            : 'bg-blue-900/90 border-blue-500'
+        }`}>
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">{disenchantNotif.isShards ? '💎' : '✨'}</span>
+            <div>
+              <div className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Disenchanted</div>
+              <div className="font-bold text-white text-sm">{disenchantNotif.itemName}</div>
+              <div className={`text-sm font-medium mt-1 ${disenchantNotif.isShards ? 'text-purple-300' : 'text-blue-300'}`}>
+                +1 {disenchantNotif.received} added to Mats
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-8">
         <div className="text-left">
@@ -1144,6 +1248,39 @@ export function CharacterSheetPage() {
             Edit Details
           </button>
         </div>
+      </div>
+
+      {/* Scroll Navigation Buttons — fixed bottom-right */}
+      <div className="fixed bottom-6 left-4 z-40 flex flex-col gap-1.5">
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="w-9 h-9 flex items-center justify-center bg-gray-700/90 hover:bg-gray-600 text-white rounded-lg shadow-lg transition-colors border border-gray-600 text-base"
+          title="Scroll to top"
+        >↑</button>
+        <button
+          onClick={() => {
+            // Find the next section heading below the current viewport mid
+            const midY = window.scrollY + window.innerHeight / 2
+            const headings = Array.from(document.querySelectorAll('h3, h2'))
+            const next = headings.find((el) => {
+              const rect = el.getBoundingClientRect()
+              return rect.top > window.innerHeight / 3
+            })
+            if (next) {
+              next.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            } else {
+              window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+            }
+            void midY
+          }}
+          className="w-9 h-9 flex items-center justify-center bg-dnd-gold/90 hover:bg-yellow-500 text-gray-900 rounded-lg shadow-lg transition-colors border border-yellow-600 text-sm font-bold"
+          title="Next section"
+        >§</button>
+        <button
+          onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })}
+          className="w-9 h-9 flex items-center justify-center bg-gray-700/90 hover:bg-gray-600 text-white rounded-lg shadow-lg transition-colors border border-gray-600 text-base"
+          title="Scroll to bottom"
+        >↓</button>
       </div>
 
       {/* Tabs */}
@@ -1806,6 +1943,81 @@ export function CharacterSheetPage() {
             </div>
           </div>
 
+          {/* Bags of Holding — collapsible */}
+          {bagsOfHolding.length > 0 && (
+            <div className="card bg-gray-800 border-gray-700 p-4">
+              <button
+                type="button"
+                onClick={() => setShowBagsSection((v) => !v)}
+                className="flex items-center justify-between w-full text-left"
+              >
+                <h3 className="text-base font-bold text-green-400">🎒 Bags of Holding ({bagsOfHolding.length})</h3>
+                <span className="text-gray-400 text-sm">{showBagsSection ? '▲ Hide' : '▼ Show'}</span>
+              </button>
+              {showBagsSection && (
+                <div className="mt-3 space-y-2">
+                  {bagsOfHolding.map((bag) => (
+                    <div key={bag.id} className="flex items-center justify-between p-2 bg-green-900/20 border border-green-700/50 rounded-lg">
+                      <div>
+                        <span className={`font-medium text-sm ${RARITY_COLORS[bag.rarity as keyof typeof RARITY_COLORS]?.text ?? 'text-white'}`}>{bag.name}</span>
+                        <div className="text-xs text-green-400">−{bag.weightReduction} lbs weight reduction</div>
+                        {bag.description && <div className="text-xs text-gray-500">{bag.description}</div>}
+                      </div>
+                      <button
+                        onClick={() => { removeEquipment(bag.id); saveCharacter() }}
+                        className="p-1 text-red-400 hover:text-red-300 hover:bg-red-900/30 rounded transition-colors ml-3"
+                        title="Remove bag"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Armor Addons (Armor +X items) — collapsible */}
+          {armorAddonItems.length > 0 && (
+            <div className="card bg-gray-800 border-gray-700 p-4">
+              <button
+                type="button"
+                onClick={() => setShowArmorAddons((v) => !v)}
+                className="flex items-center justify-between w-full text-left"
+              >
+                <h3 className="text-base font-bold text-blue-400">🛡️ Armor Addons (+{armorAddonBonus} AC total)</h3>
+                <span className="text-gray-400 text-sm">{showArmorAddons ? '▲ Hide' : '▼ Show'}</span>
+              </button>
+              {showArmorAddons && (
+                <div className="mt-3 space-y-2">
+                  {armorAddonItems.map((addon) => {
+                    const match = addon.name.match(/\+(\d+)/)
+                    const bonus = match ? parseInt(match[1]) : 0
+                    return (
+                      <div key={addon.id} className="flex items-center justify-between p-2 bg-blue-900/20 border border-blue-700/50 rounded-lg">
+                        <div>
+                          <span className={`font-medium text-sm ${RARITY_COLORS[addon.rarity as keyof typeof RARITY_COLORS]?.text ?? 'text-white'}`}>{addon.name}</span>
+                          <div className="text-xs text-blue-400">+{bonus} AC bonus</div>
+                        </div>
+                        <button
+                          onClick={() => { removeEquipment(addon.id); saveCharacter() }}
+                          className="p-1 text-red-400 hover:text-red-300 hover:bg-red-900/30 rounded transition-colors ml-3"
+                          title="Remove addon"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Food & Water Supplies */}
           <div className="card bg-gradient-to-br from-green-900/30 to-teal-900/30 border-2 border-green-600 p-4 sm:p-6">
             <h3 className="text-xl sm:text-2xl font-bold text-green-400 mb-3 sm:mb-4">🍖 Food & Water Supplies</h3>
@@ -1903,79 +2115,43 @@ export function CharacterSheetPage() {
           </div>
 
           {/* Mats (Crafting Materials) */}
-          {character.materials && character.materials.length > 0 && (
+          {consolidatedMaterials.length > 0 && (
             <div className="card bg-gray-800 border-gray-700 p-4">
-              <h3 className="text-lg font-bold text-white mb-4">📦 Mats (Crafting Materials)</h3>
-              <div className="space-y-2">
-                {character.materials.map((material) => (
-                  <div
-                    key={material.id}
-                    className="flex items-center justify-between p-3 bg-gray-900/50 rounded-lg hover:bg-gray-900/70 transition-colors"
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-white">{material.name}</span>
-                        <span className="text-xs px-2 py-0.5 bg-purple-900/50 text-purple-300 rounded">
-                          {material.category}
-                        </span>
-                        <span className={`text-xs px-2 py-0.5 rounded ${
-                          material.rarity === 'legendary' ? 'bg-orange-900/50 text-orange-300' :
-                          material.rarity === 'epic' ? 'bg-purple-900/50 text-purple-300' :
-                          material.rarity === 'rare' ? 'bg-blue-900/50 text-blue-300' :
-                          material.rarity === 'uncommon' ? 'bg-green-900/50 text-green-300' :
-                          'bg-gray-700/50 text-gray-400'
-                        }`}>
-                          {material.rarity}
-                        </span>
-                      </div>
-                      <div className="text-sm text-gray-400 mt-1">{material.description}</div>
-                      <div className="text-xs text-gray-500 mt-1">
-                        Quantity: {material.quantity} ({(material.weight * material.quantity).toFixed(1)} lbs)
+              <h3 className="text-lg font-bold text-white mb-3">📦 Mats ({consolidatedMaterials.length} types)</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                {consolidatedMaterials.map((material) => {
+                  const rc = RARITY_COLORS[material.rarity as keyof typeof RARITY_COLORS] ?? RARITY_COLORS.common
+                  return (
+                    <div
+                      key={material.id}
+                      className={`relative flex flex-col p-2.5 rounded-lg border ${rc.border} bg-gray-900/60 group`}
+                      title={`${material.description} · ${material.rarity}`}
+                    >
+                      <span className={`text-sm font-medium leading-tight ${rc.text}`}>{material.name}</span>
+                      <span className="text-xs text-gray-500 capitalize mt-0.5">{material.category}</span>
+                      <div className="flex items-center justify-between mt-2">
+                        <span className="text-lg font-bold text-white">×{material.quantity}</span>
+                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button
+                            onClick={() => { changeMaterialQuantity(material.id, -1); saveCharacter() }}
+                            className="w-5 h-5 text-xs flex items-center justify-center bg-red-900/60 hover:bg-red-700 text-red-300 rounded transition-colors"
+                            title="−1"
+                          >−</button>
+                          <button
+                            onClick={() => { changeMaterialQuantity(material.id, 1); saveCharacter() }}
+                            className="w-5 h-5 text-xs flex items-center justify-center bg-green-900/60 hover:bg-green-700 text-green-300 rounded transition-colors"
+                            title="+1"
+                          >+</button>
+                          <button
+                            onClick={() => handleSellMaterial(material.id)}
+                            className="w-5 h-5 text-xs flex items-center justify-center bg-yellow-900/60 hover:bg-yellow-700 text-yellow-300 rounded transition-colors"
+                            title="Sell"
+                          >$</button>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => {
-                          changeMaterialQuantity(material.id, -1)
-                          saveCharacter()
-                        }}
-                        className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-900/30 rounded transition-colors"
-                        title="Decrease quantity"
-                        disabled={material.quantity <= 1}
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                        </svg>
-                      </button>
-                      <button
-                        onClick={() => {
-                          changeMaterialQuantity(material.id, 1)
-                          saveCharacter()
-                        }}
-                        className="p-1.5 text-green-400 hover:text-green-300 hover:bg-green-900/30 rounded transition-colors"
-                        title="Increase quantity"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
-                      </button>
-                      <button
-                        onClick={() => handleSellMaterial(material.id)}
-                        className="p-1.5 text-yellow-400 hover:text-yellow-300 hover:bg-yellow-900/30 rounded transition-colors"
-                        title={`Sell for ${material.category === 'gem' ? material.quantity :
-                          material.rarity === 'legendary' ? material.quantity * 50 :
-                          material.rarity === 'epic' ? material.quantity * 35 :
-                          material.rarity === 'rare' ? material.quantity * 20 :
-                          material.rarity === 'uncommon' ? material.quantity * 10 :
-                          material.quantity * 5} copper`}
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
           )}
@@ -2009,7 +2185,7 @@ export function CharacterSheetPage() {
                         renameEquipment(item.id, newName)
                         saveCharacter()
                       }}
-                      onDisenchant={() => { disenchantItem(item.id); saveCharacter() }}
+                      onDisenchant={() => handleDisenchant(item)}
                     />
                   ))}
               </div>
@@ -2047,7 +2223,7 @@ export function CharacterSheetPage() {
                             renameEquipment(item.id, newName)
                             saveCharacter()
                           }}
-                          onDisenchant={() => { disenchantItem(item.id); saveCharacter() }}
+                          onDisenchant={() => handleDisenchant(item)}
                         />
                         {equippedWeapons.length > 0 && (
                           replacingItemId === item.id ? (
@@ -2122,7 +2298,7 @@ export function CharacterSheetPage() {
                         renameEquipment(item.id, newName)
                         saveCharacter()
                       }}
-                      onDisenchant={() => { disenchantItem(item.id); saveCharacter() }}
+                      onDisenchant={() => handleDisenchant(item)}
                     />
                   ))}
               </div>
@@ -2160,7 +2336,7 @@ export function CharacterSheetPage() {
                             renameEquipment(item.id, newName)
                             saveCharacter()
                           }}
-                          onDisenchant={() => { disenchantItem(item.id); saveCharacter() }}
+                          onDisenchant={() => handleDisenchant(item)}
                         />
                         {equippedArmors.length > 0 && (
                           replacingItemId === item.id ? (
@@ -2241,7 +2417,7 @@ export function CharacterSheetPage() {
                         renameEquipment(item.id, newName)
                         saveCharacter()
                       }}
-                      onDisenchant={() => { disenchantItem(item.id); saveCharacter() }}
+                      onDisenchant={() => handleDisenchant(item)}
                     />
                   ))}
               </div>
@@ -2283,7 +2459,7 @@ export function CharacterSheetPage() {
                         renameEquipment(item.id, newName)
                         saveCharacter()
                       }}
-                      onDisenchant={() => { disenchantItem(item.id); saveCharacter() }}
+                      onDisenchant={() => handleDisenchant(item)}
                     />
                   ))}
               </div>
@@ -2321,7 +2497,7 @@ export function CharacterSheetPage() {
                         saveCharacter()
                       }}
                       onUse={() => handleUseConsumable(item)}
-                      onDisenchant={() => { disenchantItem(item.id); saveCharacter() }}
+                      onDisenchant={() => handleDisenchant(item)}
                     />
                   ))}
               </div>
@@ -2354,7 +2530,7 @@ export function CharacterSheetPage() {
                       }}
                       onUse={() => handleUseConsumable(item)}
                       onSell={() => handleSellItem(item.id)}
-                      onDisenchant={() => { disenchantItem(item.id); saveCharacter() }}
+                      onDisenchant={() => handleDisenchant(item)}
                     />
                   ))}
               </div>
@@ -2396,7 +2572,9 @@ export function CharacterSheetPage() {
               !item.name.toLowerCase().includes('scroll') &&
               !item.name.toLowerCase().includes('elixir') &&
               item.id !== 'waterskin' &&
-              item.id !== 'rations'
+              item.id !== 'rations' &&
+              (item.weightReduction ?? 0) === 0 &&
+              !/^armor\s*\+\d+$/i.test(item.name.trim())
             ).length === 0 ? (
               <p className="text-gray-400 text-center py-4">Backpack is empty.</p>
             ) : (
@@ -2414,7 +2592,9 @@ export function CharacterSheetPage() {
                     !item.name.toLowerCase().includes('scroll') &&
                     !item.name.toLowerCase().includes('elixir') &&
                     item.id !== 'waterskin' &&
-                    item.id !== 'rations'
+                    item.id !== 'rations' &&
+                    (item.weightReduction ?? 0) === 0 &&
+                    !/^armor\s*\+\d+$/i.test(item.name.trim())
                   )
                   .map((item) => (
                     <EquipmentItem
@@ -2434,12 +2614,69 @@ export function CharacterSheetPage() {
                         saveCharacter()
                       }}
                       onUse={() => handleUseConsumable(item)}
-                      onDisenchant={() => { disenchantItem(item.id); saveCharacter() }}
+                      onDisenchant={() => handleDisenchant(item)}
                     />
                   ))}
               </div>
             )}
           </div>
+
+          {/* Active Enchanting Scrolls Tracker */}
+          {activeScrolls.length > 0 && (
+            <div className="card bg-purple-900/20 border-purple-700 p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-base font-bold text-purple-300">✨ Active Enchanting Scrolls</h3>
+                <span className="text-xs text-gray-500">{activeScrolls.length} active</span>
+              </div>
+              <div className="space-y-2">
+                {activeScrolls.map((scroll) => (
+                  <div key={scroll.id} className={`flex items-center justify-between p-2.5 rounded-lg border ${
+                    scroll.turnsLeft <= 1 ? 'border-red-600 bg-red-900/20' : 'border-purple-700/50 bg-purple-900/10'
+                  }`}>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-sm text-purple-200">{scroll.name}</div>
+                      <div className="text-xs text-gray-400 truncate">{scroll.bonus}</div>
+                    </div>
+                    <div className="flex items-center gap-2 ml-3 shrink-0">
+                      <div className={`text-lg font-bold ${scroll.turnsLeft <= 1 ? 'text-red-400' : 'text-purple-300'}`}>
+                        {scroll.turnsLeft}T
+                      </div>
+                      <button
+                        onClick={() => {
+                          const updated = activeScrolls
+                            .map((s) => s.id === scroll.id ? { ...s, turnsLeft: s.turnsLeft - 1 } : s)
+                            .filter((s) => s.turnsLeft > 0)
+                          setActiveScrolls(updated)
+                          if (id) localStorage.setItem(`scroll-tracker-${id}`, JSON.stringify(updated))
+                        }}
+                        className="px-2 py-1 text-xs bg-purple-700 hover:bg-purple-600 text-white rounded transition-colors"
+                        title="Use 1 turn"
+                      >Turn</button>
+                      <button
+                        onClick={() => {
+                          const updated = activeScrolls.filter((s) => s.id !== scroll.id)
+                          setActiveScrolls(updated)
+                          if (id) localStorage.setItem(`scroll-tracker-${id}`, JSON.stringify(updated))
+                        }}
+                        className="px-2 py-1 text-xs bg-red-800 hover:bg-red-700 text-red-200 rounded transition-colors"
+                        title="Dismiss scroll"
+                      >✕</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <button
+                onClick={() => {
+                  const updated = activeScrolls.map((s) => ({ ...s, turnsLeft: Math.max(0, s.turnsLeft - 1) })).filter((s) => s.turnsLeft > 0)
+                  setActiveScrolls(updated)
+                  if (id) localStorage.setItem(`scroll-tracker-${id}`, JSON.stringify(updated))
+                }}
+                className="mt-3 w-full py-1.5 text-sm bg-purple-800 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium"
+              >
+                ⏱ End Turn (all scrolls −1)
+              </button>
+            </div>
+          )}
 
           {/* Currency Modal */}
           {showCurrencyModal && (
@@ -3940,6 +4177,9 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
   const profBonus = calculateProficiencyBonus(character.level)
   const canEquip = true // All items can be equipped
   const isEquipped = item.equipped
+  const rarityTextColor = item.rarity && RARITY_COLORS[item.rarity as keyof typeof RARITY_COLORS]
+    ? RARITY_COLORS[item.rarity as keyof typeof RARITY_COLORS].text
+    : 'text-white'
 
   if (isWeapon(item)) {
     const weapon = item as Weapon
@@ -3959,7 +4199,7 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
           <EquipToggle equipped={!!isEquipped} onToggle={onToggleEquip} canEquip={canEquip} />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-medium text-white hover:text-dnd-gold">
+              <span className={`font-medium hover:text-dnd-gold ${rarityTextColor}`}>
                 {weapon.name}
               </span>
               {onRename && (
@@ -4027,7 +4267,7 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
           <EquipToggle equipped={!!isEquipped} onToggle={onToggleEquip} canEquip={canEquip} />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-medium text-white">{item.name}</span>
+              <span className={`font-medium ${rarityTextColor}`}>{item.name}</span>
               {onRename && (
                 <button
                   onClick={() => {
@@ -4087,7 +4327,7 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
           <EquipToggle equipped={!!isEquipped} onToggle={onToggleEquip} canEquip={canEquip} />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-medium text-white">{item.name}</span>
+              <span className={`font-medium ${rarityTextColor}`}>{item.name}</span>
               {isEquipped && <span className="text-xs text-purple-400 bg-purple-900/50 px-1.5 py-0.5 rounded">Equipped</span>}
             </div>
             <div className="text-sm text-gray-400">
@@ -4131,7 +4371,7 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
           <EquipToggle equipped={!!isEquipped} onToggle={onToggleEquip} canEquip={canEquip} />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-medium text-white">{item.name}</span>
+              <span className={`font-medium ${rarityTextColor}`}>{item.name}</span>
               {isEquipped && <span className="text-xs text-indigo-400 bg-indigo-900/50 px-1.5 py-0.5 rounded">Equipped</span>}
             </div>
             {item.description && (
@@ -4186,7 +4426,7 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
         <EquipToggle equipped={!!isEquipped} onToggle={onToggleEquip} canEquip={canEquip} />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-medium text-white">{item.name}</span>
+            <span className={`font-medium ${rarityTextColor}`}>{item.name}</span>
             {isEquipped && <span className="text-xs text-yellow-400 bg-yellow-900/50 px-1.5 py-0.5 rounded">Equipped</span>}
             {isConsumable && <span className="text-xs text-green-400 bg-green-900/50 px-1.5 py-0.5 rounded">Consumable</span>}
           </div>

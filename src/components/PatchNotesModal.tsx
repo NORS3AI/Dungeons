@@ -12,16 +12,41 @@ export function PatchNotesModal({ isOpen, onClose }: PatchNotesModalProps) {
 
   if (!isOpen) return null
 
+  // Parse inline bold/italic from a markdown string into React elements
+  const inlineMarkdown = (text: string, baseKey: string) => {
+    const parts = text.split(/(\*\*[^*]+\*\*)/)
+    return parts.map((part, i) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return <strong key={`${baseKey}-${i}`} className="text-white font-semibold">{part.slice(2, -2)}</strong>
+      }
+      return <span key={`${baseKey}-${i}`}>{part}</span>
+    })
+  }
+
   // Simple markdown parser for basic formatting
   const renderMarkdown = (text: string) => {
     const lines = text.split('\n')
     const elements: JSX.Element[] = []
     let inCodeBlock = false
     let codeBlockContent: string[] = []
+    let listBuffer: { content: string; idx: number }[] = []
+
+    const flushList = () => {
+      if (listBuffer.length === 0) return
+      const items = listBuffer.map(({ content, idx }) => (
+        <li key={idx} className="flex items-start gap-2 text-gray-300 my-0.5">
+          <span className="text-gray-500 mt-0.5 select-none">•</span>
+          <span>{inlineMarkdown(content, `li-${idx}`)}</span>
+        </li>
+      ))
+      elements.push(<ul key={`ul-${listBuffer[0].idx}`} className="ml-2 space-y-0.5 my-1">{items}</ul>)
+      listBuffer = []
+    }
 
     lines.forEach((line, idx) => {
       // Code blocks
       if (line.startsWith('```')) {
+        flushList()
         if (inCodeBlock) {
           elements.push(
             <pre key={`code-${idx}`} className="bg-gray-900 p-3 rounded-lg overflow-x-auto my-2">
@@ -39,54 +64,41 @@ export function PatchNotesModal({ isOpen, onClose }: PatchNotesModalProps) {
         return
       }
 
+      // Unordered list — buffer for grouping
+      if (line.startsWith('- ')) {
+        listBuffer.push({ content: line.slice(2), idx })
+        return
+      }
+
+      // Non-list line — flush any buffered list items first
+      flushList()
+
       // Headers
       if (line.startsWith('#### ')) {
-        elements.push(<h4 key={idx} className="text-lg font-bold text-blue-400 mt-4 mb-2">{line.slice(5)}</h4>)
+        elements.push(<h4 key={idx} className="text-base font-bold text-blue-400 mt-4 mb-1">{inlineMarkdown(line.slice(5), `h4-${idx}`)}</h4>)
       } else if (line.startsWith('### ')) {
-        elements.push(<h3 key={idx} className="text-xl font-bold text-purple-400 mt-6 mb-3">{line.slice(4)}</h3>)
+        elements.push(<h3 key={idx} className="text-xl font-bold text-purple-400 mt-6 mb-3">{inlineMarkdown(line.slice(4), `h3-${idx}`)}</h3>)
       } else if (line.startsWith('## ')) {
-        elements.push(<h2 key={idx} className="text-2xl font-bold text-dnd-gold mt-8 mb-4 border-b border-gray-700 pb-2">{line.slice(3)}</h2>)
+        elements.push(<h2 key={idx} className="text-2xl font-bold text-dnd-gold mt-8 mb-4 border-b border-gray-700 pb-2">{inlineMarkdown(line.slice(3), `h2-${idx}`)}</h2>)
       } else if (line.startsWith('# ')) {
-        elements.push(<h1 key={idx} className="text-3xl font-bold text-dnd-gold mb-6">{line.slice(2)}</h1>)
+        elements.push(<h1 key={idx} className="text-3xl font-bold text-dnd-gold mb-6">{inlineMarkdown(line.slice(2), `h1-${idx}`)}</h1>)
       }
       // Horizontal rule
       else if (line.trim() === '---') {
         elements.push(<hr key={idx} className="border-gray-700 my-6" />)
       }
-      // Unordered list
-      else if (line.startsWith('- ')) {
-        const content = line.slice(2)
-        // Parse bold **text**
-        const parts = content.split(/(\*\*[^*]+\*\*)/)
-        const rendered = parts.map((part, i) => {
-          if (part.startsWith('**') && part.endsWith('**')) {
-            return <strong key={i} className="text-white font-semibold">{part.slice(2, -2)}</strong>
-          }
-          return <span key={i}>{part}</span>
-        })
-        elements.push(
-          <li key={idx} className="ml-4 text-gray-300 my-1">
-            {rendered}
-          </li>
-        )
-      }
       // Regular paragraph
       else if (line.trim()) {
-        // Parse bold **text**
-        const parts = line.split(/(\*\*[^*]+\*\*)/)
-        const rendered = parts.map((part, i) => {
-          if (part.startsWith('**') && part.endsWith('**')) {
-            return <strong key={i} className="text-white font-semibold">{part.slice(2, -2)}</strong>
-          }
-          return <span key={i}>{part}</span>
-        })
-        elements.push(<p key={idx} className="text-gray-400 my-2">{rendered}</p>)
+        elements.push(<p key={idx} className="text-gray-400 my-2">{inlineMarkdown(line, `p-${idx}`)}</p>)
       }
       // Empty line
       else {
         elements.push(<div key={idx} className="h-2" />)
       }
     })
+
+    // Flush any remaining list items at end of file
+    flushList()
 
     return elements
   }
