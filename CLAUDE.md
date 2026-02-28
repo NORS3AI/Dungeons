@@ -623,3 +623,38 @@ When working on this project:
 4. Test dice calculations thoroughly - randomness must be fair
 5. Internal links should be consistent and always functional
 6. When in doubt about rules, ask for clarification
+
+### 📋 Patch Notes Rule — REQUIRED on every commit
+
+**Every commit that changes functionality visible to players MUST also update `public/PATCH_NOTES.md`.**
+
+This is the in-app patch notes file that players read to discover new features and know what to test. Keeping it current is how players stay informed and engaged.
+
+**What counts as player-visible:**
+- New spells, classes, races, feats, or subclasses
+- New UI components or tabs
+- Bug fixes that change behaviour
+- Any change to character creation, character sheets, or DM tools
+
+**What does NOT need a patch note:**
+- Internal refactors with no visible effect
+- CLAUDE.md / documentation-only updates
+- Fixing TypeScript types with no runtime change
+
+**Format to follow** (increment the version, use today's date):
+```markdown
+## Version X.Y.Z-alpha - Month DD, YYYY
+
+**Alpha Release Notice**: One-sentence summary of the release theme.
+
+### ✨ Feature Name
+
+Short description paragraph.
+
+#### **Sub-feature or detail**
+- Bullet points explaining what changed and why it matters
+
+**Why This Matters**: One sentence on the player benefit.
+```
+
+**Version numbering**: Increment the patch digit (Z) for small additions, the minor digit (Y) for significant feature groups. Current latest version is in the first entry of `public/PATCH_NOTES.md`.
