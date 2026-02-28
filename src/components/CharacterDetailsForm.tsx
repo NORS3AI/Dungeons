@@ -1,7 +1,11 @@
 import { useState, useRef, useEffect, KeyboardEvent } from 'react'
+import { RACE_NAME_TABLES, generateRandomName } from '../data/names'
 
 interface CharacterDetails {
-  name: string
+  name: string       // Composed from firstName + surname
+  firstName: string  // Required
+  surname: string    // Optional
+  nickname: string   // Optional
   gender?: 'male' | 'female' | 'other'
   age: string
   height: string
@@ -19,7 +23,8 @@ interface CharacterDetailsFormProps {
 
 /**
  * Character Details Form - Page 1 of character creation
- * Collects basic character information with full keyboard navigation
+ * Collects basic character information with full keyboard navigation.
+ * Includes a race-based random name generator.
  */
 export function CharacterDetailsForm({
   initialValues = {},
@@ -28,6 +33,9 @@ export function CharacterDetailsForm({
 }: CharacterDetailsFormProps) {
   const [details, setDetails] = useState<CharacterDetails>({
     name: initialValues.name ?? '',
+    firstName: initialValues.firstName ?? '',
+    surname: initialValues.surname ?? '',
+    nickname: initialValues.nickname ?? '',
     gender: initialValues.gender,
     age: initialValues.age ?? '',
     height: initialValues.height ?? '',
@@ -40,6 +48,9 @@ export function CharacterDetailsForm({
   const [errors, setErrors] = useState<Partial<Record<keyof CharacterDetails, string>>>({})
   const [touched, setTouched] = useState<Partial<Record<keyof CharacterDetails, boolean>>>({})
 
+  // Name generator state
+  const [generatorRace, setGeneratorRace] = useState('human')
+
   // Refs for keyboard navigation
   const inputRefs = useRef<(HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | null)[]>([])
 
@@ -48,15 +59,22 @@ export function CharacterDetailsForm({
     inputRefs.current[0]?.focus()
   }, [])
 
+  // Compose the full name whenever firstName or surname changes
+  const composeName = (firstName: string, surname: string) =>
+    [firstName.trim(), surname.trim()].filter(Boolean).join(' ')
+
   const validateField = (field: keyof CharacterDetails, value: string | number | undefined): string | undefined => {
     switch (field) {
-      case 'name':
-        if (typeof value === 'string' && !value.trim()) return 'Character name is required'
-        if (typeof value === 'string' && value.length < 2) return 'Name must be at least 2 characters'
-        if (typeof value === 'string' && value.length > 50) return 'Name must be 50 characters or less'
+      case 'firstName':
+        if (typeof value === 'string' && !value.trim()) return 'First name is required'
+        if (typeof value === 'string' && value.length < 2) return 'First name must be at least 2 characters'
+        if (typeof value === 'string' && value.length > 50) return 'First name must be 50 characters or less'
         break
-      case 'gender':
-        // Gender is optional, no validation needed
+      case 'surname':
+        if (typeof value === 'string' && value.length > 50) return 'Surname must be 50 characters or less'
+        break
+      case 'nickname':
+        if (typeof value === 'string' && value.length > 50) return 'Nickname must be 50 characters or less'
         break
       case 'age':
         if (value && (isNaN(Number(value)) || Number(value) < 0)) {
@@ -83,9 +101,18 @@ export function CharacterDetailsForm({
   }
 
   const handleChange = (field: keyof CharacterDetails, value: string | number | undefined) => {
-    setDetails((prev) => ({ ...prev, [field]: value }))
+    setDetails((prev) => {
+      const next = { ...prev, [field]: value }
+      // Keep the composed `name` in sync
+      if (field === 'firstName' || field === 'surname') {
+        next.name = composeName(
+          field === 'firstName' ? String(value ?? '') : prev.firstName,
+          field === 'surname' ? String(value ?? '') : prev.surname,
+        )
+      }
+      return next
+    })
 
-    // Clear error when user starts typing
     if (touched[field]) {
       const error = validateField(field, value)
       setErrors((prev) => ({ ...prev, [field]: error }))
@@ -99,10 +126,8 @@ export function CharacterDetailsForm({
   }
 
   const handleKeyDown = (e: KeyboardEvent, index: number) => {
-    // Handle Tab navigation (browser default works, but we can enhance it)
     if (e.key === 'Enter' && e.target instanceof HTMLInputElement) {
       e.preventDefault()
-      // Move to next input on Enter (except for textarea)
       const nextIndex = index + 1
       if (nextIndex < inputRefs.current.length) {
         inputRefs.current[nextIndex]?.focus()
@@ -110,18 +135,32 @@ export function CharacterDetailsForm({
     }
   }
 
+  const handleGenerateName = () => {
+    const gender: 'male' | 'female' | 'neutral' =
+      details.gender === 'male' ? 'male' :
+      details.gender === 'female' ? 'female' :
+      'neutral'
+    const { firstName, surname } = generateRandomName(generatorRace, gender)
+    setDetails((prev) => ({
+      ...prev,
+      firstName,
+      surname,
+      name: composeName(firstName, surname),
+    }))
+    // Clear validation errors after generating
+    setErrors((prev) => ({ ...prev, firstName: undefined, surname: undefined }))
+  }
+
   const isValid = (): boolean => {
-    const nameError = validateField('name', details.name)
-    return !nameError
+    const firstNameError = validateField('firstName', details.firstName)
+    return !firstNameError
   }
 
   const handleSubmit = () => {
-    // Validate all fields
     const newErrors: Partial<Record<keyof CharacterDetails, string>> = {}
     let hasErrors = false
 
-    Object.keys(details).forEach((key) => {
-      const field = key as keyof CharacterDetails
+    ;(['firstName', 'surname', 'nickname', 'age', 'height', 'weight', 'backstory', 'playerName', 'startingLevel'] as (keyof CharacterDetails)[]).forEach((field) => {
       const error = validateField(field, details[field])
       if (error) {
         newErrors[field] = error
@@ -130,16 +169,7 @@ export function CharacterDetailsForm({
     })
 
     setErrors(newErrors)
-    setTouched({
-      name: true,
-      gender: true,
-      age: true,
-      height: true,
-      weight: true,
-      backstory: true,
-      playerName: true,
-      startingLevel: true,
-    })
+    setTouched({ firstName: true, surname: true, nickname: true, age: true, height: true, weight: true, backstory: true, playerName: true, startingLevel: true })
 
     if (!hasErrors) {
       onSubmit(details)
@@ -171,29 +201,115 @@ export function CharacterDetailsForm({
         }}
         className="space-y-6"
       >
-        {/* Character Name - Required */}
-        <div>
-          <label htmlFor="name" className={labelClass}>
-            Character Name <span className="text-red-400">*</span>
-          </label>
-          <input
-            ref={(el) => { inputRefs.current[0] = el }}
-            id="name"
-            type="text"
-            value={details.name}
-            onChange={(e) => handleChange('name', e.target.value)}
-            onBlur={() => handleBlur('name')}
-            onKeyDown={(e) => handleKeyDown(e, 0)}
-            placeholder="Enter your character's name"
-            className={inputClass('name')}
-            aria-required="true"
-            aria-invalid={!!errors.name && touched.name}
-            aria-describedby={errors.name ? 'name-error' : undefined}
-          />
-          {errors.name && touched.name && (
-            <p id="name-error" className={errorClass} role="alert">
-              {errors.name}
-            </p>
+        {/* Name section */}
+        <div className="p-4 bg-gray-800/50 rounded-lg border border-gray-700 space-y-4">
+          <div className="flex items-center justify-between mb-1">
+            <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wide">Name</h3>
+          </div>
+
+          {/* Name Generator */}
+          <div className="flex gap-2 items-end">
+            <div className="flex-1">
+              <label className={labelClass}>Race (for name generator)</label>
+              <select
+                value={generatorRace}
+                onChange={(e) => setGeneratorRace(e.target.value)}
+                className="w-full px-3 py-2 bg-gray-800 border border-gray-600 hover:border-gray-500 rounded-lg text-white
+                           focus:outline-none focus:ring-2 focus:ring-dnd-gold"
+              >
+                {RACE_NAME_TABLES.map((r) => (
+                  <option key={r.raceId} value={r.raceId}>{r.label}</option>
+                ))}
+              </select>
+            </div>
+            <button
+              type="button"
+              onClick={handleGenerateName}
+              className="px-4 py-2 bg-dnd-gold text-gray-900 rounded-lg font-medium hover:bg-yellow-500 transition-colors whitespace-nowrap"
+              title="Generate a random name based on race and gender"
+            >
+              🎲 Generate Name
+            </button>
+          </div>
+
+          {/* First Name — required */}
+          <div>
+            <label htmlFor="firstName" className={labelClass}>
+              First Name <span className="text-red-400">*</span>
+            </label>
+            <input
+              ref={(el) => { inputRefs.current[0] = el }}
+              id="firstName"
+              type="text"
+              value={details.firstName}
+              onChange={(e) => handleChange('firstName', e.target.value)}
+              onBlur={() => handleBlur('firstName')}
+              onKeyDown={(e) => handleKeyDown(e, 0)}
+              placeholder="e.g., Araevin"
+              className={inputClass('firstName')}
+              aria-required="true"
+              aria-invalid={!!errors.firstName && touched.firstName}
+              aria-describedby={errors.firstName ? 'firstName-error' : undefined}
+            />
+            {errors.firstName && touched.firstName && (
+              <p id="firstName-error" className={errorClass} role="alert">
+                {errors.firstName}
+              </p>
+            )}
+          </div>
+
+          {/* Surname + Nickname row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="surname" className={labelClass}>
+                Surname <span className="text-gray-500 font-normal">(optional)</span>
+              </label>
+              <input
+                ref={(el) => { inputRefs.current[1] = el }}
+                id="surname"
+                type="text"
+                value={details.surname}
+                onChange={(e) => handleChange('surname', e.target.value)}
+                onBlur={() => handleBlur('surname')}
+                onKeyDown={(e) => handleKeyDown(e, 1)}
+                placeholder="e.g., Moonwhisper"
+                className={inputClass('surname')}
+              />
+              {errors.surname && touched.surname && (
+                <p className={errorClass} role="alert">{errors.surname}</p>
+              )}
+            </div>
+            <div>
+              <label htmlFor="nickname" className={labelClass}>
+                Nickname <span className="text-gray-500 font-normal">(optional)</span>
+              </label>
+              <input
+                ref={(el) => { inputRefs.current[2] = el }}
+                id="nickname"
+                type="text"
+                value={details.nickname}
+                onChange={(e) => handleChange('nickname', e.target.value)}
+                onBlur={() => handleBlur('nickname')}
+                onKeyDown={(e) => handleKeyDown(e, 2)}
+                placeholder='e.g., "Quickhand"'
+                className={inputClass('nickname')}
+              />
+              {errors.nickname && touched.nickname && (
+                <p className={errorClass} role="alert">{errors.nickname}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Composed name preview */}
+          {details.firstName && (
+            <div className="text-sm text-gray-400 pt-1">
+              Full name:{' '}
+              <span className="text-dnd-gold font-medium">
+                {details.firstName}
+                {details.nickname ? ` "${details.nickname}"` : ''}
+                {details.surname ? ` ${details.surname}` : ''}
+              </span>
+            </div>
           )}
         </div>
 
@@ -203,14 +319,13 @@ export function CharacterDetailsForm({
             Starting Level <span className="text-red-400">*</span>
           </label>
           <select
-            ref={(el) => { inputRefs.current[1] = el as HTMLSelectElement }}
+            ref={(el) => { inputRefs.current[3] = el as HTMLSelectElement }}
             id="startingLevel"
             value={details.startingLevel}
             onChange={(e) => handleChange('startingLevel', parseInt(e.target.value))}
             onBlur={() => handleBlur('startingLevel')}
             className={inputClass('startingLevel')}
             aria-required="true"
-            aria-invalid={!!errors.startingLevel && touched.startingLevel}
           >
             {Array.from({ length: 20 }, (_, i) => i + 1).map((level) => (
               <option key={level} value={level}>
@@ -219,162 +334,112 @@ export function CharacterDetailsForm({
             ))}
           </select>
           {errors.startingLevel && touched.startingLevel && (
-            <p className={errorClass} role="alert">
-              {errors.startingLevel}
-            </p>
+            <p className={errorClass} role="alert">{errors.startingLevel}</p>
           )}
         </div>
 
         {/* Gender */}
         <div>
-          <label className={labelClass}>
-            Gender
-          </label>
+          <label className={labelClass}>Gender</label>
           <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={() => handleChange('gender', 'male')}
-              className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all duration-200
-                         focus:outline-none focus:ring-2 focus:ring-dnd-gold
-                         ${
-                           details.gender === 'male'
-                             ? 'bg-dnd-gold text-gray-900'
-                             : 'bg-gray-800 text-gray-300 border border-gray-600 hover:border-gray-500'
-                         }`}
-            >
-              Male
-            </button>
-            <button
-              type="button"
-              onClick={() => handleChange('gender', 'female')}
-              className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all duration-200
-                         focus:outline-none focus:ring-2 focus:ring-dnd-gold
-                         ${
-                           details.gender === 'female'
-                             ? 'bg-dnd-gold text-gray-900'
-                             : 'bg-gray-800 text-gray-300 border border-gray-600 hover:border-gray-500'
-                         }`}
-            >
-              Female
-            </button>
-            <button
-              type="button"
-              onClick={() => handleChange('gender', 'other')}
-              className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all duration-200
-                         focus:outline-none focus:ring-2 focus:ring-dnd-gold
-                         ${
-                           details.gender === 'other'
-                             ? 'bg-dnd-gold text-gray-900'
-                             : 'bg-gray-800 text-gray-300 border border-gray-600 hover:border-gray-500'
-                         }`}
-            >
-              Other
-            </button>
+            {(['male', 'female', 'other'] as const).map((g) => (
+              <button
+                key={g}
+                type="button"
+                onClick={() => handleChange('gender', g)}
+                className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all duration-200
+                           focus:outline-none focus:ring-2 focus:ring-dnd-gold capitalize
+                           ${
+                             details.gender === g
+                               ? 'bg-dnd-gold text-gray-900'
+                               : 'bg-gray-800 text-gray-300 border border-gray-600 hover:border-gray-500'
+                           }`}
+              >
+                {g.charAt(0).toUpperCase() + g.slice(1)}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Age */}
+        {/* Age / Height / Weight */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label htmlFor="age" className={labelClass}>
-              Age
-            </label>
+            <label htmlFor="age" className={labelClass}>Age</label>
             <input
-              ref={(el) => { inputRefs.current[2] = el }}
+              ref={(el) => { inputRefs.current[4] = el }}
               id="age"
               type="text"
               value={details.age}
               onChange={(e) => handleChange('age', e.target.value)}
               onBlur={() => handleBlur('age')}
-              onKeyDown={(e) => handleKeyDown(e, 2)}
+              onKeyDown={(e) => handleKeyDown(e, 4)}
               placeholder="e.g., 25"
               className={inputClass('age')}
-              aria-invalid={!!errors.age && touched.age}
             />
             {errors.age && touched.age && (
-              <p className={errorClass} role="alert">
-                {errors.age}
-              </p>
+              <p className={errorClass} role="alert">{errors.age}</p>
             )}
           </div>
-
-          {/* Height */}
           <div>
-            <label htmlFor="height" className={labelClass}>
-              Height
-            </label>
+            <label htmlFor="height" className={labelClass}>Height</label>
             <input
-              ref={(el) => { inputRefs.current[3] = el }}
+              ref={(el) => { inputRefs.current[5] = el }}
               id="height"
               type="text"
               value={details.height}
               onChange={(e) => handleChange('height', e.target.value)}
               onBlur={() => handleBlur('height')}
-              onKeyDown={(e) => handleKeyDown(e, 3)}
+              onKeyDown={(e) => handleKeyDown(e, 5)}
               placeholder="e.g., 5'10&quot;"
               className={inputClass('height')}
             />
             {errors.height && touched.height && (
-              <p className={errorClass} role="alert">
-                {errors.height}
-              </p>
+              <p className={errorClass} role="alert">{errors.height}</p>
             )}
           </div>
-
-          {/* Weight */}
           <div>
-            <label htmlFor="weight" className={labelClass}>
-              Weight
-            </label>
+            <label htmlFor="weight" className={labelClass}>Weight</label>
             <input
-              ref={(el) => { inputRefs.current[4] = el }}
+              ref={(el) => { inputRefs.current[6] = el }}
               id="weight"
               type="text"
               value={details.weight}
               onChange={(e) => handleChange('weight', e.target.value)}
               onBlur={() => handleBlur('weight')}
-              onKeyDown={(e) => handleKeyDown(e, 4)}
+              onKeyDown={(e) => handleKeyDown(e, 6)}
               placeholder="e.g., 150 lbs"
               className={inputClass('weight')}
             />
             {errors.weight && touched.weight && (
-              <p className={errorClass} role="alert">
-                {errors.weight}
-              </p>
+              <p className={errorClass} role="alert">{errors.weight}</p>
             )}
           </div>
         </div>
 
         {/* Player Name */}
         <div>
-          <label htmlFor="playerName" className={labelClass}>
-            Player Name
-          </label>
+          <label htmlFor="playerName" className={labelClass}>Player Name</label>
           <input
-            ref={(el) => { inputRefs.current[5] = el }}
+            ref={(el) => { inputRefs.current[7] = el }}
             id="playerName"
             type="text"
             value={details.playerName}
             onChange={(e) => handleChange('playerName', e.target.value)}
             onBlur={() => handleBlur('playerName')}
-            onKeyDown={(e) => handleKeyDown(e, 5)}
+            onKeyDown={(e) => handleKeyDown(e, 7)}
             placeholder="Your name (for DM tracking)"
             className={inputClass('playerName')}
           />
           {errors.playerName && touched.playerName && (
-            <p className={errorClass} role="alert">
-              {errors.playerName}
-            </p>
+            <p className={errorClass} role="alert">{errors.playerName}</p>
           )}
         </div>
 
         {/* Backstory */}
         <div>
-          <label htmlFor="backstory" className={labelClass}>
-            Background Story / Notes
-          </label>
+          <label htmlFor="backstory" className={labelClass}>Background Story / Notes</label>
           <textarea
-            ref={(el) => { inputRefs.current[6] = el }}
+            ref={(el) => { inputRefs.current[8] = el }}
             id="backstory"
             value={details.backstory}
             onChange={(e) => handleChange('backstory', e.target.value)}
@@ -385,15 +450,11 @@ export function CharacterDetailsForm({
           />
           <div className="flex justify-between mt-1">
             {errors.backstory && touched.backstory ? (
-              <p className={errorClass} role="alert">
-                {errors.backstory}
-              </p>
+              <p className={errorClass} role="alert">{errors.backstory}</p>
             ) : (
               <span />
             )}
-            <span className="text-gray-500 text-sm">
-              {details.backstory.length}/5000
-            </span>
+            <span className="text-gray-500 text-sm">{details.backstory.length}/5000</span>
           </div>
         </div>
 

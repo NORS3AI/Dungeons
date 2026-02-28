@@ -181,7 +181,7 @@ interface CharacterState {
   prevStep: () => void
 
   // Character updates
-  updateCharacterDetails: (details: Partial<Pick<Character, 'name' | 'playerName' | 'age' | 'height' | 'weight' | 'backstory'>>) => void
+  updateCharacterDetails: (details: Partial<Pick<Character, 'name' | 'firstName' | 'surname' | 'nickname' | 'playerName' | 'age' | 'height' | 'weight' | 'backstory'>>) => void
   setRace: (race: Race) => void
   setClass: (characterClass: Class) => void
   setSubclass: (subclass: Subclass) => void

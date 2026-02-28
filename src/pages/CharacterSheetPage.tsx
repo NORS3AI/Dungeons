@@ -1054,6 +1054,11 @@ export function CharacterSheetPage() {
         <div className="text-left">
           <h1 className="text-4xl font-bold text-dnd-gold mb-2">
             {character.name || 'Unnamed Character'}
+            {character.nickname && (
+              <span className="text-2xl text-gray-400 font-normal ml-2">
+                "{character.nickname}"
+              </span>
+            )}
           </h1>
           <p className="text-xl text-gray-400">
             Level {character.level} {character.race?.name || 'Unknown'}{' '}
@@ -1237,16 +1242,9 @@ export function CharacterSheetPage() {
               </div>
             </div>
 
-            {/* Proficiency Bonus */}
-            <div className="card bg-gray-800 border-gray-700 p-4 text-center">
-              <QuickRefTooltip type="rule" id="proficiency-bonus">
-                <div className="text-xs text-gray-500 uppercase mb-1 cursor-pointer hover:text-gray-300">Proficiency Bonus</div>
-              </QuickRefTooltip>
-              <div className="text-3xl font-bold text-dnd-gold">+{profBonus}</div>
-            </div>
           </div>
 
-          {/* Middle Column - Combat Stats & Skills */}
+          {/* Middle Column - Combat Stats, Character Info */}
           <div className="space-y-6">
             {/* Combat Stats */}
             <div className="card bg-gray-800 border-gray-700 p-4">
@@ -1316,10 +1314,7 @@ export function CharacterSheetPage() {
                 }}
               />
             )}
-          </div>
 
-          {/* Right Column - Info & Skills */}
-          <div className="space-y-6">
             {/* Character Info */}
             <div className="card bg-gray-800 border-gray-700 p-4">
               <h3 className="text-lg font-bold text-white mb-4">Character Info</h3>
@@ -1349,6 +1344,18 @@ export function CharacterSheetPage() {
                   <div className="flex justify-between">
                     <span className="text-gray-500">Player</span>
                     <span className="text-gray-300">{character.playerName}</span>
+                  </div>
+                )}
+                {character.dailyIncome && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Profession</span>
+                    <span className="text-gray-300">{character.dailyIncome.professionName}</span>
+                  </div>
+                )}
+                {character.nickname && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Nickname</span>
+                    <span className="text-gray-300 italic">"{character.nickname}"</span>
                   </div>
                 )}
                 {character.gender && (
@@ -1425,6 +1432,17 @@ export function CharacterSheetPage() {
                   </div>
                 )}
               </div>
+            </div>
+          </div>
+
+          {/* Right Column - Proficiency Bonus & Skills */}
+          <div className="space-y-6">
+            {/* Proficiency Bonus */}
+            <div className="card bg-gray-800 border-gray-700 p-4 text-center">
+              <QuickRefTooltip type="rule" id="proficiency-bonus">
+                <div className="text-xs text-gray-500 uppercase mb-1 cursor-pointer hover:text-gray-300">Proficiency Bonus</div>
+              </QuickRefTooltip>
+              <div className="text-3xl font-bold text-dnd-gold">+{profBonus}</div>
             </div>
 
             {/* Skills */}

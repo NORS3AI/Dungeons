@@ -83,6 +83,9 @@ export function CharacterCreatePage() {
 
   const handleDetailsSubmit = (details: {
     name: string
+    firstName?: string
+    surname?: string
+    nickname?: string
     age: string
     height: string
     weight: string
