@@ -214,6 +214,8 @@ export function WorkTab({ character }: WorkTabProps) {
   const [activeProfession, setActiveProfession] = useState<Profession>('blacksmithing')
   const [craftedNotif, setCraftedNotif] = useState<string | null>(null)
   const notifTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [collapsedTiers, setCollapsedTiers] = useState<Set<CraftingTier>>(new Set())
+  const [haveMatsOnly, setHaveMatsOnly] = useState(false)
 
   // Cleanup notification timer on unmount
   useEffect(() => () => { if (notifTimer.current) clearTimeout(notifTimer.current) }, [])
@@ -248,6 +250,15 @@ export function WorkTab({ character }: WorkTabProps) {
     [character.materials]
   )
 
+  function toggleTier(tier: CraftingTier) {
+    setCollapsedTiers((prev) => {
+      const next = new Set(prev)
+      if (next.has(tier)) next.delete(tier)
+      else next.add(tier)
+      return next
+    })
+  }
+
   function handleCraft(item: CraftedItem) {
     // Deduct materials
     for (const cost of item.materials) {
@@ -261,7 +272,7 @@ export function WorkTab({ character }: WorkTabProps) {
       description: item.bonus,
       category: 'adventuringGear' as const,
       weight: item.weight,
-      cost: { copper: 0, silver: 0, gold: 0, platinum: 0 },
+      cost: { copper: 0, silver: item.worth?.silver ?? 0, gold: item.worth?.gold ?? 0, platinum: 0 },
       quantity: 1,
       rarity: item.tier as 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary',
     }
@@ -329,35 +340,77 @@ export function WorkTab({ character }: WorkTabProps) {
         )}
       </div>
 
+      {/* Have Materials filter */}
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={() => setHaveMatsOnly((v) => !v)}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            haveMatsOnly
+              ? 'bg-green-700 text-white'
+              : 'bg-gray-800 text-gray-400 hover:text-white border border-gray-700'
+          }`}
+        >
+          🎒 Have Materials
+        </button>
+        {haveMatsOnly && (
+          <span className="text-xs text-gray-500">Showing only craftable recipes</span>
+        )}
+      </div>
+
       {/* Craftable items by tier */}
       <div className="space-y-4">
         {(Object.keys(recipesByTier) as CraftingTier[]).map((t) => {
-          const tierRecipes = recipesByTier[t]
-          if (tierRecipes.length === 0) return null
+          const allTierRecipes = recipesByTier[t]
+          if (allTierRecipes.length === 0) return null
           const tColors = TIER_COLORS[t]
           const [lo] = TIER_SKILL_RANGES[t]
           const tierUnlocked = skillValue >= lo
+
+          // Hide tiers the player can't access yet
+          if (!tierUnlocked) return null
+
+          // Apply "Have Materials" filter
+          const tierRecipes = haveMatsOnly
+            ? allTierRecipes.filter((r) =>
+                r.materials.every((cost) => (materialsMap.get(cost.materialId) ?? 0) >= cost.quantity)
+              )
+            : allTierRecipes
+
+          if (haveMatsOnly && tierRecipes.length === 0) return null
+
+          const isCollapsed = collapsedTiers.has(t)
+
           return (
             <div key={t}>
-              <div className="flex items-center gap-2 mb-2">
+              <button
+                type="button"
+                onClick={() => toggleTier(t)}
+                className="flex items-center gap-2 mb-2 w-full text-left group"
+              >
                 <h3 className={`text-base font-bold capitalize ${tColors.text}`}>
                   {TIER_LABELS[t]}
                 </h3>
-                {!tierUnlocked && (
-                  <span className="text-xs text-gray-500">(requires skill {lo})</span>
-                )}
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {tierRecipes.map((recipe) => (
-                  <CraftCard
-                    key={recipe.id}
-                    item={recipe}
-                    skill={skillValue}
-                    materialsMap={materialsMap}
-                    onCraft={handleCraft}
-                  />
-                ))}
-              </div>
+                <span className="text-xs text-gray-500">
+                  ({tierRecipes.length} recipe{tierRecipes.length !== 1 ? 's' : ''})
+                </span>
+                <span className="ml-auto text-gray-500 text-sm group-hover:text-gray-300 transition-colors">
+                  {isCollapsed ? '▶' : '▼'}
+                </span>
+              </button>
+              {!isCollapsed && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {tierRecipes.map((recipe) => (
+                    <CraftCard
+                      key={recipe.id}
+                      item={recipe}
+                      skill={skillValue}
+                      materialsMap={materialsMap}
+                      onCraft={handleCraft}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           )
         })}

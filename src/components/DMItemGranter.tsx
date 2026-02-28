@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useCharacterStore } from '../stores/characterStore'
 import type { Equipment, Weapon, Armor, WeaponProperty, DamageType } from '../types'
 import { EMPTY_CURRENCY } from '../types'
-import { PREMADE_POTIONS, PREMADE_WEAPONS, PREMADE_ARMOR, PREMADE_GEAR } from '../data/premadeItems'
+import { PREMADE_POTIONS, PREMADE_WEAPONS, PREMADE_ARMOR, PREMADE_GEAR, PREMADE_MATERIALS } from '../data/premadeItems'
 
 interface DMItemGranterProps {
   isOpen: boolean
@@ -11,6 +11,7 @@ interface DMItemGranterProps {
 
 type ItemType = 'weapon' | 'armor' | 'potion' | 'gear' | 'custom'
 type QuickAddCategory = 'potions' | 'weapons' | 'armor' | 'gear'
+type MatCategory = 'ore' | 'cloth' | 'hide' | 'herb'
 
 /**
  * DM Item Granter - Allow DMs to grant items to characters
@@ -20,9 +21,13 @@ export function DMItemGranter({ isOpen, onClose }: DMItemGranterProps) {
   const characters = useCharacterStore((state) => state.characters)
   const grantItemToCharacter = useCharacterStore((state) => state.grantItemToCharacter)
   const grantItemToAllCharacters = useCharacterStore((state) => state.grantItemToAllCharacters)
+  const grantMaterialToCharacter = useCharacterStore((state) => state.grantMaterialToCharacter)
+  const grantMaterialToAllCharacters = useCharacterStore((state) => state.grantMaterialToAllCharacters)
 
-  const [mode, setMode] = useState<'quick' | 'custom'>('quick')
+  const [mode, setMode] = useState<'quick' | 'custom' | 'materials'>('quick')
   const [quickAddCategory, setQuickAddCategory] = useState<QuickAddCategory>('potions')
+  const [matCategory, setMatCategory] = useState<MatCategory>('ore')
+  const [matQuantity, setMatQuantity] = useState(5)
   const [selectedCharacters, setSelectedCharacters] = useState<string[]>([])
   const [itemType, setItemType] = useState<ItemType>('gear')
   const [itemName, setItemName] = useState('')
@@ -246,7 +251,7 @@ export function DMItemGranter({ isOpen, onClose }: DMItemGranterProps) {
           )}
 
           {/* Mode Selection */}
-          <div className="flex gap-4">
+          <div className="flex gap-3 flex-wrap">
             <button
               onClick={() => setMode('quick')}
               className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
@@ -256,6 +261,16 @@ export function DMItemGranter({ isOpen, onClose }: DMItemGranterProps) {
               }`}
             >
               ⚡ Quick Add (Pre-made Items)
+            </button>
+            <button
+              onClick={() => setMode('materials')}
+              className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
+                mode === 'materials'
+                  ? 'bg-green-700 text-white'
+                  : 'bg-gray-800 text-gray-300 border border-gray-600 hover:border-gray-500'
+              }`}
+            >
+              🧪 Grant Materials
             </button>
             <button
               onClick={() => setMode('custom')}
@@ -430,6 +445,116 @@ export function DMItemGranter({ isOpen, onClose }: DMItemGranterProps) {
                       <p className="text-xs text-gray-400 line-clamp-2">{item.description}</p>
                     </div>
                   ))}
+              </div>
+            </div>
+          )}
+
+          {/* Grant Materials Mode */}
+          {mode === 'materials' && (
+            <div className="space-y-4">
+              {/* Category tabs */}
+              <div className="flex gap-2 border-b border-gray-700 pb-2 flex-wrap">
+                {(['ore', 'cloth', 'hide', 'herb'] as MatCategory[]).map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setMatCategory(cat)}
+                    className={`px-4 py-2 rounded-t-lg font-medium capitalize transition-all ${
+                      matCategory === cat
+                        ? 'bg-gray-800 text-green-400 border-t border-x border-gray-600'
+                        : 'text-gray-400 hover:text-gray-300'
+                    }`}
+                  >
+                    {cat === 'ore' && '⛏️'}
+                    {cat === 'cloth' && '🧵'}
+                    {cat === 'hide' && '🦎'}
+                    {cat === 'herb' && '🌿'}
+                    {' '}{cat.charAt(0).toUpperCase() + cat.slice(1)}
+                  </button>
+                ))}
+              </div>
+
+              {/* Quantity selector */}
+              <div className="flex items-center gap-3">
+                <label className="text-sm text-gray-300 font-medium">Quantity to grant:</label>
+                <div className="flex items-center gap-2">
+                  {[1, 3, 5, 10, 20].map((q) => (
+                    <button
+                      key={q}
+                      onClick={() => setMatQuantity(q)}
+                      className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                        matQuantity === q
+                          ? 'bg-green-700 text-white'
+                          : 'bg-gray-800 text-gray-400 border border-gray-700 hover:border-gray-500'
+                      }`}
+                    >
+                      ×{q}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Materials grid */}
+              <div className="grid grid-cols-2 gap-3 max-h-96 overflow-y-auto p-2">
+                {PREMADE_MATERIALS.filter((m) =>
+                  matCategory === 'hide' ? (m.category === 'hide' || m.category === 'leather') : m.category === matCategory
+                ).map((mat) => {
+                  const rarityColors: Record<string, string> = {
+                    common: 'text-gray-300',
+                    uncommon: 'text-green-400',
+                    rare: 'text-blue-400',
+                    epic: 'text-purple-400',
+                    legendary: 'text-orange-400',
+                  }
+                  const textColor = rarityColors[mat.rarity] ?? 'text-gray-300'
+                  return (
+                    <div
+                      key={mat.id}
+                      className="p-4 bg-gray-800 rounded-lg border border-gray-700 hover:border-green-500 transition-all"
+                    >
+                      <div className="flex items-start justify-between mb-1">
+                        <div className="flex-1">
+                          <h4 className={`font-bold ${textColor}`}>{mat.name}</h4>
+                          <p className="text-xs text-gray-500 capitalize">{mat.rarity}</p>
+                        </div>
+                        <div className="flex gap-1 flex-shrink-0">
+                          <button
+                            onClick={() => {
+                              if (selectedCharacters.length === 0) {
+                                setSuccessMessage('⚠️ Please select at least one character first')
+                                setTimeout(() => setSuccessMessage(''), 3000)
+                                return
+                              }
+                              selectedCharacters.forEach((cid) => grantMaterialToCharacter(cid, mat, matQuantity))
+                              setSuccessMessage(`✅ Granted ${matQuantity}× ${mat.name} to ${selectedCharacters.length} character(s)`)
+                              setTimeout(() => setSuccessMessage(''), 2500)
+                            }}
+                            className="px-2 py-1 bg-green-700 hover:bg-green-600 text-white text-xs rounded transition-colors"
+                            title={`Grant ×${matQuantity} to selected characters`}
+                          >
+                            +{matQuantity}
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (characters.length === 0) {
+                                setSuccessMessage('⚠️ No characters available')
+                                setTimeout(() => setSuccessMessage(''), 3000)
+                                return
+                              }
+                              grantMaterialToAllCharacters(mat, matQuantity)
+                              setSuccessMessage(`✅ Granted ${matQuantity}× ${mat.name} to all ${characters.length} character(s)`)
+                              setTimeout(() => setSuccessMessage(''), 2500)
+                            }}
+                            className="px-2 py-1 bg-dnd-gold hover:bg-yellow-500 text-gray-900 text-xs rounded font-bold transition-colors"
+                            title={`Grant ×${matQuantity} to all characters`}
+                          >
+                            ALL
+                          </button>
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-400 line-clamp-2">{mat.description}</p>
+                    </div>
+                  )
+                })}
               </div>
             </div>
           )}

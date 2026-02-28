@@ -1,5 +1,116 @@
 # Dungeons - Patch Notes
 
+## Version 0.4.3-alpha - February 28, 2026
+
+**Alpha Release Notice**: Major Work tab improvements, expanded Alchemy content, a Grant Materials DM tool, gear replacement in Inventory, and Tailoring cleanup.
+
+### ✨ Work Tab Improvements
+
+The Crafting tab is now much cleaner and easier to navigate.
+
+#### **Locked Tiers Hidden**
+- Tiers you don't have the skill to craft are now **completely hidden** — if you can't reach Rare yet, you won't see Rare recipes cluttering the screen
+
+#### **Collapsible Tier Sections**
+- Each quality tier (Common, Uncommon, Rare, Epic, Legendary) now has a **▼/▶ toggle** to show or hide its recipes
+- Recipe count shown next to each tier heading — e.g. "Common (6 recipes)"
+
+#### **Have Materials Filter**
+- New **🎒 Have Materials** button filters the recipe list to only show recipes you can actually craft right now — you have the skill AND the materials
+- Locked tiers are always excluded from this filter
+
+### ✨ Alchemy Expanded — 10 Potions Per Tier
+
+Alchemy now has the same recipe breadth as Blacksmithing and Tailoring: **10 potions per tier × 5 tiers = 50 total**.
+
+The six new potion types added across all tiers:
+- **Speed** — movement speed bonus (+5 ft at Common, scaling to +30 ft + extra bonus action at Legendary)
+- **Strength** — STR stat bonus (+1 at Common, up to +6 at Legendary with cap raised to 24)
+- **Endurance** — temporary HP (+3 at Common, up to +20 with regeneration at Legendary)
+- **Precision** — attack roll bonus (+1 at Common, up to +6 with expanded crits at Legendary)
+- **Protection** — damage resistance/immunity (one type for 1 min at Common, one immunity at Legendary)
+- **Regeneration** — HP recovery over time (1 HP/turn at Common, 10 HP/turn at Legendary)
+
+**Why This Matters**: Alchemy is now a full crafting profession — herbalists have as many meaningful choices as blacksmiths.
+
+### ✨ DM Tools — Grant Materials
+
+The DM Item Granter modal now has a dedicated **🧪 Grant Materials** mode.
+
+- Browse crafting materials by category: **Ore, Cloth, Hide, Herb**
+- Select quantity to grant: ×1, ×3, ×5, ×10, ×20
+- Grant to selected characters (**+N** button) or all characters (**ALL** button)
+- All premade materials from the loot system are available, organized by rarity
+
+**Why This Matters**: DMs can now stock up their players' crafting inventories without going through the loot system.
+
+### ✨ Inventory — Replace Gear
+
+Unequipped weapons and armor now show a **↕ Replace equipped weapon/armor** button when there is equipped gear of the same type.
+
+- Clicking replaces the equipped item directly with the unequipped one (old item is removed)
+- If multiple items are equipped, a picker appears to choose which one to replace
+
+**Why This Matters**: Players with legacy starter gear can cleanly swap in their newly crafted weapons and armor.
+
+### 🔧 Tailoring Cleanup
+
+Removed **Chest, Hood, Mantle, and Sandals** from all 5 Tailoring tiers (20 recipes removed total).
+
+Tailoring now focuses on: Helmet, Shoulder, Gauntlet, Pants, Boots, Tunic — all quality tiers still have 6 craftable pieces.
+
+---
+
+## Version 0.4.2-alpha - February 28, 2026
+
+**Alpha Release Notice**: Character creation now correctly maps all race weapon proficiencies to valid weapons, and the language system has been simplified to Common + 1 free choice for every race.
+
+### ✨ Weapon Proficiency Fixes
+
+Race weapon proficiency IDs are now fully matched to weapons that exist in the game's reference system.
+
+- **Dwarf**: Replaced `Light Hammer` (unavailable) with **Mace** — the closest simple bludgeoning weapon
+- **Sea Elf**: Replaced `Spear` (unavailable) with **Javelin** — the closest thrown piercing weapon
+- All other races (High Elf, Wood Elf, Drow) were already valid — no change needed
+
+Weapon proficiency tooltips (click to see stats) will now work correctly for all races.
+
+### ✨ Language System Redesign
+
+Languages in character creation now follow a clean 1/2 model: **Common is always known, and the player picks one additional language freely**.
+
+- **Common** is always the default — locked in for every character
+- **Racial language is now Suggested** (shown in blue), not locked. Play an Elf and see Elvish suggested — but choose Draconic if you prefer
+- **Total cap is 2** — Common + 1 choice, always. No more automatic racial language grants
+- **Class secret languages** (Druidic for Druids, Thieves' Cant for Rogues) still fill the second slot automatically, as those are class features
+
+**Why This Matters**: Players now have genuine language choice regardless of race, while still seeing their race's language as the natural suggestion.
+
+---
+
+## Version 0.4.1-alpha - February 28, 2026
+
+**Alpha Release Notice**: All 170 crafted items and 20+ crafting materials now have market worth values, enabling accurate sell pricing in shops and vendor interactions.
+
+### ✨ Crafted Item & Material Worth Values
+
+Every craftable recipe and gatherable material now has a market sell value.
+
+#### **Crafting Material Worth (1–10 silver each)**
+All herbs, ores, hides, cloths, and disenchanting byproducts (Magical Dust/Shards) have worth values reflecting their rarity.
+
+#### **Crafted Item Worth by Profession**
+- **Blacksmithing** weapons: 2g 5s (Common) → 50g (Legendary Ancient Axe)
+- **Tailoring** armor: 1s (Common Hood) → 40g (Legendary Eternal Chest)
+- **Alchemy** potions: 2s (Common Minor Healing) → 25g (Legendary Instant Initiative)
+- **Enchanting** scrolls: 2s (Common stat scrolls) → 10g (Legendary Colossus/Executioner)
+
+Crafted items are added to inventory with their worth as their sell cost, so vendors and loot appraisals will reflect accurate values.
+
+**Why This Matters**: Players can now see what their crafted goods are worth and make informed decisions about keeping vs. selling equipment.
+
+---
+
 ## Version 0.4.0-alpha - February 28, 2026
 
 **Alpha Release Notice**: The Work Tab brings a full crafting system to Dungeons — forge weapons, tailor armor, brew potions, and enchant scrolls using materials gathered from the world.

@@ -148,27 +148,16 @@ export const SECRET_LANGUAGES: Language[] = [
 export const ALL_LANGUAGES = [...STANDARD_LANGUAGES, ...EXOTIC_LANGUAGES, ...SECRET_LANGUAGES]
 
 /**
- * Get languages that are automatically granted to a character by their race or class.
+ * Get languages that are automatically granted to a character by their class.
  * These are non-optional — the character always knows them regardless of choices.
+ * Racial languages are NOT granted here; they appear as suggestions instead.
  */
 export function getGrantedLanguages(params: {
   raceName?: string
   className?: string
 }): string[] {
-  const { raceName, className } = params
+  const { className } = params
   const grants: string[] = []
-
-  if (raceName) {
-    const raceLC = raceName.toLowerCase()
-    if (raceLC.includes('dwarf')) grants.push('dwarvish')
-    if (raceLC.includes('elf') || raceLC.includes('drow')) grants.push('elvish')
-    if (raceLC.includes('halfling')) grants.push('halfling')
-    if (raceLC.includes('gnome')) grants.push('gnomish')
-    if (raceLC.includes('dragonborn')) grants.push('draconic')
-    if (raceLC.includes('tiefling')) grants.push('infernal')
-    if (raceLC.includes('half-orc')) grants.push('orc')
-    if (raceLC.includes('aasimar')) grants.push('celestial')
-  }
 
   if (className) {
     const classLC = className.toLowerCase()

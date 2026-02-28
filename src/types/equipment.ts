@@ -243,6 +243,8 @@ export interface Material {
   quantity: number
   rarity: 'trash' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'artifact'
   weight: number // Weight per unit
+  /** Market value of a single unit */
+  worth?: { gold: number; silver: number }
 }
 
 /**

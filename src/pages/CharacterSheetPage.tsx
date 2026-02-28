@@ -114,6 +114,8 @@ export function CharacterSheetPage() {
   const [restNotification, setRestNotification] = useState<{ type: 'short' | 'long' | 'trance'; message: string } | null>(null)
   const [sellConfirmation, setSellConfirmation] = useState<{ itemName: string; value: number; currencyType: 'cp' | 'sp' | 'gp' | 'pp'; onConfirm: () => void } | null>(null)
   const [abilityNotification, setAbilityNotification] = useState<{ featureName: string; message: string } | null>(null)
+  // Gear replacement: id of item being replaced, null when not replacing
+  const [replacingItemId, setReplacingItemId] = useState<string | null>(null)
 
   useEffect(() => {
     if (id) {
@@ -326,6 +328,7 @@ export function CharacterSheetPage() {
         quantity: lootItem.quantity || 1,
         rarity: lootItem.rarity as any,
         weight: 0.1, // 0.1 pounds per unit
+        worth: (lootItem as any).worth,
       }
 
       addMaterial(material)
@@ -592,6 +595,14 @@ export function CharacterSheetPage() {
   // Substitute "level" keyword in a formula with the actual character level number
   const resolveHealingFormula = (formula: string, level: number): string => {
     return formula.replace(/\blevel\b/gi, String(level))
+  }
+
+  // Handle gear replacement: remove old item, equip new item
+  const handleReplaceGear = (oldItemId: string, newItemId: string) => {
+    removeEquipment(oldItemId)
+    toggleEquipment(newItemId)
+    setReplacingItemId(null)
+    saveCharacter()
   }
 
   // Handle using a potion/consumable — rolls immediately, consumes after 15 seconds
@@ -2012,31 +2023,72 @@ export function CharacterSheetPage() {
               <div className="space-y-2">
                 {character.equipment
                   .filter((item): item is Weapon => isWeapon(item) && item.equipped !== true)
-                  .map((item) => (
-                    <EquipmentItem
-                      key={item.id}
-                      item={item}
-                      character={character}
-                      onRemove={() => {
-                        removeEquipment(item.id)
-                        saveCharacter()
-                      }}
-                      onToggleEquip={() => {
-                        toggleEquipment(item.id)
-                        saveCharacter()
-                      }}
-                      onChangeQuantity={(change) => {
-                        changeEquipmentQuantity(item.id, change)
-                        saveCharacter()
-                      }}
-                      onUse={() => handleUseConsumable(item)}
-                      onRename={(newName) => {
-                        renameEquipment(item.id, newName)
-                        saveCharacter()
-                      }}
-                      onDisenchant={() => { disenchantItem(item.id); saveCharacter() }}
-                    />
-                  ))}
+                  .map((item) => {
+                    const equippedWeapons = character.equipment.filter(e => isWeapon(e) && e.equipped === true)
+                    return (
+                      <div key={item.id}>
+                        <EquipmentItem
+                          item={item}
+                          character={character}
+                          onRemove={() => {
+                            removeEquipment(item.id)
+                            saveCharacter()
+                          }}
+                          onToggleEquip={() => {
+                            toggleEquipment(item.id)
+                            saveCharacter()
+                          }}
+                          onChangeQuantity={(change) => {
+                            changeEquipmentQuantity(item.id, change)
+                            saveCharacter()
+                          }}
+                          onUse={() => handleUseConsumable(item)}
+                          onRename={(newName) => {
+                            renameEquipment(item.id, newName)
+                            saveCharacter()
+                          }}
+                          onDisenchant={() => { disenchantItem(item.id); saveCharacter() }}
+                        />
+                        {equippedWeapons.length > 0 && (
+                          replacingItemId === item.id ? (
+                            <div className="mt-1 ml-2 p-2 bg-gray-700 rounded-lg text-sm">
+                              <p className="text-gray-300 mb-1 text-xs">Replace which equipped weapon?</p>
+                              <div className="flex flex-wrap gap-1">
+                                {equippedWeapons.map((ew) => (
+                                  <button
+                                    key={ew.id}
+                                    onClick={() => handleReplaceGear(ew.id, item.id)}
+                                    className="px-2 py-1 bg-orange-700 hover:bg-orange-600 text-white text-xs rounded transition-colors"
+                                  >
+                                    Replace "{ew.name}"
+                                  </button>
+                                ))}
+                                <button
+                                  onClick={() => setReplacingItemId(null)}
+                                  className="px-2 py-1 bg-gray-600 hover:bg-gray-500 text-gray-300 text-xs rounded transition-colors"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                if (equippedWeapons.length === 1) {
+                                  handleReplaceGear(equippedWeapons[0].id, item.id)
+                                } else {
+                                  setReplacingItemId(item.id)
+                                }
+                              }}
+                              className="mt-1 ml-2 px-3 py-1 text-xs bg-gray-700 hover:bg-orange-800 text-orange-300 rounded transition-colors border border-orange-800/50"
+                            >
+                              ↕ Replace equipped weapon
+                            </button>
+                          )
+                        )}
+                      </div>
+                    )
+                  })}
               </div>
             </div>
           )}
@@ -2084,31 +2136,72 @@ export function CharacterSheetPage() {
               <div className="space-y-2">
                 {character.equipment
                   .filter((item) => (isArmor(item) || item.category === 'cloak') && item.equipped !== true)
-                  .map((item) => (
-                    <EquipmentItem
-                      key={item.id}
-                      item={item}
-                      character={character}
-                      onRemove={() => {
-                        removeEquipment(item.id)
-                        saveCharacter()
-                      }}
-                      onToggleEquip={() => {
-                        toggleEquipment(item.id)
-                        saveCharacter()
-                      }}
-                      onChangeQuantity={(change) => {
-                        changeEquipmentQuantity(item.id, change)
-                        saveCharacter()
-                      }}
-                      onUse={() => handleUseConsumable(item)}
-                      onRename={(newName) => {
-                        renameEquipment(item.id, newName)
-                        saveCharacter()
-                      }}
-                      onDisenchant={() => { disenchantItem(item.id); saveCharacter() }}
-                    />
-                  ))}
+                  .map((item) => {
+                    const equippedArmors = character.equipment.filter(e => (isArmor(e) || e.category === 'cloak') && e.equipped === true)
+                    return (
+                      <div key={item.id}>
+                        <EquipmentItem
+                          item={item}
+                          character={character}
+                          onRemove={() => {
+                            removeEquipment(item.id)
+                            saveCharacter()
+                          }}
+                          onToggleEquip={() => {
+                            toggleEquipment(item.id)
+                            saveCharacter()
+                          }}
+                          onChangeQuantity={(change) => {
+                            changeEquipmentQuantity(item.id, change)
+                            saveCharacter()
+                          }}
+                          onUse={() => handleUseConsumable(item)}
+                          onRename={(newName) => {
+                            renameEquipment(item.id, newName)
+                            saveCharacter()
+                          }}
+                          onDisenchant={() => { disenchantItem(item.id); saveCharacter() }}
+                        />
+                        {equippedArmors.length > 0 && (
+                          replacingItemId === item.id ? (
+                            <div className="mt-1 ml-2 p-2 bg-gray-700 rounded-lg text-sm">
+                              <p className="text-gray-300 mb-1 text-xs">Replace which equipped armor?</p>
+                              <div className="flex flex-wrap gap-1">
+                                {equippedArmors.map((ea) => (
+                                  <button
+                                    key={ea.id}
+                                    onClick={() => handleReplaceGear(ea.id, item.id)}
+                                    className="px-2 py-1 bg-orange-700 hover:bg-orange-600 text-white text-xs rounded transition-colors"
+                                  >
+                                    Replace "{ea.name}"
+                                  </button>
+                                ))}
+                                <button
+                                  onClick={() => setReplacingItemId(null)}
+                                  className="px-2 py-1 bg-gray-600 hover:bg-gray-500 text-gray-300 text-xs rounded transition-colors"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                if (equippedArmors.length === 1) {
+                                  handleReplaceGear(equippedArmors[0].id, item.id)
+                                } else {
+                                  setReplacingItemId(item.id)
+                                }
+                              }}
+                              className="mt-1 ml-2 px-3 py-1 text-xs bg-gray-700 hover:bg-orange-800 text-orange-300 rounded transition-colors border border-orange-800/50"
+                            >
+                              ↕ Replace equipped armor
+                            </button>
+                          )
+                        )}
+                      </div>
+                    )
+                  })}
               </div>
             </div>
           )}

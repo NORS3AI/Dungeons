@@ -1,4 +1,4 @@
-import type { Equipment, Weapon, Armor } from '../types'
+import type { Equipment, Weapon, Armor, Material } from '../types'
 import { EMPTY_CURRENCY } from '../types'
 
 /**
@@ -452,3 +452,46 @@ export const PREMADE_GEAR: Equipment[] = [
     cost: { ...EMPTY_CURRENCY, gold: 2 },
   },
 ]
+
+// ─── Premade Crafting Materials for DM granting ────────────────────────────
+export const PREMADE_MATERIALS: (Material & { label: string })[] = [
+  // Ores
+  { id: 'iron-ore',          name: 'Iron Ore Nugget',       label: 'Ore',  category: 'ore',   rarity: 'common',    quantity: 1, weight: 1,   worth: { gold: 0, silver: 2  }, description: 'Raw iron ore for blacksmithing' },
+  { id: 'copper-ore',        name: 'Copper Ore Nugget',     label: 'Ore',  category: 'ore',   rarity: 'common',    quantity: 1, weight: 1,   worth: { gold: 0, silver: 1  }, description: 'Raw copper ore for blacksmithing' },
+  { id: 'iron-ore-unc',      name: 'Quality Iron Ore',      label: 'Ore',  category: 'ore',   rarity: 'uncommon',  quantity: 1, weight: 1,   worth: { gold: 0, silver: 4  }, description: 'Higher quality iron ore for blacksmithing' },
+  { id: 'copper-ore-unc',    name: 'Quality Copper Ore',    label: 'Ore',  category: 'ore',   rarity: 'uncommon',  quantity: 1, weight: 1,   worth: { gold: 0, silver: 3  }, description: 'Higher quality copper ore for blacksmithing' },
+  { id: 'silver-ore',        name: 'Silver Ore Nugget',     label: 'Ore',  category: 'ore',   rarity: 'rare',      quantity: 1, weight: 1,   worth: { gold: 0, silver: 8  }, description: 'Pure silver ore for fine weapons' },
+  { id: 'gold-ore',          name: 'Gold Ore Nugget',       label: 'Ore',  category: 'ore',   rarity: 'rare',      quantity: 1, weight: 1,   worth: { gold: 0, silver: 9  }, description: 'Pure gold ore for valuable items' },
+  { id: 'mithril-ore',       name: 'Mithril Ore Nugget',    label: 'Ore',  category: 'ore',   rarity: 'epic',      quantity: 1, weight: 2,   worth: { gold: 0, silver: 9  }, description: 'Legendary lightweight metal' },
+  { id: 'adamantite-ore',    name: 'Adamantite Ore Nugget', label: 'Ore',  category: 'ore',   rarity: 'epic',      quantity: 1, weight: 2,   worth: { gold: 0, silver: 10 }, description: 'Incredibly hard metal' },
+  { id: 'obsidian-steel-ore',name: 'Obsidian-Steel Ore',    label: 'Ore',  category: 'ore',   rarity: 'legendary', quantity: 1, weight: 3,   worth: { gold: 2, silver: 5  }, description: 'Mythical volcanic metal forged in dragon fire' },
+
+  // Cloth
+  { id: 'linen-cloth',       name: 'Linen Cloth',           label: 'Cloth', category: 'cloth', rarity: 'common',   quantity: 1, weight: 0.1, worth: { gold: 0, silver: 1  }, description: 'Common cloth for tailoring' },
+  { id: 'wool-cloth',        name: 'Wool Cloth',            label: 'Cloth', category: 'cloth', rarity: 'common',   quantity: 1, weight: 0.1, worth: { gold: 0, silver: 2  }, description: 'Common wool cloth for tailoring' },
+  { id: 'silk-cloth',        name: 'Silk Cloth',            label: 'Cloth', category: 'cloth', rarity: 'uncommon', quantity: 1, weight: 0.1, worth: { gold: 0, silver: 6  }, description: 'Fine silk cloth for quality armor' },
+  { id: 'cotton-cloth',      name: 'Cotton Cloth',          label: 'Cloth', category: 'cloth', rarity: 'uncommon', quantity: 1, weight: 0.1, worth: { gold: 0, silver: 5  }, description: 'Sturdy cotton for padded armor' },
+  { id: 'enchanted-cloth',   name: 'Enchanted Cloth',       label: 'Cloth', category: 'cloth', rarity: 'rare',     quantity: 1, weight: 0.1, worth: { gold: 0, silver: 8  }, description: 'Magically-infused cloth for superior armor' },
+  { id: 'shadowweave-cloth', name: 'Shadowweave Cloth',     label: 'Cloth', category: 'cloth', rarity: 'epic',     quantity: 1, weight: 0.1, worth: { gold: 0, silver: 9  }, description: 'Dark cloth woven with shadow essence' },
+  { id: 'void-silk',         name: 'Void Silk',             label: 'Cloth', category: 'cloth', rarity: 'legendary',quantity: 1, weight: 0.1, worth: { gold: 1, silver: 5  }, description: 'Legendary cloth harvested from the Astral Plane' },
+
+  // Hides & Leather
+  { id: 'light-hide',        name: 'Light Animal Hide',     label: 'Hide', category: 'hide',   rarity: 'common',   quantity: 1, weight: 1,   worth: { gold: 0, silver: 2  }, description: 'Common hide from small animals' },
+  { id: 'thick-hide',        name: 'Thick Leather Hide',    label: 'Hide', category: 'hide',   rarity: 'uncommon', quantity: 1, weight: 2,   worth: { gold: 0, silver: 6  }, description: 'Uncommon hide from large animals' },
+  { id: 'scaled-hide',       name: 'Scaled Beast Hide',     label: 'Hide', category: 'hide',   rarity: 'rare',     quantity: 1, weight: 2,   worth: { gold: 0, silver: 9  }, description: 'Rare hide from a scaled creature' },
+  { id: 'wyvern-hide',       name: 'Wyvern Hide',           label: 'Hide', category: 'hide',   rarity: 'epic',     quantity: 1, weight: 3,   worth: { gold: 0, silver: 10 }, description: 'Exceptionally tough hide from a wyvern' },
+  { id: 'dragonscale-leather',name: 'Dragonscale Leather',  label: 'Hide', category: 'leather',rarity: 'legendary',quantity: 1, weight: 4,   worth: { gold: 2, silver: 0  }, description: 'Ancient dragon hide for legendary armor' },
+
+  // Herbs
+  { id: 'common-herb-lavender',  name: 'Lavender',          label: 'Herb', category: 'herb',  rarity: 'common',   quantity: 1, weight: 0.05,worth: { gold: 0, silver: 1  }, description: 'Common herb for healing salves' },
+  { id: 'common-herb-mint',      name: 'Mint Leaves',       label: 'Herb', category: 'herb',  rarity: 'common',   quantity: 1, weight: 0.05,worth: { gold: 0, silver: 1  }, description: 'Common herb for potions' },
+  { id: 'uncommon-herb-foxglove',name: 'Foxglove',          label: 'Herb', category: 'herb',  rarity: 'uncommon', quantity: 1, weight: 0.05,worth: { gold: 0, silver: 3  }, description: 'Uncommon herb for potent potions' },
+  { id: 'uncommon-herb-wolfsbane',name: 'Wolfsbane',        label: 'Herb', category: 'herb',  rarity: 'uncommon', quantity: 1, weight: 0.05,worth: { gold: 0, silver: 4  }, description: 'Effective against lycanthropes' },
+  { id: 'rare-herb-mandrake',    name: 'Mandrake Root',     label: 'Herb', category: 'herb',  rarity: 'rare',     quantity: 1, weight: 0.1, worth: { gold: 0, silver: 7  }, description: 'Rare herb for powerful concoctions' },
+  { id: 'rare-herb-bloodthorn',  name: 'Bloodthorn',        label: 'Herb', category: 'herb',  rarity: 'rare',     quantity: 1, weight: 0.1, worth: { gold: 0, silver: 8  }, description: 'Rare herb for healing potions' },
+  { id: 'rare-herb-nightshade',  name: 'Arcane Nightshade', label: 'Herb', category: 'herb',  rarity: 'epic',     quantity: 1, weight: 0.1, worth: { gold: 0, silver: 8  }, description: 'Extremely rare herb for legendary potions' },
+  { id: 'rare-herb-phoenix',     name: 'Phoenix Feather Grass',label:'Herb',category: 'herb', rarity: 'epic',     quantity: 1, weight: 0.1, worth: { gold: 0, silver: 9  }, description: 'Herb for resurrection elixirs' },
+  { id: 'legendary-herb-starbloom',name:'Starbloom Petal',  label: 'Herb', category: 'herb',  rarity: 'legendary',quantity: 1, weight: 0.05,worth: { gold: 1, silver: 2  }, description: 'Blooms only under starlight' },
+  { id: 'legendary-herb-soulroot',name: 'Soulroot',         label: 'Herb', category: 'herb',  rarity: 'legendary',quantity: 1, weight: 0.05,worth: { gold: 1, silver: 4  }, description: 'Herb from the Feywild' },
+]
+
