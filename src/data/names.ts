@@ -187,28 +187,6 @@ export const RACE_NAME_TABLES: RaceNames[] = [
     nicknameHints: ['Hellborn', 'the Fallen', 'Ashblood', 'Embervein', 'Duskchild'],
   },
   {
-    raceId: 'dragonborn',
-    label: 'Dragonborn',
-    male: [
-      'Arjhan', 'Balasar', 'Bharash', 'Donaar', 'Ghesh', 'Heskan',
-      'Kriv', 'Medrash', 'Mehen', 'Nadarr', 'Pandjed', 'Patrin',
-      'Rhogar', 'Shamash', 'Shedinn', 'Tarhun', 'Torinn',
-    ],
-    female: [
-      'Akra', 'Biri', 'Daar', 'Farideh', 'Harann', 'Havilar',
-      'Jheri', 'Kava', 'Korinn', 'Mishann', 'Nala', 'Perra',
-      'Raiann', 'Sora', 'Surina', 'Thava', 'Uadjit',
-    ],
-    surnames: [
-      'Clethtinthiallor', 'Daardendrian', 'Delmirev', 'Drachedandion',
-      'Fenkenkabradon', 'Kepeshkmolik', 'Kerrhylon', 'Kimbatuul',
-      'Linxakasendalor', 'Myastan', 'Nemmonis', 'Norixius', 'Ophinshtalajiir',
-      'Prexijandilin', 'Shestendeliath', 'Turnuroth', 'Verthisathurgiesh',
-      'Yarjerit',
-    ],
-    nicknameHints: ['Scalehunter', 'the Ancient', 'Emberclaw', 'Frostbreath', 'Stormwing'],
-  },
-  {
     raceId: 'aasimar',
     label: 'Aasimar',
     male: [
