@@ -89,6 +89,17 @@ import {
   WIZARD_LEVEL_8_SPELLS,
   WIZARD_LEVEL_9_SPELLS,
   GOO_EXPANDED_SPELLS,
+  AMAZON_CANTRIPS,
+  AMAZON_LEVEL_1_SPELLS,
+  AMAZON_LEVEL_2_SPELLS,
+  AMAZON_LEVEL_3_SPELLS,
+  AMAZON_LEVEL_4_SPELLS,
+  AMAZON_LEVEL_5_SPELLS,
+  DEMON_HUNTER_LEVEL_1_SPELLS,
+  DEMON_HUNTER_LEVEL_2_SPELLS,
+  DEMON_HUNTER_LEVEL_3_SPELLS,
+  DEMON_HUNTER_LEVEL_4_SPELLS,
+  DEMON_HUNTER_LEVEL_5_SPELLS,
 } from '../data/spells'
 
 interface SpellSelectorProps {
@@ -117,6 +128,7 @@ export function SpellSelector({
 
   // Determine available spells based on class
   const availableCantrips = useMemo(() => {
+    if (characterClass?.id === 'amazon') return AMAZON_CANTRIPS
     if (characterClass?.id === 'bard') return BARD_CANTRIPS
     if (characterClass?.id === 'cleric') return CLERIC_CANTRIPS
     if (characterClass?.id === 'death-knight') return DEATH_KNIGHT_CANTRIPS
@@ -399,6 +411,46 @@ export function SpellSelector({
       }
       if (level >= 17) {
         spells.push(...WIZARD_LEVEL_9_SPELLS)
+      }
+      return spells
+    }
+
+    // Amazon spells - half-caster with level-based progression
+    if (characterClass?.id === 'amazon') {
+      if (level >= 2) {
+        spells.push(...AMAZON_LEVEL_1_SPELLS)
+      }
+      if (level >= 5) {
+        spells.push(...AMAZON_LEVEL_2_SPELLS)
+      }
+      if (level >= 9) {
+        spells.push(...AMAZON_LEVEL_3_SPELLS)
+      }
+      if (level >= 13) {
+        spells.push(...AMAZON_LEVEL_4_SPELLS)
+      }
+      if (level >= 17) {
+        spells.push(...AMAZON_LEVEL_5_SPELLS)
+      }
+      return spells
+    }
+
+    // Demon Hunter spells - half-caster with level-based progression
+    if (characterClass?.id === 'demon-hunter') {
+      if (level >= 2) {
+        spells.push(...DEMON_HUNTER_LEVEL_1_SPELLS)
+      }
+      if (level >= 5) {
+        spells.push(...DEMON_HUNTER_LEVEL_2_SPELLS)
+      }
+      if (level >= 9) {
+        spells.push(...DEMON_HUNTER_LEVEL_3_SPELLS)
+      }
+      if (level >= 13) {
+        spells.push(...DEMON_HUNTER_LEVEL_4_SPELLS)
+      }
+      if (level >= 17) {
+        spells.push(...DEMON_HUNTER_LEVEL_5_SPELLS)
       }
       return spells
     }
