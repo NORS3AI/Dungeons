@@ -112,6 +112,7 @@ export function LootCache({ character, onAddToInventory, dmModeEnabled = false }
   const [isGeneratingLegendary, setIsGeneratingLegendary] = useState(false)
   const [selectedRarity, setSelectedRarity] = useState<LootRarity>('rare')
   const [legendaryQuantity, setLegendaryQuantity] = useState<number>(1)
+  const [materialsOnly, setMaterialsOnly] = useState(false)
 
   // Collapse states
   const [showLegendaryResults, setShowLegendaryResults] = useState(true)
@@ -146,7 +147,7 @@ export function LootCache({ character, onAddToInventory, dmModeEnabled = false }
   const handleGenerateLegendaryLoot = (rarity: LootRarity, quantity: number) => {
     setIsGeneratingLegendary(true)
     setTimeout(() => {
-      const loot = generateLegendaryLoot(rarity, quantity)
+      const loot = generateLegendaryLoot(rarity, quantity, materialsOnly)
       setLegendaryLoot((prev) => [...prev, ...loot])
       setShowLegendaryResults(true)
       setIsGeneratingLegendary(false)
@@ -185,7 +186,7 @@ export function LootCache({ character, onAddToInventory, dmModeEnabled = false }
             </div>
           </div>
 
-          {/* Quantity Selection + Generate */}
+          {/* Quantity Selection + Filter + Generate */}
           <div className="flex items-end gap-4 flex-wrap">
             <div>
               <label className="text-sm text-gray-400 mb-2 block">Quantity</label>
@@ -206,12 +207,26 @@ export function LootCache({ character, onAddToInventory, dmModeEnabled = false }
               </div>
             </div>
 
+            <div>
+              <label className="text-sm text-gray-400 mb-2 block">Filter</label>
+              <button
+                onClick={() => setMaterialsOnly(!materialsOnly)}
+                className={`h-10 px-4 rounded-lg border-2 text-sm font-bold transition-all ${
+                  materialsOnly
+                    ? 'border-green-500 bg-green-900/40 text-green-400'
+                    : 'border-gray-600 bg-gray-800 text-gray-400 hover:border-gray-500'
+                }`}
+              >
+                🪨 Mats Only
+              </button>
+            </div>
+
             <button
               onClick={() => handleGenerateLegendaryLoot(selectedRarity, legendaryQuantity)}
               disabled={isGeneratingLegendary}
               className={`px-6 py-2.5 rounded-lg font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed border-2 ${RARITY_COLORS[selectedRarity].border} ${RARITY_COLORS[selectedRarity].bg} ${RARITY_COLORS[selectedRarity].text} hover:scale-105`}
             >
-              {isGeneratingLegendary ? 'Generating...' : `Generate ${legendaryQuantity} ${selectedRarity.charAt(0).toUpperCase() + selectedRarity.slice(1)}`}
+              {isGeneratingLegendary ? 'Generating...' : `Generate ${legendaryQuantity} ${selectedRarity.charAt(0).toUpperCase() + selectedRarity.slice(1)}${materialsOnly ? ' Mats' : ''}`}
             </button>
           </div>
 

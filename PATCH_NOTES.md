@@ -1,5 +1,23 @@
 # Dungeons - Patch Notes
 
+## Version 0.4.12-alpha - February 28, 2026
+
+**Alpha Release Notice**: Legendary Loot Generator can now generate crafting materials only.
+
+### ✨ Mats Only Filter — Legendary Loot Generator
+
+DMs can now toggle **"Mats Only"** in the Legendary Loot Generator to generate exclusively crafting materials (ores, cloth, hides, herbs) at any rarity tier.
+
+#### **What changed**
+- New **"Mats Only"** toggle button between the Quantity selector and Generate button
+- When enabled, the generator filters the loot pool to only include `Crafting Material` items
+- The Generate button label updates to reflect the filter (e.g. "Generate 5 Rare Mats")
+- Works at all rarity tiers that have materials (common through legendary)
+
+**Why This Matters**: DMs can now reward crafting materials directly without sifting through mixed loot results.
+
+---
+
 ## Version 0.4.11-alpha - February 28, 2026
 
 **Alpha Release Notice**: Potion effect info is now clearly visible on every potion card.
