@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import type { Character } from '../types'
+import { RACE_NAME_TABLES, generateRandomName } from '../data/names'
 
 interface CharacterEditModalProps {
   character: Character
@@ -7,6 +8,9 @@ interface CharacterEditModalProps {
   onClose: () => void
   onSave: (details: {
     name: string
+    firstName?: string
+    surname?: string
+    nickname?: string
     playerName: string
     gender?: 'male' | 'female' | 'other'
     age: string
@@ -16,9 +20,16 @@ interface CharacterEditModalProps {
   }) => void
 }
 
+const inputClass =
+  'w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-dnd-gold focus:border-transparent'
+
+const labelClass = 'block text-sm font-medium text-gray-300 mb-2'
+
 export function CharacterEditModal({ character, isOpen, onClose, onSave }: CharacterEditModalProps) {
   const [formData, setFormData] = useState({
-    name: character.name,
+    firstName: character.firstName ?? character.name ?? '',
+    surname: character.surname ?? '',
+    nickname: character.nickname ?? '',
     playerName: character.playerName,
     gender: character.gender,
     age: character.age,
@@ -27,10 +38,16 @@ export function CharacterEditModal({ character, isOpen, onClose, onSave }: Chara
     backstory: character.backstory,
   })
 
-  // Update form when character changes
+  // Default the generator race to the character's current race (if available in table)
+  const defaultRace = RACE_NAME_TABLES.find((r) => r.raceId === character.race?.id)?.raceId ?? 'human'
+  const [generatorRace, setGeneratorRace] = useState(defaultRace)
+
+  // Sync when character prop changes
   useEffect(() => {
     setFormData({
-      name: character.name,
+      firstName: character.firstName ?? character.name ?? '',
+      surname: character.surname ?? '',
+      nickname: character.nickname ?? '',
       playerName: character.playerName,
       gender: character.gender,
       age: character.age,
@@ -38,21 +55,20 @@ export function CharacterEditModal({ character, isOpen, onClose, onSave }: Chara
       weight: character.weight,
       backstory: character.backstory,
     })
+    setGeneratorRace(
+      RACE_NAME_TABLES.find((r) => r.raceId === character.race?.id)?.raceId ?? 'human'
+    )
   }, [character])
 
-  // Close on escape key
+  // Close on Escape
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose()
-      }
+      if (e.key === 'Escape') onClose()
     }
-
     if (isOpen) {
       document.addEventListener('keydown', handleEscape)
       document.body.style.overflow = 'hidden'
     }
-
     return () => {
       document.removeEventListener('keydown', handleEscape)
       document.body.style.overflow = ''
@@ -61,23 +77,45 @@ export function CharacterEditModal({ character, isOpen, onClose, onSave }: Chara
 
   if (!isOpen) return null
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    onSave(formData)
-    onClose()
-  }
+  const composeName = (first: string, surname: string) =>
+    [first.trim(), surname.trim()].filter(Boolean).join(' ')
 
   const handleChange = (field: keyof typeof formData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
+  const handleGenerateName = () => {
+    const gender: 'male' | 'female' | 'neutral' =
+      formData.gender === 'male' ? 'male' :
+      formData.gender === 'female' ? 'female' :
+      'neutral'
+    const { firstName, surname } = generateRandomName(generatorRace, gender)
+    setFormData((prev) => ({ ...prev, firstName, surname }))
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    const { firstName, surname, nickname, ...rest } = formData
+    onSave({
+      ...rest,
+      firstName,
+      surname,
+      nickname,
+      name: composeName(firstName, surname),
+    })
+    onClose()
+  }
+
+  const fullNamePreview = [
+    formData.firstName.trim(),
+    formData.nickname.trim() ? `"${formData.nickname.trim()}"` : '',
+    formData.surname.trim(),
+  ].filter(Boolean).join(' ')
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal */}
       <div className="relative bg-gray-800 rounded-xl border border-gray-700 shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -95,155 +133,154 @@ export function CharacterEditModal({ character, isOpen, onClose, onSave }: Chara
           </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {/* Character Name */}
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
-              Character Name <span className="text-red-400">*</span>
-            </label>
-            <input
-              id="name"
-              type="text"
-              value={formData.name}
-              onChange={(e) => handleChange('name', e.target.value)}
-              required
-              className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg
-                       text-white placeholder-gray-500 focus:outline-none focus:ring-2
-                       focus:ring-dnd-gold focus:border-transparent"
-              placeholder="Enter character name"
-            />
+        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+          {/* ── Name Section ── */}
+          <div className="p-4 bg-gray-800/50 rounded-lg border border-gray-700 space-y-4">
+            <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wide">Name</h3>
+
+            {/* Generator row */}
+            <div className="flex gap-2 items-end">
+              <div className="flex-1">
+                <label className={labelClass}>Race (for name generator)</label>
+                <select
+                  value={generatorRace}
+                  onChange={(e) => setGeneratorRace(e.target.value)}
+                  className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-dnd-gold"
+                >
+                  {RACE_NAME_TABLES.map((r) => (
+                    <option key={r.raceId} value={r.raceId}>{r.label}</option>
+                  ))}
+                </select>
+              </div>
+              <button
+                type="button"
+                onClick={handleGenerateName}
+                className="px-4 py-2 bg-dnd-gold text-gray-900 rounded-lg font-medium hover:bg-yellow-500 transition-colors whitespace-nowrap"
+                title="Generate a random name based on race and gender"
+              >
+                🎲 Generate Name
+              </button>
+            </div>
+
+            {/* First Name */}
+            <div>
+              <label htmlFor="firstName" className={labelClass}>
+                First Name <span className="text-red-400">*</span>
+              </label>
+              <input
+                id="firstName"
+                type="text"
+                value={formData.firstName}
+                onChange={(e) => handleChange('firstName', e.target.value)}
+                required
+                className={inputClass}
+                placeholder="e.g., Araevin"
+              />
+            </div>
+
+            {/* Surname + Nickname */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="surname" className={labelClass}>
+                  Surname <span className="text-gray-500 font-normal">(optional)</span>
+                </label>
+                <input
+                  id="surname"
+                  type="text"
+                  value={formData.surname}
+                  onChange={(e) => handleChange('surname', e.target.value)}
+                  className={inputClass}
+                  placeholder="e.g., Moonwhisper"
+                />
+              </div>
+              <div>
+                <label htmlFor="nickname" className={labelClass}>
+                  Nickname <span className="text-gray-500 font-normal">(optional)</span>
+                </label>
+                <input
+                  id="nickname"
+                  type="text"
+                  value={formData.nickname}
+                  onChange={(e) => handleChange('nickname', e.target.value)}
+                  className={inputClass}
+                  placeholder='e.g., "Quickhand"'
+                />
+              </div>
+            </div>
+
+            {/* Full name preview */}
+            {formData.firstName.trim() && (
+              <div className="text-sm text-gray-400">
+                Full name:{' '}
+                <span className="text-dnd-gold font-medium">{fullNamePreview}</span>
+              </div>
+            )}
           </div>
 
           {/* Player Name */}
           <div>
-            <label htmlFor="playerName" className="block text-sm font-medium text-gray-300 mb-2">
-              Player Name
-            </label>
+            <label htmlFor="playerName" className={labelClass}>Player Name</label>
             <input
               id="playerName"
               type="text"
               value={formData.playerName}
               onChange={(e) => handleChange('playerName', e.target.value)}
-              className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg
-                       text-white placeholder-gray-500 focus:outline-none focus:ring-2
-                       focus:ring-dnd-gold focus:border-transparent"
+              className={inputClass}
               placeholder="Enter player name"
             />
           </div>
 
           {/* Gender */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Gender
-            </label>
+            <label className={labelClass}>Gender</label>
             <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => handleChange('gender', 'male')}
-                className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all duration-200
-                           focus:outline-none focus:ring-2 focus:ring-dnd-gold
-                           ${
-                             formData.gender === 'male'
-                               ? 'bg-dnd-gold text-gray-900'
-                               : 'bg-gray-800 text-gray-300 border border-gray-600 hover:border-gray-500'
-                           }`}
-              >
-                Male
-              </button>
-              <button
-                type="button"
-                onClick={() => handleChange('gender', 'female')}
-                className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all duration-200
-                           focus:outline-none focus:ring-2 focus:ring-dnd-gold
-                           ${
-                             formData.gender === 'female'
-                               ? 'bg-dnd-gold text-gray-900'
-                               : 'bg-gray-800 text-gray-300 border border-gray-600 hover:border-gray-500'
-                           }`}
-              >
-                Female
-              </button>
-              <button
-                type="button"
-                onClick={() => handleChange('gender', 'other')}
-                className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all duration-200
-                           focus:outline-none focus:ring-2 focus:ring-dnd-gold
-                           ${
-                             formData.gender === 'other'
-                               ? 'bg-dnd-gold text-gray-900'
-                               : 'bg-gray-800 text-gray-300 border border-gray-600 hover:border-gray-500'
-                           }`}
-              >
-                Other
-              </button>
+              {(['male', 'female', 'other'] as const).map((g) => (
+                <button
+                  key={g}
+                  type="button"
+                  onClick={() => handleChange('gender', g)}
+                  className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all duration-200 capitalize
+                             focus:outline-none focus:ring-2 focus:ring-dnd-gold
+                             ${
+                               formData.gender === g
+                                 ? 'bg-dnd-gold text-gray-900'
+                                 : 'bg-gray-800 text-gray-300 border border-gray-600 hover:border-gray-500'
+                             }`}
+                >
+                  {g.charAt(0).toUpperCase() + g.slice(1)}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Age, Height, Weight (Grid) */}
+          {/* Age / Height / Weight */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <label htmlFor="age" className="block text-sm font-medium text-gray-300 mb-2">
-                Age
-              </label>
-              <input
-                id="age"
-                type="text"
-                value={formData.age}
-                onChange={(e) => handleChange('age', e.target.value)}
-                className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg
-                         text-white placeholder-gray-500 focus:outline-none focus:ring-2
-                         focus:ring-dnd-gold focus:border-transparent"
-                placeholder="Age"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="height" className="block text-sm font-medium text-gray-300 mb-2">
-                Height
-              </label>
-              <input
-                id="height"
-                type="text"
-                value={formData.height}
-                onChange={(e) => handleChange('height', e.target.value)}
-                className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg
-                         text-white placeholder-gray-500 focus:outline-none focus:ring-2
-                         focus:ring-dnd-gold focus:border-transparent"
-                placeholder="Height"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="weight" className="block text-sm font-medium text-gray-300 mb-2">
-                Weight
-              </label>
-              <input
-                id="weight"
-                type="text"
-                value={formData.weight}
-                onChange={(e) => handleChange('weight', e.target.value)}
-                className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg
-                         text-white placeholder-gray-500 focus:outline-none focus:ring-2
-                         focus:ring-dnd-gold focus:border-transparent"
-                placeholder="Weight"
-              />
-            </div>
+            {(['age', 'height', 'weight'] as const).map((field) => (
+              <div key={field}>
+                <label htmlFor={field} className={labelClass}>
+                  {field.charAt(0).toUpperCase() + field.slice(1)}
+                </label>
+                <input
+                  id={field}
+                  type="text"
+                  value={formData[field]}
+                  onChange={(e) => handleChange(field, e.target.value)}
+                  className={inputClass}
+                  placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                />
+              </div>
+            ))}
           </div>
 
           {/* Backstory */}
           <div>
-            <label htmlFor="backstory" className="block text-sm font-medium text-gray-300 mb-2">
-              Backstory
-            </label>
+            <label htmlFor="backstory" className={labelClass}>Backstory</label>
             <textarea
               id="backstory"
               value={formData.backstory}
               onChange={(e) => handleChange('backstory', e.target.value)}
               rows={6}
-              className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg
-                       text-white placeholder-gray-500 focus:outline-none focus:ring-2
-                       focus:ring-dnd-gold focus:border-transparent resize-none"
+              className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-dnd-gold focus:border-transparent resize-none"
               placeholder="Enter character backstory..."
             />
           </div>
@@ -253,15 +290,13 @@ export function CharacterEditModal({ character, isOpen, onClose, onSave }: Chara
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600
-                       transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500"
+              className="px-6 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-6 py-2 bg-dnd-gold text-gray-900 rounded-lg hover:bg-yellow-500
-                       transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-dnd-gold"
+              className="px-6 py-2 bg-dnd-gold text-gray-900 rounded-lg hover:bg-yellow-500 transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-dnd-gold"
             >
               Save Changes
             </button>
