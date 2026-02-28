@@ -218,6 +218,8 @@ interface CharacterState {
   // DM Tools - Grant items to any character
   grantItemToCharacter: (characterId: string, item: Equipment) => void
   grantItemToAllCharacters: (item: Equipment) => void
+  grantMaterialToCharacter: (characterId: string, material: Material, quantity: number) => void
+  grantMaterialToAllCharacters: (material: Material, quantity: number) => void
 
   // Carrying Capacity & Supplies
   updateCarryingCapacity: () => void // Recalculate based on STR and equipment weight
@@ -987,6 +989,48 @@ export const useCharacterStore = create<CharacterState>()(
             if (updatedCurrent) {
               set({ currentCharacter: updatedCurrent })
             }
+          }
+        },
+
+        grantMaterialToCharacter: (characterId: string, material: Material, quantity: number) => {
+          const { characters } = get()
+          const targetCharacter = characters.find((c) => c.id === characterId)
+          if (!targetCharacter) return
+
+          const existingIndex = targetCharacter.materials.findIndex((m) => m.id === material.id)
+          const updatedMaterials =
+            existingIndex >= 0
+              ? targetCharacter.materials.map((m, i) =>
+                  i === existingIndex ? { ...m, quantity: m.quantity + quantity } : m
+                )
+              : [...targetCharacter.materials, { ...material, quantity }]
+
+          const updatedCharacter = { ...targetCharacter, materials: updatedMaterials }
+          const updatedCharacters = characters.map((c) =>
+            c.id === characterId ? updatedCharacter : c
+          )
+          set({ characters: updatedCharacters })
+          const { currentCharacter } = get()
+          if (currentCharacter?.id === characterId) set({ currentCharacter: updatedCharacter })
+        },
+
+        grantMaterialToAllCharacters: (material: Material, quantity: number) => {
+          const { characters } = get()
+          const updatedCharacters = characters.map((character) => {
+            const existingIndex = character.materials.findIndex((m) => m.id === material.id)
+            const updatedMaterials =
+              existingIndex >= 0
+                ? character.materials.map((m, i) =>
+                    i === existingIndex ? { ...m, quantity: m.quantity + quantity } : m
+                  )
+                : [...character.materials, { ...material, quantity }]
+            return { ...character, materials: updatedMaterials }
+          })
+          set({ characters: updatedCharacters })
+          const { currentCharacter } = get()
+          if (currentCharacter) {
+            const updatedCurrent = updatedCharacters.find((c) => c.id === currentCharacter.id)
+            if (updatedCurrent) set({ currentCharacter: updatedCurrent })
           }
         },
 

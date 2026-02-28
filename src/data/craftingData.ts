@@ -402,11 +402,6 @@ export const TAILORING_RECIPES: CraftedItem[] = [
     weight: 1, hpBonus: 1, bonus: '+1 Max HP', worth: { gold: 0, silver: 2 },
   },
   {
-    id: 'craft-chest-common', name: 'Chest', tier: 'common', minSkill: 1,
-    materials: [{ materialId: 'linen-cloth', label: 'Linen Cloth', quantity: 5 }],
-    weight: 15, acBonus: 1, bonus: '+1 AC', worth: { gold: 0, silver: 4 },
-  },
-  {
     id: 'craft-gauntlet-common', name: 'Gauntlet', tier: 'common', minSkill: 1,
     materials: [{ materialId: 'linen-cloth', label: 'Linen Cloth', quantity: 2 }],
     weight: 1, hpBonus: 1, bonus: '+1 Max HP', worth: { gold: 0, silver: 2 },
@@ -422,26 +417,10 @@ export const TAILORING_RECIPES: CraftedItem[] = [
     weight: 2, speedBonus: 2, bonus: '+2 Speed', worth: { gold: 0, silver: 2 },
   },
   {
-    id: 'craft-hood-common', name: 'Hood', tier: 'common', minSkill: 1,
-    materials: [{ materialId: 'linen-cloth', label: 'Linen Cloth', quantity: 1 }],
-    weight: 0.5, hpBonus: 1, bonus: '+1 Max HP', worth: { gold: 0, silver: 1 },
-  },
-  {
-    id: 'craft-mantle-common', name: 'Mantle', tier: 'common', minSkill: 1,
-    materials: [{ materialId: 'linen-cloth', label: 'Linen Cloth', quantity: 2 }],
-    weight: 1, hpBonus: 1, bonus: '+1 Max HP', worth: { gold: 0, silver: 1 },
-  },
-  {
     id: 'craft-tunic-common', name: 'Tunic', tier: 'common', minSkill: 1,
     materials: [{ materialId: 'wool-cloth', label: 'Wool Cloth', quantity: 3 }],
     weight: 4, acBonus: 1, bonus: '+1 AC', worth: { gold: 0, silver: 3 },
   },
-  {
-    id: 'craft-sandals-common', name: 'Sandals', tier: 'common', minSkill: 1,
-    materials: [{ materialId: 'light-hide', label: 'Light Animal Hide', quantity: 1 }],
-    weight: 0.5, speedBonus: 1, bonus: '+1 Speed', worth: { gold: 0, silver: 2 },
-  },
-
   // ── Uncommon (Tier 2) ─────────────────────────────────────────────────────
   {
     id: 'craft-helmet-uncommon', name: 'Padded Helmet', tier: 'uncommon', minSkill: 26,
@@ -452,11 +431,6 @@ export const TAILORING_RECIPES: CraftedItem[] = [
     id: 'craft-shoulder-uncommon', name: 'Leather Shoulder', tier: 'uncommon', minSkill: 26,
     materials: [{ materialId: 'thick-hide', label: 'Thick Leather Hide', quantity: 1 }, { materialId: 'silk-cloth', label: 'Silk Cloth', quantity: 1 }],
     weight: 2, acBonus: 1, bonus: '+1 AC', worth: { gold: 2, silver: 0 },
-  },
-  {
-    id: 'craft-chest-uncommon', name: 'Cloth Chest', tier: 'uncommon', minSkill: 26,
-    materials: [{ materialId: 'silk-cloth', label: 'Silk Cloth', quantity: 5 }],
-    weight: 10, acBonus: 1, hpBonus: 2, bonus: '+1 AC, +2 Max HP', worth: { gold: 3, silver: 5 },
   },
   {
     id: 'craft-gauntlet-uncommon', name: 'Thick Gauntlet', tier: 'uncommon', minSkill: 26,
@@ -474,26 +448,10 @@ export const TAILORING_RECIPES: CraftedItem[] = [
     weight: 3, speedBonus: 4, bonus: '+4 Speed', worth: { gold: 2, silver: 0 },
   },
   {
-    id: 'craft-hood-uncommon', name: 'Reinforced Hood', tier: 'uncommon', minSkill: 26,
-    materials: [{ materialId: 'cotton-cloth', label: 'Cotton Cloth', quantity: 2 }],
-    weight: 1, acBonus: 1, bonus: '+1 AC', worth: { gold: 1, silver: 0 },
-  },
-  {
-    id: 'craft-mantle-uncommon', name: 'Stiff Mantle', tier: 'uncommon', minSkill: 26,
-    materials: [{ materialId: 'silk-cloth', label: 'Silk Cloth', quantity: 2 }],
-    weight: 2, hpBonus: 2, bonus: '+2 Max HP', worth: { gold: 1, silver: 5 },
-  },
-  {
     id: 'craft-tunic-uncommon', name: 'Quilted Tunic', tier: 'uncommon', minSkill: 26,
     materials: [{ materialId: 'cotton-cloth', label: 'Cotton Cloth', quantity: 4 }],
     weight: 5, acBonus: 1, hpBonus: 1, bonus: '+1 AC, +1 Max HP', worth: { gold: 2, silver: 0 },
   },
-  {
-    id: 'craft-sandals-uncommon', name: 'Soft Sandals', tier: 'uncommon', minSkill: 26,
-    materials: [{ materialId: 'thick-hide', label: 'Thick Leather Hide', quantity: 1 }],
-    weight: 1, speedBonus: 3, bonus: '+3 Speed', worth: { gold: 1, silver: 5 },
-  },
-
   // ── Rare (Tier 3) ─────────────────────────────────────────────────────────
   {
     id: 'craft-helmet-rare', name: 'Studded Helmet', tier: 'rare', minSkill: 51,
@@ -504,11 +462,6 @@ export const TAILORING_RECIPES: CraftedItem[] = [
     id: 'craft-shoulder-rare', name: 'Gilded Shoulder', tier: 'rare', minSkill: 51,
     materials: [{ materialId: 'scaled-hide', label: 'Scaled Beast Hide', quantity: 1 }, { materialId: 'enchanted-cloth', label: 'Enchanted Cloth', quantity: 1 }],
     weight: 3, hpBonus: 4, bonus: '+4 Max HP', worth: { gold: 8, silver: 0 },
-  },
-  {
-    id: 'craft-chest-rare', name: 'Layered Chest', tier: 'rare', minSkill: 51,
-    materials: [{ materialId: 'scaled-hide', label: 'Scaled Beast Hide', quantity: 2 }, { materialId: 'enchanted-cloth', label: 'Enchanted Cloth', quantity: 3 }],
-    weight: 20, acBonus: 2, hpBonus: 5, bonus: '+2 AC, +5 Max HP', worth: { gold: 12, silver: 0 },
   },
   {
     id: 'craft-gauntlet-rare', name: 'Plate Gauntlet', tier: 'rare', minSkill: 51,
@@ -526,26 +479,10 @@ export const TAILORING_RECIPES: CraftedItem[] = [
     weight: 4, speedBonus: 6, bonus: '+6 Speed', worth: { gold: 7, silver: 5 },
   },
   {
-    id: 'craft-hood-rare', name: 'Heavy Hood', tier: 'rare', minSkill: 51,
-    materials: [{ materialId: 'enchanted-cloth', label: 'Enchanted Cloth', quantity: 2 }],
-    weight: 2, hpBonus: 5, bonus: '+5 Max HP', worth: { gold: 5, silver: 5 },
-  },
-  {
-    id: 'craft-mantle-rare', name: 'Wool Mantle', tier: 'rare', minSkill: 51,
-    materials: [{ materialId: 'enchanted-cloth', label: 'Enchanted Cloth', quantity: 2 }],
-    weight: 3, acBonus: 1, bonus: '+1 AC', worth: { gold: 6, silver: 0 },
-  },
-  {
     id: 'craft-tunic-rare', name: 'Linen Tunic', tier: 'rare', minSkill: 51,
     materials: [{ materialId: 'enchanted-cloth', label: 'Enchanted Cloth', quantity: 4 }],
     weight: 6, acBonus: 1, hpBonus: 3, bonus: '+1 AC, +3 Max HP', worth: { gold: 8, silver: 5 },
   },
-  {
-    id: 'craft-sandals-rare', name: 'Durable Sandals', tier: 'rare', minSkill: 51,
-    materials: [{ materialId: 'scaled-hide', label: 'Scaled Beast Hide', quantity: 1 }],
-    weight: 2, speedBonus: 4, hpBonus: 2, bonus: '+4 Speed, +2 Max HP', worth: { gold: 6, silver: 5 },
-  },
-
   // ── Epic (Tier 4) ─────────────────────────────────────────────────────────
   {
     id: 'craft-helmet-epic', name: 'Great Helmet', tier: 'epic', minSkill: 76,
@@ -556,11 +493,6 @@ export const TAILORING_RECIPES: CraftedItem[] = [
     id: 'craft-shoulder-epic', name: 'Ornate Shoulder', tier: 'epic', minSkill: 76,
     materials: [{ materialId: 'wyvern-hide', label: 'Wyvern Hide', quantity: 1 }, { materialId: 'shadowweave-cloth', label: 'Shadowweave Cloth', quantity: 1 }],
     weight: 4, acBonus: 1, hpBonus: 8, bonus: '+1 AC, +8 Max HP', worth: { gold: 17, silver: 0 },
-  },
-  {
-    id: 'craft-chest-epic', name: 'Battle Chest', tier: 'epic', minSkill: 76,
-    materials: [{ materialId: 'wyvern-hide', label: 'Wyvern Hide', quantity: 2 }, { materialId: 'shadowweave-cloth', label: 'Shadowweave Cloth', quantity: 3 }],
-    weight: 30, acBonus: 3, hpBonus: 10, bonus: '+3 AC, +10 Max HP', worth: { gold: 25, silver: 0 },
   },
   {
     id: 'craft-gauntlet-epic', name: 'War Gauntlet', tier: 'epic', minSkill: 76,
@@ -578,26 +510,10 @@ export const TAILORING_RECIPES: CraftedItem[] = [
     weight: 5, speedBonus: 8, bonus: '+8 Speed', worth: { gold: 15, silver: 0 },
   },
   {
-    id: 'craft-hood-epic', name: 'Master Hood', tier: 'epic', minSkill: 76,
-    materials: [{ materialId: 'shadowweave-cloth', label: 'Shadowweave Cloth', quantity: 2 }],
-    weight: 2, acBonus: 1, hpBonus: 5, bonus: '+1 AC, +5 Max HP', worth: { gold: 16, silver: 0 },
-  },
-  {
-    id: 'craft-mantle-epic', name: 'Royal Mantle', tier: 'epic', minSkill: 76,
-    materials: [{ materialId: 'shadowweave-cloth', label: 'Shadowweave Cloth', quantity: 2 }],
-    weight: 3, hpBonus: 10, bonus: '+10 Max HP', worth: { gold: 18, silver: 0 },
-  },
-  {
     id: 'craft-tunic-epic', name: 'Padded Tunic', tier: 'epic', minSkill: 76,
     materials: [{ materialId: 'shadowweave-cloth', label: 'Shadowweave Cloth', quantity: 4 }],
     weight: 8, acBonus: 2, hpBonus: 5, bonus: '+2 AC, +5 Max HP', worth: { gold: 22, silver: 0 },
   },
-  {
-    id: 'craft-sandals-epic', name: 'Iron Sandals', tier: 'epic', minSkill: 76,
-    materials: [{ materialId: 'wyvern-hide', label: 'Wyvern Hide', quantity: 1 }],
-    weight: 4, speedBonus: 7, acBonus: 1, bonus: '+7 Speed, +1 AC', worth: { gold: 15, silver: 5 },
-  },
-
   // ── Legendary (Tier 5) ────────────────────────────────────────────────────
   {
     id: 'craft-helmet-legendary', name: 'Eternal Helmet', tier: 'legendary', minSkill: 91,
@@ -608,11 +524,6 @@ export const TAILORING_RECIPES: CraftedItem[] = [
     id: 'craft-shoulder-legendary', name: 'Eternal Shoulder', tier: 'legendary', minSkill: 91,
     materials: [{ materialId: 'dragonscale-leather', label: 'Dragonscale Leather Hide', quantity: 1 }, { materialId: 'void-silk', label: 'Void Silk', quantity: 1 }],
     weight: 5, acBonus: 2, hpBonus: 15, bonus: '+2 AC, +15 Max HP', worth: { gold: 36, silver: 0 },
-  },
-  {
-    id: 'craft-chest-legendary', name: 'Eternal Chest', tier: 'legendary', minSkill: 91,
-    materials: [{ materialId: 'dragonscale-leather', label: 'Dragonscale Leather Hide', quantity: 2 }, { materialId: 'void-silk', label: 'Void Silk', quantity: 1 }],
-    weight: 35, acBonus: 4, hpBonus: 25, bonus: '+4 AC, +25 Max HP', worth: { gold: 40, silver: 0 },
   },
   {
     id: 'craft-gauntlet-legendary', name: 'Eternal Gauntlet', tier: 'legendary', minSkill: 91,
@@ -630,24 +541,9 @@ export const TAILORING_RECIPES: CraftedItem[] = [
     weight: 6, speedBonus: 10, acBonus: 1, bonus: '+10 Speed, +1 AC', worth: { gold: 37, silver: 0 },
   },
   {
-    id: 'craft-hood-legendary', name: 'Eternal Hood', tier: 'legendary', minSkill: 91,
-    materials: [{ materialId: 'void-silk', label: 'Void Silk', quantity: 1 }],
-    weight: 2, acBonus: 2, hpBonus: 10, bonus: '+2 AC, +10 Max HP', worth: { gold: 35, silver: 0 },
-  },
-  {
-    id: 'craft-mantle-legendary', name: 'Eternal Mantle', tier: 'legendary', minSkill: 91,
-    materials: [{ materialId: 'void-silk', label: 'Void Silk', quantity: 1 }],
-    weight: 4, acBonus: 1, hpBonus: 20, bonus: '+1 AC, +20 Max HP', worth: { gold: 36, silver: 0 },
-  },
-  {
     id: 'craft-tunic-legendary', name: 'Eternal Tunic', tier: 'legendary', minSkill: 91,
     materials: [{ materialId: 'void-silk', label: 'Void Silk', quantity: 1 }, { materialId: 'dragonscale-leather', label: 'Dragonscale Leather Hide', quantity: 1 }],
     weight: 10, acBonus: 3, hpBonus: 15, bonus: '+3 AC, +15 Max HP', worth: { gold: 39, silver: 0 },
-  },
-  {
-    id: 'craft-sandals-legendary', name: 'Eternal Sandals', tier: 'legendary', minSkill: 91,
-    materials: [{ materialId: 'dragonscale-leather', label: 'Dragonscale Leather Hide', quantity: 1 }],
-    weight: 3, speedBonus: 10, acBonus: 2, bonus: '+10 Speed, +2 AC', worth: { gold: 35, silver: 0 },
   },
 ]
 
@@ -671,19 +567,49 @@ export const ALCHEMY_RECIPES: CraftedItem[] = [
     weight: 0.5, bonus: 'Restores 1d4+1 HP on use', worth: { gold: 0, silver: 2 },
   },
   {
-    id: 'craft-pot-weak-ac', name: 'Weak AC Potion', tier: 'common', minSkill: 1,
+    id: 'craft-pot-weak-ac', name: 'Potion of Minor Ward', tier: 'common', minSkill: 1,
     materials: [{ materialId: 'common-herb-mint', label: 'Mint Leaves', quantity: 3 }],
     weight: 0.5, bonus: '+1 AC for 1 minute', worth: { gold: 0, silver: 2 },
   },
   {
-    id: 'craft-pot-slow-init', name: 'Slow Initiative Potion', tier: 'common', minSkill: 1,
+    id: 'craft-pot-slow-init', name: 'Potion of Minor Reflexes', tier: 'common', minSkill: 1,
     materials: [{ materialId: 'common-herb-lavender', label: 'Lavender', quantity: 2 }, { materialId: 'common-herb-mint', label: 'Mint Leaves', quantity: 1 }],
-    weight: 0.5, bonus: '+1 to next Initiative roll', worth: { gold: 0, silver: 3 },
+    weight: 0.5, bonus: '+1 to next Initiative roll', worth: { gold: 0, silver: 2 },
   },
   {
-    id: 'craft-pot-blur-invis', name: 'Blur Invisibility Potion', tier: 'common', minSkill: 1,
+    id: 'craft-pot-blur-invis', name: 'Potion of Blur', tier: 'common', minSkill: 1,
     materials: [{ materialId: 'common-herb-mint', label: 'Mint Leaves', quantity: 4 }],
-    weight: 0.5, bonus: 'Disadvantage to attackers for 1 round', worth: { gold: 0, silver: 5 },
+    weight: 0.5, bonus: 'Attackers have disadvantage against you for 1 round', worth: { gold: 0, silver: 3 },
+  },
+  {
+    id: 'craft-pot-minor-speed', name: 'Potion of Minor Speed', tier: 'common', minSkill: 1,
+    materials: [{ materialId: 'common-herb-lavender', label: 'Lavender', quantity: 2 }],
+    weight: 0.5, bonus: '+5 ft movement speed for 10 minutes', worth: { gold: 0, silver: 2 },
+  },
+  {
+    id: 'craft-pot-minor-strength', name: 'Potion of Minor Strength', tier: 'common', minSkill: 1,
+    materials: [{ materialId: 'common-herb-mint', label: 'Mint Leaves', quantity: 2 }],
+    weight: 0.5, bonus: '+1 STR (max 20) for 1 hour', worth: { gold: 0, silver: 2 },
+  },
+  {
+    id: 'craft-pot-minor-endurance', name: 'Potion of Minor Endurance', tier: 'common', minSkill: 1,
+    materials: [{ materialId: 'common-herb-lavender', label: 'Lavender', quantity: 3 }],
+    weight: 0.5, bonus: '+3 temporary HP for 1 hour', worth: { gold: 0, silver: 2 },
+  },
+  {
+    id: 'craft-pot-minor-precision', name: 'Potion of Minor Precision', tier: 'common', minSkill: 1,
+    materials: [{ materialId: 'common-herb-mint', label: 'Mint Leaves', quantity: 2 }, { materialId: 'common-herb-lavender', label: 'Lavender', quantity: 1 }],
+    weight: 0.5, bonus: '+1 to attack rolls for 1 hour', worth: { gold: 0, silver: 3 },
+  },
+  {
+    id: 'craft-pot-minor-protection', name: 'Potion of Minor Protection', tier: 'common', minSkill: 1,
+    materials: [{ materialId: 'common-herb-mint', label: 'Mint Leaves', quantity: 3 }],
+    weight: 0.5, bonus: 'Resistance to one chosen damage type for 1 minute', worth: { gold: 0, silver: 4 },
+  },
+  {
+    id: 'craft-pot-minor-regen', name: 'Potion of Minor Regeneration', tier: 'common', minSkill: 1,
+    materials: [{ materialId: 'common-herb-lavender', label: 'Lavender', quantity: 2 }, { materialId: 'common-herb-mint', label: 'Mint Leaves', quantity: 2 }],
+    weight: 0.5, bonus: 'Regain 1 HP at start of each turn for 1 minute', worth: { gold: 0, silver: 5 },
   },
 
   // ── Uncommon (Tier 2) ─────────────────────────────────────────────────────
@@ -693,19 +619,49 @@ export const ALCHEMY_RECIPES: CraftedItem[] = [
     weight: 0.5, bonus: 'Restores 2d4+2 HP on use', worth: { gold: 1, silver: 5 },
   },
   {
-    id: 'craft-pot-simple-ac', name: 'Simple AC Potion', tier: 'uncommon', minSkill: 26,
+    id: 'craft-pot-simple-ac', name: 'Potion of Lesser Ward', tier: 'uncommon', minSkill: 26,
     materials: [{ materialId: 'uncommon-herb-wolfsbane', label: 'Wolfsbane', quantity: 3 }],
     weight: 0.5, bonus: '+2 AC for 10 minutes', worth: { gold: 1, silver: 5 },
   },
   {
-    id: 'craft-pot-swift-init', name: 'Swift Initiative Potion', tier: 'uncommon', minSkill: 26,
+    id: 'craft-pot-swift-init', name: 'Potion of Swift Reflexes', tier: 'uncommon', minSkill: 26,
     materials: [{ materialId: 'uncommon-herb-foxglove', label: 'Foxglove', quantity: 2 }, { materialId: 'uncommon-herb-wolfsbane', label: 'Wolfsbane', quantity: 1 }],
-    weight: 0.5, bonus: '+2 Initiative, +5 Speed for 1 hour', worth: { gold: 2, silver: 0 },
+    weight: 0.5, bonus: '+2 Initiative, +5 ft Speed for 1 hour', worth: { gold: 2, silver: 0 },
   },
   {
-    id: 'craft-pot-shimmer-invis', name: 'Shimmer Invisibility Potion', tier: 'uncommon', minSkill: 26,
+    id: 'craft-pot-shimmer-invis', name: 'Shimmer Potion', tier: 'uncommon', minSkill: 26,
     materials: [{ materialId: 'uncommon-herb-wolfsbane', label: 'Wolfsbane', quantity: 4 }],
-    weight: 0.5, bonus: 'Invisibility for 1 minute (breaks on attack/spell)', worth: { gold: 3, silver: 0 },
+    weight: 0.5, bonus: 'Invisibility for 1 minute (breaks on attack or spell)', worth: { gold: 3, silver: 0 },
+  },
+  {
+    id: 'craft-pot-speed', name: 'Potion of Speed', tier: 'uncommon', minSkill: 26,
+    materials: [{ materialId: 'uncommon-herb-foxglove', label: 'Foxglove', quantity: 2 }],
+    weight: 0.5, bonus: '+10 ft movement speed for 1 hour', worth: { gold: 1, silver: 5 },
+  },
+  {
+    id: 'craft-pot-strength', name: 'Potion of Strength', tier: 'uncommon', minSkill: 26,
+    materials: [{ materialId: 'uncommon-herb-wolfsbane', label: 'Wolfsbane', quantity: 2 }],
+    weight: 0.5, bonus: '+2 STR (max 20) for 1 hour', worth: { gold: 2, silver: 0 },
+  },
+  {
+    id: 'craft-pot-endurance', name: 'Potion of Endurance', tier: 'uncommon', minSkill: 26,
+    materials: [{ materialId: 'uncommon-herb-foxglove', label: 'Foxglove', quantity: 3 }],
+    weight: 0.5, bonus: '+6 temporary HP for 1 hour', worth: { gold: 1, silver: 5 },
+  },
+  {
+    id: 'craft-pot-precision', name: 'Potion of Precision', tier: 'uncommon', minSkill: 26,
+    materials: [{ materialId: 'uncommon-herb-wolfsbane', label: 'Wolfsbane', quantity: 2 }, { materialId: 'uncommon-herb-foxglove', label: 'Foxglove', quantity: 1 }],
+    weight: 0.5, bonus: '+2 to attack rolls for 1 hour', worth: { gold: 2, silver: 0 },
+  },
+  {
+    id: 'craft-pot-protection', name: 'Potion of Protection', tier: 'uncommon', minSkill: 26,
+    materials: [{ materialId: 'uncommon-herb-wolfsbane', label: 'Wolfsbane', quantity: 3 }],
+    weight: 0.5, bonus: 'Resistance to two chosen damage types for 10 minutes', worth: { gold: 2, silver: 5 },
+  },
+  {
+    id: 'craft-pot-regen', name: 'Potion of Regeneration', tier: 'uncommon', minSkill: 26,
+    materials: [{ materialId: 'uncommon-herb-foxglove', label: 'Foxglove', quantity: 2 }, { materialId: 'uncommon-herb-wolfsbane', label: 'Wolfsbane', quantity: 2 }],
+    weight: 0.5, bonus: 'Regain 2 HP at start of each turn for 1 minute', worth: { gold: 3, silver: 0 },
   },
 
   // ── Rare (Tier 3) ─────────────────────────────────────────────────────────
@@ -715,19 +671,49 @@ export const ALCHEMY_RECIPES: CraftedItem[] = [
     weight: 0.5, bonus: 'Restores 3d4+3 HP on use', worth: { gold: 5, silver: 5 },
   },
   {
-    id: 'craft-pot-sturdy-ac', name: 'Sturdy AC Potion', tier: 'rare', minSkill: 51,
+    id: 'craft-pot-sturdy-ac', name: 'Potion of Greater Ward', tier: 'rare', minSkill: 51,
     materials: [{ materialId: 'rare-herb-mandrake', label: 'Mandrake Root', quantity: 2 }],
     weight: 0.5, bonus: '+3 AC for 1 hour', worth: { gold: 6, silver: 0 },
   },
   {
-    id: 'craft-pot-quick-init', name: 'Quick Initiative Potion', tier: 'rare', minSkill: 51,
+    id: 'craft-pot-quick-init', name: 'Potion of Greater Reflexes', tier: 'rare', minSkill: 51,
     materials: [{ materialId: 'rare-herb-mandrake', label: 'Mandrake Root', quantity: 1 }, { materialId: 'rare-herb-bloodthorn', label: 'Bloodthorn', quantity: 1 }],
     weight: 0.5, bonus: '+3 Initiative, Dash as bonus action once per combat', worth: { gold: 7, silver: 0 },
   },
   {
-    id: 'craft-pot-fade-invis', name: 'Fade Invisibility Potion', tier: 'rare', minSkill: 51,
+    id: 'craft-pot-fade-invis', name: 'Fade Potion', tier: 'rare', minSkill: 51,
     materials: [{ materialId: 'rare-herb-mandrake', label: 'Mandrake Root', quantity: 2 }],
-    weight: 0.5, bonus: 'Invisibility for 10 minutes (breaks on attack/spell)', worth: { gold: 8, silver: 0 },
+    weight: 0.5, bonus: 'Invisibility for 10 minutes (breaks on attack or spell)', worth: { gold: 8, silver: 0 },
+  },
+  {
+    id: 'craft-pot-swift-speed', name: 'Potion of Swift Speed', tier: 'rare', minSkill: 51,
+    materials: [{ materialId: 'rare-herb-bloodthorn', label: 'Bloodthorn', quantity: 2 }],
+    weight: 0.5, bonus: '+15 ft movement speed for 1 hour', worth: { gold: 6, silver: 0 },
+  },
+  {
+    id: 'craft-pot-greater-strength', name: 'Potion of Greater Strength', tier: 'rare', minSkill: 51,
+    materials: [{ materialId: 'rare-herb-mandrake', label: 'Mandrake Root', quantity: 2 }],
+    weight: 0.5, bonus: '+3 STR (max 20) for 1 hour', worth: { gold: 6, silver: 5 },
+  },
+  {
+    id: 'craft-pot-greater-endurance', name: 'Potion of Greater Endurance', tier: 'rare', minSkill: 51,
+    materials: [{ materialId: 'rare-herb-bloodthorn', label: 'Bloodthorn', quantity: 2 }],
+    weight: 0.5, bonus: '+10 temporary HP for 1 hour', worth: { gold: 5, silver: 5 },
+  },
+  {
+    id: 'craft-pot-greater-precision', name: 'Potion of Greater Precision', tier: 'rare', minSkill: 51,
+    materials: [{ materialId: 'rare-herb-mandrake', label: 'Mandrake Root', quantity: 1 }, { materialId: 'rare-herb-bloodthorn', label: 'Bloodthorn', quantity: 1 }],
+    weight: 0.5, bonus: '+3 to attack rolls for 1 hour', worth: { gold: 7, silver: 5 },
+  },
+  {
+    id: 'craft-pot-greater-protection', name: 'Potion of Greater Protection', tier: 'rare', minSkill: 51,
+    materials: [{ materialId: 'rare-herb-mandrake', label: 'Mandrake Root', quantity: 3 }],
+    weight: 0.5, bonus: 'Resistance to all physical damage for 10 minutes', worth: { gold: 8, silver: 0 },
+  },
+  {
+    id: 'craft-pot-greater-regen', name: 'Potion of Greater Regeneration', tier: 'rare', minSkill: 51,
+    materials: [{ materialId: 'rare-herb-bloodthorn', label: 'Bloodthorn', quantity: 2 }, { materialId: 'rare-herb-mandrake', label: 'Mandrake Root', quantity: 1 }],
+    weight: 0.5, bonus: 'Regain 3 HP at start of each turn for 1 minute', worth: { gold: 8, silver: 0 },
   },
 
   // ── Epic (Tier 4) ─────────────────────────────────────────────────────────
@@ -737,19 +723,49 @@ export const ALCHEMY_RECIPES: CraftedItem[] = [
     weight: 0.5, bonus: 'Restores 5d4+5 HP on use', worth: { gold: 13, silver: 0 },
   },
   {
-    id: 'craft-pot-strong-ac', name: 'Strong AC Potion', tier: 'epic', minSkill: 76,
+    id: 'craft-pot-strong-ac', name: 'Potion of Superior Ward', tier: 'epic', minSkill: 76,
     materials: [{ materialId: 'rare-herb-nightshade', label: 'Arcane Nightshade', quantity: 1 }],
     weight: 0.5, bonus: '+4 AC for 1 hour', worth: { gold: 14, silver: 0 },
   },
   {
-    id: 'craft-pot-fast-init', name: 'Fast Initiative Potion', tier: 'epic', minSkill: 76,
+    id: 'craft-pot-fast-init', name: 'Potion of Superior Reflexes', tier: 'epic', minSkill: 76,
     materials: [{ materialId: 'rare-herb-nightshade', label: 'Arcane Nightshade', quantity: 1 }, { materialId: 'rare-herb-phoenix', label: 'Phoenix Feather Grass', quantity: 1 }],
     weight: 0.5, bonus: '+4 Initiative, cannot be Surprised', worth: { gold: 17, silver: 0 },
   },
   {
-    id: 'craft-pot-vanish-invis', name: 'Vanish Invisibility Potion', tier: 'epic', minSkill: 76,
+    id: 'craft-pot-vanish-invis', name: 'Vanish Potion', tier: 'epic', minSkill: 76,
     materials: [{ materialId: 'rare-herb-phoenix', label: 'Phoenix Feather Grass', quantity: 1 }],
-    weight: 0.5, bonus: 'Invisibility for 1 hour; one attack/spell before breaking', worth: { gold: 15, silver: 0 },
+    weight: 0.5, bonus: 'Invisibility for 1 hour; persists through one attack or spell', worth: { gold: 15, silver: 0 },
+  },
+  {
+    id: 'craft-pot-epic-speed', name: 'Potion of Superior Speed', tier: 'epic', minSkill: 76,
+    materials: [{ materialId: 'rare-herb-phoenix', label: 'Phoenix Feather Grass', quantity: 1 }],
+    weight: 0.5, bonus: '+20 ft movement speed for 1 hour', worth: { gold: 13, silver: 5 },
+  },
+  {
+    id: 'craft-pot-epic-strength', name: 'Potion of Superior Strength', tier: 'epic', minSkill: 76,
+    materials: [{ materialId: 'rare-herb-nightshade', label: 'Arcane Nightshade', quantity: 1 }],
+    weight: 0.5, bonus: '+4 STR (max 22) for 1 hour', worth: { gold: 14, silver: 5 },
+  },
+  {
+    id: 'craft-pot-epic-endurance', name: 'Potion of Superior Endurance', tier: 'epic', minSkill: 76,
+    materials: [{ materialId: 'rare-herb-phoenix', label: 'Phoenix Feather Grass', quantity: 1 }],
+    weight: 0.5, bonus: '+15 temporary HP for 1 hour', worth: { gold: 14, silver: 0 },
+  },
+  {
+    id: 'craft-pot-epic-precision', name: 'Potion of Superior Precision', tier: 'epic', minSkill: 76,
+    materials: [{ materialId: 'rare-herb-nightshade', label: 'Arcane Nightshade', quantity: 1 }, { materialId: 'rare-herb-phoenix', label: 'Phoenix Feather Grass', quantity: 1 }],
+    weight: 0.5, bonus: '+4 to attack rolls for 1 hour', worth: { gold: 16, silver: 0 },
+  },
+  {
+    id: 'craft-pot-epic-protection', name: 'Potion of Superior Protection', tier: 'epic', minSkill: 76,
+    materials: [{ materialId: 'rare-herb-nightshade', label: 'Arcane Nightshade', quantity: 2 }],
+    weight: 0.5, bonus: 'Resistance to all damage for 10 minutes', worth: { gold: 17, silver: 0 },
+  },
+  {
+    id: 'craft-pot-epic-regen', name: 'Potion of Superior Regeneration', tier: 'epic', minSkill: 76,
+    materials: [{ materialId: 'rare-herb-phoenix', label: 'Phoenix Feather Grass', quantity: 1 }, { materialId: 'rare-herb-nightshade', label: 'Arcane Nightshade', quantity: 1 }],
+    weight: 0.5, bonus: 'Regain 5 HP at start of each turn for 1 minute', worth: { gold: 15, silver: 0 },
   },
 
   // ── Legendary (Tier 5) ────────────────────────────────────────────────────
@@ -759,19 +775,49 @@ export const ALCHEMY_RECIPES: CraftedItem[] = [
     weight: 0.5, bonus: 'Restores 6d4+10 HP on use', worth: { gold: 22, silver: 0 },
   },
   {
-    id: 'craft-pot-ultimate-ac', name: 'Ultimate AC Potion', tier: 'legendary', minSkill: 91,
+    id: 'craft-pot-ultimate-ac', name: 'Potion of Supreme Ward', tier: 'legendary', minSkill: 91,
     materials: [{ materialId: 'legendary-herb-starbloom', label: 'Starbloom Petal', quantity: 1 }],
     weight: 0.5, bonus: '+5 AC for 1 hour', worth: { gold: 23, silver: 0 },
   },
   {
-    id: 'craft-pot-instant-init', name: 'Instant Initiative Potion', tier: 'legendary', minSkill: 91,
+    id: 'craft-pot-instant-init', name: 'Potion of Supreme Reflexes', tier: 'legendary', minSkill: 91,
     materials: [{ materialId: 'legendary-herb-starbloom', label: 'Starbloom Petal', quantity: 1 }, { materialId: 'legendary-herb-soulroot', label: 'Soulroot', quantity: 1 }],
-    weight: 0.5, bonus: '+6 Initiative, extra Reaction in first round', worth: { gold: 25, silver: 0 },
+    weight: 0.5, bonus: '+6 Initiative, extra Reaction in first round of combat', worth: { gold: 25, silver: 0 },
   },
   {
-    id: 'craft-pot-true-invis', name: 'True Invisibility Potion', tier: 'legendary', minSkill: 91,
+    id: 'craft-pot-true-invis', name: 'Potion of True Sight', tier: 'legendary', minSkill: 91,
     materials: [{ materialId: 'legendary-herb-soulroot', label: 'Soulroot', quantity: 1 }],
-    weight: 0.5, bonus: 'Invisibility for 8 hours; breaks only on damage or AoE hit', worth: { gold: 24, silver: 0 },
+    weight: 0.5, bonus: 'Invisibility for 8 hours; breaks only on taking damage from AoE', worth: { gold: 24, silver: 0 },
+  },
+  {
+    id: 'craft-pot-supreme-speed', name: 'Potion of Supreme Speed', tier: 'legendary', minSkill: 91,
+    materials: [{ materialId: 'legendary-herb-starbloom', label: 'Starbloom Petal', quantity: 1 }],
+    weight: 0.5, bonus: '+30 ft movement speed and one extra bonus action per turn for 1 hour', worth: { gold: 24, silver: 0 },
+  },
+  {
+    id: 'craft-pot-supreme-strength', name: 'Potion of Supreme Strength', tier: 'legendary', minSkill: 91,
+    materials: [{ materialId: 'legendary-herb-soulroot', label: 'Soulroot', quantity: 1 }],
+    weight: 0.5, bonus: '+6 STR (max 24) for 1 hour', worth: { gold: 23, silver: 0 },
+  },
+  {
+    id: 'craft-pot-supreme-endurance', name: 'Potion of Supreme Endurance', tier: 'legendary', minSkill: 91,
+    materials: [{ materialId: 'legendary-herb-starbloom', label: 'Starbloom Petal', quantity: 1 }],
+    weight: 0.5, bonus: '+20 temporary HP; regain 2 HP at start of each turn for 10 minutes', worth: { gold: 23, silver: 5 },
+  },
+  {
+    id: 'craft-pot-supreme-precision', name: 'Potion of Supreme Precision', tier: 'legendary', minSkill: 91,
+    materials: [{ materialId: 'legendary-herb-soulroot', label: 'Soulroot', quantity: 1 }, { materialId: 'legendary-herb-starbloom', label: 'Starbloom Petal', quantity: 1 }],
+    weight: 0.5, bonus: '+6 to attack rolls; critical hits on 19-20 for 1 hour', worth: { gold: 25, silver: 0 },
+  },
+  {
+    id: 'craft-pot-supreme-protection', name: 'Potion of Supreme Protection', tier: 'legendary', minSkill: 91,
+    materials: [{ materialId: 'legendary-herb-starbloom', label: 'Starbloom Petal', quantity: 2 }],
+    weight: 0.5, bonus: 'Immunity to one chosen damage type for 1 hour', worth: { gold: 25, silver: 0 },
+  },
+  {
+    id: 'craft-pot-supreme-regen', name: 'Potion of Supreme Regeneration', tier: 'legendary', minSkill: 91,
+    materials: [{ materialId: 'legendary-herb-soulroot', label: 'Soulroot', quantity: 1 }, { materialId: 'legendary-herb-starbloom', label: 'Starbloom Petal', quantity: 1 }],
+    weight: 0.5, bonus: 'Regain 10 HP at start of each turn for 1 minute', worth: { gold: 25, silver: 0 },
   },
 ]
 

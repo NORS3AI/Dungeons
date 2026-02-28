@@ -1,5 +1,66 @@
 # Dungeons - Patch Notes
 
+## Version 0.4.3-alpha - February 28, 2026
+
+**Alpha Release Notice**: Major Work tab improvements, expanded Alchemy content, a Grant Materials DM tool, gear replacement in Inventory, and Tailoring cleanup.
+
+### ✨ Work Tab Improvements
+
+The Crafting tab is now much cleaner and easier to navigate.
+
+#### **Locked Tiers Hidden**
+- Tiers you don't have the skill to craft are now **completely hidden** — if you can't reach Rare yet, you won't see Rare recipes cluttering the screen
+
+#### **Collapsible Tier Sections**
+- Each quality tier (Common, Uncommon, Rare, Epic, Legendary) now has a **▼/▶ toggle** to show or hide its recipes
+- Recipe count shown next to each tier heading — e.g. "Common (6 recipes)"
+
+#### **Have Materials Filter**
+- New **🎒 Have Materials** button filters the recipe list to only show recipes you can actually craft right now — you have the skill AND the materials
+- Locked tiers are always excluded from this filter
+
+### ✨ Alchemy Expanded — 10 Potions Per Tier
+
+Alchemy now has the same recipe breadth as Blacksmithing and Tailoring: **10 potions per tier × 5 tiers = 50 total**.
+
+The six new potion types added across all tiers:
+- **Speed** — movement speed bonus (+5 ft at Common, scaling to +30 ft + extra bonus action at Legendary)
+- **Strength** — STR stat bonus (+1 at Common, up to +6 at Legendary with cap raised to 24)
+- **Endurance** — temporary HP (+3 at Common, up to +20 with regeneration at Legendary)
+- **Precision** — attack roll bonus (+1 at Common, up to +6 with expanded crits at Legendary)
+- **Protection** — damage resistance/immunity (one type for 1 min at Common, one immunity at Legendary)
+- **Regeneration** — HP recovery over time (1 HP/turn at Common, 10 HP/turn at Legendary)
+
+**Why This Matters**: Alchemy is now a full crafting profession — herbalists have as many meaningful choices as blacksmiths.
+
+### ✨ DM Tools — Grant Materials
+
+The DM Item Granter modal now has a dedicated **🧪 Grant Materials** mode.
+
+- Browse crafting materials by category: **Ore, Cloth, Hide, Herb**
+- Select quantity to grant: ×1, ×3, ×5, ×10, ×20
+- Grant to selected characters (**+N** button) or all characters (**ALL** button)
+- All premade materials from the loot system are available, organized by rarity
+
+**Why This Matters**: DMs can now stock up their players' crafting inventories without going through the loot system.
+
+### ✨ Inventory — Replace Gear
+
+Unequipped weapons and armor now show a **↕ Replace equipped weapon/armor** button when there is equipped gear of the same type.
+
+- Clicking replaces the equipped item directly with the unequipped one (old item is removed)
+- If multiple items are equipped, a picker appears to choose which one to replace
+
+**Why This Matters**: Players with legacy starter gear can cleanly swap in their newly crafted weapons and armor.
+
+### 🔧 Tailoring Cleanup
+
+Removed **Chest, Hood, Mantle, and Sandals** from all 5 Tailoring tiers (20 recipes removed total).
+
+Tailoring now focuses on: Helmet, Shoulder, Gauntlet, Pants, Boots, Tunic — all quality tiers still have 6 craftable pieces.
+
+---
+
 ## Version 0.4.2-alpha - February 28, 2026
 
 **Alpha Release Notice**: Character creation now correctly maps all race weapon proficiencies to valid weapons, and the language system has been simplified to Common + 1 free choice for every race.
