@@ -52,7 +52,6 @@ export function CharacterCreatePage() {
     setCreationStep,
     saveCharacter,
     initializeHP,
-    setLevel,
   } = useCharacterStore()
 
   // HP rolling state - track 3 rolls and select highest
@@ -280,21 +279,6 @@ export function CharacterCreatePage() {
                       <span className="text-gray-300">
                         {currentCharacter.playerName || 'Not specified'}
                       </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-500">Starting Level:</span>{' '}
-                      <select
-                        value={currentCharacter.level}
-                        onChange={(e) => setLevel(Number(e.target.value))}
-                        className="px-3 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm
-                                 focus:outline-none focus:ring-2 focus:ring-dnd-gold"
-                      >
-                        {Array.from({ length: 20 }, (_, i) => i + 1).map((level) => (
-                          <option key={level} value={level}>
-                            Level {level}
-                          </option>
-                        ))}
-                      </select>
                     </div>
                     <div>
                       <span className="text-gray-500">Race:</span>{' '}
