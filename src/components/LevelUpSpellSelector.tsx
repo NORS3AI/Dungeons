@@ -11,6 +11,16 @@ import {
   BARD_LEVEL_7_SPELLS,
   BARD_LEVEL_8_SPELLS,
   BARD_LEVEL_9_SPELLS,
+  PALADIN_LEVEL_1_SPELLS,
+  PALADIN_LEVEL_2_SPELLS,
+  PALADIN_LEVEL_3_SPELLS,
+  PALADIN_LEVEL_4_SPELLS,
+  PALADIN_LEVEL_5_SPELLS,
+  RANGER_LEVEL_1_SPELLS,
+  RANGER_LEVEL_2_SPELLS,
+  RANGER_LEVEL_3_SPELLS,
+  RANGER_LEVEL_4_SPELLS,
+  RANGER_LEVEL_5_SPELLS,
   CLERIC_CANTRIPS,
   CLERIC_LEVEL_1_SPELLS,
   CLERIC_LEVEL_2_SPELLS,
@@ -152,6 +162,19 @@ function getSpellsKnown(characterClass: string, level: number): { cantrips: numb
     }
   }
 
+  // Ranger progression (PHB 2024) - half-caster, no cantrips, starts at level 2
+  if (className.includes('ranger')) {
+    // spellsKnown: [0, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11]
+    const rangerSpells = [0, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11]
+    return { cantrips: 0, spells: rangerSpells[level - 1] || 0 }
+  }
+
+  // Paladin progression (PHB 2024) - half-caster, no cantrips, starts at level 2
+  if (className.includes('paladin')) {
+    const paladinSpells = [0, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11]
+    return { cantrips: 0, spells: paladinSpells[level - 1] || 0 }
+  }
+
   return { cantrips: 0, spells: 0 }
 }
 
@@ -278,6 +301,26 @@ function getAvailableSpells(characterClass: string, level: number, includeCantri
     if (level >= 13) spells.push(...WARLOCK_LEVEL_7_SPELLS)
     if (level >= 15) spells.push(...WARLOCK_LEVEL_8_SPELLS)
     if (level >= 17) spells.push(...WARLOCK_LEVEL_9_SPELLS)
+    return spells
+  }
+
+  // Ranger spells - half-caster, no cantrips, spell access starts at level 2
+  if (className.includes('ranger')) {
+    if (level >= 2) spells.push(...RANGER_LEVEL_1_SPELLS)
+    if (level >= 5) spells.push(...RANGER_LEVEL_2_SPELLS)
+    if (level >= 9) spells.push(...RANGER_LEVEL_3_SPELLS)
+    if (level >= 13) spells.push(...RANGER_LEVEL_4_SPELLS)
+    if (level >= 17) spells.push(...RANGER_LEVEL_5_SPELLS)
+    return spells
+  }
+
+  // Paladin spells - half-caster, no cantrips, spell access starts at level 2
+  if (className.includes('paladin')) {
+    if (level >= 2) spells.push(...PALADIN_LEVEL_1_SPELLS)
+    if (level >= 5) spells.push(...PALADIN_LEVEL_2_SPELLS)
+    if (level >= 9) spells.push(...PALADIN_LEVEL_3_SPELLS)
+    if (level >= 13) spells.push(...PALADIN_LEVEL_4_SPELLS)
+    if (level >= 17) spells.push(...PALADIN_LEVEL_5_SPELLS)
     return spells
   }
 

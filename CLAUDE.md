@@ -624,7 +624,9 @@ When working on this project:
 5. Internal links should be consistent and always functional
 6. When in doubt about rules, ask for clarification
 
-### 📋 Patch Notes Rule — REQUIRED on every commit
+### 📋 Patch Notes Rule — MANDATORY, NO EXCEPTIONS
+
+**⚠️ ALWAYS update `PATCH_NOTES.md` (root, NOT `public/PATCH_NOTES.md`) in EVERY session, EVERY commit, without exception. This is non-negotiable. If you forget, fix it before pushing.**
 
 **Every commit that changes functionality visible to players MUST also update `PATCH_NOTES.md` (root, NOT `public/PATCH_NOTES.md`).**
 
