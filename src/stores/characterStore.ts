@@ -910,6 +910,7 @@ export const useCharacterStore = create<CharacterState>()(
                   quantity: 1,
                   rarity: materialRarity,
                   weight: 0.1,
+                  worth: isDust ? { gold: 0, silver: 7 } : { gold: 0, silver: 10 },
                 },
               ]
 

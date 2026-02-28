@@ -326,6 +326,7 @@ export function CharacterSheetPage() {
         quantity: lootItem.quantity || 1,
         rarity: lootItem.rarity as any,
         weight: 0.1, // 0.1 pounds per unit
+        worth: (lootItem as any).worth,
       }
 
       addMaterial(material)

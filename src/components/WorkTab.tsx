@@ -261,7 +261,7 @@ export function WorkTab({ character }: WorkTabProps) {
       description: item.bonus,
       category: 'adventuringGear' as const,
       weight: item.weight,
-      cost: { copper: 0, silver: 0, gold: 0, platinum: 0 },
+      cost: { copper: 0, silver: item.worth?.silver ?? 0, gold: item.worth?.gold ?? 0, platinum: 0 },
       quantity: 1,
       rarity: item.tier as 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary',
     }

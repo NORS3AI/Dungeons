@@ -1,5 +1,28 @@
 # Dungeons - Patch Notes
 
+## Version 0.4.1-alpha - February 28, 2026
+
+**Alpha Release Notice**: All 170 crafted items and 20+ crafting materials now have market worth values, enabling accurate sell pricing in shops and vendor interactions.
+
+### ✨ Crafted Item & Material Worth Values
+
+Every craftable recipe and gatherable material now has a market sell value.
+
+#### **Crafting Material Worth (1–10 silver each)**
+All herbs, ores, hides, cloths, and disenchanting byproducts (Magical Dust/Shards) have worth values reflecting their rarity.
+
+#### **Crafted Item Worth by Profession**
+- **Blacksmithing** weapons: 2g 5s (Common) → 50g (Legendary Ancient Axe)
+- **Tailoring** armor: 1s (Common Hood) → 40g (Legendary Eternal Chest)
+- **Alchemy** potions: 2s (Common Minor Healing) → 25g (Legendary Instant Initiative)
+- **Enchanting** scrolls: 2s (Common stat scrolls) → 10g (Legendary Colossus/Executioner)
+
+Crafted items are added to inventory with their worth as their sell cost, so vendors and loot appraisals will reflect accurate values.
+
+**Why This Matters**: Players can now see what their crafted goods are worth and make informed decisions about keeping vs. selling equipment.
+
+---
+
 ## Version 0.4.0-alpha - February 28, 2026
 
 **Alpha Release Notice**: The Work Tab brings a full crafting system to Dungeons — forge weapons, tailor armor, brew potions, and enchant scrolls using materials gathered from the world.

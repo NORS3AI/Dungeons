@@ -138,16 +138,16 @@ const COMMON_LOOT: LootItem[] = [
   { id: 'arrows', name: 'Arrows', category: 'Ammunition', description: 'Standard arrows', rarity: 'common', value: 1, quantity: 20 },
   { id: 'bolts', name: 'Crossbow Bolts', category: 'Ammunition', description: 'Standard bolts', rarity: 'common', value: 1, quantity: 20 },
   // Crafting Materials — Ore
-  { id: 'iron-ore', name: 'Iron Ore Nugget', category: 'Crafting Material', description: 'Raw iron ore for blacksmithing', rarity: 'common', value: 5, quantity: 3 },
-  { id: 'copper-ore', name: 'Copper Ore Nugget', category: 'Crafting Material', description: 'Raw copper ore for blacksmithing', rarity: 'common', value: 3, quantity: 3 },
+  { id: 'iron-ore', name: 'Iron Ore Nugget', category: 'Crafting Material', description: 'Raw iron ore for blacksmithing', rarity: 'common', value: 5, quantity: 3, worth: { gold: 0, silver: 2 } },
+  { id: 'copper-ore', name: 'Copper Ore Nugget', category: 'Crafting Material', description: 'Raw copper ore for blacksmithing', rarity: 'common', value: 3, quantity: 3, worth: { gold: 0, silver: 1 } },
   // Crafting Materials — Cloth
-  { id: 'linen-cloth', name: 'Linen Cloth', category: 'Crafting Material', description: 'Common cloth for tailoring basic armor', rarity: 'common', value: 2, quantity: 5 },
-  { id: 'wool-cloth', name: 'Wool Cloth', category: 'Crafting Material', description: 'Common wool cloth for tailoring', rarity: 'common', value: 3, quantity: 5 },
+  { id: 'linen-cloth', name: 'Linen Cloth', category: 'Crafting Material', description: 'Common cloth for tailoring basic armor', rarity: 'common', value: 2, quantity: 5, worth: { gold: 0, silver: 1 } },
+  { id: 'wool-cloth', name: 'Wool Cloth', category: 'Crafting Material', description: 'Common wool cloth for tailoring', rarity: 'common', value: 3, quantity: 5, worth: { gold: 0, silver: 2 } },
   // Crafting Materials — Hide
-  { id: 'light-hide', name: 'Light Animal Hide', category: 'Crafting Material', description: 'Common hide from small animals, used for light armor', rarity: 'common', value: 4, quantity: 3 },
+  { id: 'light-hide', name: 'Light Animal Hide', category: 'Crafting Material', description: 'Common hide from small animals, used for light armor', rarity: 'common', value: 4, quantity: 3, worth: { gold: 0, silver: 2 } },
   // Crafting Materials — Herb
-  { id: 'common-herb-lavender', name: 'Lavender', category: 'Crafting Material', description: 'Common herb for alchemy and healing salves', rarity: 'common', value: 2, quantity: 5 },
-  { id: 'common-herb-mint', name: 'Mint Leaves', category: 'Crafting Material', description: 'Common herb for alchemy and potions', rarity: 'common', value: 2, quantity: 5 },
+  { id: 'common-herb-lavender', name: 'Lavender', category: 'Crafting Material', description: 'Common herb for alchemy and healing salves', rarity: 'common', value: 2, quantity: 5, worth: { gold: 0, silver: 1 } },
+  { id: 'common-herb-mint', name: 'Mint Leaves', category: 'Crafting Material', description: 'Common herb for alchemy and potions', rarity: 'common', value: 2, quantity: 5, worth: { gold: 0, silver: 1 } },
 ]
 
 /**
@@ -163,16 +163,16 @@ const UNCOMMON_LOOT: LootItem[] = [
   { id: 'bag-holding', name: 'Bag of Holding', category: 'Wondrous', description: 'Reduces total carry weight by 50 lbs', rarity: 'uncommon', value: 400, weightReduction: 50 },
   { id: 'boots-speed', name: 'Boots of Speed', category: 'Wondrous', description: 'Double movement speed for 1 minute', rarity: 'uncommon', value: 350 },
   // Crafting Materials — Ore
-  { id: 'iron-ore-unc', name: 'Quality Iron Ore', category: 'Crafting Material', description: 'Higher quality iron ore for blacksmithing', rarity: 'uncommon', value: 10, quantity: 5 },
-  { id: 'copper-ore-unc', name: 'Quality Copper Ore', category: 'Crafting Material', description: 'Higher quality copper ore for blacksmithing', rarity: 'uncommon', value: 8, quantity: 5 },
+  { id: 'iron-ore-unc', name: 'Quality Iron Ore', category: 'Crafting Material', description: 'Higher quality iron ore for blacksmithing', rarity: 'uncommon', value: 10, quantity: 5, worth: { gold: 0, silver: 4 } },
+  { id: 'copper-ore-unc', name: 'Quality Copper Ore', category: 'Crafting Material', description: 'Higher quality copper ore for blacksmithing', rarity: 'uncommon', value: 8, quantity: 5, worth: { gold: 0, silver: 3 } },
   // Crafting Materials — Cloth
-  { id: 'silk-cloth', name: 'Silk Cloth', category: 'Crafting Material', description: 'Fine silk cloth for quality tailored armor', rarity: 'uncommon', value: 12, quantity: 4 },
-  { id: 'cotton-cloth', name: 'Cotton Cloth', category: 'Crafting Material', description: 'Sturdy cotton for crafting padded armor', rarity: 'uncommon', value: 10, quantity: 4 },
+  { id: 'silk-cloth', name: 'Silk Cloth', category: 'Crafting Material', description: 'Fine silk cloth for quality tailored armor', rarity: 'uncommon', value: 12, quantity: 4, worth: { gold: 0, silver: 6 } },
+  { id: 'cotton-cloth', name: 'Cotton Cloth', category: 'Crafting Material', description: 'Sturdy cotton for crafting padded armor', rarity: 'uncommon', value: 10, quantity: 4, worth: { gold: 0, silver: 5 } },
   // Crafting Materials — Hide
-  { id: 'thick-hide', name: 'Thick Leather Hide', category: 'Crafting Material', description: 'Uncommon hide from large animals for medium armor', rarity: 'uncommon', value: 15, quantity: 3 },
+  { id: 'thick-hide', name: 'Thick Leather Hide', category: 'Crafting Material', description: 'Uncommon hide from large animals for medium armor', rarity: 'uncommon', value: 15, quantity: 3, worth: { gold: 0, silver: 6 } },
   // Crafting Materials — Herb
-  { id: 'uncommon-herb-foxglove', name: 'Foxglove', category: 'Crafting Material', description: 'Uncommon herb for potent potions and antidotes', rarity: 'uncommon', value: 15, quantity: 3 },
-  { id: 'uncommon-herb-wolfsbane', name: 'Wolfsbane', category: 'Crafting Material', description: 'Uncommon herb for alchemy, effective against lycanthropes', rarity: 'uncommon', value: 18, quantity: 3 },
+  { id: 'uncommon-herb-foxglove', name: 'Foxglove', category: 'Crafting Material', description: 'Uncommon herb for potent potions and antidotes', rarity: 'uncommon', value: 15, quantity: 3, worth: { gold: 0, silver: 3 } },
+  { id: 'uncommon-herb-wolfsbane', name: 'Wolfsbane', category: 'Crafting Material', description: 'Uncommon herb for alchemy, effective against lycanthropes', rarity: 'uncommon', value: 18, quantity: 3, worth: { gold: 0, silver: 4 } },
 ]
 
 /**
@@ -190,15 +190,15 @@ const RARE_LOOT: LootItem[] = [
   { id: 'ring-protection', name: 'Ring of Protection', category: 'Wondrous', description: '+1 to AC and saving throws', rarity: 'rare', value: 800 },
   { id: 'wand-fireballs', name: 'Wand of Fireballs', category: 'Wondrous', description: '7 charges, cast fireball', rarity: 'rare', value: 1500 },
   // Crafting Materials — Ore
-  { id: 'silver-ore', name: 'Silver Ore Nugget', category: 'Crafting Material', description: 'Pure silver ore for fine jewelry and silver weapons', rarity: 'rare', value: 50, quantity: 3 },
-  { id: 'gold-ore', name: 'Gold Ore Nugget', category: 'Crafting Material', description: 'Pure gold ore for jewelry and valuable items', rarity: 'rare', value: 100, quantity: 2 },
+  { id: 'silver-ore', name: 'Silver Ore Nugget', category: 'Crafting Material', description: 'Pure silver ore for fine jewelry and silver weapons', rarity: 'rare', value: 50, quantity: 3, worth: { gold: 0, silver: 8 } },
+  { id: 'gold-ore', name: 'Gold Ore Nugget', category: 'Crafting Material', description: 'Pure gold ore for jewelry and valuable items', rarity: 'rare', value: 100, quantity: 2, worth: { gold: 0, silver: 9 } },
   // Crafting Materials — Cloth
-  { id: 'enchanted-cloth', name: 'Enchanted Cloth', category: 'Crafting Material', description: 'Rare magically-infused cloth for superior tailored armor', rarity: 'rare', value: 60, quantity: 3 },
+  { id: 'enchanted-cloth', name: 'Enchanted Cloth', category: 'Crafting Material', description: 'Rare magically-infused cloth for superior tailored armor', rarity: 'rare', value: 60, quantity: 3, worth: { gold: 0, silver: 8 } },
   // Crafting Materials — Hide
-  { id: 'scaled-hide', name: 'Scaled Beast Hide', category: 'Crafting Material', description: 'Rare hide from a scaled creature, ideal for medium/heavy armor', rarity: 'rare', value: 80, quantity: 2 },
+  { id: 'scaled-hide', name: 'Scaled Beast Hide', category: 'Crafting Material', description: 'Rare hide from a scaled creature, ideal for medium/heavy armor', rarity: 'rare', value: 80, quantity: 2, worth: { gold: 0, silver: 9 } },
   // Crafting Materials — Herb
-  { id: 'rare-herb-mandrake', name: 'Mandrake Root', category: 'Crafting Material', description: 'Rare herb for powerful alchemical concoctions', rarity: 'rare', value: 75, quantity: 2 },
-  { id: 'rare-herb-bloodthorn', name: 'Bloodthorn', category: 'Crafting Material', description: 'Rare herb for healing potions and resurrection elixirs', rarity: 'rare', value: 80, quantity: 2 },
+  { id: 'rare-herb-mandrake', name: 'Mandrake Root', category: 'Crafting Material', description: 'Rare herb for powerful alchemical concoctions', rarity: 'rare', value: 75, quantity: 2, worth: { gold: 0, silver: 7 } },
+  { id: 'rare-herb-bloodthorn', name: 'Bloodthorn', category: 'Crafting Material', description: 'Rare herb for healing potions and resurrection elixirs', rarity: 'rare', value: 80, quantity: 2, worth: { gold: 0, silver: 8 } },
 ]
 
 /**
@@ -213,15 +213,15 @@ const MORE_EPIC_LOOT: LootItem[] = [
   { id: 'cloak-invisibility', name: 'Cloak of Invisibility', category: 'Cloak', description: 'Become invisible at will', rarity: 'epic', value: 5000 },
   { id: 'belt-giant-strength', name: 'Belt of Giant Strength', category: 'Wondrous', description: 'Set Strength to 23', rarity: 'epic', value: 4000 },
   // Crafting Materials — Ore
-  { id: 'mithril-ore', name: 'Mithril Ore Nugget', category: 'Crafting Material', description: 'Legendary lightweight metal for superior armor and weapons', rarity: 'epic', value: 500, quantity: 2 },
-  { id: 'adamantite-ore', name: 'Adamantite Ore Nugget', category: 'Crafting Material', description: 'Incredibly hard metal for indestructible equipment', rarity: 'epic', value: 600, quantity: 2 },
+  { id: 'mithril-ore', name: 'Mithril Ore Nugget', category: 'Crafting Material', description: 'Legendary lightweight metal for superior armor and weapons', rarity: 'epic', value: 500, quantity: 2, worth: { gold: 0, silver: 9 } },
+  { id: 'adamantite-ore', name: 'Adamantite Ore Nugget', category: 'Crafting Material', description: 'Incredibly hard metal for indestructible equipment', rarity: 'epic', value: 600, quantity: 2, worth: { gold: 0, silver: 10 } },
   // Crafting Materials — Cloth
-  { id: 'shadowweave-cloth', name: 'Shadowweave Cloth', category: 'Crafting Material', description: 'Epic dark cloth woven with shadow essence for powerful armor', rarity: 'epic', value: 350, quantity: 2 },
+  { id: 'shadowweave-cloth', name: 'Shadowweave Cloth', category: 'Crafting Material', description: 'Epic dark cloth woven with shadow essence for powerful armor', rarity: 'epic', value: 350, quantity: 2, worth: { gold: 0, silver: 9 } },
   // Crafting Materials — Hide
-  { id: 'wyvern-hide', name: 'Wyvern Hide', category: 'Crafting Material', description: 'Epic hide from a wyvern, exceptionally tough and magical', rarity: 'epic', value: 400, quantity: 2 },
+  { id: 'wyvern-hide', name: 'Wyvern Hide', category: 'Crafting Material', description: 'Epic hide from a wyvern, exceptionally tough and magical', rarity: 'epic', value: 400, quantity: 2, worth: { gold: 0, silver: 10 } },
   // Crafting Materials — Herb
-  { id: 'rare-herb-nightshade', name: 'Arcane Nightshade', category: 'Crafting Material', description: 'Extremely rare herb for legendary potions and elixirs', rarity: 'epic', value: 400, quantity: 1 },
-  { id: 'rare-herb-phoenix', name: 'Phoenix Feather Grass', category: 'Crafting Material', description: 'Extremely rare herb for resurrection and immortality elixirs', rarity: 'epic', value: 450, quantity: 1 },
+  { id: 'rare-herb-nightshade', name: 'Arcane Nightshade', category: 'Crafting Material', description: 'Extremely rare herb for legendary potions and elixirs', rarity: 'epic', value: 400, quantity: 1, worth: { gold: 0, silver: 8 } },
+  { id: 'rare-herb-phoenix', name: 'Phoenix Feather Grass', category: 'Crafting Material', description: 'Extremely rare herb for resurrection and immortality elixirs', rarity: 'epic', value: 450, quantity: 1, worth: { gold: 0, silver: 9 } },
 ]
 
 /**
@@ -237,8 +237,8 @@ const EPIC_LOOT: LootItem[] = [
   { id: 'boots-seven-leagues', name: 'Boots of Seven Leagues', category: 'Wondrous', description: 'Teleport up to 1 mile once per day', rarity: 'epic', value: 6500 },
   { id: 'amulet-planes', name: 'Amulet of the Planes', category: 'Wondrous', description: 'Travel to other planes of existence', rarity: 'epic', value: 7500 },
   // Additional Crafting Materials — Ore
-  { id: 'mithril-ore-epic', name: 'Pure Mithril Ore', category: 'Crafting Material', description: 'The purest mithril for masterwork equipment', rarity: 'epic', value: 800, quantity: 3 },
-  { id: 'adamantite-ore-epic', name: 'Pure Adamantite Ore', category: 'Crafting Material', description: 'The purest adamantite for legendary weapons', rarity: 'epic', value: 900, quantity: 3 },
+  { id: 'mithril-ore-epic', name: 'Pure Mithril Ore', category: 'Crafting Material', description: 'The purest mithril for masterwork equipment', rarity: 'epic', value: 800, quantity: 3, worth: { gold: 0, silver: 10 } },
+  { id: 'adamantite-ore-epic', name: 'Pure Adamantite Ore', category: 'Crafting Material', description: 'The purest adamantite for legendary weapons', rarity: 'epic', value: 900, quantity: 3, worth: { gold: 0, silver: 10 } },
 ]
 
 /**
@@ -254,14 +254,14 @@ const LEGENDARY_LOOT: LootItem[] = [
   { id: 'vorpal-sword', name: 'Vorpal Sword', category: 'Weapon', description: 'Decapitates on critical hit', rarity: 'legendary', value: 15000, weaponDamageBonus: 4, attackBonus: 4 },
   { id: 'staff-magi', name: 'Staff of the Magi', category: 'Wondrous', description: 'Ultimate spellcasting focus', rarity: 'legendary', value: 20000 },
   // Crafting Materials — Ore
-  { id: 'obsidian-steel-ore', name: 'Obsidian-Steel Ore Nugget', category: 'Crafting Material', description: 'Mythical volcanic metal forged in dragon fire', rarity: 'legendary', value: 2500, quantity: 2 },
+  { id: 'obsidian-steel-ore', name: 'Obsidian-Steel Ore Nugget', category: 'Crafting Material', description: 'Mythical volcanic metal forged in dragon fire', rarity: 'legendary', value: 2500, quantity: 2, worth: { gold: 0, silver: 10 } },
   // Crafting Materials — Hide
-  { id: 'dragonscale-leather', name: 'Dragonscale Leather Hide', category: 'Crafting Material', description: 'Ancient dragon hide for legendary armor and accessories', rarity: 'legendary', value: 2000, quantity: 2 },
+  { id: 'dragonscale-leather', name: 'Dragonscale Leather Hide', category: 'Crafting Material', description: 'Ancient dragon hide for legendary armor and accessories', rarity: 'legendary', value: 2000, quantity: 2, worth: { gold: 0, silver: 10 } },
   // Crafting Materials — Cloth
-  { id: 'void-silk', name: 'Void Silk', category: 'Crafting Material', description: 'Legendary cloth harvested from the Astral Plane, shimmers between realities', rarity: 'legendary', value: 1500, quantity: 1 },
+  { id: 'void-silk', name: 'Void Silk', category: 'Crafting Material', description: 'Legendary cloth harvested from the Astral Plane, shimmers between realities', rarity: 'legendary', value: 1500, quantity: 1, worth: { gold: 0, silver: 10 } },
   // Crafting Materials — Herb
-  { id: 'legendary-herb-starbloom', name: 'Starbloom Petal', category: 'Crafting Material', description: 'Legendary herb that blooms only under starlight, for supreme elixirs', rarity: 'legendary', value: 1200, quantity: 1 },
-  { id: 'legendary-herb-soulroot', name: 'Soulroot', category: 'Crafting Material', description: 'Legendary herb from the Feywild, said to restore the soul itself', rarity: 'legendary', value: 1400, quantity: 1 },
+  { id: 'legendary-herb-starbloom', name: 'Starbloom Petal', category: 'Crafting Material', description: 'Legendary herb that blooms only under starlight, for supreme elixirs', rarity: 'legendary', value: 1200, quantity: 1, worth: { gold: 0, silver: 10 } },
+  { id: 'legendary-herb-soulroot', name: 'Soulroot', category: 'Crafting Material', description: 'Legendary herb from the Feywild, said to restore the soul itself', rarity: 'legendary', value: 1400, quantity: 1, worth: { gold: 0, silver: 10 } },
 ]
 
 /**
