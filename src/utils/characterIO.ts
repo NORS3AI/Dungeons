@@ -36,10 +36,11 @@ function validateCharacterData(data: unknown): data is Character {
 }
 
 /**
- * Import character from JSON file
- * Returns the character or throws an error
+ * Import character(s) from JSON file.
+ * Handles both single-character exports and Export-All array exports.
+ * Returns an array of one or more characters.
  */
-export async function importCharacterFromJSON(file: File): Promise<Character> {
+export async function importCharacterFromJSON(file: File): Promise<Character[]> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
 
@@ -52,11 +53,31 @@ export async function importCharacterFromJSON(file: File): Promise<Character> {
 
         const data = JSON.parse(text)
 
+        // Handle Export-All format (array of characters)
+        if (Array.isArray(data)) {
+          const imported: Character[] = []
+          for (const item of data) {
+            if (validateCharacterData(item)) {
+              imported.push({
+                ...item,
+                id: crypto.randomUUID(),
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+              })
+            }
+          }
+          if (imported.length === 0) {
+            throw new Error('No valid character data found in file')
+          }
+          resolve(imported)
+          return
+        }
+
+        // Handle single character export
         if (!validateCharacterData(data)) {
           throw new Error('Invalid character data format')
         }
 
-        // Generate new ID to avoid conflicts
         const importedCharacter: Character = {
           ...data,
           id: crypto.randomUUID(),
@@ -65,7 +86,7 @@ export async function importCharacterFromJSON(file: File): Promise<Character> {
           updatedAt: new Date().toISOString(),
         }
 
-        resolve(importedCharacter)
+        resolve([importedCharacter])
       } catch (error) {
         reject(new Error(`Failed to parse character file: ${error instanceof Error ? error.message : 'Unknown error'}`))
       }

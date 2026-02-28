@@ -836,15 +836,19 @@ export const useCharacterStore = create<CharacterState>()(
           const { currentCharacter, history } = get()
           if (!currentCharacter) return
 
-          const materials = currentCharacter.materials
-            .map((m) => {
-              if (m.id === materialId) {
-                const newQuantity = m.quantity + change
-                return newQuantity > 0 ? { ...m, quantity: newQuantity } : null
-              }
-              return m
-            })
-            .filter((m): m is Material => m !== null)
+          // First consolidate all entries with this id into one, then apply change
+          const totalQty = currentCharacter.materials
+            .filter((m) => m.id === materialId)
+            .reduce((sum, m) => sum + m.quantity, 0)
+          const newTotal = totalQty + change
+          const template = currentCharacter.materials.find((m) => m.id === materialId)
+          // Remove all duplicate entries for this id
+          const without = currentCharacter.materials.filter((m) => m.id !== materialId)
+          // Re-add as single consolidated entry if quantity > 0
+          const materials: Material[] =
+            newTotal > 0 && template
+              ? [...without, { ...template, quantity: newTotal }]
+              : without
 
           set({
             currentCharacter: {
