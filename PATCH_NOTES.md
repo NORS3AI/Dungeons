@@ -1,5 +1,20 @@
 # Dungeons - Patch Notes
 
+## Version 0.4.4-alpha - February 28, 2026
+
+**Alpha Release Notice**: Character creation polish — Starting Level removed and language selection fixed.
+
+### 🐛 Bug Fixes
+
+#### **Language Selector — Racial Language No Longer Locked**
+- Racial languages (Elvish, Dwarvish, Draconic, etc.) were incorrectly appearing locked/disabled in the language picker due to a case mismatch between stored language IDs (`'Common'`) and selector IDs (`'common'`). This caused the internal count to exceed the limit of 2, disabling all remaining choices.
+- Language IDs are now consistently normalised to lowercase throughout — existing characters with old capitalised language data are silently corrected on load.
+
+#### **Starting Level Removed from Character Creation**
+- The Starting Level field has been removed from the Character Details step and the Review & Finalize overview. All characters begin at Level 1.
+
+---
+
 ## Version 0.4.3-alpha - February 28, 2026
 
 **Alpha Release Notice**: Major Work tab improvements, expanded Alchemy content, a Grant Materials DM tool, gear replacement in Inventory, and Tailoring cleanup.
