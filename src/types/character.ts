@@ -185,6 +185,9 @@ export interface Character {
   // Identity
   id: string
   name: string
+  firstName?: string
+  surname?: string
+  nickname?: string
   playerName: string
   gender?: 'male' | 'female' | 'other'
 

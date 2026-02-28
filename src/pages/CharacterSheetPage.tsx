@@ -102,7 +102,13 @@ export function CharacterSheetPage() {
   const [weaponRolls, setWeaponRolls] = useState<Record<string, { hit?: number; damage?: number }>>({})
   const [spellRolls, setSpellRolls] = useState<Record<string, { hit?: number; damage?: number; healing?: number }>>({})
   const [showDMAbilityEditor, setShowDMAbilityEditor] = useState(false)
-  const [lastHealingRoll, setLastHealingRoll] = useState<{ itemId: string; amount: number } | null>(null)
+  const [pendingPotionConsume, setPendingPotionConsume] = useState<{
+    itemId: string
+    name: string
+    newQuantity: number // -1 means remove entirely
+    roll: number | null
+    displayFormula: string
+  } | null>(null)
   const [showMigrationSuccess, setShowMigrationSuccess] = useState(false)
   const [restNotification, setRestNotification] = useState<{ type: 'short' | 'long' | 'trance'; message: string } | null>(null)
   const [sellConfirmation, setSellConfirmation] = useState<{ itemName: string; value: number; currencyType: 'cp' | 'sp' | 'gp' | 'pp'; onConfirm: () => void } | null>(null)
@@ -560,17 +566,17 @@ export function CharacterSheetPage() {
     })
   }
 
-  // Parse healing amount from potion description
+  // Parse healing formula from potion description (raw, may contain "level" as a variable)
   const parseHealingAmount = (description: string): string | null => {
-    // Look for patterns like "2d4+2", "restores 10 hit points", "heals 2d8", etc.
-    const dicePattern = /(\d+d\d+(?:\s*[+\-]\s*\d+)?)/i
+    // Match dice formulas where the modifier can be a number or the word "level"
+    const diceWithLevelPattern = /(\d+d\d+(?:\s*[+\-]\s*(?:\d+|level))?)/i
     const hpPattern = /(\d+)\s*hit points?/i
-    const healsPattern = /heals?\s+(\d+d\d+(?:\s*[+\-]\s*\d+)?|\d+)/i
+    const healsPattern = /heals?\s+(\d+d\d+(?:\s*[+\-]\s*(?:\d+|level))?|\d+)/i
 
     let match = description.match(healsPattern)
     if (match) return match[1]
 
-    match = description.match(dicePattern)
+    match = description.match(diceWithLevelPattern)
     if (match) return match[1]
 
     match = description.match(hpPattern)
@@ -579,66 +585,53 @@ export function CharacterSheetPage() {
     return null
   }
 
-  // Handle using a potion/consumable
+  // Substitute "level" keyword in a formula with the actual character level number
+  const resolveHealingFormula = (formula: string, level: number): string => {
+    return formula.replace(/\blevel\b/gi, String(level))
+  }
+
+  // Handle using a potion/consumable — rolls immediately, consumes after 15 seconds
   const handleUsePotion = (itemId: string) => {
     const item = character.equipment.find(eq => eq.id === itemId)
     if (!item) return
 
-    // Try to roll healing dice if this is a healing potion
-    const healingFormula = parseHealingAmount(item.description)
-    let healingRoll: number | null = null
+    // Don't allow double-triggering while already pending
+    if (pendingPotionConsume?.itemId === itemId) return
 
-    if (healingFormula) {
-      // Check if it's a dice formula or flat number
-      if (healingFormula.includes('d')) {
-        const roll = rollDice(healingFormula)
-        if (roll) {
-          healingRoll = roll.grandTotal
-        }
+    // Parse and resolve the healing formula (substitute level if needed)
+    const rawFormula = parseHealingAmount(item.description)
+    const resolvedFormula = rawFormula ? resolveHealingFormula(rawFormula, character.level) : null
+    const displayFormula = resolvedFormula || rawFormula || ''
+
+    let healingRoll: number | null = null
+    if (resolvedFormula) {
+      if (resolvedFormula.includes('d')) {
+        const roll = rollDice(resolvedFormula)
+        if (roll) healingRoll = roll.grandTotal
       } else {
-        // It's a flat number
-        healingRoll = parseInt(healingFormula)
+        healingRoll = parseInt(resolvedFormula)
       }
     }
 
-    // Store the healing roll result
-    if (healingRoll !== null) {
-      setLastHealingRoll({ itemId, amount: healingRoll })
+    const newQuantity = item.quantity && item.quantity > 1 ? item.quantity - 1 : -1
 
-      // Clear after 5 seconds
-      setTimeout(() => {
-        setLastHealingRoll(null)
-      }, 5000)
-    }
+    // Show result immediately; consume the item after 15 seconds
+    setPendingPotionConsume({ itemId, name: item.name, newQuantity, roll: healingRoll, displayFormula })
 
-    // Check if it has multiple quantities
-    if (item.quantity && item.quantity > 1) {
-      changeEquipmentQuantity(itemId, item.quantity - 1)
-      const message = healingRoll !== null
-        ? `Used ${item.name}. Healed ${healingRoll} HP! ${item.quantity - 1} remaining.`
-        : `Used ${item.name}. ${item.quantity - 1} remaining.`
-      setShowConsumableNotification({
-        message,
-        type: 'success'
-      })
-    } else {
-      // Remove the item entirely
-      removeEquipment(itemId)
-      const message = healingRoll !== null
-        ? `Used ${item.name}. Healed ${healingRoll} HP! Item removed from inventory.`
-        : `Used ${item.name}. Item removed from inventory.`
-      setShowConsumableNotification({
-        message,
-        type: 'success'
-      })
-    }
-
-    saveCharacter()
-
-    // Auto-hide notification after 3 seconds
     setTimeout(() => {
-      setShowConsumableNotification(null)
-    }, 3000)
+      if (newQuantity === -1) {
+        removeEquipment(itemId)
+      } else {
+        changeEquipmentQuantity(itemId, newQuantity)
+      }
+      saveCharacter()
+      setPendingPotionConsume(null)
+      const message = healingRoll !== null
+        ? `${item.name} consumed. Healed ${healingRoll} HP!`
+        : `${item.name} consumed.`
+      setShowConsumableNotification({ message, type: 'success' })
+      setTimeout(() => setShowConsumableNotification(null), 3000)
+    }, 15000)
   }
 
   // Roll to hit for weapon attack
@@ -1061,6 +1054,11 @@ export function CharacterSheetPage() {
         <div className="text-left">
           <h1 className="text-4xl font-bold text-dnd-gold mb-2">
             {character.name || 'Unnamed Character'}
+            {character.nickname && (
+              <span className="text-2xl text-gray-400 font-normal ml-2">
+                "{character.nickname}"
+              </span>
+            )}
           </h1>
           <p className="text-xl text-gray-400">
             Level {character.level} {character.race?.name || 'Unknown'}{' '}
@@ -1244,16 +1242,9 @@ export function CharacterSheetPage() {
               </div>
             </div>
 
-            {/* Proficiency Bonus */}
-            <div className="card bg-gray-800 border-gray-700 p-4 text-center">
-              <QuickRefTooltip type="rule" id="proficiency-bonus">
-                <div className="text-xs text-gray-500 uppercase mb-1 cursor-pointer hover:text-gray-300">Proficiency Bonus</div>
-              </QuickRefTooltip>
-              <div className="text-3xl font-bold text-dnd-gold">+{profBonus}</div>
-            </div>
           </div>
 
-          {/* Middle Column - Combat Stats & Skills */}
+          {/* Middle Column - Combat Stats, Character Info */}
           <div className="space-y-6">
             {/* Combat Stats */}
             <div className="card bg-gray-800 border-gray-700 p-4">
@@ -1323,10 +1314,7 @@ export function CharacterSheetPage() {
                 }}
               />
             )}
-          </div>
 
-          {/* Right Column - Info & Skills */}
-          <div className="space-y-6">
             {/* Character Info */}
             <div className="card bg-gray-800 border-gray-700 p-4">
               <h3 className="text-lg font-bold text-white mb-4">Character Info</h3>
@@ -1356,6 +1344,18 @@ export function CharacterSheetPage() {
                   <div className="flex justify-between">
                     <span className="text-gray-500">Player</span>
                     <span className="text-gray-300">{character.playerName}</span>
+                  </div>
+                )}
+                {character.dailyIncome && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Profession</span>
+                    <span className="text-gray-300">{character.dailyIncome.professionName}</span>
+                  </div>
+                )}
+                {character.nickname && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Nickname</span>
+                    <span className="text-gray-300 italic">"{character.nickname}"</span>
                   </div>
                 )}
                 {character.gender && (
@@ -1433,6 +1433,17 @@ export function CharacterSheetPage() {
                 )}
               </div>
             </div>
+          </div>
+
+          {/* Right Column - Proficiency Bonus & Skills */}
+          <div className="space-y-6">
+            {/* Proficiency Bonus */}
+            <div className="card bg-gray-800 border-gray-700 p-4 text-center">
+              <QuickRefTooltip type="rule" id="proficiency-bonus">
+                <div className="text-xs text-gray-500 uppercase mb-1 cursor-pointer hover:text-gray-300">Proficiency Bonus</div>
+              </QuickRefTooltip>
+              <div className="text-3xl font-bold text-dnd-gold">+{profBonus}</div>
+            </div>
 
             {/* Skills */}
             <div className="card bg-gray-800 border-gray-700 p-4">
@@ -1468,15 +1479,21 @@ export function CharacterSheetPage() {
         <div className="space-y-6">
           {/* Spell Action Buttons */}
           <div className="flex justify-end gap-3">
-            {/* Choose Class Spells - only for spellcasting classes */}
+            {/* Choose Class Spells - DM only, only for spellcasting classes */}
             {character.class && character.class.spellcasting !== 'none' ? (
               <button
-                onClick={() => setShowClassSpellSelector(true)}
-                className="px-4 py-2 bg-blue-700 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors flex items-center gap-2"
-                title="Choose spells from your class spell list"
+                onClick={() => dmModeEnabled && setShowClassSpellSelector(true)}
+                disabled={!dmModeEnabled}
+                className={`px-4 py-2 font-semibold rounded-lg transition-colors flex items-center gap-2 ${
+                  dmModeEnabled
+                    ? 'bg-blue-700 hover:bg-blue-600 text-white cursor-pointer'
+                    : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                }`}
+                title={dmModeEnabled ? 'Choose spells from your class spell list' : 'DM Tools must be enabled to use this'}
               >
                 <span className="text-lg">📚</span>
                 Choose Class Spells
+                {!dmModeEnabled && <span className="text-xs font-normal">(DM)</span>}
               </button>
             ) : character.class ? (
               <div className="px-4 py-2 bg-gray-700 text-gray-400 rounded-lg flex items-center gap-2" title={`${character.class.name} is not a spellcasting class`}>
@@ -2934,37 +2951,76 @@ export function CharacterSheetPage() {
                   )
                   .map((item) => {
                     const healingAmount = parseHealingAmount(item.description)
+                    const isPending = pendingPotionConsume?.itemId === item.id
                     return (
-                      <div key={item.id} className="p-4 bg-gradient-to-br from-green-900/20 to-blue-900/20 border border-green-700 rounded-lg">
+                      <div
+                        key={item.id}
+                        className={`p-4 rounded-lg border transition-colors ${
+                          isPending
+                            ? 'bg-gradient-to-br from-emerald-900/40 to-green-900/40 border-emerald-500'
+                            : 'bg-gradient-to-br from-green-900/20 to-blue-900/20 border-green-700'
+                        }`}
+                      >
                         <div className="flex items-start justify-between mb-2">
                           <div className="flex-1">
                             <h4 className="font-bold text-green-400">{item.name}</h4>
                             {item.quantity && item.quantity > 1 && (
                               <p className="text-sm text-gray-400">Qty: {item.quantity}</p>
                             )}
-                            {healingAmount && (
-                              <div className="flex items-center gap-2 text-sm font-medium text-emerald-400 mt-1">
-                                <span>❤️ Heals: {healingAmount}</span>
-                                {lastHealingRoll?.itemId === item.id && (
-                                  <span className="px-2 py-0.5 bg-emerald-600 text-white rounded font-bold animate-pulse">
-                                    {lastHealingRoll.amount} HP
-                                  </span>
-                                )}
+                            {healingAmount && !isPending && (
+                              <div className="text-sm font-medium text-emerald-400 mt-1">
+                                ❤️ Heals: {resolveHealingFormula(healingAmount, character.level)}
                               </div>
                             )}
                           </div>
                         </div>
-                        <p className="text-sm text-gray-300 mb-3">{item.description}</p>
-                        {item.charges && (
+
+                        {isPending ? (
+                          /* Pending consume — show roll result and draining progress bar */
+                          <div className="mb-3">
+                            {pendingPotionConsume.roll !== null ? (
+                              <div className="text-center py-3">
+                                <div className="text-5xl font-bold text-emerald-300 mb-1">
+                                  +{pendingPotionConsume.roll}
+                                </div>
+                                <div className="text-sm text-emerald-400 font-medium">HP Restored</div>
+                                {pendingPotionConsume.displayFormula && (
+                                  <div className="text-xs text-gray-400 mt-1">
+                                    ({pendingPotionConsume.displayFormula})
+                                  </div>
+                                )}
+                              </div>
+                            ) : (
+                              <p className="text-sm text-gray-300 mb-3">{item.description}</p>
+                            )}
+                            <div className="text-xs text-center text-gray-400 mb-1">Consuming in 15s…</div>
+                            <div className="h-1.5 bg-gray-700 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-emerald-500 rounded-full"
+                                style={{ animation: 'consumeDrain 15s linear forwards' }}
+                              />
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="text-sm text-gray-300 mb-3">{item.description}</p>
+                        )}
+
+                        {item.charges && !isPending && (
                           <div className="text-xs text-blue-300 mb-3">
                             Magical: {item.charges.spellName}
                           </div>
                         )}
+
                         <button
                           onClick={() => handleUsePotion(item.id)}
-                          className="w-full px-3 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg font-medium transition-colors"
+                          disabled={isPending}
+                          className={`w-full px-3 py-2 rounded-lg font-medium transition-colors ${
+                            isPending
+                              ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                              : 'bg-green-600 hover:bg-green-500 text-white'
+                          }`}
                         >
-                          Use
+                          {isPending ? 'In Use…' : 'Use'}
                         </button>
                       </div>
                     )
@@ -3598,6 +3654,7 @@ export function CharacterSheetPage() {
                 subclass={character.subclass}
                 level={character.level}
                 isCharacterCreation={false}
+                existingSpells={character.knownSpells}
                 onSubmit={(cantrips, spells) => {
                   // Add all selected spells
                   cantrips.forEach((spell) => addSpell(spell))

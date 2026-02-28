@@ -1,5 +1,91 @@
 # Dungeons - Patch Notes
 
+## Version 0.3.12-alpha - February 28, 2026
+
+**Alpha Release Notice**: Paladin spells fixed, character sheet columns rebalanced, profession now visible in Character Info, and character creation gains a race-based name generator with separate First Name, Surname, and Nickname fields.
+
+### 🐛 Fix: Paladin Can't Select Spells
+
+The Paladin class was missing its `spellsKnown` array in the class definition. Since the Spell Selector uses that array to determine how many spells to show, Paladin players saw an empty spell list and could not select any spells during character creation or via DM tools.
+
+**Fix**: Added `spellsKnown: [0, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11]` to the Paladin class (matching the half-caster progression, with 0 at level 1 since Paladins gain spellcasting at level 2).
+
+---
+
+### ✨ Character Sheet Improvements
+
+#### **Profession in Character Info**
+The character's current profession (set via Daily Income roll) now appears in the **Character Info** card on the main overview tab, alongside Alignment, Player, Nickname, Gender, Age, Height, Weight, Vision, and Languages.
+
+#### **Balanced overview columns**
+The three-column overview layout was reorganized for more even height distribution:
+- **Left**: Ability Scores + Saving Throws
+- **Middle**: Combat Stats + Fighting Stance (Fighter) + Character Info
+- **Right**: Proficiency Bonus + Skills
+
+Previously Proficiency Bonus sat at the bottom of the left column (making it disproportionately tall) and Character Info sat at the top of the right column above the large Skills list. The new arrangement distributes content more evenly across all three columns.
+
+#### **Nickname displayed in header**
+If a character has a nickname, it appears next to their name in the sheet header in quote marks: `Araevin "Swiftarrow" Moonwhisper`.
+
+---
+
+### ✨ Race-Based Name Generator in Character Creation
+
+The Character Details form (step 1 of character creation) now has a dedicated **Name** section with:
+
+- **First Name** (required) — replaces the old single "Character Name" field
+- **Surname** (optional)
+- **Nickname** (optional) — displayed as `"Quickhand"` style on the character sheet
+- **Full name preview** — shows the composed name live as you type: `Araevin "Quickhand" Moonwhisper`
+
+#### **🎲 Generate Name button**
+- Pick any race from a dropdown (Human, Elf, Dwarf, Halfling, Gnome, Half-Elf, Half-Orc, Tiefling, Dragonborn, Aasimar, Goblin, Orc)
+- If a gender is selected, the generator respects it (male/female name pools)
+- Clicking **Generate Name** fills First Name and Surname instantly — you can keep rolling until you like the result
+- Name tables include authentic D&D-style names for each race
+
+**Why This Matters**: Players who aren't sure what to name their character can get race-appropriate suggestions in one click, while still being able to edit or override any field.
+
+---
+
+## Version 0.3.11-alpha - February 28, 2026
+
+**Alpha Release Notice**: Potion rolls now show results for 15 seconds before the item is consumed, level-scaled formulas (e.g. 4d4+level) roll correctly, and Choose Class Spells is DM-gated and spell-aware.
+
+### ✨ Potion Improvements
+
+#### **Level-scaled healing formulas**
+Potions whose descriptions include the word "level" as a modifier (e.g. "4d4 + level hit points") now resolve correctly. The character's current level is substituted into the formula before rolling — a level 7 character drinking a 4d4+level potion rolls 4d4+7.
+
+#### **15-second display before consumption**
+Clicking **Use** on a potion now:
+1. Rolls immediately and displays the healed HP value in large text on the card
+2. Shows a draining green progress bar counting down 15 seconds
+3. Automatically removes/decrements the potion when the timer expires
+
+The "Use" button becomes "In Use…" and is disabled during the countdown, preventing double-use.
+
+**Why This Matters**: Players now have time to read what they rolled and confirm the HP change before the item disappears from their inventory.
+
+---
+
+### ✨ Choose Class Spells — DM Mode & Duplicate Prevention
+
+#### **DM Tools required**
+The **Choose Class Spells** button on the Spells tab is now only active when **DM Mode** is enabled. When DM Mode is off, the button remains visible but grayed out with a "(DM)" label, making it clear it's a DM-only action. This prevents players from freely adding class spells outside of character creation.
+
+#### **Already-known spells excluded**
+When the DM opens Choose Class Spells, the selector:
+- Hides spells the character already knows from the selectable list
+- Shows a banner: "X spells already known — already-known spells are hidden"
+- Allows selecting any number of new spells (no slot-count restriction in mid-game mode)
+- "Done" becomes active as soon as at least one spell is selected
+
+**Why This Matters**: DMs can now add individual missing spells without the character accidentally re-selecting duplicates or being forced to fill all class spell slots.
+
+---
+
 ## Version 0.3.10-alpha - February 28, 2026
 
 **Alpha Release Notice**: DM Tools now includes a profession reroll button on the Currency section, giving DMs instant control over a character's daily income without touching character creation.
