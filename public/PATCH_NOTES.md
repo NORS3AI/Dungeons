@@ -1,5 +1,65 @@
 # Dungeons - Patch Notes
 
+## Version 0.3.9-alpha - February 28, 2026
+
+**Alpha Release Notice**: This version completes the spell system for all 16 classes, adding full spell support for the Amazon and Demon Hunter custom classes.
+
+### ✨ Amazon Spell System
+
+The Amazon class now has a complete spell list covering all half-caster progression levels.
+
+#### **Amazon Cantrip**
+- **Magic Arrow**: Conjure a force-damage arrow that auto-scales (1d4 → 4d4). Ignores mundane cover and nonmagical shields.
+
+#### **Amazon Spells (Levels 1–5)**
+- **Level 1**: Inner Sight (negate enemy invisibility/hiding), Power Strike (melee + chain lightning 1d6), Guided Arrow (next ranged attack auto-hits)
+- **Level 2**: Charged Strike (2d6 lightning + chain arc to 2 nearby targets), Slow Missiles (20 ft zone grants ranged resistance + disadvantage to attackers)
+- **Level 3**: Lightning Fury (15 ft burst 6d6 lightning, chains on failed saves), Freezing Arrow (3d8 cold + restrain on failed CON save)
+- **Level 4**: Immolation Arrow (3d6 fire hit + 3d6 explosion + burning ground), Strafe (up to 4 separate ranged attacks in one action)
+- **Level 5**: Decoy (illusion duplicate that draws enemy attacks), Summon Valkyrie (AC 16 warrior companion that fights until defeated)
+
+**Spell progression** follows half-caster rules: 1st level spells at character level 2, unlocking a new tier every 4 levels thereafter.
+
+---
+
+### 🔥 Demon Hunter Spell System
+
+The Demon Hunter class now has a complete spell list covering all half-caster progression levels.
+
+#### **Demon Hunter Spells (Levels 1–5)**
+- **Level 1**: Fel Rush (20 ft dash through enemies, 1d8 fire DEX save), Vault (supernatural leap, advantage on next attack after landing), Immolation Aura (5 ft fire aura, 1d4 on nearby creatures and attackers)
+- **Level 2**: Eye Beam (40 ft line, 4d6 fire + blinds on failed save), Blade Dance (5 ft AoE 2d6 slashing + retaliation thorns)
+- **Level 3**: Metamorphosis (+1 AC, fly 30 ft, +1d6 fire melee, advantage on STR), Shadow Power (hide + 1d8 necrotic bonus strike + frighten)
+- **Level 4**: Rain of Vengeance (20 ft cylinder 6d6 fire + difficult terrain), Infernal Strike (20 ft aerial leap + 2d6 fire burst on landing)
+- **Level 5**: Multishot (15 ft cone 3d6 piercing, pushes on hard fail)
+
+**Spell progression** follows half-caster rules: 1st level spells at character level 2, unlocking a new tier every 4 levels thereafter.
+
+---
+
+### 📋 Spell System Now Complete
+
+All 16 classes have full spell data:
+
+| Class | Type | Levels |
+|-------|------|--------|
+| Bard | Full caster | Cantrips + 1–9 |
+| Cleric | Full caster | Cantrips + 1–9 |
+| Druid | Full caster | Cantrips + 1–9 |
+| Sorcerer | Full caster | Cantrips + 1–9 |
+| Warlock | Pact magic | Cantrips + 1–9 |
+| Wizard | Full caster | Cantrips + 1–9 |
+| Necromancer | Full caster | Cantrips + 1–9 |
+| Paladin | Half caster | 1–5 |
+| Ranger | Half caster | 1–5 |
+| Amazon ✨ | Half caster | Cantrip + 1–5 |
+| Demon Hunter ✨ | Half caster | 1–5 |
+| Death Knight | Third caster | Cantrips + 1–9 |
+
+**Why This Matters**: Amazon and Demon Hunter players could previously not select spells — the spell selector showed no spells for these classes. Both classes are now fully playable as spellcasters through the character creation flow and the Spells tab on the character sheet.
+
+---
+
 ## Version 0.2.2 - February 22, 2026
 
 ### 🆕 New Features
