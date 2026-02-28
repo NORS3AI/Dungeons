@@ -1,5 +1,31 @@
 # Dungeons - Patch Notes
 
+## Version 0.4.5-alpha - February 28, 2026
+
+**Alpha Release Notice**: DM Item Granter completely overhauled — 6-tab Quick Add, crafting-aligned weapons/armor/potions, Enchanting Scrolls, and a full D&D 5e Shop.
+
+### ✨ DM Item Granter Overhaul
+
+The DM Item Granter has been rebuilt from the ground up with a much richer item library and smarter organisation.
+
+#### **6 Quick-Add Tabs**
+- **⚔️ Weapons** — All 50 craftable weapons from the Blacksmithing work skill (Common through Legendary), filterable by tier. Each card shows damage dice, type, and the weapon's magical bonus.
+- **🛡️ Armor** — All 30 crafted armor pieces from the Tailoring work skill across all 5 tiers, filterable by tier.
+- **🧪 Potions** — All 50 crafted potions from the Alchemy work skill plus classic healing potions, filterable by tier.
+- **✨ Enchanting** — 25 new Enchanting Scrolls across all 5 quality tiers: minor sharpening, armor fortification, elemental binding, spell storage, vorpal edge, invulnerability, and more.
+- **🎒 Gear** — Expanded to 35+ items covering all class/race starting equipment: ammo, focus items, instruments, tools, adventure packs, and more.
+- **🏪 Shop** — New! 130+ items covering all purchasable D&D 5e gear, filterable by Simple Weapons, Martial Weapons, Armor, Gear, Tools, and Magic Items.
+
+#### **Tier Filter**
+Weapons, Armor, Potions, and Enchanting tabs all have a tier filter bar (All / Common / Uncommon / Rare / Epic / Legendary).
+
+#### **Shop Category Filter**
+The Shop tab narrows across ~130 items by category with a pill filter bar.
+
+**Why This Matters**: DMs can now grant any item in the D&D 5e ruleset — including crafted gear that exactly mirrors what players see in the Work tab — in just a few clicks.
+
+---
+
 ## Version 0.4.4-alpha - February 28, 2026
 
 **Alpha Release Notice**: Character creation polish — Starting Level removed and language selection fixed.

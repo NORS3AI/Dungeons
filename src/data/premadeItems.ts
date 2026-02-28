@@ -1,5 +1,10 @@
-import type { Equipment, Weapon, Armor, Material } from '../types'
+import type { Equipment, Weapon, Armor, Material, DamageType } from '../types'
 import { EMPTY_CURRENCY } from '../types'
+import { BLACKSMITHING_RECIPES, TAILORING_RECIPES, ALCHEMY_RECIPES } from './craftingData'
+import type { CraftingTier } from './craftingData'
+
+export type ShopCategory = 'simple-weapons' | 'martial-weapons' | 'armor' | 'gear' | 'tools' | 'magic'
+export type ShopItem = Equipment & { shopCategory: ShopCategory }
 
 /**
  * Pre-made items for quick DM granting
@@ -394,63 +399,160 @@ export const PREMADE_ARMOR: Armor[] = [
   },
 ]
 
-// Common Adventuring Gear
+// ─── Adventuring Gear (all basic class/race starting items) ─────────────────
 export const PREMADE_GEAR: Equipment[] = [
-  {
-    id: 'rope-hemp-50ft',
-    name: 'Rope, Hempen (50 feet)',
-    description: 'Rope has 2 hit points and can be burst with a DC 17 Strength check.',
+  // Essentials
+  { id: 'backpack',          name: 'Backpack',                description: 'Holds 1 cubic foot / 30 lbs of gear.',                                                           category: 'adventuringGear', rarity: 'common', quantity: 1, weight: 5,   equipped: false, cost: { ...EMPTY_CURRENCY, gold: 2 } },
+  { id: 'bedroll',           name: 'Bedroll',                 description: 'Comfortable sleeping roll for travel.',                                                          category: 'adventuringGear', rarity: 'common', quantity: 1, weight: 7,   equipped: false, cost: { ...EMPTY_CURRENCY, gold: 1 } },
+  { id: 'rations',           name: 'Rations (1 day)',         description: 'Dried food for extended travel: jerky, hardtack, nuts, dried fruit.',                           category: 'adventuringGear', rarity: 'common', quantity: 1, weight: 2,   equipped: false, cost: { ...EMPTY_CURRENCY, silver: 5 } },
+  { id: 'waterskin',         name: 'Waterskin',               description: 'Holds 4 pints of liquid.',                                                                       category: 'adventuringGear', rarity: 'common', quantity: 1, weight: 5,   equipped: false, cost: { ...EMPTY_CURRENCY, silver: 2 } },
+  { id: 'tinderbox',         name: 'Tinderbox',               description: 'Steel, flint, and tinder. Light a fire in 1 minute, or as an action if the kindling is handy.', category: 'adventuringGear', rarity: 'common', quantity: 1, weight: 1,   equipped: false, cost: { ...EMPTY_CURRENCY, silver: 5 } },
+  { id: 'torch',             name: 'Torch',                   description: 'Burns 1 hour. Bright light 20 ft, dim light 20 ft.',                                            category: 'adventuringGear', rarity: 'common', quantity: 1, weight: 1,   equipped: false, cost: { ...EMPTY_CURRENCY, copper: 1 } },
+  { id: 'rope-hemp-50ft',    name: 'Rope, Hempen (50 ft)',    description: '2 HP; burst DC 17 Strength check.',                                                              category: 'adventuringGear', rarity: 'common', quantity: 1, weight: 10,  equipped: false, cost: { ...EMPTY_CURRENCY, gold: 1 } },
+  { id: 'rope-silk-50ft',    name: 'Rope, Silk (50 ft)',      description: 'Lighter than hemp; 2 HP; burst DC 17 Strength check.',                                          category: 'adventuringGear', rarity: 'common', quantity: 1, weight: 5,   equipped: false, cost: { ...EMPTY_CURRENCY, gold: 10 } },
+
+  // Ammunition
+  { id: 'arrows-20',         name: 'Arrows (×20)',            description: 'Ammunition for shortbows and longbows.',                                                         category: 'adventuringGear', rarity: 'common', quantity: 20, weight: 1,  equipped: false, cost: { ...EMPTY_CURRENCY, gold: 1 } },
+  { id: 'bolts-20',          name: 'Bolts (×20)',             description: 'Ammunition for light and heavy crossbows.',                                                      category: 'adventuringGear', rarity: 'common', quantity: 20, weight: 1.5, equipped: false, cost: { ...EMPTY_CURRENCY, gold: 1 } },
+  { id: 'sling-bullets-20',  name: 'Sling Bullets (×20)',     description: 'Ammunition for slings.',                                                                         category: 'adventuringGear', rarity: 'common', quantity: 20, weight: 1.5, equipped: false, cost: { ...EMPTY_CURRENCY, copper: 4 } },
+  { id: 'darts-4',           name: 'Darts (×4)',              description: 'Small throwing darts.',                                                                          category: 'adventuringGear', rarity: 'common', quantity: 4,  weight: 0.2, equipped: false, cost: { ...EMPTY_CURRENCY, copper: 2 } },
+  { id: 'blowgun-needles-50',name: 'Blowgun Needles (×50)',   description: 'Ammunition for blowguns.',                                                                       category: 'adventuringGear', rarity: 'common', quantity: 50, weight: 1,  equipped: false, cost: { ...EMPTY_CURRENCY, gold: 1 } },
+
+  // Focus items (class-specific)
+  { id: 'arcane-focus',      name: 'Arcane Focus',            description: 'Crystal, orb, rod, staff, or wand. Used as a spellcasting focus for arcane spells.',           category: 'adventuringGear', rarity: 'common', quantity: 1, weight: 1,   equipped: false, cost: { ...EMPTY_CURRENCY, gold: 10 } },
+  { id: 'holy-symbol',       name: 'Holy Symbol',             description: 'Amulet, emblem, or reliquary. Used as a spellcasting focus for divine spells.',                category: 'adventuringGear', rarity: 'common', quantity: 1, weight: 1,   equipped: false, cost: { ...EMPTY_CURRENCY, gold: 5 } },
+  { id: 'druidic-focus',     name: 'Druidic Focus',           description: 'Sprig of mistletoe, totem, wooden staff, or yew wand. Spellcasting focus for druids.',        category: 'adventuringGear', rarity: 'common', quantity: 1, weight: 1,   equipped: false, cost: { ...EMPTY_CURRENCY, gold: 5 } },
+  { id: 'component-pouch',   name: 'Component Pouch',         description: 'Belt pouch with material components for spells (except those with a gold piece cost).',        category: 'adventuringGear', rarity: 'common', quantity: 1, weight: 2,   equipped: false, cost: { ...EMPTY_CURRENCY, gold: 25 } },
+
+  // Shields
+  { id: 'shield',            name: 'Shield',                  description: '+2 AC. Requires one free hand to wield.',                                                        category: 'adventuringGear', rarity: 'common', quantity: 1, weight: 6,   equipped: false, cost: { ...EMPTY_CURRENCY, gold: 10 } },
+
+  // Clothing & disguise
+  { id: 'clothes-common',    name: 'Clothes, Common',         description: 'Simple everyday clothing.',                                                                      category: 'adventuringGear', rarity: 'common', quantity: 1, weight: 3,   equipped: false, cost: { ...EMPTY_CURRENCY, silver: 5 } },
+  { id: 'clothes-traveler',  name: "Clothes, Traveler's",     description: 'Sturdy clothes fit for long journeys.',                                                          category: 'adventuringGear', rarity: 'common', quantity: 1, weight: 4,   equipped: false, cost: { ...EMPTY_CURRENCY, gold: 2 } },
+  { id: 'clothes-fine',      name: 'Clothes, Fine',           description: 'Elegant attire suitable for nobility or formal events.',                                         category: 'adventuringGear', rarity: 'common', quantity: 1, weight: 6,   equipped: false, cost: { ...EMPTY_CURRENCY, gold: 15 } },
+  { id: 'disguise-kit',      name: 'Disguise Kit',            description: 'Cosmetics, hair dye, small props. Tool proficiency allows assuming new identities.',            category: 'adventuringGear', rarity: 'common', quantity: 1, weight: 3,   equipped: false, cost: { ...EMPTY_CURRENCY, gold: 25 } },
+
+  // Tools & kits
+  { id: 'thieves-tools',     name: "Thieves' Tools",          description: 'Small file, set of lock picks, small mirror, pliers, narrow-bladed scissors. Picks locks & disarms traps.', category: 'adventuringGear', rarity: 'common', quantity: 1, weight: 1, equipped: false, cost: { ...EMPTY_CURRENCY, gold: 25 } },
+  { id: 'healers-kit',       name: "Healer's Kit",            description: '10 uses. Stabilize a dying creature as an action without a Medicine check.',                   category: 'adventuringGear', rarity: 'common', quantity: 1, weight: 3,   equipped: false, cost: { ...EMPTY_CURRENCY, gold: 5 } },
+  { id: 'herbalism-kit',     name: 'Herbalism Kit',           description: 'Pouches, clippers, leather gloves, vials, waterskin. Identify and apply herbs.',              category: 'adventuringGear', rarity: 'common', quantity: 1, weight: 3,   equipped: false, cost: { ...EMPTY_CURRENCY, gold: 5 } },
+  { id: 'poisoner-kit',      name: "Poisoner's Kit",          description: 'Vials, chemicals, and equipment for crafting and applying poisons.',                           category: 'adventuringGear', rarity: 'common', quantity: 1, weight: 2,   equipped: false, cost: { ...EMPTY_CURRENCY, gold: 50 } },
+  { id: 'navigators-tools',  name: "Navigator's Tools",       description: 'Sextant, compass, calipers, ruler, parchment, ink, quill.',                                    category: 'adventuringGear', rarity: 'common', quantity: 1, weight: 2,   equipped: false, cost: { ...EMPTY_CURRENCY, gold: 25 } },
+
+  // Musical instruments (Bard)
+  { id: 'lute',              name: 'Lute',                    description: 'A stringed musical instrument favoured by bards.',                                              category: 'adventuringGear', rarity: 'common', quantity: 1, weight: 2,   equipped: false, cost: { ...EMPTY_CURRENCY, gold: 35 } },
+  { id: 'flute',             name: 'Flute',                   description: 'A wind instrument favoured by bards.',                                                          category: 'adventuringGear', rarity: 'common', quantity: 1, weight: 1,   equipped: false, cost: { ...EMPTY_CURRENCY, gold: 2 } },
+  { id: 'drum',              name: 'Drum',                    description: 'A percussion instrument favoured by bards.',                                                    category: 'adventuringGear', rarity: 'common', quantity: 1, weight: 3,   equipped: false, cost: { ...EMPTY_CURRENCY, gold: 6 } },
+
+  // Adventure packs (bundled starting gear)
+  { id: 'pack-dungeoneers',  name: "Dungeoneer's Pack",       description: 'Backpack, crowbar, hammer, 10 pitons, 10 torches, tinderbox, 10 days rations, waterskin, 50 ft rope.',     category: 'adventuringGear', rarity: 'common', quantity: 1, weight: 61.5, equipped: false, cost: { ...EMPTY_CURRENCY, gold: 12 } },
+  { id: 'pack-explorers',    name: "Explorer's Pack",         description: 'Backpack, bedroll, mess kit, tinderbox, 10 torches, 10 days rations, waterskin, 50 ft rope.',              category: 'adventuringGear', rarity: 'common', quantity: 1, weight: 59,   equipped: false, cost: { ...EMPTY_CURRENCY, gold: 10 } },
+  { id: 'pack-scholars',     name: "Scholar's Pack",          description: 'Backpack, spellbook, 10 candles, tinderbox, pouch with 10 gp.',                                            category: 'adventuringGear', rarity: 'common', quantity: 1, weight: 10,   equipped: false, cost: { ...EMPTY_CURRENCY, gold: 40 } },
+  { id: 'pack-priests',      name: "Priest's Pack",           description: 'Backpack, blanket, 10 candles, tinderbox, alms box, 2 blocks of incense, censer, vestments, 2 days rations, waterskin.', category: 'adventuringGear', rarity: 'common', quantity: 1, weight: 24, equipped: false, cost: { ...EMPTY_CURRENCY, gold: 19 } },
+  { id: 'pack-burglars',     name: "Burglar's Pack",          description: 'Backpack, 1000 ball bearings, 10 ft string, bell, 5 candles, crowbar, hammer, 10 pitons, lantern, 2 flasks oil, 5 days rations, tinderbox, waterskin.', category: 'adventuringGear', rarity: 'common', quantity: 1, weight: 44.5, equipped: false, cost: { ...EMPTY_CURRENCY, gold: 16 } },
+  { id: 'pack-entertainers', name: "Entertainer's Pack",      description: 'Backpack, bedroll, 2 costumes, 5 candles, 5 days rations, waterskin, disguise kit.',                     category: 'adventuringGear', rarity: 'common', quantity: 1, weight: 33,   equipped: false, cost: { ...EMPTY_CURRENCY, gold: 40 } },
+  { id: 'pack-diplomats',    name: "Diplomat's Pack",         description: 'Chest, 2 map/scroll cases, fine clothes, bottle of ink, ink pen, lamp, 2 flasks oil, 5 sheets paper, vial perfume, sealing wax, soap.', category: 'adventuringGear', rarity: 'common', quantity: 1, weight: 36, equipped: false, cost: { ...EMPTY_CURRENCY, gold: 39 } },
+
+  // Spellbook
+  { id: 'spellbook',         name: 'Spellbook',               description: '100 pages of blank vellum. Wizards record their spells here.',                                 category: 'adventuringGear', rarity: 'common', quantity: 1, weight: 3,   equipped: false, cost: { ...EMPTY_CURRENCY, gold: 50 } },
+]
+
+// ─── Crafted Weapons (from Blacksmithing – mirrors Work tab) ────────────────
+export const CRAFTED_WEAPONS: Array<Weapon & { tier: CraftingTier; craftBonus: string }> =
+  BLACKSMITHING_RECIPES.map((item) => {
+    const nameLower = item.name.toLowerCase()
+    const isRanged = nameLower.includes('bow') || nameLower.includes('crossbow')
+    return {
+      id: item.id,
+      name: item.name,
+      description: item.bonus,
+      category: 'weapon',
+      weaponType: 'martial',
+      weaponCategory: isRanged ? 'ranged' : 'melee',
+      damage: {
+        dice: item.damage ?? '1d6',
+        type: (item.damageType?.toLowerCase() ?? 'slashing') as DamageType,
+      },
+      properties: [],
+      rarity: item.tier as Equipment['rarity'],
+      quantity: 1,
+      weight: item.weight,
+      equipped: false,
+      cost: { ...EMPTY_CURRENCY, gold: item.worth?.gold ?? 0, silver: item.worth?.silver ?? 0 },
+      tier: item.tier,
+      craftBonus: item.bonus,
+    }
+  })
+
+// ─── Crafted Armor Pieces (from Tailoring – mirrors Work tab) ────────────────
+export const CRAFTED_ARMOR: Array<Equipment & { tier: CraftingTier; craftBonus: string }> =
+  TAILORING_RECIPES.map((item) => ({
+    id: item.id,
+    name: item.name,
+    description: item.bonus,
     category: 'adventuringGear',
-    rarity: 'common',
+    rarity: item.tier as Equipment['rarity'],
     quantity: 1,
-    weight: 10,
+    weight: item.weight,
     equipped: false,
-    cost: { ...EMPTY_CURRENCY, gold: 1 },
-  },
-  {
-    id: 'torch',
-    name: 'Torch',
-    description: 'A torch burns for 1 hour, providing bright light in a 20-foot radius and dim light for an additional 20 feet.',
-    category: 'adventuringGear',
-    rarity: 'common',
+    cost: { ...EMPTY_CURRENCY, gold: item.worth?.gold ?? 0, silver: item.worth?.silver ?? 0 },
+    tier: item.tier,
+    craftBonus: item.bonus,
+  }))
+
+// ─── Crafted Potions (from Alchemy – mirrors Work tab) ───────────────────────
+export const CRAFTED_POTIONS: Array<Equipment & { tier: CraftingTier; craftBonus: string }> =
+  ALCHEMY_RECIPES.map((item) => ({
+    id: item.id,
+    name: item.name,
+    description: item.bonus,
+    category: 'consumable',
+    rarity: item.tier as Equipment['rarity'],
     quantity: 1,
-    weight: 1,
+    weight: item.weight,
     equipped: false,
-    cost: { ...EMPTY_CURRENCY, copper: 1 },
-  },
-  {
-    id: 'rations',
-    name: 'Rations (1 day)',
-    description: 'Rations consist of dry foods suitable for extended travel, including jerky, dried fruit, hardtack, and nuts.',
-    category: 'adventuringGear',
-    rarity: 'common',
-    quantity: 1,
-    weight: 2,
-    equipped: false,
-    cost: { ...EMPTY_CURRENCY, silver: 5 },
-  },
-  {
-    id: 'bedroll',
-    name: 'Bedroll',
-    description: 'A simple sleeping bag with a blanket.',
-    category: 'adventuringGear',
-    rarity: 'common',
-    quantity: 1,
-    weight: 7,
-    equipped: false,
-    cost: { ...EMPTY_CURRENCY, gold: 1 },
-  },
-  {
-    id: 'backpack',
-    name: 'Backpack',
-    description: 'A leather pack with straps that can hold 1 cubic foot of material.',
-    category: 'adventuringGear',
-    rarity: 'common',
-    quantity: 1,
-    weight: 5,
-    equipped: false,
-    cost: { ...EMPTY_CURRENCY, gold: 2 },
-  },
+    cost: { ...EMPTY_CURRENCY, gold: item.worth?.gold ?? 0, silver: item.worth?.silver ?? 0 },
+    tier: item.tier,
+    craftBonus: item.bonus,
+  }))
+
+// ─── Enchanting Scrolls (all 5 quality tiers) ────────────────────────────────
+function esc(id: string, name: string, tier: CraftingTier, bonus: string, gold: number): Equipment & { tier: CraftingTier; craftBonus: string } {
+  return { id, name, description: bonus, category: 'consumable', rarity: tier as Equipment['rarity'], quantity: 1, weight: 0.1, equipped: false, cost: { ...EMPTY_CURRENCY, gold }, tier, craftBonus: bonus }
+}
+
+export const ENCHANTING_SCROLLS: Array<Equipment & { tier: CraftingTier; craftBonus: string }> = [
+  // ── Common ────────────────────────────────────────────────────────────────
+  esc('scroll-minor-sharpen',  'Scroll of Minor Sharpening',    'common',    '+1 to attack rolls for 1 hour',                            5),
+  esc('scroll-minor-ward',     'Scroll of Minor Ward',          'common',    '+1 AC for 1 hour',                                         5),
+  esc('scroll-elem-spark',     'Scroll of Elemental Spark',     'common',    'Weapon deals +1d4 fire/cold/lightning for 1 hour',         6),
+  esc('scroll-featherweight',  'Scroll of Featherweight',       'common',    'Reduces item weight by 5 lbs for 24 hours',                4),
+  esc('scroll-radiance',       'Scroll of Radiance',            'common',    'Weapon sheds dim light 10 ft; +1d4 radiant for 1 hour',    6),
+  // ── Uncommon ─────────────────────────────────────────────────────────────
+  esc('scroll-weapon-plus1',   'Scroll of +1 Weapon Enhancement','uncommon', 'Permanently grants weapon +1 to attack and damage rolls',  25),
+  esc('scroll-armor-plus1',    'Scroll of +1 Armor Fortification','uncommon','Permanently grants armor +1 AC',                           25),
+  esc('scroll-elem-binding',   'Scroll of Elemental Binding',   'uncommon',  'Adds 1d6 elemental damage to weapon for 1 day',            30),
+  esc('scroll-swiftness',      'Scroll of Swiftness',           'uncommon',  'Armor loses stealth disadvantage for 1 day',               28),
+  esc('scroll-lifedrain',      'Scroll of Lifedrain',           'uncommon',  'Weapon heals 1d4 HP on hit for 1 day',                     35),
+  // ── Rare ──────────────────────────────────────────────────────────────────
+  esc('scroll-weapon-plus2',   'Scroll of +2 Weapon Enhancement','rare',     'Permanently grants weapon +2 to attack and damage rolls',  150),
+  esc('scroll-armor-plus2',    'Scroll of +2 Armor Fortification','rare',    'Permanently grants armor +2 AC',                           150),
+  esc('scroll-dragon-breath',  "Scroll of Dragon's Breath",     'rare',      'Weapon deals +2d6 fire/acid/cold/lightning (choose) for 1 day', 180),
+  esc('scroll-spell-storage',  'Scroll of Spell Storage',       'rare',      'Store one spell (up to level 3) in a weapon; cast by attacking', 200),
+  esc('scroll-shadow-step',    'Scroll of Shadow Step',         'rare',      'Wearer can teleport up to 30 ft (1/short rest)',           175),
+  // ── Epic ──────────────────────────────────────────────────────────────────
+  esc('scroll-weapon-plus3',   'Scroll of +3 Weapon Enhancement','epic',     'Permanently grants weapon +3 to attack and damage rolls',  750),
+  esc('scroll-armor-plus3',    'Scroll of +3 Armor Fortification','epic',    'Permanently grants armor +3 AC',                           750),
+  esc('scroll-vorpal',         'Scroll of Vorpal Edge',         'epic',      'Weapon crits on 19-20; nat 20 can sever limbs',            800),
+  esc('scroll-spell-reflect',  'Scroll of Spell Reflection',    'epic',      'Armor reflects one spell per long rest on a successful save', 850),
+  esc('scroll-time-dilation',  'Scroll of Time Dilation',       'epic',      'Weapon grants one additional attack on first turn of combat (1/day)', 900),
+  // ── Legendary ─────────────────────────────────────────────────────────────
+  esc('scroll-runic-mastery',  'Scroll of Runic Mastery',       'legendary', 'Weapon cycles through all elemental damage types on each hit', 3000),
+  esc('scroll-invulnerability','Scroll of Invulnerability',     'legendary', 'Armor ignores non-magical damage for 1 hour (1/day)',      3500),
+  esc('scroll-soul-binding',   'Scroll of Soul Binding',        'legendary', 'Weapon traps souls of slain creatures (INT save DC 20)',   4000),
+  esc('scroll-divine-blessing','Scroll of Divine Blessing',     'legendary', 'Weapon permanently deals +2d6 radiant damage',            4500),
+  esc('scroll-abs-defense',    'Scroll of Absolute Defense',    'legendary', 'Armor grants +4 AC for 1 round as reaction (1/short rest)', 5000),
 ]
 
 // ─── Premade Crafting Materials for DM granting ────────────────────────────
@@ -493,5 +595,197 @@ export const PREMADE_MATERIALS: (Material & { label: string })[] = [
   { id: 'rare-herb-phoenix',     name: 'Phoenix Feather Grass',label:'Herb',category: 'herb', rarity: 'epic',     quantity: 1, weight: 0.1, worth: { gold: 0, silver: 9  }, description: 'Herb for resurrection elixirs' },
   { id: 'legendary-herb-starbloom',name:'Starbloom Petal',  label: 'Herb', category: 'herb',  rarity: 'legendary',quantity: 1, weight: 0.05,worth: { gold: 1, silver: 2  }, description: 'Blooms only under starlight' },
   { id: 'legendary-herb-soulroot',name: 'Soulroot',         label: 'Herb', category: 'herb',  rarity: 'legendary',quantity: 1, weight: 0.05,worth: { gold: 1, silver: 4  }, description: 'Herb from the Feywild' },
+]
+
+// ─── Shop Items — All purchasable D&D 5e items ───────────────────────────────
+// Helper for weapon shop entries
+function sw(id: string, name: string, dice: string, dmgType: DamageType, wType: 'simple'|'martial', wCat: 'melee'|'ranged', props: string[], weight: number, gold: number, silver: number, copper: number, shopCat: ShopCategory): ShopItem {
+  const w: Weapon & { shopCategory: ShopCategory } = {
+    id, name, description: `${dice} ${dmgType}${props.length ? '. ' + props.join(', ') : ''}.`,
+    category: 'weapon', weaponType: wType, weaponCategory: wCat,
+    damage: { dice, type: dmgType }, properties: props as never[],
+    rarity: 'common', quantity: 1, weight, equipped: false,
+    cost: { ...EMPTY_CURRENCY, gold, silver, copper }, shopCategory: shopCat,
+  }
+  return w
+}
+// Helper for armor shop entries
+function sa(id: string, name: string, desc: string, aType: 'light'|'medium'|'heavy', ac: number, stealth: boolean, weight: number, gold: number, shopCat: ShopCategory): ShopItem {
+  const a: Armor & { shopCategory: ShopCategory } = {
+    id, name, description: desc,
+    category: 'armor', armorType: aType, baseAC: ac, stealthDisadvantage: stealth,
+    rarity: 'common', quantity: 1, weight, equipped: false,
+    cost: { ...EMPTY_CURRENCY, gold }, shopCategory: shopCat,
+  }
+  return a
+}
+// Helper for generic shop gear
+function sg(id: string, name: string, desc: string, weight: number, gold: number, silver: number, copper: number, shopCat: ShopCategory): ShopItem {
+  return { id, name, description: desc, category: 'adventuringGear', rarity: 'common', quantity: 1, weight, equipped: false, cost: { ...EMPTY_CURRENCY, gold, silver, copper }, shopCategory: shopCat }
+}
+
+export const SHOP_ITEMS: ShopItem[] = [
+  // ── Simple Melee Weapons ────────────────────────────────────────────────────
+  sw('shop-club',         'Club',         '1d4', 'bludgeoning', 'simple', 'melee',  ['light'],              2,    0, 2, 0, 'simple-weapons'),
+  sw('shop-dagger',       'Dagger',       '1d4', 'piercing',    'simple', 'melee',  ['finesse','light','thrown'], 1, 2, 0, 0, 'simple-weapons'),
+  sw('shop-greatclub',    'Greatclub',    '1d8', 'bludgeoning', 'simple', 'melee',  ['twoHanded'],          10,   0, 2, 0, 'simple-weapons'),
+  sw('shop-handaxe',      'Handaxe',      '1d6', 'slashing',    'simple', 'melee',  ['light','thrown'],     2,    5, 0, 0, 'simple-weapons'),
+  sw('shop-javelin',      'Javelin',      '1d6', 'piercing',    'simple', 'melee',  ['thrown'],             2,    0, 5, 0, 'simple-weapons'),
+  sw('shop-light-hammer', 'Light Hammer', '1d4', 'bludgeoning', 'simple', 'melee',  ['light','thrown'],     2,    2, 0, 0, 'simple-weapons'),
+  sw('shop-mace',         'Mace',         '1d6', 'bludgeoning', 'simple', 'melee',  [],                     4,    5, 0, 0, 'simple-weapons'),
+  sw('shop-quarterstaff', 'Quarterstaff', '1d6', 'bludgeoning', 'simple', 'melee',  ['versatile'],          4,    0, 2, 0, 'simple-weapons'),
+  sw('shop-sickle',       'Sickle',       '1d4', 'slashing',    'simple', 'melee',  ['light'],              2,    1, 0, 0, 'simple-weapons'),
+  sw('shop-spear',        'Spear',        '1d6', 'piercing',    'simple', 'melee',  ['thrown','versatile'], 3,    1, 0, 0, 'simple-weapons'),
+  // ── Simple Ranged Weapons ──────────────────────────────────────────────────
+  sw('shop-crossbow-light','Light Crossbow','1d8','piercing',   'simple', 'ranged', ['ammunition','loading','twoHanded'], 5, 25, 0, 0, 'simple-weapons'),
+  sw('shop-dart',         'Dart',          '1d4','piercing',    'simple', 'ranged', ['finesse','thrown'],   0.25, 0, 0, 5, 'simple-weapons'),
+  sw('shop-shortbow',     'Shortbow',      '1d6','piercing',    'simple', 'ranged', ['ammunition','twoHanded'], 2, 25, 0, 0, 'simple-weapons'),
+  sw('shop-sling',        'Sling',         '1d4','bludgeoning', 'simple', 'ranged', ['ammunition'],         0,    0, 1, 0, 'simple-weapons'),
+  // ── Martial Melee Weapons ──────────────────────────────────────────────────
+  sw('shop-battleaxe',    'Battleaxe',    '1d8',  'slashing',    'martial','melee', ['versatile'],          4,  10, 0, 0, 'martial-weapons'),
+  sw('shop-flail',        'Flail',        '1d8',  'bludgeoning', 'martial','melee', [],                     2,  10, 0, 0, 'martial-weapons'),
+  sw('shop-glaive',       'Glaive',       '1d10', 'slashing',    'martial','melee', ['heavy','reach','twoHanded'], 6, 20, 0, 0, 'martial-weapons'),
+  sw('shop-greataxe',     'Greataxe',     '1d12', 'slashing',    'martial','melee', ['heavy','twoHanded'],  7,  30, 0, 0, 'martial-weapons'),
+  sw('shop-greatsword',   'Greatsword',   '2d6',  'slashing',    'martial','melee', ['heavy','twoHanded'],  6,  50, 0, 0, 'martial-weapons'),
+  sw('shop-halberd',      'Halberd',      '1d10', 'slashing',    'martial','melee', ['heavy','reach','twoHanded'], 6, 20, 0, 0, 'martial-weapons'),
+  sw('shop-lance',        'Lance',        '1d12', 'piercing',    'martial','melee', ['reach'],              6,  10, 0, 0, 'martial-weapons'),
+  sw('shop-longsword',    'Longsword',    '1d8',  'slashing',    'martial','melee', ['versatile'],          3,  15, 0, 0, 'martial-weapons'),
+  sw('shop-maul',         'Maul',         '2d6',  'bludgeoning', 'martial','melee', ['heavy','twoHanded'],  10, 10, 0, 0, 'martial-weapons'),
+  sw('shop-morningstar',  'Morningstar',  '1d8',  'piercing',    'martial','melee', [],                     4,  15, 0, 0, 'martial-weapons'),
+  sw('shop-pike',         'Pike',         '1d10', 'piercing',    'martial','melee', ['heavy','reach','twoHanded'], 18, 5, 0, 0, 'martial-weapons'),
+  sw('shop-rapier',       'Rapier',       '1d8',  'piercing',    'martial','melee', ['finesse'],            2,  25, 0, 0, 'martial-weapons'),
+  sw('shop-scimitar',     'Scimitar',     '1d6',  'slashing',    'martial','melee', ['finesse','light'],    3,  25, 0, 0, 'martial-weapons'),
+  sw('shop-shortsword',   'Shortsword',   '1d6',  'piercing',    'martial','melee', ['finesse','light'],    2,  10, 0, 0, 'martial-weapons'),
+  sw('shop-trident',      'Trident',      '1d6',  'piercing',    'martial','melee', ['thrown','versatile'], 4,   5, 0, 0, 'martial-weapons'),
+  sw('shop-war-pick',     'War Pick',     '1d8',  'piercing',    'martial','melee', [],                     2,   5, 0, 0, 'martial-weapons'),
+  sw('shop-warhammer',    'Warhammer',    '1d8',  'bludgeoning', 'martial','melee', ['versatile'],          2,  15, 0, 0, 'martial-weapons'),
+  sw('shop-whip',         'Whip',         '1d4',  'slashing',    'martial','melee', ['finesse','reach'],    3,   2, 0, 0, 'martial-weapons'),
+  // ── Martial Ranged Weapons ─────────────────────────────────────────────────
+  sw('shop-blowgun',      'Blowgun',       '1',    'piercing',   'martial','ranged',['ammunition','loading'],1, 10, 0, 0, 'martial-weapons'),
+  sw('shop-crossbow-hand','Hand Crossbow', '1d6',  'piercing',   'martial','ranged',['ammunition','light','loading'], 3, 75, 0, 0, 'martial-weapons'),
+  sw('shop-crossbow-heavy','Heavy Crossbow','1d10','piercing',   'martial','ranged',['ammunition','heavy','loading','twoHanded'], 18, 50, 0, 0, 'martial-weapons'),
+  sw('shop-longbow',      'Longbow',       '1d8',  'piercing',   'martial','ranged',['ammunition','heavy','twoHanded'], 2, 50, 0, 0, 'martial-weapons'),
+  // ── Armor ─────────────────────────────────────────────────────────────────
+  sa('shop-padded',       'Padded Armor',    'Light armor. AC 11 + DEX mod.',              'light',  11, true,   8,    5,   'armor'),
+  sa('shop-leather',      'Leather Armor',   'Light armor. AC 11 + DEX mod.',              'light',  11, false,  10,   10,  'armor'),
+  sa('shop-studded',      'Studded Leather', 'Light armor. AC 12 + DEX mod.',              'light',  12, false,  13,   45,  'armor'),
+  sa('shop-hide',         'Hide Armor',      'Medium armor. AC 12 + DEX mod (max 2).',     'medium', 12, false,  12,   10,  'armor'),
+  sa('shop-chain-shirt',  'Chain Shirt',     'Medium armor. AC 13 + DEX mod (max 2).',     'medium', 13, false,  20,   50,  'armor'),
+  sa('shop-scale-mail',   'Scale Mail',      'Medium armor. AC 14 + DEX mod (max 2).',     'medium', 14, true,   45,   50,  'armor'),
+  sa('shop-breastplate',  'Breastplate',     'Medium armor. AC 14 + DEX mod (max 2).',     'medium', 14, false,  20,   400, 'armor'),
+  sa('shop-half-plate',   'Half Plate',      'Medium armor. AC 15 + DEX mod (max 2).',     'medium', 15, true,   40,   750, 'armor'),
+  sa('shop-ring-mail',    'Ring Mail',       'Heavy armor. AC 14. No DEX bonus.',          'heavy',  14, true,   40,   30,  'armor'),
+  sa('shop-chain-mail',   'Chain Mail',      'Heavy armor. AC 16. Requires STR 13.',       'heavy',  16, true,   55,   75,  'armor'),
+  sa('shop-splint',       'Splint Armor',    'Heavy armor. AC 17. Requires STR 15.',       'heavy',  17, true,   60,   200, 'armor'),
+  sa('shop-plate',        'Plate Armor',     'Heavy armor. AC 18. Requires STR 15.',       'heavy',  18, true,   65,   1500,'armor'),
+  // ── Adventuring Gear ───────────────────────────────────────────────────────
+  sg('shop-abacus',       'Abacus',                  'Counting tool.',                                  2,  2,   0, 0, 'gear'),
+  sg('shop-acid-vial',    'Acid (vial)',              'As an action, splash contents (5 ft). 2d6 acid.', 1,  25,  0, 0, 'gear'),
+  sg('shop-alch-fire',    "Alchemist's Fire",        'As an action, throw (20 ft). 1d4 fire on hit/each turn until DC 10 DEX check.', 1, 50, 0, 0, 'gear'),
+  sg('shop-ball-bearings','Ball Bearings (bag of 1000)', 'Scatter as action. DC 10 DEX or fall prone.',0.5,1,  0, 0, 'gear'),
+  sg('shop-bell',         'Bell',                    'Alerts when string is disturbed.',                0,  1,   0, 0, 'gear'),
+  sg('shop-blanket',      'Blanket',                 'Warmth during rest in cold environments.',        3,  5,   0, 0, 'gear'),
+  sg('shop-block-tackle', 'Block and Tackle',        'Allows you to hoist up to four times the weight with advantage.', 5, 1, 0, 0, 'gear'),
+  sg('shop-book',         'Book',                    'A blank book or one filled with lore.',           5,  25,  0, 0, 'gear'),
+  sg('shop-candle',       'Candle',                  'For 1 hour, sheds bright light 5 ft, dim light 5 ft.', 0, 0, 1, 0, 'gear'),
+  sg('shop-chain-10ft',   'Chain (10 feet)',         '10 HP; break with DC 20 STR check.',              10, 5,  0, 0, 'gear'),
+  sg('shop-chalk',        'Chalk (1 piece)',          'Mark surfaces.',                                 0,  0,   1, 0, 'gear'),
+  sg('shop-chest',        'Chest',                   'Holds 12 cubic feet / 300 lbs.',                 25, 5,   0, 0, 'gear'),
+  sg('shop-crowbar',      'Crowbar',                 'Advantage on STR checks when it applies.',        5,  2,   0, 0, 'gear'),
+  sg('shop-fishing-tackle','Fishing Tackle',         'Hook, line, sinker, lures. WIS (Survival) to catch fish.', 4, 1, 0, 0, 'gear'),
+  sg('shop-flask',        'Flask or Tankard',        'Holds 1 pint.',                                  1,  0,   2, 0, 'gear'),
+  sg('shop-grapple-hook', 'Grappling Hook',          'Thrown 60 ft; attaches to a surface.',           4,  2,   0, 0, 'gear'),
+  sg('shop-hammer',       'Hammer',                  'Drive a piton or other object.',                  3,  1,   0, 0, 'gear'),
+  sg('shop-hammer-sledge','Hammer, Sledge',          'Drive stakes or break objects.',                 10,  2,   0, 0, 'gear'),
+  sg('shop-hourglass',    'Hourglass',               'Tracks 1 hour intervals.',                        1,  25,  0, 0, 'gear'),
+  sg('shop-hunting-trap', 'Hunting Trap',            'DC 13 DEX to spot; 1d4 piercing, STR 13 to escape.', 25, 5, 0, 0, 'gear'),
+  sg('shop-ink-bottle',   'Ink (1 oz bottle)',       'Standard writing ink.',                           0,  10,  0, 0, 'gear'),
+  sg('shop-ink-pen',      'Ink Pen',                 'For writing with ink.',                           0,  0,   2, 0, 'gear'),
+  sg('shop-jug',          'Jug or Pitcher',          'Holds 1 gallon.',                                 4,  0,   2, 0, 'gear'),
+  sg('shop-ladder-10ft',  'Ladder (10 ft)',          'Wooden ladder for climbing.',                    25,  0,   1, 0, 'gear'),
+  sg('shop-lamp',         'Lamp',                    'Burns 6 hours per flask. Bright 15 ft, dim 30 ft.', 1, 0,  5, 0, 'gear'),
+  sg('shop-lantern-bull', 'Lantern, Bullseye',       'Burns 6 hours. Bright cone 60 ft, dim 60 ft.',   2,  10,  0, 0, 'gear'),
+  sg('shop-lantern-hood', 'Lantern, Hooded',         'Burns 6 hours. Bright 30 ft, dim 30 ft. Can dim as action.', 2, 5, 0, 0, 'gear'),
+  sg('shop-lock',         'Lock',                    'DC 15 DEX (Thieves\' Tools) to pick.',            1,  10,  0, 0, 'gear'),
+  sg('shop-magnifier',    'Magnifying Glass',        'Advantage on INT checks to examine fine details. Start fires with sun.', 0, 100, 0, 0, 'gear'),
+  sg('shop-manacles',     'Manacles',                'Restrain a creature of size Medium or smaller. STR 20 or DEX 20 (DC) to escape.', 6, 2, 0, 0, 'gear'),
+  sg('shop-map-case',     'Map or Scroll Case',     'Holds up to 10 rolled sheets.',                   1,  1,   0, 0, 'gear'),
+  sg('shop-mess-kit',     'Mess Kit',                'Tin box with cup, bowl, fork, knife, spoon.',     1,  0,   2, 0, 'gear'),
+  sg('shop-mirror-steel', 'Mirror, Steel',           'A small steel mirror.',                           0.5,5,   0, 0, 'gear'),
+  sg('shop-oil-flask',    'Oil (flask)',              'As action, douse creature: DC 10 DEX or 5 fire damage. Burns for 2 rounds.', 1, 0, 1, 0, 'gear'),
+  sg('shop-paper',        'Paper (one sheet)',       'High quality writing paper.',                     0,  0,   2, 0, 'gear'),
+  sg('shop-parchment',    'Parchment (one sheet)',   'Animal hide suitable for writing.',               0,  0,   1, 0, 'gear'),
+  sg('shop-perfume',      'Perfume (vial)',          'A pleasant scent.',                               0,  5,   0, 0, 'gear'),
+  sg('shop-piton',        'Piton',                   'Iron spike driven into rock or wood.',            0.25,0,  5, 0, 'gear'),
+  sg('shop-poison-basic', 'Poison, Basic (vial)',    'Apply to weapon; next attack deals extra 1d4 poison and DC 10 CON or poisoned 1 min.', 0, 100, 0, 0, 'gear'),
+  sg('shop-pole-10ft',    'Pole (10 ft)',            'Wooden pole for probing ahead.',                 7,   0,   5, 0, 'gear'),
+  sg('shop-pot-iron',     'Pot, Iron',               'Holds 1 gallon. Used for cooking.',              10,  2,   0, 0, 'gear'),
+  sg('shop-pouch',        'Pouch',                   'Holds 1/5 cubic foot / 6 lbs.',                  1,   5,   0, 0, 'gear'),
+  sg('shop-rations',      'Rations (1 day)',         'Dried food for extended travel.',                 2,   0,   5, 0, 'gear'),
+  sg('shop-robe',         'Robe',                    'A comfortable robe.',                             4,   1,   0, 0, 'gear'),
+  sg('shop-rope-hemp',    'Rope, Hempen (50 ft)',    '2 HP; burst DC 17 STR.',                         10,  1,   0, 0, 'gear'),
+  sg('shop-rope-silk',    'Rope, Silk (50 ft)',      '2 HP; lighter than hemp.',                        5,  10,   0, 0, 'gear'),
+  sg('shop-sack',         'Sack',                    'Holds 1 cubic foot / 30 lbs.',                    0.5, 0,   1, 0, 'gear'),
+  sg('shop-scale-merchant','Scale, Merchant\'s',    'Weighs items up to 2 lbs.',                       3,   5,   0, 0, 'gear'),
+  sg('shop-sealing-wax',  'Sealing Wax',             'Melt and stamp with a signet ring.',              0,   0,   5, 0, 'gear'),
+  sg('shop-shovel',       'Shovel',                  'Dig in soil or loose ground.',                    5,   2,   0, 0, 'gear'),
+  sg('shop-signal-whistle','Signal Whistle',         'Audible up to 600 feet.',                         0,   0,   5, 0, 'gear'),
+  sg('shop-signet-ring',  'Signet Ring',             'Personal seal. Forging it requires a DC 15 check.', 0, 5,  0, 0, 'gear'),
+  sg('shop-soap',         'Soap',                    'For washing.',                                    0,   0,   2, 0, 'gear'),
+  sg('shop-spellbook',    'Spellbook',               '100 pages of vellum. Wizards record spells here.',3,  50,   0, 0, 'gear'),
+  sg('shop-spike-iron',   'Spike, Iron',             'Hammered into surfaces.',                         1,   0,   1, 0, 'gear'),
+  sg('shop-tent',         'Tent, Two-Person',        'Shelter for two creatures.',                     20,   2,   0, 0, 'gear'),
+  sg('shop-torch',        'Torch',                   '1 hour. Bright 20 ft, dim 20 ft.',               1,   0,   1, 0, 'gear'),
+  sg('shop-vial',         'Vial',                    'Holds up to 4 oz of liquid.',                    0,   1,   0, 0, 'gear'),
+  sg('shop-waterskin',    'Waterskin',               'Holds 4 pints.',                                  5,   0,   2, 0, 'gear'),
+  sg('shop-whetstone',    'Whetstone',               'Sharpen edged weapons.',                          1,   0,   1, 0, 'gear'),
+  // ── Tools ──────────────────────────────────────────────────────────────────
+  sg('shop-tools-alchemist',   "Alchemist's Supplies",  'Identify potions & craft basic alchemical items.',   8,  50,  0, 0, 'tools'),
+  sg('shop-tools-brewer',      "Brewer's Supplies",     'Craft and identify ales, meads, and spirits.',       9,  20,  0, 0, 'tools'),
+  sg('shop-tools-calligrapher',"Calligrapher's Supplies",'Produce readable and elegant writing.',             5,  10,  0, 0, 'tools'),
+  sg('shop-tools-carpenter',   "Carpenter's Tools",     'Construct and repair wooden structures and objects.',6,  8,   0, 0, 'tools'),
+  sg('shop-tools-cartographer',"Cartographer's Tools",  'Create accurate maps.',                             6,  15,  0, 0, 'tools'),
+  sg('shop-tools-cobbler',     "Cobbler's Tools",       'Craft and repair footwear.',                        5,  5,   0, 0, 'tools'),
+  sg('shop-tools-cook',        "Cook's Utensils",       'Prepare meals. Advantage on INT checks about food.',8,  1,   0, 0, 'tools'),
+  sg('shop-tools-glassblower', "Glassblower's Tools",   'Craft glassware and identify glass objects.',       5,  30,  0, 0, 'tools'),
+  sg('shop-tools-jeweler',     "Jeweler's Tools",       'Evaluate and craft jewelry.',                       2,  25,  0, 0, 'tools'),
+  sg('shop-tools-leatherworker',"Leatherworker's Tools",'Craft and repair leather goods.',                   5,  5,   0, 0, 'tools'),
+  sg('shop-tools-mason',       "Mason's Tools",         'Work with stone and masonry.',                     8,  10,  0, 0, 'tools'),
+  sg('shop-tools-painter',     "Painter's Supplies",    'Produce paintings and identify artwork.',           5,  10,  0, 0, 'tools'),
+  sg('shop-tools-potter',      "Potter's Tools",        'Craft pottery and ceramics.',                       3,  10,  0, 0, 'tools'),
+  sg('shop-tools-smith',       "Smith's Tools",         'Work metals; advantage on STR checks to break iron objects.', 8, 20, 0, 0, 'tools'),
+  sg('shop-tools-tinker',      "Tinker's Tools",        'Construct and repair mechanical objects.',          10, 50,  0, 0, 'tools'),
+  sg('shop-tools-weaver',      "Weaver's Tools",        'Craft cloth goods.',                               5,  1,   0, 0, 'tools'),
+  sg('shop-tools-woodcarver',  "Woodcarver's Tools",    'Craft and carve wooden objects.',                   5,  1,   0, 0, 'tools'),
+  sg('shop-tools-disguise',    'Disguise Kit',          'Cosmetics and props to adopt a new identity.',      3,  25,  0, 0, 'tools'),
+  sg('shop-tools-forgery',     'Forgery Kit',           'Materials to duplicate documents and handwriting.',  5,  15,  0, 0, 'tools'),
+  sg('shop-tools-herbalism',   'Herbalism Kit',         'Identify plants and craft herbal remedies.',        3,  5,   0, 0, 'tools'),
+  sg('shop-tools-navigators',  "Navigator's Tools",     'Plot a course by stars. Prevent getting lost.',     2,  25,  0, 0, 'tools'),
+  sg('shop-tools-poisoner',    "Poisoner's Kit",        'Craft and apply poisons.',                          2,  50,  0, 0, 'tools'),
+  sg('shop-tools-thieves',     "Thieves' Tools",        'Pick locks and disarm traps.',                      1,  25,  0, 0, 'tools'),
+  sg('shop-tools-gaming-dice', 'Gaming Set (Dice)',     'A set of polyhedral dice.',                         0,  1,   0, 0, 'tools'),
+  sg('shop-tools-gaming-cards','Gaming Set (Cards)',    'A deck of playing cards.',                          0,  0,   5, 0, 'tools'),
+  sg('shop-tools-musical-drum','Drum',                  'Percussion instrument.',                            3,  6,   0, 0, 'tools'),
+  sg('shop-tools-musical-flute','Flute',                'Wind instrument.',                                  1,  2,   0, 0, 'tools'),
+  sg('shop-tools-musical-lute','Lute',                  'Stringed instrument favoured by bards.',            2,  35,  0, 0, 'tools'),
+  sg('shop-tools-musical-lyre','Lyre',                  'Stringed instrument of celestial origin.',          2,  30,  0, 0, 'tools'),
+  sg('shop-tools-musical-horn','Horn',                  'Wind instrument; audible 600 ft.',                  2,  3,   0, 0, 'tools'),
+  sg('shop-tools-musical-viol','Viol',                  'Bowed stringed instrument.',                        1,  30,  0, 0, 'tools'),
+  // ── Common Magic Items ─────────────────────────────────────────────────────
+  sg('shop-magic-bag-holding', 'Bag of Holding',         'Holds 500 lbs / 64 cu ft. Weighs 15 lbs regardless of contents.',  15,  200, 0, 0, 'magic'),
+  sg('shop-magic-rope-climbing','Rope of Climbing',      'Animates on command; can tie and untie itself.',   3,   200, 0, 0, 'magic'),
+  sg('shop-magic-eyes-eagle',  'Eyes of the Eagle',      'Advantage on Perception checks. Can see clearly up to 1 mile.', 0, 250, 0, 0, 'magic'),
+  sg('shop-magic-goggles-night','Goggles of Night',      'Darkvision 60 ft (stacks with existing).',          0,  150, 0, 0, 'magic'),
+  sg('shop-magic-boots-elf',   'Boots of Elvenkind',     'Your steps make no sound; advantage on Stealth (movement).', 1, 250, 0, 0, 'magic'),
+  sg('shop-magic-cloak-prot',  'Cloak of Protection',    '+1 AC and saving throws.',                          1,  300, 0, 0, 'magic'),
+  sg('shop-magic-ring-prot',   'Ring of Protection',     '+1 AC and saving throws.',                          0,  350, 0, 0, 'magic'),
+  sg('shop-magic-boots-speed', 'Boots of Speed',         'Double movement speed; enemies have disadvantage on opportunity attacks.', 1, 400, 0, 0, 'magic'),
+  sg('shop-magic-gauntlets',   'Gauntlets of Ogre Power','STR becomes 19 if lower.',                          2,  400, 0, 0, 'magic'),
+  sg('shop-magic-amulet-health','Amulet of Health',      'CON becomes 19 if lower.',                          0,  400, 0, 0, 'magic'),
+  sg('shop-magic-belt-giant',  'Belt of Hill Giant Strength','STR becomes 21.',                               1,  500, 0, 0, 'magic'),
+  sg('shop-magic-ring-swim',   'Ring of Swimming',       'Gain a swimming speed of 40 ft.',                   0,  100, 0, 0, 'magic'),
+  sg('shop-magic-ring-jumping','Ring of Jumping',        'Jump triple the normal distance.',                  0,  100, 0, 0, 'magic'),
+  sg('shop-magic-brooch-shield','Brooch of Shielding',   'Immunity to Magic Missile. Resistance to force damage.', 0, 150, 0, 0, 'magic'),
+  sg('shop-magic-hat-disguise','Hat of Disguise',        'Cast Disguise Self at will.',                       0,  250, 0, 0, 'magic'),
 ]
 
