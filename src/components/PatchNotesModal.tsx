@@ -1,4 +1,19 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useMemo } from 'react'
+
+// ⚠️  DO NOT change this to fetch() or any runtime network request.
+//
+// WHY: The deployed site (GitHub Pages) serves files from the `main` branch.
+//   fetch(`${BASE_URL}PATCH_NOTES.md`) silently returns the OLD file from main,
+//   hiding every version added since the last merge — the exact bug that caused
+//   v0.4.1–0.4.8 to vanish from the in-app patch notes.
+//
+// HOW IT WORKS: Vite bundles the markdown content into the JS at build time via
+//   the `?raw` suffix. The built app always contains the correct notes regardless
+//   of what file the server happens to be serving.
+//
+// RULE: `npm run build` will fail if this import is missing or fetch() is used.
+//   See CLAUDE.md § "Critical Technical Constraints" for the full explanation.
+import patchNotesRaw from '../../PATCH_NOTES.md?raw'
 
 interface PatchNotesModalProps {
   isOpen: boolean
@@ -122,20 +137,9 @@ function renderBody(text: string) {
 }
 
 export function PatchNotesModal({ isOpen, onClose }: PatchNotesModalProps) {
-  const [rawMd, setRawMd] = useState<string>('')
-  const [isLoading, setIsLoading] = useState(false)
   const [selectedIdx, setSelectedIdx] = useState(0)
 
-  useEffect(() => {
-    if (!isOpen || rawMd) return
-    setIsLoading(true)
-    fetch(`${import.meta.env.BASE_URL}PATCH_NOTES.md`)
-      .then((r) => r.text())
-      .then((text) => { setRawMd(text); setIsLoading(false) })
-      .catch(() => { setRawMd('# Error\nFailed to load patch notes.'); setIsLoading(false) })
-  }, [isOpen, rawMd])
-
-  const versions = useMemo(() => parseVersions(rawMd), [rawMd])
+  const versions = useMemo(() => parseVersions(patchNotesRaw), [])
 
   if (!isOpen) return null
 
@@ -169,15 +173,7 @@ export function PatchNotesModal({ isOpen, onClose }: PatchNotesModalProps) {
           </button>
         </div>
 
-        {isLoading ? (
-          <div className="flex-1 flex items-center justify-center bg-gray-900">
-            <div className="text-center">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-dnd-gold mb-3" />
-              <p className="text-gray-400">Loading patch notes…</p>
-            </div>
-          </div>
-        ) : (
-          <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-1 overflow-hidden">
             {/* Sidebar — version list */}
             <aside className="w-44 shrink-0 bg-gray-900 border-r border-gray-700 overflow-y-auto">
               {versions.map((v, i) => (
@@ -217,7 +213,6 @@ export function PatchNotesModal({ isOpen, onClose }: PatchNotesModalProps) {
               )}
             </main>
           </div>
-        )}
 
         {/* Footer */}
         <div className="px-4 py-3 bg-gray-800 border-t border-gray-700 flex items-center justify-between shrink-0">

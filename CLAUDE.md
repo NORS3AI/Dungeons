@@ -1,5 +1,33 @@
 # Claude.md - Project Context for AI Assistance
 
+## ⛔ Critical Technical Constraints — READ BEFORE CHANGING ANYTHING
+
+These rules exist because violating them has broken the app in production before.
+`npm run build` runs `validate:constraints` and will fail if any rule is broken.
+
+### PatchNotesModal — MUST use `?raw` import, NEVER `fetch()`
+
+```ts
+// CORRECT — Vite bundles the markdown at build time:
+import patchNotesRaw from '../../PATCH_NOTES.md?raw'
+
+// WRONG — fetches from the server at runtime:
+fetch(`${BASE_URL}PATCH_NOTES.md`)   // ❌ DO NOT DO THIS
+```
+
+**Why `fetch()` silently breaks everything**: GitHub Pages serves the deployed site
+from the `main` branch. A runtime fetch returns the old `PATCH_NOTES.md` from `main`,
+hiding every version added on the feature branch. This caused v0.4.1–0.4.8 to vanish
+from the in-app patch notes with no error shown to the user.
+
+**Why `?raw` is correct**: Vite embeds the file contents into the JS bundle at build
+time. The built app always contains the correct notes. No server file needed.
+
+**Enforcement**: `npm run validate:constraints` (runs automatically during `npm run build`)
+fails the build if `?raw` is missing OR if `fetch()` is used in PatchNotesModal.
+
+---
+
 ## 🚧 CURRENT WORK IN PROGRESS
 
 **Next Task**: Add Amazon and Demon Hunter class features to the Actions tab and `quickReference.ts`

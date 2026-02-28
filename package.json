@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run validate:data && tsc -b && vite build",
+    "build": "npm run validate:constraints && npm run validate:data && tsc -b && vite build",
     "validate:data": "tsx src/scripts/validateData.ts",
+    "validate:constraints": "node -e \"const fs=require('fs'),c=fs.readFileSync('src/components/PatchNotesModal.tsx','utf8');const code=c.split('\\\\n').filter(l=>!l.trim().startsWith('//') && !l.trim().startsWith('*')).join('\\\\n');const hasRaw=c.includes('PATCH_NOTES.md?raw');const hasFetch=code.includes('fetch(')&&code.includes('PATCH_NOTES');if(!hasRaw||hasFetch){console.error('\\\\n\\u274c CONSTRAINT VIOLATED in PatchNotesModal.tsx:');if(!hasRaw)console.error('  Must import PATCH_NOTES.md via ?raw (bundled at build time)');if(hasFetch)console.error('  Must NOT fetch() patch notes at runtime (see comment at top of file)');console.error('  See CLAUDE.md Critical Technical Constraints for why.\\\\n');process.exit(1)}console.log('\\u2713 PatchNotesModal constraints OK')\"",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest",
