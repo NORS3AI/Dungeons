@@ -1,5 +1,23 @@
 # Dungeons - Patch Notes
 
+## Version 0.4.11-alpha - February 28, 2026
+
+**Alpha Release Notice**: Potion effect info is now clearly visible on every potion card.
+
+### 🐛 Potion Effect Display Fix
+
+Potions in the Actions tab now prominently display their healing/effect information.
+
+#### **What changed**
+- Every potion card now shows a highlighted **"Effect:"** box with the potion's description (e.g. "Restores 2d4+2 hit points", "+1 AC for 1 minute")
+- Healing formula parser now recognizes "restores" and "regain" wording in addition to "heals", so more potions show the green **"Heals:"** line
+- HP pattern also matches "HP" shorthand (not just "hit points")
+- Healing potion detection during the consume animation now also recognizes "restores" and "regain" descriptions
+
+**Why This Matters**: Players can now see at a glance exactly what each potion does before using it.
+
+---
+
 ## Version 0.4.10-alpha - February 28, 2026
 
 **Alpha Release Notice**: Homepage now shows the SVG logo instead of plain text.

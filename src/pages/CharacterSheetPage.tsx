@@ -610,8 +610,8 @@ export function CharacterSheetPage() {
   const parseHealingAmount = (description: string): string | null => {
     // Match dice formulas where the modifier can be a number or the word "level"
     const diceWithLevelPattern = /(\d+d\d+(?:\s*[+\-]\s*(?:\d+|level))?)/i
-    const hpPattern = /(\d+)\s*hit points?/i
-    const healsPattern = /heals?\s+(\d+d\d+(?:\s*[+\-]\s*(?:\d+|level))?|\d+)/i
+    const hpPattern = /(\d+)\s*(?:hit points?|HP)\b/i
+    const healsPattern = /(?:heals?|restores?|regain)\s+(\d+d\d+(?:\s*[+\-]\s*(?:\d+|level))?|\d+)/i
 
     let match = description.match(healsPattern)
     if (match) return match[1]
@@ -3339,7 +3339,9 @@ export function CharacterSheetPage() {
                             const isHealingPotion =
                               item.name.toLowerCase().includes('healing') ||
                               item.description.toLowerCase().includes('heals') ||
-                              item.description.toLowerCase().includes('hit points')
+                              item.description.toLowerCase().includes('hit points') ||
+                              item.description.toLowerCase().includes('restores') ||
+                              item.description.toLowerCase().includes('regain')
                             return (
                               <div className="mb-3">
                                 {pendingPotionConsume.roll !== null ? (
@@ -3372,7 +3374,10 @@ export function CharacterSheetPage() {
                             )
                           })()
                         ) : (
-                          <p className="text-sm text-gray-300 mb-3">{item.description}</p>
+                          <div className="text-sm mb-3 p-2 rounded bg-gray-900/50 border border-gray-700">
+                            <span className="font-semibold text-yellow-400">Effect: </span>
+                            <span className="text-gray-200">{item.description}</span>
+                          </div>
                         )}
 
                         {item.charges && !isPending && (
