@@ -12,7 +12,7 @@ export function PatchNotesModal({ isOpen, onClose }: PatchNotesModalProps) {
   useEffect(() => {
     if (!isOpen || patchNotes) return
     setIsLoading(true)
-    fetch('/PATCH_NOTES.md')
+    fetch(`${import.meta.env.BASE_URL}PATCH_NOTES.md`)
       .then((r) => r.text())
       .then((text) => { setPatchNotes(text); setIsLoading(false) })
       .catch(() => { setPatchNotes('Failed to load patch notes.'); setIsLoading(false) })
