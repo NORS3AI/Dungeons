@@ -1,5 +1,25 @@
 # Dungeons - Patch Notes
 
+## Version 0.4.13-alpha - February 28, 2026
+
+**Alpha Release Notice**: All 46 Paladin spells now have quickReference entries for tooltip support.
+
+### 🐛 Paladin Spell References Fix
+
+Added 32 missing Paladin spell entries to the quickReference system so tooltips work when clicking any Paladin spell.
+
+#### **Spells added (by level)**
+- **Level 1** (11): Compelled Duel, Detect Evil and Good, Detect Magic, Detect Poison and Disease, Divine Favor, Heroism, Purify Food and Drink, Searing Smite, Shield of Faith, Thunderous Smite, Wrathful Smite
+- **Level 2** (8): Aid, Branding Smite, Find Steed, Lesser Restoration, Locate Object, Magic Weapon, Protection from Poison, Zone of Truth
+- **Level 3** (7): Aura of Vitality, Blinding Smite, Create Food and Water, Crusader's Mantle, Daylight, Elemental Weapon, Magic Circle
+- **Level 4** (6): Aura of Life, Aura of Purity, Death Ward, Freedom of Movement, Locate Creature, Staggering Smite
+
+*Level 5 spells (Banishing Smite, Circle of Power, Destructive Wave, Dispel Evil and Good, Flame Strike, Geas, Raise Dead) were already present.*
+
+**Why This Matters**: Paladin players can now click any spell name and see its full description, casting time, range, and components in a popup.
+
+---
+
 ## Version 0.4.12-alpha - February 28, 2026
 
 **Alpha Release Notice**: Legendary Loot Generator can now generate crafting materials only.
