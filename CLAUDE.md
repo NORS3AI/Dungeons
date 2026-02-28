@@ -2,17 +2,22 @@
 
 ## 🚧 CURRENT WORK IN PROGRESS
 
-**Next Task**: Create `src/data/classSpells.ts` to connect spells to classes in SpellSelector
+**Next Task**: Create spell data for Amazon and Demon Hunter custom classes
 
-**Problem**: SpellSelector.tsx only has hardcoded Warlock spells. Other classes show "Spell Selection Unavailable".
+**Problem**: `SpellSelector.tsx` has no spell data or handling for the `amazon` and `demon-hunter` class IDs. These two custom half-casters show no spells.
 
 **Solution needed**:
-1. Create `src/data/classSpells.ts` with properly typed `Spell` objects for each class
-2. Export arrays: `BARD_CANTRIPS`, `BARD_LEVEL_1_SPELLS`, `CLERIC_CANTRIPS`, etc.
-3. Export helper: `getClassSpells(classId: string, level: number)`
-4. Update `SpellSelector.tsx` to import from classSpells.ts instead of hardcoded arrays
+1. Create `src/data/spells/amazon.ts` — half-caster spell list (levels 1-5) based on FEATURES.md Amazon spell list
+2. Create `src/data/spells/demon-hunter.ts` — half-caster spell list (levels 1-5) based on FEATURES.md Demon Hunter spell list
+3. Export from `src/data/spells/index.ts`
+4. Add `amazon` and `demon-hunter` cases to `SpellSelector.tsx` (follow Paladin/Ranger pattern for half-caster progression)
 
-**Spell interface required** (from `src/types/spell.ts`):
+**✅ Already Done** (classSpells task is complete):
+- `src/data/spells/` contains individual files for: bard, cleric, death-knight, druid, necromancer, paladin, ranger, sorcerer, warlock, wizard
+- `SpellSelector.tsx` imports and handles all of the above with full level-progression logic
+- `src/data/spells/index.ts` re-exports everything
+
+**Spell interface** (from `src/types/spell.ts`):
 ```typescript
 {
   id: string,
@@ -30,12 +35,9 @@
 }
 ```
 
-**Classes needing spells**:
-- Full casters (cantrips + spells): Bard, Cleric, Druid, Sorcerer, Warlock, Wizard
-- Half casters (spells only): Paladin, Ranger
-- Custom classes: Death Knight, Necromancer, Demon Hunter, Amazon
+**Amazon spells** (from FEATURES.md): Magic Arrow (cantrip), Power Strike, Charged Strike, Lightning Fury, Immolation Arrow, Freezing Arrow, Guided Arrow, Inner Sight, Slow Missiles, Decoy, Summon Valkyrie
 
-**Reference**: 401 spells exist in `src/data/quickReference.ts` as `SpellRef` type (string-based), but SpellSelector needs structured `Spell` type objects.
+**Demon Hunter spells** (from FEATURES.md): Fel Rush, Eye Beam, Immolation Aura, Metamorphosis, Multishot, Rain of Vengeance, Vault
 
 ---
 

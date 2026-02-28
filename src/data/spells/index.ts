@@ -7,9 +7,11 @@
 export * from './common'
 
 // Class spells
+export * from './amazon'
 export * from './bard'
 export * from './cleric'
 export * from './death-knight'
+export * from './demon-hunter'
 export * from './druid'
 export * from './necromancer'
 export * from './paladin'
