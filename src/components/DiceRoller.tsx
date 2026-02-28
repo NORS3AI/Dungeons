@@ -98,13 +98,26 @@ export function DiceRoller({ onRoll, compact = false, character }: DiceRollerPro
     const abilityMod = Math.floor((abilityScore - 10) / 2)
     const profBonus = Math.floor((character.level - 1) / 4) + 2
 
+    // Sum bonuses from equipped non-weapon items (rings, amulets, Weapon +X items, etc.)
+    const hasEquippedWeapon = equippedWeapons.length > 0
+    const equippedWeaponDmgBonus = hasEquippedWeapon
+      ? character.equipment
+          .filter((e) => e.equipped && e.weaponDamageBonus)
+          .reduce((sum, e) => sum + (e.weaponDamageBonus ?? 0), 0)
+      : 0
+    const equippedAttackBonus = hasEquippedWeapon
+      ? character.equipment
+          .filter((e) => e.equipped && e.attackBonus)
+          .reduce((sum, e) => sum + (e.attackBonus ?? 0), 0)
+      : 0
+
     switch (rollPurpose) {
       case 'attack':
-        // Attack: ability modifier + proficiency bonus
-        return abilityMod + profBonus + manualModifier
+        // Attack: ability modifier + proficiency bonus + any equipped attack bonuses
+        return abilityMod + profBonus + equippedAttackBonus + manualModifier
       case 'damage':
-        // Damage: just ability modifier (no proficiency)
-        return abilityMod + manualModifier
+        // Damage: ability modifier + any equipped weapon damage bonuses
+        return abilityMod + equippedWeaponDmgBonus + manualModifier
       case 'save': {
         // Save: ability modifier + proficiency if proficient
         const isProficient = character.savingThrows[selectedAbility]
@@ -116,7 +129,7 @@ export function DiceRoller({ onRoll, compact = false, character }: DiceRollerPro
       default:
         return manualModifier
     }
-  }, [character, rollPurpose, selectedAbility, manualModifier])
+  }, [character, rollPurpose, selectedAbility, manualModifier, equippedWeapons])
 
   const totalModifier = calculateSmartModifier()
 
