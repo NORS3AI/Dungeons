@@ -1,5 +1,21 @@
 # Dungeons - Patch Notes
 
+## Version 0.4.10-alpha - February 28, 2026
+
+**Alpha Release Notice**: Homepage now shows the SVG logo instead of plain text.
+
+### ✨ Homepage Logo
+
+The homepage title "Dungeons" has been replaced with the SVG logo that already appears in the header.
+
+#### **What changed**
+- The plain gradient text heading has been swapped for the `logo.svg` image
+- Logo scales responsively (smaller on mobile, larger on desktop)
+
+**Why This Matters**: Consistent branding — the homepage now matches the header.
+
+---
+
 ## Version 0.4.9-alpha - February 28, 2026
 
 **Alpha Release Notice**: New D20 favicon and header logo, patch notes navigator with sidebar, and Export All import fix.
