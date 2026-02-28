@@ -626,9 +626,9 @@ When working on this project:
 
 ### 📋 Patch Notes Rule — REQUIRED on every commit
 
-**Every commit that changes functionality visible to players MUST also update `public/PATCH_NOTES.md`.**
+**Every commit that changes functionality visible to players MUST also update `PATCH_NOTES.md` (root, NOT `public/PATCH_NOTES.md`).**
 
-This is the in-app patch notes file that players read to discover new features and know what to test. Keeping it current is how players stay informed and engaged.
+This is the in-app patch notes file — `src/components/PatchNotesModal.tsx` imports it directly via `../../PATCH_NOTES.md?raw`. The `public/PATCH_NOTES.md` file is NOT used by the app. Always update the root `PATCH_NOTES.md`. Keeping it current is how players stay informed and engaged.
 
 **What counts as player-visible:**
 - New spells, classes, races, feats, or subclasses
