@@ -1,16 +1,30 @@
 # Dungeons - Patch Notes
 
-## Version 0.4.8-alpha - February 28, 2026
+## Version 0.4.9-alpha - February 28, 2026
 
-**Alpha Release Notice**: Fix for Export All import crashing; patch notes now load at runtime so cache-clearing works.
+**Alpha Release Notice**: New D20 favicon and header logo, patch notes navigator with sidebar, and Export All import fix.
 
-### 🐛 Patch Notes — Now Load at Runtime
+### ✨ New Logo & Favicon
 
-Patch notes were previously baked into the JavaScript bundle at build time (`?raw` import), meaning clearing your browser cache had no effect — the content was frozen inside the JS file itself. They now fetch `/PATCH_NOTES.md` from the server each time the modal opens for the first time, so:
+The browser tab and header have been redesigned with a custom D20 die icon.
 
-- **Clearing cache now works** — you will always see the latest notes after a cache clear
-- **No rebuild required** to see updated patch notes after a deployment
-- Works identically in incognito mode
+#### **What changed**
+- Browser tab now shows a purple D20 die with "20" in gold (replaces the plain dice icon)
+- Header "Dungeons" text replaced with a full SVG logo — D20 icon + gold DUNGEONS wordmark
+- Logo and favicon live in `public/images/` and are served at runtime (no bundle rebuild needed)
+
+### ✨ Patch Notes Navigator
+
+The patch notes modal has been completely redesigned to eliminate the endless scroll.
+
+#### **What changed**
+- Left sidebar lists every version — click any version to jump directly to it
+- Right panel shows only the selected version's content
+- Footer **← Newer / Older →** buttons step through versions one at a time
+- Latest version (top of list) is highlighted in gold and selected by default
+- Version badge shown in the modal header while browsing
+
+**Why This Matters**: With dozens of patch versions, the old single-scroll approach was unusable. You can now jump straight to any version in one click.
 
 ### 🐛 Import — Export All Now Works
 
