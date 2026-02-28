@@ -51,9 +51,12 @@ export function HomePage() {
 
     try {
       setImportError(null)
-      const character = await importCharacterFromJSON(file)
-      importCharacter(character)
-      navigate(`/character/${character.id}`)
+      const imported = await importCharacterFromJSON(file)
+      for (const character of imported) {
+        importCharacter(character)
+      }
+      // Navigate to last imported character (or first if only one)
+      navigate(`/character/${imported[imported.length - 1].id}`)
     } catch (error) {
       setImportError(error instanceof Error ? error.message : 'Failed to import character')
     }

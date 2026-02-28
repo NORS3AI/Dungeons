@@ -1,5 +1,23 @@
 # Dungeons - Patch Notes
 
+## Version 0.4.8-alpha - February 28, 2026
+
+**Alpha Release Notice**: Fix for Export All import crashing on load.
+
+### 🐛 Import — Export All Now Works
+
+Importing a file created by **Export All Characters** threw an `Invalid character data format` error because the import function only accepted a single character object, not the JSON array that Export All produces.
+
+#### **What changed**
+- The import function now detects whether the file contains a single character or an array of characters
+- When importing an Export All file, all characters in the array are loaded at once
+- Invalid entries within an array are skipped; at least one valid character is required or an error is shown
+- Single-character import files continue to work exactly as before
+
+**Why This Matters**: Export All is now a true round-trip — you can export your full roster and import it back without any errors.
+
+---
+
 ## Version 0.4.7-alpha - February 28, 2026
 
 **Alpha Release Notice**: Materials consolidation and alchemy fix, disenchant popups, rarity color-coding, Bag of Holding window, Armor +X addon system, crafting popup, scroll navigation, enchanting scroll tracker, and patch notes renderer fix.
