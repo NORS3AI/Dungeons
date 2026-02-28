@@ -40,6 +40,18 @@ Importing a file created by **Export All Characters** threw an `Invalid characte
 
 ---
 
+## Version 0.4.8-alpha - February 28, 2026
+
+**Alpha Release Notice**: Minor bug fixes and stability improvements.
+
+### 🐛 Bug Fixes
+
+- Fixed minor UI inconsistencies across several tabs
+- Resolved edge cases in character data handling
+- General stability improvements
+
+---
+
 ## Version 0.4.7-alpha - February 28, 2026
 
 **Alpha Release Notice**: Materials consolidation and alchemy fix, disenchant popups, rarity color-coding, Bag of Holding window, Armor +X addon system, crafting popup, scroll navigation, enchanting scroll tracker, and patch notes renderer fix.
