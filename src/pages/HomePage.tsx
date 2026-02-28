@@ -88,7 +88,7 @@ export function HomePage() {
         <img
           src={`${import.meta.env.BASE_URL}images/logo.svg`}
           alt="Dungeons"
-          className="h-24 md:h-32 mx-auto mb-6"
+          className="h-32 md:h-40 mx-auto mb-6"
         />
         <p className="text-xl md:text-2xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
           D&D 5th Edition Character Creator & DM Tool
