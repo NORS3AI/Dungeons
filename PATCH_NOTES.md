@@ -1,5 +1,32 @@
 # Dungeons - Patch Notes
 
+## Version 0.4.2-alpha - February 28, 2026
+
+**Alpha Release Notice**: Character creation now correctly maps all race weapon proficiencies to valid weapons, and the language system has been simplified to Common + 1 free choice for every race.
+
+### ✨ Weapon Proficiency Fixes
+
+Race weapon proficiency IDs are now fully matched to weapons that exist in the game's reference system.
+
+- **Dwarf**: Replaced `Light Hammer` (unavailable) with **Mace** — the closest simple bludgeoning weapon
+- **Sea Elf**: Replaced `Spear` (unavailable) with **Javelin** — the closest thrown piercing weapon
+- All other races (High Elf, Wood Elf, Drow) were already valid — no change needed
+
+Weapon proficiency tooltips (click to see stats) will now work correctly for all races.
+
+### ✨ Language System Redesign
+
+Languages in character creation now follow a clean 1/2 model: **Common is always known, and the player picks one additional language freely**.
+
+- **Common** is always the default — locked in for every character
+- **Racial language is now Suggested** (shown in blue), not locked. Play an Elf and see Elvish suggested — but choose Draconic if you prefer
+- **Total cap is 2** — Common + 1 choice, always. No more automatic racial language grants
+- **Class secret languages** (Druidic for Druids, Thieves' Cant for Rogues) still fill the second slot automatically, as those are class features
+
+**Why This Matters**: Players now have genuine language choice regardless of race, while still seeing their race's language as the natural suggestion.
+
+---
+
 ## Version 0.4.1-alpha - February 28, 2026
 
 **Alpha Release Notice**: All 170 crafted items and 20+ crafting materials now have market worth values, enabling accurate sell pricing in shops and vendor interactions.

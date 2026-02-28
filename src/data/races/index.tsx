@@ -63,7 +63,7 @@ export const DWARF: Race = {
     { id: 'stonecunning', name: 'Stonecunning', description: 'Whenever you make an Intelligence (History) check related to the origin of stonework, you are considered proficient and add double your proficiency bonus.' },
   ],
   damageResistances: ['poison'],
-  weaponProficiencies: ['battleaxe', 'handaxe', 'light-hammer', 'warhammer'],
+  weaponProficiencies: ['battleaxe', 'handaxe', 'warhammer', 'mace'],
   subraces: [
     {
       id: 'hill-dwarf',
@@ -238,7 +238,7 @@ export const ELF: Race = {
         { id: 'child-of-the-sea', name: 'Child of the Sea', description: 'You can breathe air and water, and you have a swimming speed equal to your walking speed.' },
         { id: 'friend-of-the-sea', name: 'Friend of the Sea', description: 'You can communicate simple ideas with beasts that can breathe water.' },
       ],
-      weaponProficiencies: ['spear', 'trident', 'light-crossbow', 'net'],
+      weaponProficiencies: ['javelin', 'trident', 'light-crossbow', 'net'],
     },
     {
       id: 'shadar-kai',

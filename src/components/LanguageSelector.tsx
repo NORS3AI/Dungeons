@@ -36,14 +36,15 @@ export function LanguageSelector({
     (id) => !grantedLanguages.includes(id),
   )
 
-  // Total max: Common (1) + racial/class grants (N) + 1 free choice
-  const effectiveMax = 2 + grantedLanguages.length
+  // Total max: Common (1) + 1 free choice = 2 always.
+  // Class secret languages (Druidic, Thieves' Cant) consume the free slot.
+  const effectiveMax = 2
 
   // Whenever race or class changes, rebuild selection:
   // keep Common + grants as the locked base, preserve up to 1 prior manual choice.
   useEffect(() => {
     const grants = getGrantedLanguages({ raceName, className })
-    const max = 2 + grants.length
+    const max = 2
     setSelectedLanguages((prev: string[]) => {
       const base = ['common', ...grants.filter((id: string) => id !== 'common')]
       const freeSlots = max - base.length // always 1
@@ -180,13 +181,13 @@ export function LanguageSelector({
         <h2 className="text-2xl font-bold text-white mb-2">Languages</h2>
         <p className="text-gray-400 text-sm">
           All characters speak <span className="text-green-400 font-medium">Common</span>.
-          Your race or class may grant additional languages automatically.
-          You may choose{' '}
-          <span className="text-dnd-gold font-medium">1 additional language</span> of your choice.
+          Choose <span className="text-dnd-gold font-medium">1 additional language</span> of your choice.
+          Your racial language is{' '}
+          <span className="text-blue-400 font-medium">suggested</span> but you can pick any language you like.
         </p>
         {grantedLanguages.length > 0 && (
           <p className="text-orange-400 text-sm mt-1">
-            Granted by your race/class:{' '}
+            Granted by your class:{' '}
             {grantedLanguages
               .map((id) => getLanguageById(id)?.name)
               .filter(Boolean)
