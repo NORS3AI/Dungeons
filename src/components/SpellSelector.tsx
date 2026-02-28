@@ -109,6 +109,7 @@ interface SpellSelectorProps {
   onSubmit: (cantrips: Spell[], spells: Spell[]) => void
   onBack: () => void
   isCharacterCreation?: boolean // If true, shows "Next: Equipment", if false shows "Done"
+  existingSpells?: Spell[] // Spells the character already knows — excluded from the selectable list
 }
 
 /**
@@ -122,9 +123,16 @@ export function SpellSelector({
   onSubmit,
   onBack,
   isCharacterCreation = true,
+  existingSpells = [],
 }: SpellSelectorProps) {
   const [selectedCantrips, setSelectedCantrips] = useState<Spell[]>([])
   const [selectedSpells, setSelectedSpells] = useState<Spell[]>([])
+
+  // Build a set of already-known spell IDs for fast lookup
+  const existingSpellIds = useMemo(
+    () => new Set(existingSpells.map((s) => s.id)),
+    [existingSpells],
+  )
 
   // Determine available spells based on class
   const availableCantrips = useMemo(() => {
@@ -139,6 +147,12 @@ export function SpellSelector({
     if (characterClass?.id === 'wizard') return WIZARD_CANTRIPS
     return []
   }, [characterClass])
+
+  // Filter out cantrips and spells the character already knows
+  const selectableCantrips = useMemo(
+    () => availableCantrips.filter((s) => !existingSpellIds.has(s.id)),
+    [availableCantrips, existingSpellIds],
+  )
 
   const availableSpells = useMemo(() => {
     const spells: Spell[] = []
@@ -458,6 +472,11 @@ export function SpellSelector({
     return []
   }, [characterClass, subclass, level])
 
+  const selectableSpells = useMemo(
+    () => availableSpells.filter((s) => !existingSpellIds.has(s.id)),
+    [availableSpells, existingSpellIds],
+  )
+
   // Determine limits based on class
   const cantripsKnown = characterClass?.cantripsKnown?.[level - 1] || 0
   const spellsKnown = characterClass?.spellsKnown?.[level - 1] || 0
@@ -488,13 +507,13 @@ export function SpellSelector({
     })
   }
 
-  const isComplete =
-    selectedCantrips.length === cantripsKnown && selectedSpells.length === spellsKnown
+  // During character creation, require exact slot fill. Mid-game (DM adding spells), allow any selection.
+  const isComplete = isCharacterCreation
+    ? selectedCantrips.length === cantripsKnown && selectedSpells.length === spellsKnown
+    : selectedCantrips.length > 0 || selectedSpells.length > 0
 
   const handleSubmit = () => {
-    if (isComplete) {
-      onSubmit(selectedCantrips, selectedSpells)
-    }
+    onSubmit(selectedCantrips, selectedSpells)
   }
 
   // Handle non-spellcasting classes
@@ -556,29 +575,42 @@ export function SpellSelector({
         </div>
       )}
 
+      {/* Already-known spells info banner (mid-game only) */}
+      {!isCharacterCreation && existingSpells.length > 0 && (
+        <div className="mb-6 p-3 bg-blue-900/20 border border-blue-600/40 rounded-lg">
+          <p className="text-sm text-blue-300">
+            <span className="font-medium">{existingSpells.length} spell{existingSpells.length !== 1 ? 's' : ''} already known</span>
+            {' '}— already-known spells are hidden. Select new spells to add.
+          </p>
+        </div>
+      )}
+
       {/* Cantrips Section - Only show if class has cantrips */}
-      {cantripsKnown > 0 && (
+      {(cantripsKnown > 0 || !isCharacterCreation) && selectableCantrips.length > 0 && (
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-xl font-bold text-white">
               Cantrips
-              <span className="text-sm font-normal text-gray-400 ml-2">
-                (Choose {cantripsKnown})
-              </span>
+              {isCharacterCreation && (
+                <span className="text-sm font-normal text-gray-400 ml-2">
+                  (Choose {cantripsKnown})
+                </span>
+              )}
             </h3>
-            <span className={`text-sm ${selectedCantrips.length === cantripsKnown ? 'text-green-400' : 'text-dnd-gold'}`}>
-              {selectedCantrips.length} / {cantripsKnown} selected
+            <span className={`text-sm ${isCharacterCreation && selectedCantrips.length === cantripsKnown ? 'text-green-400' : 'text-dnd-gold'}`}>
+              {selectedCantrips.length}{isCharacterCreation ? ` / ${cantripsKnown}` : ''} selected
             </span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {availableCantrips.map((spell) => (
+            {selectableCantrips.map((spell) => (
               <SpellCard
                 key={spell.id}
                 spell={spell}
                 isSelected={selectedCantrips.some((s) => s.id === spell.id)}
                 onToggle={handleCantripToggle}
                 disabled={
+                  isCharacterCreation &&
                   selectedCantrips.length >= cantripsKnown &&
                   !selectedCantrips.some((s) => s.id === spell.id)
                 }
@@ -600,23 +632,25 @@ export function SpellSelector({
       )}
 
       {/* Spells Section - Group by level */}
-      {spellsKnown > 0 && availableSpells.length > 0 && (
+      {(spellsKnown > 0 || !isCharacterCreation) && selectableSpells.length > 0 && (
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-xl font-bold text-white">
               Spells
-              <span className="text-sm font-normal text-gray-400 ml-2">
-                (Choose {spellsKnown} total)
-              </span>
+              {isCharacterCreation && (
+                <span className="text-sm font-normal text-gray-400 ml-2">
+                  (Choose {spellsKnown} total)
+                </span>
+              )}
             </h3>
-            <span className={`text-sm ${selectedSpells.length === spellsKnown ? 'text-green-400' : 'text-dnd-gold'}`}>
-              {selectedSpells.length} / {spellsKnown} selected
+            <span className={`text-sm ${isCharacterCreation && selectedSpells.length === spellsKnown ? 'text-green-400' : 'text-dnd-gold'}`}>
+              {selectedSpells.length}{isCharacterCreation ? ` / ${spellsKnown}` : ''} selected
             </span>
           </div>
 
           {/* Group spells by level and display each level separately */}
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((spellLevel) => {
-            const spellsOfLevel = availableSpells.filter((s) => s.level === spellLevel)
+            const spellsOfLevel = selectableSpells.filter((s) => s.level === spellLevel)
             if (spellsOfLevel.length === 0) return null
 
             return (
@@ -641,6 +675,7 @@ export function SpellSelector({
                     isSelected={selectedSpells.some((s) => s.id === spell.id)}
                     onToggle={handleSpellToggle}
                     disabled={
+                      isCharacterCreation &&
                       selectedSpells.length >= spellsKnown &&
                       !selectedSpells.some((s) => s.id === spell.id)
                     }

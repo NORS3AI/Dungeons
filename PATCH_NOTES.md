@@ -1,5 +1,42 @@
 # Dungeons - Patch Notes
 
+## Version 0.3.11-alpha - February 28, 2026
+
+**Alpha Release Notice**: Potion rolls now show results for 15 seconds before the item is consumed, level-scaled formulas (e.g. 4d4+level) roll correctly, and Choose Class Spells is DM-gated and spell-aware.
+
+### ✨ Potion Improvements
+
+#### **Level-scaled healing formulas**
+Potions whose descriptions include the word "level" as a modifier (e.g. "4d4 + level hit points") now resolve correctly. The character's current level is substituted into the formula before rolling — a level 7 character drinking a 4d4+level potion rolls 4d4+7.
+
+#### **15-second display before consumption**
+Clicking **Use** on a potion now:
+1. Rolls immediately and displays the healed HP value in large text on the card
+2. Shows a draining green progress bar counting down 15 seconds
+3. Automatically removes/decrements the potion when the timer expires
+
+The "Use" button becomes "In Use…" and is disabled during the countdown, preventing double-use.
+
+**Why This Matters**: Players now have time to read what they rolled and confirm the HP change before the item disappears from their inventory.
+
+---
+
+### ✨ Choose Class Spells — DM Mode & Duplicate Prevention
+
+#### **DM Tools required**
+The **Choose Class Spells** button on the Spells tab is now only active when **DM Mode** is enabled. When DM Mode is off, the button remains visible but grayed out with a "(DM)" label, making it clear it's a DM-only action. This prevents players from freely adding class spells outside of character creation.
+
+#### **Already-known spells excluded**
+When the DM opens Choose Class Spells, the selector:
+- Hides spells the character already knows from the selectable list
+- Shows a banner: "X spells already known — already-known spells are hidden"
+- Allows selecting any number of new spells (no slot-count restriction in mid-game mode)
+- "Done" becomes active as soon as at least one spell is selected
+
+**Why This Matters**: DMs can now add individual missing spells without the character accidentally re-selecting duplicates or being forced to fill all class spell slots.
+
+---
+
 ## Version 0.3.10-alpha - February 28, 2026
 
 **Alpha Release Notice**: DM Tools now includes a profession reroll button on the Currency section, giving DMs instant control over a character's daily income without touching character creation.
