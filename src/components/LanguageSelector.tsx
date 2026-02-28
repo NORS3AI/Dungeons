@@ -4,6 +4,7 @@ import {
   EXOTIC_LANGUAGES,
   SECRET_LANGUAGES,
   getSuggestedLanguages,
+  getGrantedLanguages,
   getLanguageById,
   type Language,
 } from '../data/languages'
@@ -14,7 +15,6 @@ interface LanguageSelectorProps {
   className?: string
   backgroundName?: string
   onChange: (languages: string[]) => void
-  maxLanguages?: number // Maximum number of languages allowed (default: 5)
 }
 
 export function LanguageSelector({
@@ -23,40 +23,66 @@ export function LanguageSelector({
   className,
   backgroundName,
   onChange,
-  maxLanguages = 5,
 }: LanguageSelectorProps) {
-  const [selectedLanguages, setSelectedLanguages] = useState<string[]>(currentLanguages)
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>(
+    currentLanguages.length > 0 ? currentLanguages : ['common'],
+  )
 
-  // Get suggested languages based on character
-  const suggestions = getSuggestedLanguages({
-    raceName,
-    className,
-    backgroundName,
-  })
+  // Languages unconditionally granted by race/class (auto-selected, cannot be removed)
+  const grantedLanguages = getGrantedLanguages({ raceName, className })
 
-  // Update parent when languages change
+  // Free-choice suggestion hints (excluding grants — those are already locked in)
+  const suggestions = getSuggestedLanguages({ raceName, className, backgroundName }).filter(
+    (id) => !grantedLanguages.includes(id),
+  )
+
+  // Total max: Common (1) + racial/class grants (N) + 1 free choice
+  const effectiveMax = 2 + grantedLanguages.length
+
+  // Whenever race or class changes, rebuild selection:
+  // keep Common + grants as the locked base, preserve up to 1 prior manual choice.
+  useEffect(() => {
+    const grants = getGrantedLanguages({ raceName, className })
+    const max = 2 + grants.length
+    setSelectedLanguages((prev: string[]) => {
+      const base = ['common', ...grants.filter((id: string) => id !== 'common')]
+      const freeSlots = max - base.length // always 1
+      const prevManual = prev.filter((id: string) => !base.includes(id))
+      const kept = prevManual.slice(0, freeSlots)
+      const next = [...base, ...kept]
+      // Avoid a re-render when nothing actually changed
+      if (
+        next.length === prev.length &&
+        next.every((id: string, i: number) => id === prev[i])
+      ) {
+        return prev
+      }
+      return next
+    })
+  }, [raceName, className])
+
+  // Propagate changes to parent
   useEffect(() => {
     onChange(selectedLanguages)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedLanguages])
 
+  const isNonRemovable = (id: string) =>
+    id === 'common' || grantedLanguages.includes(id)
+
   const toggleLanguage = (languageId: string) => {
-    // Cannot remove Common
-    if (languageId === 'common') return
+    if (isNonRemovable(languageId)) return
 
     if (selectedLanguages.includes(languageId)) {
-      setSelectedLanguages(selectedLanguages.filter((id) => id !== languageId))
+      setSelectedLanguages(selectedLanguages.filter((id: string) => id !== languageId))
     } else {
-      // Check if we've reached the maximum language limit
-      if (selectedLanguages.length >= maxLanguages) {
-        return // Cannot add more languages
-      }
+      if (selectedLanguages.length >= effectiveMax) return
       setSelectedLanguages([...selectedLanguages, languageId])
     }
   }
 
   const renderLanguageGroup = (title: string, languages: Language[]) => {
-    const isAtLimit = selectedLanguages.length >= maxLanguages
+    const isAtLimit = selectedLanguages.length >= effectiveMax
 
     return (
       <div className="mb-6">
@@ -64,9 +90,10 @@ export function LanguageSelector({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
           {languages.map((lang) => {
             const isSelected = selectedLanguages.includes(lang.id)
-            const isSuggested = suggestions.includes(lang.id)
+            const isGranted = isNonRemovable(lang.id)
             const isCommon = lang.id === 'common'
-            const isDisabled = isCommon || (isAtLimit && !isSelected)
+            const isSuggested = suggestions.includes(lang.id)
+            const isDisabled = isGranted || (isAtLimit && !isSelected)
 
             return (
               <button
@@ -88,10 +115,15 @@ export function LanguageSelector({
                       <span className="font-medium text-white">{lang.name}</span>
                       {isCommon && (
                         <span className="text-xs px-2 py-0.5 bg-green-900/50 text-green-400 rounded">
-                          Default
+                          Always
                         </span>
                       )}
-                      {isSuggested && !isCommon && (
+                      {!isCommon && isGranted && (
+                        <span className="text-xs px-2 py-0.5 bg-orange-900/50 text-orange-400 rounded">
+                          Granted
+                        </span>
+                      )}
+                      {isSuggested && (
                         <span className="text-xs px-2 py-0.5 bg-blue-900/50 text-blue-400 rounded">
                           Suggested
                         </span>
@@ -102,7 +134,22 @@ export function LanguageSelector({
                       {lang.speakers.join(', ')}
                     </div>
                   </div>
-                  {isSelected && !isCommon && (
+                  {isGranted && (
+                    /* Lock icon for non-removable languages */
+                    <svg
+                      className={`w-5 h-5 flex-shrink-0 ${isCommon ? 'text-green-400' : 'text-orange-400'}`}
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  )}
+                  {isSelected && !isGranted && (
+                    /* Check icon for freely chosen languages */
                     <svg
                       className="w-5 h-5 text-dnd-gold flex-shrink-0"
                       fill="currentColor"
@@ -124,42 +171,66 @@ export function LanguageSelector({
     )
   }
 
+  const freeChoiceCount = selectedLanguages.filter((id: string) => !isNonRemovable(id)).length
+  const hasFreeChoice = freeChoiceCount > 0
+
   return (
     <div>
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-white mb-2">Languages</h2>
         <p className="text-gray-400 text-sm">
-          Select the languages your character knows. All characters speak Common by default.
-          {suggestions.length > 0 && (
-            <span className="block mt-1 text-blue-400">
-              Based on your race, class, and background, we recommend: {suggestions.map((id) => getLanguageById(id)?.name).filter(Boolean).join(', ')}
-            </span>
-          )}
+          All characters speak <span className="text-green-400 font-medium">Common</span>.
+          Your race or class may grant additional languages automatically.
+          You may choose{' '}
+          <span className="text-dnd-gold font-medium">1 additional language</span> of your choice.
         </p>
+        {grantedLanguages.length > 0 && (
+          <p className="text-orange-400 text-sm mt-1">
+            Granted by your race/class:{' '}
+            {grantedLanguages
+              .map((id) => getLanguageById(id)?.name)
+              .filter(Boolean)
+              .join(', ')}
+          </p>
+        )}
+        {suggestions.length > 0 && (
+          <p className="text-blue-400 text-sm mt-1">
+            Suggested for your character:{' '}
+            {suggestions
+              .map((id) => getLanguageById(id)?.name)
+              .filter(Boolean)
+              .join(', ')}
+          </p>
+        )}
       </div>
 
-      {/* Selected Count */}
+      {/* Status bar */}
       <div className="mb-4 p-3 bg-gray-800 rounded-lg border border-gray-700">
-        <div className="text-sm">
-          <span className="text-gray-400">Selected Languages:</span>{' '}
-          <span className={`font-medium ${selectedLanguages.length >= maxLanguages ? 'text-red-400' : 'text-dnd-gold'}`}>
-            {selectedLanguages.length} / {maxLanguages}
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-gray-400">Languages known:</span>
+          <span className={`font-medium ${hasFreeChoice ? 'text-green-400' : 'text-dnd-gold'}`}>
+            {selectedLanguages.length} / {effectiveMax}
+            {hasFreeChoice
+              ? ' ✓'
+              : <span className="ml-2 text-xs text-blue-400">(choose 1 more)</span>}
           </span>
-          {selectedLanguages.length >= maxLanguages && (
-            <span className="ml-2 text-xs text-red-400">(Maximum reached)</span>
-          )}
         </div>
-        {selectedLanguages.length > 1 && (
+        {selectedLanguages.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-1">
-            {selectedLanguages.map((id) => {
+            {selectedLanguages.map((id: string) => {
               const lang = getLanguageById(id)
               if (!lang) return null
               return (
                 <span
                   key={id}
-                  className="text-xs px-2 py-1 bg-dnd-gold/20 text-dnd-gold rounded"
+                  className={`text-xs px-2 py-1 rounded ${
+                    isNonRemovable(id)
+                      ? 'bg-orange-900/30 text-orange-300'
+                      : 'bg-dnd-gold/20 text-dnd-gold'
+                  }`}
                 >
                   {lang.name}
+                  {isNonRemovable(id) && ' 🔒'}
                 </span>
               )
             })}
@@ -169,17 +240,11 @@ export function LanguageSelector({
 
       {renderLanguageGroup('Standard Languages', STANDARD_LANGUAGES)}
       {renderLanguageGroup('Exotic Languages', EXOTIC_LANGUAGES)}
-      {/* Filter secret languages based on class */}
+      {/* Filter secret languages to only show relevant ones */}
       {(() => {
         const filteredSecretLanguages = SECRET_LANGUAGES.filter((lang) => {
-          // Only show Druidic for Druids
-          if (lang.id === 'druidic') {
-            return className?.toLowerCase().includes('druid')
-          }
-          // Only show Thieves' Cant for Rogues
-          if (lang.id === 'thieves-cant') {
-            return className?.toLowerCase().includes('rogue')
-          }
+          if (lang.id === 'druidic') return className?.toLowerCase().includes('druid')
+          if (lang.id === 'thieves-cant') return className?.toLowerCase().includes('rogue')
           return true
         })
         return filteredSecretLanguages.length > 0

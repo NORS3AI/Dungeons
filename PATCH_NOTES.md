@@ -1,5 +1,50 @@
 # Dungeons - Patch Notes
 
+## Version 0.3.14-alpha - February 28, 2026
+
+**Alpha Release Notice**: Language selection now enforces a two-language maximum with automatic racial/class grants, and spell selection limits are now always enforced for every class in both character creation and the character sheet.
+
+### ✨ Language Selection — Limits & Automatic Grants
+
+All characters are limited to **2 languages** (Common + 1 free choice), unless their race or class grants extra languages on top.
+
+#### **How it works**
+- **Common** is always included and locked — every character speaks it.
+- **Racial/class grants** are automatically added to your selection and are also locked (shown with a 🔒 and an **orange "Granted"** badge). They do not use up your free choice slot.
+- **1 free choice** is available to every character. This can be any standard or exotic language.
+- The total maximum is `2 + number of granted languages` (e.g., an Elf gets Common + Elvish [granted] + 1 choice = 3).
+
+#### **Granted languages by race/class**
+| Race | Granted |
+|------|---------|
+| Dwarf | Dwarvish |
+| Elf / Drow | Elvish |
+| Halfling | Halfling |
+| Gnome | Gnomish |
+| Dragonborn | Draconic |
+| Tiefling | Infernal |
+| Half-Orc | Orc |
+| Aasimar | Celestial |
+| Druid (class) | Druidic |
+| Rogue (class) | Thieves' Cant |
+
+**Why This Matters**: Previously the selector allowed up to 5 languages with no enforcement. Now the limit is clearly communicated, racial languages are automatic, and the free-choice slot is exactly 1.
+
+---
+
+### ✨ Spell Selection — Limits Always Enforced
+
+Spell and cantrip limits are now enforced **everywhere** — both during character creation and when adding spells from the character sheet. Previously `isCharacterCreation=false` (DM mode) bypassed all limits, allowing any class to select every available spell.
+
+#### **What changed**
+- The "grey out when at limit" and "block toggle past limit" logic no longer depends on `isCharacterCreation` — it always applies.
+- When using the character sheet's spell selector, **already-known spells count against the class limit**. If a Paladin knows 3 spells (their level-4 cap), all remaining spells are greyed out in the selector.
+- Remaining slots = `class limit − already-known spells of that type`.
+
+**Why This Matters**: A Paladin at level 4 could previously select all 15 available spells. Now the 3/3 counter correctly greys out and blocks further selection, matching every other class's behaviour.
+
+---
+
 ## Version 0.3.13-alpha - February 28, 2026
 
 **Alpha Release Notice**: Bag of Holding now actively reduces carry weight, new higher-tier Bags of Holding added to loot, and equipped magic weapon items (+1/+2/+3…) now add their bonus to all dice rolls in the Dice Roller.
