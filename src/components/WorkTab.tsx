@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import type { Character, Material, CraftingSkills } from '../types'
 import {
   BLACKSMITHING_RECIPES,
@@ -12,6 +12,7 @@ import {
   type CraftingTier,
 } from '../data/craftingData'
 import { useCharacterStore } from '../stores/characterStore'
+import { RARITY_COLORS } from '../data/lootGenerator'
 
 interface WorkTabProps {
   character: Character
@@ -66,6 +67,8 @@ const PROFESSION_INFO: Record<Profession, {
   },
 }
 
+const TIERS: CraftingTier[] = ['common', 'uncommon', 'rare', 'epic', 'legendary']
+
 const TIER_LABELS: Record<CraftingTier, string> = {
   common: 'Common',
   uncommon: 'Uncommon',
@@ -102,7 +105,7 @@ function SkillBar({ value, profession }: { value: number; profession: Profession
         />
       </div>
       <div className="flex justify-between text-xs text-gray-600 mt-0.5">
-        {(['common', 'uncommon', 'rare', 'epic', 'legendary'] as CraftingTier[]).map((t) => {
+        {TIERS.map((t) => {
           const [lo, hi] = TIER_SKILL_RANGES[t]
           return (
             <span key={t} className={tier === t ? TIER_COLORS[t].text : ''}>
@@ -116,18 +119,10 @@ function SkillBar({ value, profession }: { value: number; profession: Profession
 }
 
 function MaterialRow({ mat }: { mat: Material }) {
-  const rarityColors: Record<string, string> = {
-    trash: 'text-gray-500',
-    common: 'text-white',
-    uncommon: 'text-green-400',
-    rare: 'text-blue-400',
-    epic: 'text-purple-400',
-    legendary: 'text-yellow-400',
-    artifact: 'text-red-400',
-  }
+  const textColor = RARITY_COLORS[mat.rarity]?.text ?? 'text-white'
   return (
     <div className="flex items-center justify-between px-3 py-1.5 rounded bg-gray-800/50 border border-gray-700">
-      <span className={`text-sm font-medium ${rarityColors[mat.rarity] ?? 'text-white'}`}>
+      <span className={`text-sm font-medium ${textColor}`}>
         {mat.name}
       </span>
       <span className="text-sm text-gray-400 ml-3">×{mat.quantity}</span>
@@ -138,19 +133,18 @@ function MaterialRow({ mat }: { mat: Material }) {
 interface CraftCardProps {
   item: CraftedItem
   skill: number
-  materials: Material[]
+  materialsMap: Map<string, number>
   onCraft: (item: CraftedItem) => void
 }
 
-function CraftCard({ item, skill, materials, onCraft }: CraftCardProps) {
+function CraftCard({ item, skill, materialsMap, onCraft }: CraftCardProps) {
   const colors = TIER_COLORS[item.tier]
   const isUnlocked = skill >= item.minSkill
 
-  // Check if the character has enough materials
-  const canAfford = item.materials.every((cost) => {
-    const owned = materials.find((m) => m.id === cost.materialId)
-    return owned && owned.quantity >= cost.quantity
-  })
+  // O(1) per cost instead of O(n) array search
+  const canAfford = item.materials.every((cost) =>
+    (materialsMap.get(cost.materialId) ?? 0) >= cost.quantity
+  )
 
   const isDisabled = !isUnlocked || !canAfford
 
@@ -178,8 +172,7 @@ function CraftCard({ item, skill, materials, onCraft }: CraftCardProps) {
 
       <div className="flex flex-wrap gap-1 mb-2">
         {item.materials.map((cost) => {
-          const owned = materials.find((m) => m.id === cost.materialId)
-          const qty = owned?.quantity ?? 0
+          const qty = materialsMap.get(cost.materialId) ?? 0
           const enough = qty >= cost.quantity
           return (
             <span
@@ -220,6 +213,10 @@ export function WorkTab({ character }: WorkTabProps) {
 
   const [activeProfession, setActiveProfession] = useState<Profession>('blacksmithing')
   const [craftedNotif, setCraftedNotif] = useState<string | null>(null)
+  const notifTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Cleanup notification timer on unmount
+  useEffect(() => () => { if (notifTimer.current) clearTimeout(notifTimer.current) }, [])
 
   const skills = character.craftingSkills ?? {
     blacksmithing: 1,
@@ -230,16 +227,25 @@ export function WorkTab({ character }: WorkTabProps) {
 
   const info = PROFESSION_INFO[activeProfession]
   const skillValue = skills[info.skill]
-  const ownedMats = character.materials.filter((m) =>
-    info.matCategory.includes(m.category as Material['category'])
+
+  const ownedMats = useMemo(
+    () => character.materials.filter((m) => info.matCategory.includes(m.category as Material['category'])),
+    [character.materials, info.matCategory]
   )
+
   // Group recipes by tier
-  const recipesByTier = info.recipes.reduce<Record<CraftingTier, CraftedItem[]>>(
-    (acc: Record<CraftingTier, CraftedItem[]>, r: CraftedItem) => {
-      acc[r.tier].push(r)
-      return acc
-    },
-    { common: [], uncommon: [], rare: [], epic: [], legendary: [] }
+  const recipesByTier = useMemo(
+    () => info.recipes.reduce<Record<CraftingTier, CraftedItem[]>>(
+      (acc: Record<CraftingTier, CraftedItem[]>, r: CraftedItem) => { acc[r.tier].push(r); return acc },
+      { common: [], uncommon: [], rare: [], epic: [], legendary: [] }
+    ),
+    [info.recipes]
+  )
+
+  // Build a quantity Map for O(1) lookups in CraftCard
+  const materialsMap = useMemo(
+    () => new Map(character.materials.map((m) => [m.id, m.quantity])),
+    [character.materials]
   )
 
   function handleCraft(item: CraftedItem) {
@@ -248,15 +254,7 @@ export function WorkTab({ character }: WorkTabProps) {
       changeMaterialQuantity(cost.materialId, -cost.quantity)
     }
 
-    // Add crafted item to inventory
-    const rarityMap: Record<CraftingTier, 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'> = {
-      common: 'common',
-      uncommon: 'uncommon',
-      rare: 'rare',
-      epic: 'epic',
-      legendary: 'legendary',
-    }
-
+    // CraftingTier values are identical to the equipment rarity union — cast directly
     const newItem = {
       id: `crafted-${item.id}-${Date.now()}`,
       name: item.name,
@@ -265,16 +263,17 @@ export function WorkTab({ character }: WorkTabProps) {
       weight: item.weight,
       cost: { copper: 0, silver: 0, gold: 0, platinum: 0 },
       quantity: 1,
-      rarity: rarityMap[item.tier],
+      rarity: item.tier as 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary',
     }
     addEquipment(newItem)
 
     // Increment skill (+1 per craft)
     incrementCraftingSkill(info.skill, 1)
 
-    // Notify
+    // Show notification with cleanup
     setCraftedNotif(`Crafted ${item.name}!`)
-    setTimeout(() => setCraftedNotif(null), 2500)
+    if (notifTimer.current) clearTimeout(notifTimer.current)
+    notifTimer.current = setTimeout(() => setCraftedNotif(null), 2500)
   }
 
   return (
@@ -354,7 +353,7 @@ export function WorkTab({ character }: WorkTabProps) {
                     key={recipe.id}
                     item={recipe}
                     skill={skillValue}
-                    materials={character.materials}
+                    materialsMap={materialsMap}
                     onCraft={handleCraft}
                   />
                 ))}

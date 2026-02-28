@@ -1078,9 +1078,9 @@ export const TIER_SKILL_RANGES: Record<CraftingTier, [number, number]> = {
 }
 
 export function getTierForSkill(skill: number): CraftingTier {
-  if (skill >= 91) return 'legendary'
-  if (skill >= 76) return 'epic'
-  if (skill >= 51) return 'rare'
-  if (skill >= 26) return 'uncommon'
+  const ordered: CraftingTier[] = ['legendary', 'epic', 'rare', 'uncommon', 'common']
+  for (const tier of ordered) {
+    if (skill >= TIER_SKILL_RANGES[tier][0]) return tier
+  }
   return 'common'
 }

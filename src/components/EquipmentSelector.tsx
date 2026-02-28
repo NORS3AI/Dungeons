@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import type { Class, Equipment, Weapon, Armor, Race } from '../types'
-import { isShield } from '../types/equipment'
+import { isWeapon, isArmor, isShield } from '../types/equipment'
 import {
   ALL_WEAPONS,
   SHIELDS,
@@ -31,6 +31,10 @@ const STANDARD_STARTING_GEAR = [
   { id: 'torch', quantity: 10 },
   { id: 'component-pouch', quantity: 1 }, // For spellcasting
 ]
+
+const MAX_WEAPONS = 3
+const MAX_ARMOR = 1
+const MAX_SHIELDS = 1
 
 /**
  * The 12 simplified weapon types available to all classes.
@@ -160,21 +164,9 @@ export function EquipmentSelector({ characterClass, onSubmit, onBack }: Equipmen
   ]
 
   // Count selected weapons, armor sets, and shields
-  const selectedWeaponCount = selectedEquipment.filter(
-    (e) => 'weaponType' in e && (e.weaponType === 'simple' || e.weaponType === 'martial')
-  ).length
-
-  const selectedArmorCount = selectedEquipment.filter(
-    (e) => 'armorType' in e && e.armorType !== undefined
-  ).length
-
-  const selectedShieldCount = selectedEquipment.filter(
-    (e) => 'acBonus' in e && !('armorType' in e)
-  ).length
-
-  const MAX_WEAPONS = 3
-  const MAX_ARMOR = 1
-  const MAX_SHIELDS = 1
+  const selectedWeaponCount = selectedEquipment.filter(isWeapon).length
+  const selectedArmorCount = selectedEquipment.filter(isArmor).length
+  const selectedShieldCount = selectedEquipment.filter(isShield).length
 
   const toggleEquipment = (item: Equipment) => {
     setSelectedEquipment((prev) => {
@@ -183,13 +175,9 @@ export function EquipmentSelector({ characterClass, onSubmit, onBack }: Equipmen
         return prev.filter((e) => e.id !== item.id)
       }
 
-      const isWeaponItem = 'weaponType' in item && (item.weaponType === 'simple' || item.weaponType === 'martial')
-      const isArmorItem = 'armorType' in item && item.armorType !== undefined
-      const isShieldItem = 'acBonus' in item && !('armorType' in item)
-
-      if (isWeaponItem && selectedWeaponCount >= MAX_WEAPONS) return prev
-      if (isArmorItem && selectedArmorCount >= MAX_ARMOR) return prev
-      if (isShieldItem && selectedShieldCount >= MAX_SHIELDS) return prev
+      if (isWeapon(item) && selectedWeaponCount >= MAX_WEAPONS) return prev
+      if (isArmor(item) && selectedArmorCount >= MAX_ARMOR) return prev
+      if (isShield(item) && selectedShieldCount >= MAX_SHIELDS) return prev
 
       return [...prev, { ...item, quantity: 1 }]
     })
@@ -205,10 +193,8 @@ export function EquipmentSelector({ characterClass, onSubmit, onBack }: Equipmen
 
   const canSelectArmorItem = (itemId: string, item: Equipment) => {
     if (isSelected(itemId)) return true
-    const isArmorItem = 'armorType' in item && item.armorType !== undefined
-    const isShieldItem = 'acBonus' in item && !('armorType' in item)
-    if (isArmorItem) return selectedArmorCount < MAX_ARMOR
-    if (isShieldItem) return selectedShieldCount < MAX_SHIELDS
+    if (isArmor(item)) return selectedArmorCount < MAX_ARMOR
+    if (isShield(item)) return selectedShieldCount < MAX_SHIELDS
     return true
   }
 
