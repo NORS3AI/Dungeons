@@ -2,42 +2,34 @@
 
 ## 🚧 CURRENT WORK IN PROGRESS
 
-**Next Task**: Create spell data for Amazon and Demon Hunter custom classes
+**Next Task**: Add Amazon and Demon Hunter class features to the Actions tab and `quickReference.ts`
 
-**Problem**: `SpellSelector.tsx` has no spell data or handling for the `amazon` and `demon-hunter` class IDs. These two custom half-casters show no spells.
+**Problem**: Amazon and Demon Hunter key abilities (Spectral Sight, Fel Rush, Metamorphosis, Inner Sight, Critical Strike, etc.) are defined in FEATURES.md but have no entries in `quickReference.ts` (needed for tooltip support) and no entries in `ACTIONABLE_FEATURES.md` (needed for the Actions tab charge-tracking system introduced in v0.3.7).
 
 **Solution needed**:
-1. Create `src/data/spells/amazon.ts` — half-caster spell list (levels 1-5) based on FEATURES.md Amazon spell list
-2. Create `src/data/spells/demon-hunter.ts` — half-caster spell list (levels 1-5) based on FEATURES.md Demon Hunter spell list
-3. Export from `src/data/spells/index.ts`
-4. Add `amazon` and `demon-hunter` cases to `SpellSelector.tsx` (follow Paladin/Ranger pattern for half-caster progression)
+1. Add trait references for Amazon and Demon Hunter class features to `src/data/quickReference.ts` (follow existing class trait pattern)
+2. Add Amazon and Demon Hunter sections to `ACTIONABLE_FEATURES.md` (document which features are Active, Reactive, or Passive)
+3. Verify the Actions tab class feature system (introduced v0.3.7) picks up the new traits automatically, or add explicit class feature data if needed
 
-**✅ Already Done** (classSpells task is complete):
-- `src/data/spells/` contains individual files for: bard, cleric, death-knight, druid, necromancer, paladin, ranger, sorcerer, warlock, wizard
-- `SpellSelector.tsx` imports and handles all of the above with full level-progression logic
+**Key features to cover:**
+
+*Amazon* (from FEATURES.md):
+- Inner Sight (L1) — 1 charge/short rest, negates invisibility/hiding on one creature
+- Critical Strike (L1) — 1 charge/short rest, advantage on next attack
+- Dodge (L2) — reaction, imposes disadvantage on incoming attack, 2 charges/short rest
+- Avoid (L7) — passive, advantage on DEX saves
+- Summon Valkyrie (L11) — 1 charge/long rest, summons Valkyrie companion
+
+*Demon Hunter* (from FEATURES.md):
+- Spectral Sight (L1) — passive, see invisible 30 ft, +30 ft darkvision
+- Fel Rush (L3) — 20 ft dash + 1d8 fire, 2 charges/short rest
+- Blade Dance (L6) — 5 ft AoE 2d6 slashing, 2 charges/short rest
+- Metamorphosis (L9) — +1 AC, fly 30 ft, +1d6 fire, 1 charge/long rest
+
+**✅ Already Done** (spell system is fully complete):
+- `src/data/spells/` contains files for all 16 classes including amazon and demon-hunter
+- `SpellSelector.tsx` handles all classes with correct half-caster level-progression
 - `src/data/spells/index.ts` re-exports everything
-
-**Spell interface** (from `src/types/spell.ts`):
-```typescript
-{
-  id: string,
-  name: string,
-  description: string,
-  level: number, // 0 for cantrips
-  school: 'abjuration' | 'conjuration' | 'divination' | 'enchantment' | 'evocation' | 'illusion' | 'necromancy' | 'transmutation',
-  castingTime: { amount: number, unit: 'action' | 'bonusAction' | 'reaction' | 'minute' | 'hour' },
-  range: { type: 'self' | 'touch' | 'ranged', distance?: number },
-  components: { verbal: boolean, somatic: boolean, material: boolean, materialDescription?: string },
-  duration: { type: 'instantaneous' | 'concentration' | 'timed', amount?: number, unit?: 'round' | 'minute' | 'hour' },
-  ritual: boolean,
-  concentration: boolean,
-  classes: string[]
-}
-```
-
-**Amazon spells** (from FEATURES.md): Magic Arrow (cantrip), Power Strike, Charged Strike, Lightning Fury, Immolation Arrow, Freezing Arrow, Guided Arrow, Inner Sight, Slow Missiles, Decoy, Summon Valkyrie
-
-**Demon Hunter spells** (from FEATURES.md): Fel Rush, Eye Beam, Immolation Aura, Metamorphosis, Multishot, Rain of Vengeance, Vault
 
 ---
 
