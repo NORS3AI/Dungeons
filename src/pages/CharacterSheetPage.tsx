@@ -250,6 +250,9 @@ export function CharacterSheetPage() {
 
   const handleSaveDetails = (details: {
     name: string
+    firstName?: string
+    surname?: string
+    nickname?: string
     playerName: string
     gender?: 'male' | 'female' | 'other'
     age: string

@@ -487,7 +487,7 @@ export function SpellSelector({
       if (prev.find((s) => s.id === spell.id)) {
         return prev.filter((s) => s.id !== spell.id)
       }
-      if (prev.length < cantripsKnown) {
+      if (!isCharacterCreation || prev.length < cantripsKnown) {
         return [...prev, spell]
       }
       return prev
@@ -500,7 +500,7 @@ export function SpellSelector({
       if (prev.find((s) => s.id === spell.id)) {
         return prev.filter((s) => s.id !== spell.id)
       }
-      if (prev.length < spellsKnown) {
+      if (!isCharacterCreation || prev.length < spellsKnown) {
         return [...prev, spell]
       }
       return prev
@@ -598,7 +598,7 @@ export function SpellSelector({
               )}
             </h3>
             <span className={`text-sm ${isCharacterCreation && selectedCantrips.length === cantripsKnown ? 'text-green-400' : 'text-dnd-gold'}`}>
-              {selectedCantrips.length}{isCharacterCreation ? ` / ${cantripsKnown}` : ''} selected
+              {selectedCantrips.length}{cantripsKnown > 0 ? ` / ${cantripsKnown}` : ''} selected
             </span>
           </div>
 
@@ -644,7 +644,7 @@ export function SpellSelector({
               )}
             </h3>
             <span className={`text-sm ${isCharacterCreation && selectedSpells.length === spellsKnown ? 'text-green-400' : 'text-dnd-gold'}`}>
-              {selectedSpells.length}{isCharacterCreation ? ` / ${spellsKnown}` : ''} selected
+              {selectedSpells.length}{spellsKnown > 0 ? ` / ${spellsKnown}` : ''} selected
             </span>
           </div>
 
