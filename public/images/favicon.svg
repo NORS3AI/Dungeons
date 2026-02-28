@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e0a3c"/>
+      <stop offset="100%" stop-color="#0d0a1a"/>
+    </linearGradient>
+    <linearGradient id="face" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#5b21b6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Rounded background -->
+  <rect width="100" height="100" rx="14" fill="url(#bg)"/>
+
+  <!-- D20 outer pentagon -->
+  <polygon points="50,7 91,34 76,87 24,87 9,34"
+    fill="url(#face)" stroke="#4c1d95" stroke-width="2" stroke-linejoin="round"/>
+
+  <!-- Inner pentagon (rotated 36°) -->
+  <polygon points="61,35 67,56 50,68 33,56 39,35"
+    fill="none" stroke="#1e0a3c" stroke-width="1.8"/>
+
+  <!-- Outer-to-inner edge lines (10 lines, one per D20 face edge) -->
+  <line x1="50" y1="7"  x2="61" y2="35" stroke="#1e0a3c" stroke-width="1.6"/>
+  <line x1="50" y1="7"  x2="39" y2="35" stroke="#1e0a3c" stroke-width="1.6"/>
+  <line x1="91" y1="34" x2="61" y2="35" stroke="#1e0a3c" stroke-width="1.6"/>
+  <line x1="91" y1="34" x2="67" y2="56" stroke="#1e0a3c" stroke-width="1.6"/>
+  <line x1="76" y1="87" x2="67" y2="56" stroke="#1e0a3c" stroke-width="1.6"/>
+  <line x1="76" y1="87" x2="50" y2="68" stroke="#1e0a3c" stroke-width="1.6"/>
+  <line x1="24" y1="87" x2="50" y2="68" stroke="#1e0a3c" stroke-width="1.6"/>
+  <line x1="24" y1="87" x2="33" y2="56" stroke="#1e0a3c" stroke-width="1.6"/>
+  <line x1="9"  y1="34" x2="33" y2="56" stroke="#1e0a3c" stroke-width="1.6"/>
+  <line x1="9"  y1="34" x2="39" y2="35" stroke="#1e0a3c" stroke-width="1.6"/>
+
+  <!-- "20" in gold -->
+  <text x="50" y="53"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="21" font-weight="bold"
+    fill="#fbbf24" text-anchor="middle" dominant-baseline="middle">20</text>
+</svg>
