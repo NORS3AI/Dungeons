@@ -161,7 +161,13 @@ export interface BaseEquipment {
   equipped?: boolean
   charges?: MagicalItemCharges // For magical items with limited uses
   abilityScoreModifiers?: AbilityScoreModifiers // e.g., Belt of Giant Strength (+2 STR)
-  rarity?: 'trash' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'artifact' // For selling crafting materials
+  rarity?: 'trash' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'artifact'
+  /** Reduces the total inventory weight shown when this item is in the inventory (e.g. Bag of Holding) */
+  weightReduction?: number
+  /** Bonus added to all weapon damage rolls when this item is equipped and a weapon is also equipped */
+  weaponDamageBonus?: number
+  /** Bonus added to all weapon attack rolls when this item is equipped and a weapon is also equipped */
+  attackBonus?: number
 }
 
 /**

@@ -1,5 +1,48 @@
 # Dungeons - Patch Notes
 
+## Version 0.3.13-alpha - February 28, 2026
+
+**Alpha Release Notice**: Bag of Holding now actively reduces carry weight, new higher-tier Bags of Holding added to loot, and equipped magic weapon items (+1/+2/+3…) now add their bonus to all dice rolls in the Dice Roller.
+
+### ✨ Bag of Holding — Weight Reduction System
+
+Picking up a Bag of Holding from the Loot Cache now actively reduces the **Total Carrying Weight** shown in the Inventory tab. Four tiers now exist:
+
+| Rarity | Weight Reduction | Loot Value |
+|--------|-----------------|------------|
+| Uncommon | −50 lbs | 400 gp |
+| Rare | −100 lbs | 800 gp |
+| Epic | −150 lbs | 1,500 gp |
+| Legendary | −225 lbs | 3,000 gp |
+
+Weight reductions from multiple Bags of Holding stack. The total weight display also shows a green line indicating how many pounds are being reduced (e.g. "−50 lbs from Bag(s) of Holding"). Total weight never goes below 0.
+
+---
+
+### ✨ Magic Weapon Items — Dice Roller Bonus
+
+Loot items that grant weapon bonuses (Masterwork Weapon, Weapon +2, Weapon +3, Dragonslayer Greatsword, Holy Avenger, Vorpal Sword, Godslayer Blade, etc.) now carry structured `weaponDamageBonus` and `attackBonus` values. When one of these items is **equipped** in your inventory:
+
+- **Attack rolls** in the Dice Roller automatically add the `attackBonus` on top of ability + proficiency
+- **Damage rolls** automatically add the `weaponDamageBonus` on top of ability modifier
+
+The bonus only applies when at least one weapon is also equipped — no floating +3 to unarmed punches.
+
+#### **Bonus values by item**
+| Item | Attack | Damage |
+|------|--------|--------|
+| Masterwork Weapon | +1 | +1 |
+| Weapon +2 | +2 | +2 |
+| Weapon +3 | +3 | +3 |
+| Dragonslayer Greatsword | +3 | +3 |
+| Holy Avenger | +3 | +3 |
+| Vorpal Sword | +4 | +4 |
+| Godslayer Blade (Artifact) | +5 | +5 |
+
+**Why This Matters**: Magic weapon items finally have real mechanical teeth — equipping a Weapon +2 now visibly changes your roll results, not just your item description.
+
+---
+
 ## Version 0.3.12-alpha - February 28, 2026
 
 **Alpha Release Notice**: Paladin spells fixed, character sheet columns rebalanced, profession now visible in Character Info, and character creation gains a race-based name generator with separate First Name, Surname, and Nickname fields.

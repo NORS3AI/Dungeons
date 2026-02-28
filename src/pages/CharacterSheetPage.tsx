@@ -372,10 +372,10 @@ export function CharacterSheetPage() {
         rarity: lootItem.rarity,
         quantity: lootItem.quantity || 1,
         weight: 1,
-        cost: {
-          ...EMPTY_CURRENCY,
-          gold: lootItem.value || 0,
-        },
+        cost: { ...EMPTY_CURRENCY, gold: lootItem.value || 0 },
+        ...(lootItem.weightReduction !== undefined && { weightReduction: lootItem.weightReduction }),
+        ...(lootItem.weaponDamageBonus !== undefined && { weaponDamageBonus: lootItem.weaponDamageBonus }),
+        ...(lootItem.attackBonus !== undefined && { attackBonus: lootItem.attackBonus }),
       }
       addEquipment(featureItem)
       saveCharacter()
@@ -412,17 +412,17 @@ export function CharacterSheetPage() {
         rarity: lootItem.rarity,
         quantity: lootItem.quantity || 1,
         weight: 0.5,
-        cost: {
-          ...EMPTY_CURRENCY,
-          gold: lootItem.value || 0,
-        },
+        cost: { ...EMPTY_CURRENCY, gold: lootItem.value || 0 },
+        ...(lootItem.weightReduction !== undefined && { weightReduction: lootItem.weightReduction }),
+        ...(lootItem.weaponDamageBonus !== undefined && { weaponDamageBonus: lootItem.weaponDamageBonus }),
+        ...(lootItem.attackBonus !== undefined && { attackBonus: lootItem.attackBonus }),
       }
       addEquipment(accessoryItem)
       saveCharacter()
       return
     }
 
-    // Auto-add all other items (weapons, armor, shields, etc.) directly to inventory
+    // Auto-add all other items (weapons, armor, shields, Wondrous, etc.) directly to inventory
     const genericItem: Equipment = {
       id: lootItem.id + '-' + Date.now(),
       name: lootItem.name,
@@ -432,10 +432,10 @@ export function CharacterSheetPage() {
       rarity: lootItem.rarity,
       quantity: lootItem.quantity || 1,
       weight: 1,
-      cost: {
-        ...EMPTY_CURRENCY,
-        gold: lootItem.value || 0,
-      },
+      cost: { ...EMPTY_CURRENCY, gold: lootItem.value || 0 },
+      ...(lootItem.weightReduction !== undefined && { weightReduction: lootItem.weightReduction }),
+      ...(lootItem.weaponDamageBonus !== undefined && { weaponDamageBonus: lootItem.weaponDamageBonus }),
+      ...(lootItem.attackBonus !== undefined && { attackBonus: lootItem.attackBonus }),
     }
     addEquipment(genericItem)
     saveCharacter()
@@ -1765,13 +1765,27 @@ export function CharacterSheetPage() {
                 <p className="text-xs text-gray-400 mt-1">Combined weight of all equipped and inventory items</p>
               </div>
               <div className="text-right">
-                <div className="text-3xl font-bold text-orange-300">
-                  {character.equipment.reduce((total, item) => {
-                    const itemWeight = item.weight || 0
-                    const quantity = item.quantity || 1
-                    return total + (itemWeight * quantity)
-                  }, 0).toFixed(1)} lbs
-                </div>
+                {(() => {
+                  const rawWeight = character.equipment.reduce((total, item) => {
+                    return total + (item.weight || 0) * (item.quantity || 1)
+                  }, 0)
+                  const weightReduction = character.equipment.reduce((total, item) => {
+                    return total + (item.weightReduction || 0)
+                  }, 0)
+                  const netWeight = Math.max(0, rawWeight - weightReduction)
+                  return (
+                    <>
+                      <div className="text-3xl font-bold text-orange-300">
+                        {netWeight.toFixed(1)} lbs
+                      </div>
+                      {weightReduction > 0 && (
+                        <div className="text-xs text-green-400 mt-0.5">
+                          −{weightReduction} lbs from Bag(s) of Holding
+                        </div>
+                      )}
+                    </>
+                  )
+                })()}
                 <div className="text-xs text-gray-500 mt-1">
                   {character.materials?.reduce((total, mat) => total + (mat.weight * mat.quantity), 0).toFixed(1) || '0'} lbs from materials
                 </div>
