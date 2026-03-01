@@ -1,5 +1,25 @@
 # Dungeons - Patch Notes
 
+## Version 0.4.15-alpha - March 1, 2026
+
+**Alpha Release Notice**: Languages chosen during character creation now display correctly on the character sheet.
+
+### 🐛 Languages Not Saving to Overview
+
+Languages selected during character creation were not showing on the character sheet overview.
+
+#### **What was wrong**
+The overview was reading `character.race.languages` (the race's default language list, e.g. just "Common, Elvish" for an Elf) instead of `character.languages` (the actual languages the player chose, including any bonus picks).
+
+#### **What changed**
+- Overview now reads from `character.languages` — the player's actual selections
+- Language IDs are resolved to proper display names (e.g. `"thieves-cant"` → `"Thieves' Cant"`)
+- All languages chosen during creation (racial defaults + bonus picks) now appear
+
+**Why This Matters**: Players can finally see their full language list on the character sheet.
+
+---
+
 ## Version 0.4.14-alpha - March 1, 2026
 
 **Alpha Release Notice**: Crafting materials now display as grouped circle badges in the Inventory tab.

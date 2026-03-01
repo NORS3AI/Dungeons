@@ -40,6 +40,7 @@ import type { LootItem } from '../data/lootGenerator'
 import { RARITY_COLORS } from '../data/lootGenerator'
 import type { Spell } from '../types'
 import { WorkTab } from '../components/WorkTab'
+import { getLanguageById } from '../data/languages'
 
 const ABILITY_NAMES: Record<Ability, string> = {
   strength: 'STR',
@@ -1556,12 +1557,14 @@ export function CharacterSheetPage() {
                     </span>
                   </div>
                 )}
-                {character.race?.languages && (
+                {character.languages && character.languages.length > 0 && (
                   <div className="flex justify-between">
                     <QuickRefTooltip type="rule" id="languages">
                       <span className="text-gray-500 cursor-pointer hover:text-gray-300">Languages</span>
                     </QuickRefTooltip>
-                    <span className="text-gray-300">{character.race.languages.join(', ')}</span>
+                    <span className="text-gray-300">
+                      {character.languages.map(id => getLanguageById(id)?.name ?? id.charAt(0).toUpperCase() + id.slice(1)).join(', ')}
+                    </span>
                   </div>
                 )}
                 {character.race?.damageResistances && character.race.damageResistances.length > 0 && (
