@@ -1,5 +1,24 @@
 # Dungeons - Patch Notes
 
+## Version 0.4.14-alpha - March 1, 2026
+
+**Alpha Release Notice**: Crafting materials now display as grouped circle badges in the Inventory tab.
+
+### ✨ Materials — Grouped Circle Layout
+
+The Mats section in the Inventory tab has been redesigned. Materials are now grouped by category (Ores, Herbs, Cloth, Hides, Leather, Gems, etc.) and displayed as round circle badges with the quantity in the center.
+
+#### **What changed**
+- Materials are grouped under category headers with icons (e.g. ⛏️ Ores, 🌿 Herbs, 🧵 Cloth)
+- Each material is a round circle badge colored by rarity, with the quantity displayed in the center
+- Material name appears below the circle
+- Hover to reveal +/−/sell action buttons as small round icons
+- Tooltip shows full name, description, and rarity on hover
+
+**Why This Matters**: Much cleaner at a glance — you can immediately see all your ores together, all herbs together, etc., instead of scanning a flat grid.
+
+---
+
 ## Version 0.4.13-alpha - February 28, 2026
 
 **Alpha Release Notice**: All 46 Paladin spells now have quickReference entries for tooltip support.
