@@ -359,8 +359,14 @@ function getLootPool(rarity: LootRarity): LootItem[] {
  * Generate legendary loot with specific rarity quantities
  * For DM weekly session rewards
  */
-export function generateLegendaryLoot(rarity: LootRarity, quantity: number): LootItem[] {
-  const pool = getLootPool(rarity)
+export function generateLegendaryLoot(rarity: LootRarity, quantity: number, materialsOnly = false): LootItem[] {
+  let pool = getLootPool(rarity)
+
+  if (materialsOnly) {
+    pool = pool.filter(item => item.category === 'Crafting Material')
+    if (pool.length === 0) return [] // no materials at this rarity
+  }
+
   const loot: LootItem[] = []
 
   for (let i = 0; i < quantity; i++) {

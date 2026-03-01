@@ -1,5 +1,61 @@
 # Dungeons - Patch Notes
 
+## Version 0.4.13-alpha - February 28, 2026
+
+**Alpha Release Notice**: All 46 Paladin spells now have quickReference entries for tooltip support.
+
+### 🐛 Paladin Spell References Fix
+
+Added 32 missing Paladin spell entries to the quickReference system so tooltips work when clicking any Paladin spell.
+
+#### **Spells added (by level)**
+- **Level 1** (11): Compelled Duel, Detect Evil and Good, Detect Magic, Detect Poison and Disease, Divine Favor, Heroism, Purify Food and Drink, Searing Smite, Shield of Faith, Thunderous Smite, Wrathful Smite
+- **Level 2** (8): Aid, Branding Smite, Find Steed, Lesser Restoration, Locate Object, Magic Weapon, Protection from Poison, Zone of Truth
+- **Level 3** (7): Aura of Vitality, Blinding Smite, Create Food and Water, Crusader's Mantle, Daylight, Elemental Weapon, Magic Circle
+- **Level 4** (6): Aura of Life, Aura of Purity, Death Ward, Freedom of Movement, Locate Creature, Staggering Smite
+
+*Level 5 spells (Banishing Smite, Circle of Power, Destructive Wave, Dispel Evil and Good, Flame Strike, Geas, Raise Dead) were already present.*
+
+**Why This Matters**: Paladin players can now click any spell name and see its full description, casting time, range, and components in a popup.
+
+---
+
+## Version 0.4.12-alpha - February 28, 2026
+
+**Alpha Release Notice**: Legendary Loot Generator can now generate crafting materials only.
+
+### ✨ Mats Only Filter — Legendary Loot Generator
+
+DMs can now toggle **"Mats Only"** in the Legendary Loot Generator to generate exclusively crafting materials (ores, cloth, hides, herbs) at any rarity tier.
+
+#### **What changed**
+- New **"Mats Only"** toggle button between the Quantity selector and Generate button
+- When enabled, the generator filters the loot pool to only include `Crafting Material` items
+- The Generate button label updates to reflect the filter (e.g. "Generate 5 Rare Mats")
+- Works at all rarity tiers that have materials (common through legendary)
+
+**Why This Matters**: DMs can now reward crafting materials directly without sifting through mixed loot results.
+
+---
+
+## Version 0.4.11-alpha - February 28, 2026
+
+**Alpha Release Notice**: Potion effect info is now clearly visible on every potion card.
+
+### 🐛 Potion Effect Display Fix
+
+Potions in the Actions tab now prominently display their healing/effect information.
+
+#### **What changed**
+- Every potion card now shows a highlighted **"Effect:"** box with the potion's description (e.g. "Restores 2d4+2 hit points", "+1 AC for 1 minute")
+- Healing formula parser now recognizes "restores" and "regain" wording in addition to "heals", so more potions show the green **"Heals:"** line
+- HP pattern also matches "HP" shorthand (not just "hit points")
+- Healing potion detection during the consume animation now also recognizes "restores" and "regain" descriptions
+
+**Why This Matters**: Players can now see at a glance exactly what each potion does before using it.
+
+---
+
 ## Version 0.4.10-alpha - February 28, 2026
 
 **Alpha Release Notice**: Homepage now shows the SVG logo instead of plain text.
