@@ -173,6 +173,36 @@ export interface CraftingSkills {
 }
 
 /**
+ * Sailor role within their seafaring profession
+ */
+export type SailorRole = 'captain' | 'crew' | 'navy'
+
+/**
+ * Ship details for sailor/captain characters
+ */
+export interface ShipDetails {
+  name: string
+  captainFirstName: string
+  captainSurname: string
+  hullPoints: number
+  armorClass: number
+  speed: number        // ft per round
+  cargoCapacity: number // tons
+  cannons: number
+  crew: number         // required crew size
+  notes: string
+}
+
+/**
+ * Profession-specific extra data (varies by profession type)
+ */
+export interface ProfessionData {
+  // Sailor / Ship Captain
+  sailorRole?: SailorRole
+  ship?: ShipDetails
+}
+
+/**
  * Fighter fighting stance options (homebrew)
  */
 export type FightingStance = 'two-handed' | 'dual-two-handed' | 'sword-and-board'
@@ -262,6 +292,9 @@ export interface Character {
 
   // Crafting (Work tab)
   craftingSkills: CraftingSkills
+
+  // Profession-specific data (Profession tab)
+  professionData?: ProfessionData
 
   // Fighter-specific
   fightingStance?: FightingStance

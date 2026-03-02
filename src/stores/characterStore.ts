@@ -17,6 +17,7 @@ import type {
   ClassFeature,
   FeatureCharge,
   CraftingSkills,
+  ProfessionData,
 } from '../types'
 import { DEFAULT_ABILITY_SCORES, EMPTY_CURRENCY, autoConvertCurrency } from '../types'
 import { migrateCharacter, needsMigration } from '../utils/characterMigration'
@@ -213,6 +214,7 @@ interface CharacterState {
   incrementCraftingSkill: (skill: keyof CraftingSkills, amount?: number) => void
   disenchantItem: (itemId: string) => void // Break down item into Magical Dust or Shards
   setDailyIncome: (professionName: string, amount: number, currency: 'copper' | 'silver' | 'gold') => void
+  setProfessionData: (data: Partial<ProfessionData>) => void
   setFightingStance: (stance: FightingStance) => void
 
   // DM Tools - Grant items to any character
@@ -935,6 +937,19 @@ export const useCharacterStore = create<CharacterState>()(
             currentCharacter: {
               ...currentCharacter,
               dailyIncome: { professionName, amount, currency },
+            },
+            history: addToHistory(history, currentCharacter),
+          })
+        },
+
+        setProfessionData: (data: Partial<ProfessionData>) => {
+          const { currentCharacter, history } = get()
+          if (!currentCharacter) return
+
+          set({
+            currentCharacter: {
+              ...currentCharacter,
+              professionData: { ...(currentCharacter.professionData ?? {}), ...data },
             },
             history: addToHistory(history, currentCharacter),
           })

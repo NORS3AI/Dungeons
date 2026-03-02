@@ -40,6 +40,8 @@ import type { LootItem } from '../data/lootGenerator'
 import { RARITY_COLORS } from '../data/lootGenerator'
 import type { Spell } from '../types'
 import { WorkTab } from '../components/WorkTab'
+import { ProfessionTab } from '../components/ProfessionTab'
+import { getLanguageById } from '../data/languages'
 
 const ABILITY_NAMES: Record<Ability, string> = {
   strength: 'STR',
@@ -81,7 +83,7 @@ export function CharacterSheetPage() {
   const { characters, loadCharacter, currentCharacter, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, changeEquipmentQuantity, renameEquipment, setFightingStance, addEquipment, addMaterial, removeMaterial, changeMaterialQuantity, updateHitPoints, addSpell, removeSpell, saveCharacter, addFoodRations, addWaterSupply, addItemFeature, setAlignment, setAbilityScores, migrateCurrentCharacter, needsMigration, setLevelWithHP, shortRest, longRest, initializeResourcePools, initializeFeatureCharges, useFeatureCharge, spendResource, disenchantItem } = useCharacterStore()
   const { dmModeEnabled } = useSettingsStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
-  const [activeTab, setActiveTab] = useState<'main' | 'actions' | 'spells' | 'inventory' | 'features' | 'story' | 'work' | 'loot'>('main')
+  const [activeTab, setActiveTab] = useState<'main' | 'actions' | 'spells' | 'inventory' | 'features' | 'story' | 'work' | 'profession' | 'loot'>('main')
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
   const [showIncomeRoller, setShowIncomeRoller] = useState(false)
   const [showDMReroll, setShowDMReroll] = useState(false)
@@ -1145,6 +1147,7 @@ export function CharacterSheetPage() {
     { id: 'features', label: 'Features' },
     { id: 'story', label: 'Story' },
     { id: 'work', label: 'Work' },
+    { id: 'profession', label: 'Profession' },
     { id: 'loot', label: 'Loot Cache' },
   ] as const
 
@@ -1556,12 +1559,14 @@ export function CharacterSheetPage() {
                     </span>
                   </div>
                 )}
-                {character.race?.languages && (
+                {character.languages && character.languages.length > 0 && (
                   <div className="flex justify-between">
                     <QuickRefTooltip type="rule" id="languages">
                       <span className="text-gray-500 cursor-pointer hover:text-gray-300">Languages</span>
                     </QuickRefTooltip>
-                    <span className="text-gray-300">{character.race.languages.join(', ')}</span>
+                    <span className="text-gray-300">
+                      {character.languages.map(id => getLanguageById(id)?.name ?? id.charAt(0).toUpperCase() + id.slice(1)).join(', ')}
+                    </span>
                   </div>
                 )}
                 {character.race?.damageResistances && character.race.damageResistances.length > 0 && (
@@ -2114,47 +2119,84 @@ export function CharacterSheetPage() {
             </div>
           </div>
 
-          {/* Mats (Crafting Materials) */}
-          {consolidatedMaterials.length > 0 && (
-            <div className="card bg-gray-800 border-gray-700 p-4">
-              <h3 className="text-lg font-bold text-white mb-3">📦 Mats ({consolidatedMaterials.length} types)</h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                {consolidatedMaterials.map((material) => {
-                  const rc = RARITY_COLORS[material.rarity as keyof typeof RARITY_COLORS] ?? RARITY_COLORS.common
-                  return (
-                    <div
-                      key={material.id}
-                      className={`relative flex flex-col p-2.5 rounded-lg border ${rc.border} bg-gray-900/60 group`}
-                      title={`${material.description} · ${material.rarity}`}
-                    >
-                      <span className={`text-sm font-medium leading-tight ${rc.text}`}>{material.name}</span>
-                      <span className="text-xs text-gray-500 capitalize mt-0.5">{material.category}</span>
-                      <div className="flex items-center justify-between mt-2">
-                        <span className="text-lg font-bold text-white">×{material.quantity}</span>
-                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button
-                            onClick={() => { changeMaterialQuantity(material.id, -1); saveCharacter() }}
-                            className="w-5 h-5 text-xs flex items-center justify-center bg-red-900/60 hover:bg-red-700 text-red-300 rounded transition-colors"
-                            title="−1"
-                          >−</button>
-                          <button
-                            onClick={() => { changeMaterialQuantity(material.id, 1); saveCharacter() }}
-                            className="w-5 h-5 text-xs flex items-center justify-center bg-green-900/60 hover:bg-green-700 text-green-300 rounded transition-colors"
-                            title="+1"
-                          >+</button>
-                          <button
-                            onClick={() => handleSellMaterial(material.id)}
-                            className="w-5 h-5 text-xs flex items-center justify-center bg-yellow-900/60 hover:bg-yellow-700 text-yellow-300 rounded transition-colors"
-                            title="Sell"
-                          >$</button>
+          {/* Mats (Crafting Materials) — grouped by category, circle badges */}
+          {consolidatedMaterials.length > 0 && (() => {
+            const CATEGORY_META: Record<string, { icon: string; label: string }> = {
+              ore: { icon: '⛏️', label: 'Ores' },
+              herb: { icon: '🌿', label: 'Herbs' },
+              cloth: { icon: '🧵', label: 'Cloth' },
+              hide: { icon: '🐾', label: 'Hides' },
+              leather: { icon: '🦎', label: 'Leather' },
+              gem: { icon: '💎', label: 'Gems' },
+              dust: { icon: '✨', label: 'Dust' },
+              shard: { icon: '🔮', label: 'Shards' },
+              other: { icon: '📦', label: 'Other' },
+            }
+            const grouped = new Map<string, Material[]>()
+            for (const mat of consolidatedMaterials) {
+              const key = mat.category || 'other'
+              if (!grouped.has(key)) grouped.set(key, [])
+              grouped.get(key)!.push(mat)
+            }
+            return (
+              <div className="card bg-gray-800 border-gray-700 p-4">
+                <h3 className="text-lg font-bold text-white mb-3">📦 Mats ({consolidatedMaterials.length} types)</h3>
+                <div className="space-y-4">
+                  {Array.from(grouped.entries()).map(([cat, mats]) => {
+                    const meta = CATEGORY_META[cat] ?? CATEGORY_META.other
+                    return (
+                      <div key={cat}>
+                        <div className="flex items-center gap-1.5 mb-2">
+                          <span className="text-base">{meta.icon}</span>
+                          <span className="text-sm font-semibold text-gray-300">{meta.label}</span>
+                          <span className="text-xs text-gray-500">({mats.length})</span>
+                        </div>
+                        <div className="flex flex-wrap gap-3">
+                          {mats.map((material) => {
+                            const rc = RARITY_COLORS[material.rarity as keyof typeof RARITY_COLORS] ?? RARITY_COLORS.common
+                            return (
+                              <div
+                                key={material.id}
+                                className="relative group flex flex-col items-center"
+                                title={`${material.name}\n${material.description}\nRarity: ${material.rarity}`}
+                              >
+                                {/* Circle badge */}
+                                <div className={`w-14 h-14 rounded-full border-2 ${rc.border} ${rc.bg} flex items-center justify-center relative transition-transform hover:scale-110`}>
+                                  <span className="text-base font-bold text-white">{material.quantity}</span>
+                                </div>
+                                {/* Name label */}
+                                <span className={`text-xs font-medium text-center mt-1 leading-tight max-w-[4rem] ${rc.text}`}>
+                                  {material.name.replace(/ \(.*\)/, '')}
+                                </span>
+                                {/* Hover actions */}
+                                <div className="absolute -top-1 -right-1 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                                  <button
+                                    onClick={() => { changeMaterialQuantity(material.id, -1); saveCharacter() }}
+                                    className="w-4 h-4 text-[10px] flex items-center justify-center bg-red-800 hover:bg-red-600 text-white rounded-full transition-colors"
+                                    title="−1"
+                                  >−</button>
+                                  <button
+                                    onClick={() => { changeMaterialQuantity(material.id, 1); saveCharacter() }}
+                                    className="w-4 h-4 text-[10px] flex items-center justify-center bg-green-800 hover:bg-green-600 text-white rounded-full transition-colors"
+                                    title="+1"
+                                  >+</button>
+                                  <button
+                                    onClick={() => handleSellMaterial(material.id)}
+                                    className="w-4 h-4 text-[10px] flex items-center justify-center bg-yellow-800 hover:bg-yellow-600 text-white rounded-full transition-colors"
+                                    title="Sell"
+                                  >$</button>
+                                </div>
+                              </div>
+                            )
+                          })}
                         </div>
                       </div>
-                    </div>
-                  )
-                })}
+                    )
+                  })}
+                </div>
               </div>
-            </div>
-          )}
+            )
+          })()}
 
           {/* Equipped Weapons */}
           {character.equipment.filter(item => isWeapon(item) && item.equipped === true).length > 0 && (
@@ -3844,6 +3886,10 @@ export function CharacterSheetPage() {
 
       {activeTab === 'work' && (
         <WorkTab character={character} />
+      )}
+
+      {activeTab === 'profession' && (
+        <ProfessionTab character={character} />
       )}
 
       {activeTab === 'loot' && (
