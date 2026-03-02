@@ -1591,6 +1591,70 @@ export function CharacterSheetPage() {
                 )}
               </div>
             </div>
+
+            {/* New Day / Daily Income */}
+            <div className="card bg-gray-800 border-gray-700 p-4">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-lg font-bold text-white">Daily Actions</h3>
+                {character.dailyIncome && (
+                  <span className="text-xs text-gray-400">
+                    {character.dailyIncome.professionName} — {character.dailyIncome.amount} {character.dailyIncome.currency === 'gold' ? 'GP' : character.dailyIncome.currency === 'silver' ? 'SP' : 'CP'}/day
+                  </span>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {!character.dailyIncome ? (
+                  <button
+                    onClick={() => setShowIncomeRoller(true)}
+                    className="px-4 py-2 text-sm bg-dnd-gold text-gray-900 rounded-lg hover:bg-yellow-500 transition-colors font-medium"
+                  >
+                    🎲 Roll Profession
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      if (!character.dailyIncome) return
+
+                      const earned: Partial<Currency> = {}
+                      if (character.dailyIncome.currency === 'gold') earned.gold = character.dailyIncome.amount
+                      else if (character.dailyIncome.currency === 'silver') earned.silver = character.dailyIncome.amount
+                      else if (character.dailyIncome.currency === 'copper') earned.copper = character.dailyIncome.amount
+
+                      const newCurrency = { ...character.currency }
+                      for (const [key, value] of Object.entries(earned)) {
+                        newCurrency[key as keyof Currency] += value
+                      }
+                      updateCurrency(newCurrency)
+
+                      if (character.foodRations > 0) {
+                        addFoodRations(-1)
+                      }
+
+                      saveCharacter()
+                    }}
+                    className="px-4 py-2 text-sm bg-blue-700 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
+                    title={`Collect ${character.dailyIncome.amount} ${character.dailyIncome.currency === 'gold' ? 'GP' : character.dailyIncome.currency === 'silver' ? 'SP' : 'CP'} from ${character.dailyIncome.professionName} (Consumes 1 food)`}
+                  >
+                    ☀️ New Day
+                  </button>
+                )}
+                {character.dailyIncome && dmModeEnabled && (
+                  <button
+                    onClick={() => setShowDMReroll(true)}
+                    className="px-3 py-2 text-xs bg-purple-700 text-white rounded-lg hover:bg-purple-600 transition-colors"
+                    title="DM: Reroll this character's profession"
+                  >
+                    🎲 Reroll
+                  </button>
+                )}
+              </div>
+              {character.dailyIncome && (
+                <div className="mt-3 flex gap-4 text-xs text-gray-400">
+                  <span>🍖 Rations: {character.foodRations} days</span>
+                  <span>💧 Water: {character.waterSupply} days</span>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Right Column - Proficiency Bonus & Skills */}

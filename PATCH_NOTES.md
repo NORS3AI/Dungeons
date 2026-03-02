@@ -1,5 +1,24 @@
 # Dungeons - Patch Notes
 
+## Version 0.4.17-alpha - March 2, 2026
+
+**Alpha Release Notice**: The New Day button is now on the Overview tab for quick daily income collection.
+
+### ✨ New Day on Overview Tab
+
+The **New Day** button has been added to the Overview tab in a new "Daily Actions" card, so you no longer need to switch to the Inventory tab to collect daily income.
+
+#### **What's in the Daily Actions card**
+- **New Day** button — collect daily income and consume 1 food ration
+- **Roll Profession** button — appears if no profession is set yet
+- **DM Reroll** button — visible when DM mode is enabled
+- Current profession name and income displayed at the top
+- Food ration and water supply counts shown at a glance
+
+**Why This Matters**: Players can start each in-game day from the Overview tab without hunting through other tabs.
+
+---
+
 ## Version 0.4.16-alpha - March 2, 2026
 
 **Alpha Release Notice**: New Profession tab brings character jobs to life with duties, perks, and full ship management for sailors.
