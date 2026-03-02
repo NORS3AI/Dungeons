@@ -14,6 +14,9 @@ export type {
   FightingStance,
   FightingStanceInfo,
   CraftingSkills,
+  SailorRole,
+  ShipDetails,
+  ProfessionData,
   Character,
 } from './character'
 

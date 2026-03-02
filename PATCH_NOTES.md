@@ -1,5 +1,35 @@
 # Dungeons - Patch Notes
 
+## Version 0.4.16-alpha - March 2, 2026
+
+**Alpha Release Notice**: New Profession tab brings character jobs to life with duties, perks, and full ship management for sailors.
+
+### ✨ Profession Tab
+
+A new **Profession** tab has been added after the Work tab on every character sheet. It makes each character's job more than just a daily income number.
+
+#### **What's on the tab**
+- Profession name and lifestyle category displayed at the top (e.g. "Sailor — Modest Lifestyle")
+- Daily income shown as a clear gold/silver/copper amount
+- **Duties & Responsibilities** — a list of what the job actually requires day to day
+- **Perks & Benefits** — proficiency bonuses, contacts, and advantages the job provides
+- Relevant skill chips for quick reference
+
+#### **Sailor & Ship Captain — Ship Management**
+Sailors and Ship Captains get an interactive **Ship Details** panel:
+- Role picker: **Captain** (own ship), **Crew Member** (another's ship), or **Navy Sailor**
+- Ship name, captain's name, hull points, armor class, speed, crew size, cannons, and cargo capacity
+- Live stat summary chips so key numbers are always visible
+- Notes field for ship history, modifications, and notable voyages
+- Changes save via a **Save Ship Details** button
+
+#### **Professions with full flavour data**
+Sailor, Ship Captain, Soldier, Merchant, Scholar, Physician, Craftsman, Priest, and Hunter each have hand-written duties and perks. All other professions show a sensible default.
+
+**Why This Matters**: Players can see what their job means in the world — not just how much coin they earn.
+
+---
+
 ## Version 0.4.15-alpha - March 1, 2026
 
 **Alpha Release Notice**: Languages chosen during character creation now display correctly on the character sheet.

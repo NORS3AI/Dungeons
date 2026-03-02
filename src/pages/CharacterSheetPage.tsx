@@ -40,6 +40,7 @@ import type { LootItem } from '../data/lootGenerator'
 import { RARITY_COLORS } from '../data/lootGenerator'
 import type { Spell } from '../types'
 import { WorkTab } from '../components/WorkTab'
+import { ProfessionTab } from '../components/ProfessionTab'
 import { getLanguageById } from '../data/languages'
 
 const ABILITY_NAMES: Record<Ability, string> = {
@@ -82,7 +83,7 @@ export function CharacterSheetPage() {
   const { characters, loadCharacter, currentCharacter, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, changeEquipmentQuantity, renameEquipment, setFightingStance, addEquipment, addMaterial, removeMaterial, changeMaterialQuantity, updateHitPoints, addSpell, removeSpell, saveCharacter, addFoodRations, addWaterSupply, addItemFeature, setAlignment, setAbilityScores, migrateCurrentCharacter, needsMigration, setLevelWithHP, shortRest, longRest, initializeResourcePools, initializeFeatureCharges, useFeatureCharge, spendResource, disenchantItem } = useCharacterStore()
   const { dmModeEnabled } = useSettingsStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
-  const [activeTab, setActiveTab] = useState<'main' | 'actions' | 'spells' | 'inventory' | 'features' | 'story' | 'work' | 'loot'>('main')
+  const [activeTab, setActiveTab] = useState<'main' | 'actions' | 'spells' | 'inventory' | 'features' | 'story' | 'work' | 'profession' | 'loot'>('main')
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
   const [showIncomeRoller, setShowIncomeRoller] = useState(false)
   const [showDMReroll, setShowDMReroll] = useState(false)
@@ -1146,6 +1147,7 @@ export function CharacterSheetPage() {
     { id: 'features', label: 'Features' },
     { id: 'story', label: 'Story' },
     { id: 'work', label: 'Work' },
+    { id: 'profession', label: 'Profession' },
     { id: 'loot', label: 'Loot Cache' },
   ] as const
 
@@ -3884,6 +3886,10 @@ export function CharacterSheetPage() {
 
       {activeTab === 'work' && (
         <WorkTab character={character} />
+      )}
+
+      {activeTab === 'profession' && (
+        <ProfessionTab character={character} />
       )}
 
       {activeTab === 'loot' && (
