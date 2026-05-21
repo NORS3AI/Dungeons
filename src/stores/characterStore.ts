@@ -18,6 +18,9 @@ import type {
   FeatureCharge,
   CraftingSkills,
   ProfessionData,
+  Skills,
+  SavingThrows,
+  ProficiencyLevel,
 } from '../types'
 import { DEFAULT_ABILITY_SCORES, EMPTY_CURRENCY, autoConvertCurrency } from '../types'
 import { migrateCharacter, needsMigration } from '../utils/characterMigration'
@@ -245,6 +248,11 @@ interface CharacterState {
   restoreResource: (poolId: string, amount: number) => void
   shortRest: () => void
   longRest: () => void
+
+  // DM Direct Editing
+  dmUpdateField: (updates: Partial<Pick<Character, 'armorClass' | 'speed' | 'initiative' | 'gender'>>) => void
+  dmUpdateSkill: (skillKey: keyof Skills, level: ProficiencyLevel) => void
+  dmUpdateSavingThrow: (ability: keyof SavingThrows, proficient: boolean) => void
 
   // Leveling
   levelUp: () => void
@@ -963,6 +971,43 @@ export const useCharacterStore = create<CharacterState>()(
             currentCharacter: {
               ...currentCharacter,
               fightingStance: stance,
+            },
+            history: addToHistory(history, currentCharacter),
+          })
+        },
+
+        // DM Direct Editing
+        dmUpdateField: (updates) => {
+          const { currentCharacter, history } = get()
+          if (!currentCharacter) return
+
+          set({
+            currentCharacter: { ...currentCharacter, ...updates },
+            history: addToHistory(history, currentCharacter),
+          })
+        },
+
+        dmUpdateSkill: (skillKey, level) => {
+          const { currentCharacter, history } = get()
+          if (!currentCharacter) return
+
+          set({
+            currentCharacter: {
+              ...currentCharacter,
+              skills: { ...currentCharacter.skills, [skillKey]: level },
+            },
+            history: addToHistory(history, currentCharacter),
+          })
+        },
+
+        dmUpdateSavingThrow: (ability, proficient) => {
+          const { currentCharacter, history } = get()
+          if (!currentCharacter) return
+
+          set({
+            currentCharacter: {
+              ...currentCharacter,
+              savingThrows: { ...currentCharacter.savingThrows, [ability]: proficient },
             },
             history: addToHistory(history, currentCharacter),
           })

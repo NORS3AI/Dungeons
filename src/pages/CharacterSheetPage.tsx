@@ -80,7 +80,7 @@ const SKILLS: { name: string; ability: Ability; key: SkillKey; refId: string }[]
 export function CharacterSheetPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { characters, loadCharacter, currentCharacter, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, changeEquipmentQuantity, renameEquipment, setFightingStance, addEquipment, addMaterial, removeMaterial, changeMaterialQuantity, updateHitPoints, addSpell, removeSpell, saveCharacter, addFoodRations, addWaterSupply, addItemFeature, setAlignment, setAbilityScores, migrateCurrentCharacter, needsMigration, setLevelWithHP, shortRest, longRest, initializeResourcePools, initializeFeatureCharges, useFeatureCharge, spendResource, disenchantItem } = useCharacterStore()
+  const { characters, loadCharacter, currentCharacter, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, changeEquipmentQuantity, renameEquipment, setFightingStance, addEquipment, addMaterial, removeMaterial, changeMaterialQuantity, updateHitPoints, addSpell, removeSpell, saveCharacter, addFoodRations, addWaterSupply, addItemFeature, setAlignment, setAbilityScores, migrateCurrentCharacter, needsMigration, setLevelWithHP, shortRest, longRest, initializeResourcePools, initializeFeatureCharges, useFeatureCharge, spendResource, disenchantItem, dmUpdateField, dmUpdateSkill, dmUpdateSavingThrow } = useCharacterStore()
   const { dmModeEnabled } = useSettingsStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
   const [activeTab, setActiveTab] = useState<'main' | 'actions' | 'spells' | 'inventory' | 'features' | 'story' | 'work' | 'profession' | 'loot'>('main')
@@ -1380,16 +1380,26 @@ export function CharacterSheetPage() {
               <h3 className="text-lg font-bold text-white mb-4">Saving Throws</h3>
               <div className="space-y-2">
                 {(Object.keys(ABILITY_NAMES) as Ability[]).map((ability) => {
-                  const isProficient = character.class?.savingThrows.includes(ability)
+                  const classProficient = character.class?.savingThrows.includes(ability)
+                  const isProficient = character.savingThrows[ability] || classProficient
                   const mod = getAbilityMod(ability) + (isProficient ? profBonus : 0)
                   return (
                     <div
                       key={ability}
-                      className="flex items-center justify-between py-1 px-2 rounded bg-gray-900/50"
+                      className={`flex items-center justify-between py-1 px-2 rounded bg-gray-900/50 ${dmModeEnabled ? 'cursor-pointer hover:bg-gray-900' : ''}`}
+                      onClick={() => {
+                        if (!dmModeEnabled) return
+                        dmUpdateSavingThrow(ability, !character.savingThrows[ability])
+                        saveCharacter()
+                      }}
+                      title={dmModeEnabled ? `DM: Toggle ${ABILITY_NAMES[ability]} save proficiency` : undefined}
                     >
                       <div className="flex items-center gap-2">
                         <span className={`w-2 h-2 rounded-full ${isProficient ? 'bg-dnd-gold' : 'bg-gray-600'}`} />
                         <span className="text-gray-300 text-sm">{ABILITY_NAMES[ability]}</span>
+                        {dmModeEnabled && (
+                          <span className="text-[10px] text-purple-400">(click)</span>
+                        )}
                       </div>
                       <span className="text-white font-medium">{formatMod(mod)}</span>
                     </div>
@@ -1410,12 +1420,24 @@ export function CharacterSheetPage() {
                   <QuickRefTooltip type="rule" id="armor-class">
                     <div className="text-xs text-gray-500 uppercase mb-1 cursor-pointer hover:text-gray-300">AC</div>
                   </QuickRefTooltip>
-                  <div className="text-2xl font-bold text-white">
-                    {calculateAC()}
-                    {character.conditions.includes('enraged') && (
-                      <span className="text-xs text-orange-400 ml-1">(-1)</span>
-                    )}
-                  </div>
+                  {dmModeEnabled ? (
+                    <input
+                      type="number"
+                      value={calculateAC()}
+                      onChange={(e) => {
+                        dmUpdateField({ armorClass: Number(e.target.value) })
+                        saveCharacter()
+                      }}
+                      className="w-full text-2xl font-bold text-white bg-transparent text-center border-b border-purple-500 focus:outline-none focus:border-purple-400"
+                    />
+                  ) : (
+                    <div className="text-2xl font-bold text-white">
+                      {calculateAC()}
+                      {character.conditions.includes('enraged') && (
+                        <span className="text-xs text-orange-400 ml-1">(-1)</span>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <div className="bg-gray-900 rounded-lg p-3 text-center border border-red-900/50">
                   <div className="text-xs text-gray-500 uppercase mb-1 flex items-center justify-center">
@@ -1435,9 +1457,21 @@ export function CharacterSheetPage() {
                   <QuickRefTooltip type="rule" id="speed">
                     <div className="text-xs text-gray-500 uppercase mb-1 cursor-pointer hover:text-gray-300">Speed</div>
                   </QuickRefTooltip>
-                  <div className="text-2xl font-bold text-white">
-                    {character.race?.speed || 30} ft
-                  </div>
+                  {dmModeEnabled ? (
+                    <input
+                      type="number"
+                      value={character.speed}
+                      onChange={(e) => {
+                        dmUpdateField({ speed: Number(e.target.value) })
+                        saveCharacter()
+                      }}
+                      className="w-full text-2xl font-bold text-white bg-transparent text-center border-b border-purple-500 focus:outline-none focus:border-purple-400"
+                    />
+                  ) : (
+                    <div className="text-2xl font-bold text-white">
+                      {character.race?.speed || 30} ft
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -1445,9 +1479,21 @@ export function CharacterSheetPage() {
                   <QuickRefTooltip type="rule" id="initiative">
                     <div className="text-xs text-gray-500 uppercase mb-1 cursor-pointer hover:text-gray-300">Initiative</div>
                   </QuickRefTooltip>
-                  <div className="text-xl font-bold text-white">
-                    {formatMod(getAbilityMod('dexterity'))}
-                  </div>
+                  {dmModeEnabled ? (
+                    <input
+                      type="number"
+                      value={character.initiative}
+                      onChange={(e) => {
+                        dmUpdateField({ initiative: Number(e.target.value) })
+                        saveCharacter()
+                      }}
+                      className="w-full text-xl font-bold text-white bg-transparent text-center border-b border-purple-500 focus:outline-none focus:border-purple-400"
+                    />
+                  ) : (
+                    <div className="text-xl font-bold text-white">
+                      {formatMod(getAbilityMod('dexterity'))}
+                    </div>
+                  )}
                 </div>
                 <div className="bg-gray-900 rounded-lg p-3 text-center border border-gray-700">
                   <QuickRefTooltip type="rule" id="hit-die">
@@ -1496,10 +1542,20 @@ export function CharacterSheetPage() {
                     </button>
                   </div>
                 </div>
-                {character.playerName && (
-                  <div className="flex justify-between">
+                {(character.playerName || dmModeEnabled) && (
+                  <div className="flex justify-between items-center">
                     <span className="text-gray-500">Player</span>
-                    <span className="text-gray-300">{character.playerName}</span>
+                    {dmModeEnabled ? (
+                      <input
+                        type="text"
+                        value={character.playerName}
+                        onChange={(e) => { updateCharacterDetails({ playerName: e.target.value }); saveCharacter() }}
+                        className="bg-transparent text-gray-300 text-right text-sm border-b border-purple-500 focus:outline-none focus:border-purple-400 w-32"
+                        placeholder="Player name"
+                      />
+                    ) : (
+                      <span className="text-gray-300">{character.playerName}</span>
+                    )}
                   </div>
                 )}
                 {character.dailyIncome && (
@@ -1508,34 +1564,91 @@ export function CharacterSheetPage() {
                     <span className="text-gray-300">{character.dailyIncome.professionName}</span>
                   </div>
                 )}
-                {character.nickname && (
-                  <div className="flex justify-between">
+                {(character.nickname || dmModeEnabled) && (
+                  <div className="flex justify-between items-center">
                     <span className="text-gray-500">Nickname</span>
-                    <span className="text-gray-300 italic">"{character.nickname}"</span>
+                    {dmModeEnabled ? (
+                      <input
+                        type="text"
+                        value={character.nickname ?? ''}
+                        onChange={(e) => { updateCharacterDetails({ nickname: e.target.value } as Parameters<typeof updateCharacterDetails>[0]); saveCharacter() }}
+                        className="bg-transparent text-gray-300 italic text-right text-sm border-b border-purple-500 focus:outline-none focus:border-purple-400 w-32"
+                        placeholder="Nickname"
+                      />
+                    ) : (
+                      <span className="text-gray-300 italic">"{character.nickname}"</span>
+                    )}
                   </div>
                 )}
-                {character.gender && (
-                  <div className="flex justify-between">
+                {(character.gender || dmModeEnabled) && (
+                  <div className="flex justify-between items-center">
                     <span className="text-gray-500">Gender</span>
-                    <span className="text-gray-300 capitalize">{character.gender}</span>
+                    {dmModeEnabled ? (
+                      <select
+                        value={character.gender ?? ''}
+                        onChange={(e) => {
+                          const val = e.target.value as 'male' | 'female' | 'other' | ''
+                          dmUpdateField({ gender: val || undefined } as Parameters<typeof dmUpdateField>[0])
+                          saveCharacter()
+                        }}
+                        className="bg-gray-900 text-gray-300 text-sm border border-purple-500 rounded px-2 py-0.5 focus:outline-none focus:border-purple-400"
+                      >
+                        <option value="">—</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                      </select>
+                    ) : (
+                      <span className="text-gray-300 capitalize">{character.gender}</span>
+                    )}
                   </div>
                 )}
-                {character.age && (
-                  <div className="flex justify-between">
+                {(character.age || dmModeEnabled) && (
+                  <div className="flex justify-between items-center">
                     <span className="text-gray-500">Age</span>
-                    <span className="text-gray-300">{character.age}</span>
+                    {dmModeEnabled ? (
+                      <input
+                        type="text"
+                        value={character.age}
+                        onChange={(e) => { updateCharacterDetails({ age: e.target.value }); saveCharacter() }}
+                        className="bg-transparent text-gray-300 text-right text-sm border-b border-purple-500 focus:outline-none focus:border-purple-400 w-20"
+                        placeholder="Age"
+                      />
+                    ) : (
+                      <span className="text-gray-300">{character.age}</span>
+                    )}
                   </div>
                 )}
-                {character.height && (
-                  <div className="flex justify-between">
+                {(character.height || dmModeEnabled) && (
+                  <div className="flex justify-between items-center">
                     <span className="text-gray-500">Height</span>
-                    <span className="text-gray-300">{character.height}</span>
+                    {dmModeEnabled ? (
+                      <input
+                        type="text"
+                        value={character.height}
+                        onChange={(e) => { updateCharacterDetails({ height: e.target.value }); saveCharacter() }}
+                        className="bg-transparent text-gray-300 text-right text-sm border-b border-purple-500 focus:outline-none focus:border-purple-400 w-20"
+                        placeholder="Height"
+                      />
+                    ) : (
+                      <span className="text-gray-300">{character.height}</span>
+                    )}
                   </div>
                 )}
-                {character.weight && (
-                  <div className="flex justify-between">
+                {(character.weight || dmModeEnabled) && (
+                  <div className="flex justify-between items-center">
                     <span className="text-gray-500">Weight</span>
-                    <span className="text-gray-300">{character.weight}</span>
+                    {dmModeEnabled ? (
+                      <input
+                        type="text"
+                        value={character.weight}
+                        onChange={(e) => { updateCharacterDetails({ weight: e.target.value }); saveCharacter() }}
+                        className="bg-transparent text-gray-300 text-right text-sm border-b border-purple-500 focus:outline-none focus:border-purple-400 w-20"
+                        placeholder="Weight"
+                      />
+                    ) : (
+                      <span className="text-gray-300">{character.weight}</span>
+                    )}
                   </div>
                 )}
                 {character.race?.vision && (
@@ -1665,31 +1778,69 @@ export function CharacterSheetPage() {
                 <div className="text-xs text-gray-500 uppercase mb-1 cursor-pointer hover:text-gray-300">Proficiency Bonus</div>
               </QuickRefTooltip>
               <div className="text-3xl font-bold text-dnd-gold">+{profBonus}</div>
+              {dmModeEnabled && (
+                <div className="mt-2 flex items-center justify-center gap-2">
+                  <span className="text-xs text-gray-500">Level</span>
+                  <input
+                    type="number"
+                    min={1}
+                    max={20}
+                    value={character.level}
+                    onChange={(e) => {
+                      const newLevel = Math.max(1, Math.min(20, Number(e.target.value)))
+                      setLevelWithHP(newLevel, character.hitPoints.maximum)
+                      saveCharacter()
+                    }}
+                    className="w-14 text-sm font-bold text-white bg-gray-900 text-center border-b border-purple-500 rounded px-1 py-0.5 focus:outline-none focus:border-purple-400"
+                  />
+                </div>
+              )}
             </div>
 
             {/* Skills */}
             <div className="card bg-gray-800 border-gray-700 p-4">
-              <h3 className="text-lg font-bold text-white mb-4">Skills</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-white">Skills</h3>
+                {dmModeEnabled && (
+                  <span className="text-[10px] text-purple-400">Click dot to cycle</span>
+                )}
+              </div>
               <div className="space-y-1 max-h-80 overflow-y-auto pr-2">
-                {SKILLS.map((skill) => (
-                  <div
-                    key={skill.key}
-                    className="flex items-center justify-between py-1 px-2 rounded bg-gray-900/50 hover:bg-gray-900"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full ${
-                        isSkillProficient(skill.key) ? 'bg-dnd-gold' : 'bg-gray-600'
-                      }`} />
-                      <QuickRefTooltip type="skill" id={skill.refId}>
-                        <span className="text-gray-300 text-sm">
-                          {skill.name}
-                        </span>
-                      </QuickRefTooltip>
-                      <span className="text-xs text-gray-600">({ABILITY_NAMES[skill.ability]})</span>
+                {SKILLS.map((skill) => {
+                  const profLevel = character.skills[skill.key]
+                  return (
+                    <div
+                      key={skill.key}
+                      className="flex items-center justify-between py-1 px-2 rounded bg-gray-900/50 hover:bg-gray-900"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`w-2 h-2 rounded-full ${
+                            profLevel === 'expertise' ? 'bg-purple-400' :
+                            isSkillProficient(skill.key) ? 'bg-dnd-gold' : 'bg-gray-600'
+                          } ${dmModeEnabled ? 'cursor-pointer ring-1 ring-transparent hover:ring-purple-500 w-3 h-3' : ''}`}
+                          onClick={() => {
+                            if (!dmModeEnabled) return
+                            const next = profLevel === 'none' ? 'proficient' : profLevel === 'proficient' ? 'expertise' : 'none'
+                            dmUpdateSkill(skill.key, next)
+                            saveCharacter()
+                          }}
+                          title={dmModeEnabled ? `DM: ${profLevel} → click to cycle (none → proficient → expertise)` : undefined}
+                        />
+                        <QuickRefTooltip type="skill" id={skill.refId}>
+                          <span className="text-gray-300 text-sm">
+                            {skill.name}
+                          </span>
+                        </QuickRefTooltip>
+                        <span className="text-xs text-gray-600">({ABILITY_NAMES[skill.ability]})</span>
+                        {profLevel === 'expertise' && (
+                          <span className="text-[10px] text-purple-400 font-medium">EXP</span>
+                        )}
+                      </div>
+                      <span className="text-white font-medium">{formatMod(getSkillMod(skill))}</span>
                     </div>
-                    <span className="text-white font-medium">{formatMod(getSkillMod(skill))}</span>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
           </div>
