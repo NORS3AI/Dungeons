@@ -190,6 +190,8 @@ export function CharacterSheetPage() {
   }
 
   const calculateAC = (): number => {
+    if (character.acOverride != null) return character.acOverride
+
     let baseAC = 10 + getAbilityMod('dexterity')
 
     // Check equipped armor
@@ -1421,15 +1423,29 @@ export function CharacterSheetPage() {
                     <div className="text-xs text-gray-500 uppercase mb-1 cursor-pointer hover:text-gray-300">AC</div>
                   </QuickRefTooltip>
                   {dmModeEnabled ? (
-                    <input
-                      type="number"
-                      value={calculateAC()}
-                      onChange={(e) => {
-                        dmUpdateField({ armorClass: Number(e.target.value) })
-                        saveCharacter()
-                      }}
-                      className="w-full text-2xl font-bold text-white bg-transparent text-center border-b border-purple-500 focus:outline-none focus:border-purple-400"
-                    />
+                    <div>
+                      <input
+                        type="number"
+                        value={calculateAC()}
+                        onChange={(e) => {
+                          dmUpdateField({ acOverride: Number(e.target.value) })
+                          saveCharacter()
+                        }}
+                        className="w-full text-2xl font-bold text-white bg-transparent text-center border-b border-purple-500 focus:outline-none focus:border-purple-400"
+                      />
+                      {character.acOverride != null && (
+                        <button
+                          onClick={() => {
+                            dmUpdateField({ acOverride: undefined } as Parameters<typeof dmUpdateField>[0])
+                            saveCharacter()
+                          }}
+                          className="text-[10px] text-purple-400 hover:text-purple-300 mt-1"
+                          title="Reset to auto-calculated AC"
+                        >
+                          reset
+                        </button>
+                      )}
+                    </div>
                   ) : (
                     <div className="text-2xl font-bold text-white">
                       {calculateAC()}

@@ -257,6 +257,7 @@ export interface Character {
   // Combat
   hitPoints: HitPoints
   armorClass: number
+  acOverride?: number // DM manual AC override — when set, bypasses calculated AC
   initiative: number
   speed: number
   deathSaves: DeathSaves
