@@ -250,7 +250,7 @@ interface CharacterState {
   longRest: () => void
 
   // DM Direct Editing
-  dmUpdateField: (updates: Partial<Pick<Character, 'armorClass' | 'speed' | 'initiative' | 'gender'>>) => void
+  dmUpdateField: (updates: Partial<Pick<Character, 'armorClass' | 'acOverride' | 'speed' | 'initiative' | 'gender'>>) => void
   dmUpdateSkill: (skillKey: keyof Skills, level: ProficiencyLevel) => void
   dmUpdateSavingThrow: (ability: keyof SavingThrows, proficient: boolean) => void
 
