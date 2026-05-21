@@ -1,5 +1,45 @@
 # Dungeons - Patch Notes
 
+## Version 0.4.18-alpha - May 21, 2026
+
+**Alpha Release Notice**: DM Mode now enables full inline editing of every stat on the Overview tab.
+
+### ✨ DM Inline Editing — Overview Tab
+
+When DM Mode is enabled, the Overview tab becomes fully editable. No more switching to separate editors for basic stat changes.
+
+#### **Combat Stats**
+- **AC** — editable number input (overrides calculated value)
+- **Speed** — editable number input
+- **Initiative** — editable number input (override DEX-based default)
+- **Hit Die** — displayed from class (read-only, change via class selection)
+
+#### **Proficiency Bonus / Level**
+- Level input appears below the proficiency bonus when DM Mode is on
+- Changing level immediately recalculates proficiency bonus
+
+#### **Saving Throws**
+- Click any saving throw row to toggle proficiency on/off
+- Purple "(click)" hint shown when DM Mode is active
+- Modifier recalculates instantly
+
+#### **Skills**
+- Click the proficiency dot to cycle: none → proficient → expertise → none
+- Expertise shows as a purple dot with "EXP" label
+- "Click dot to cycle" hint shown in header when DM Mode is active
+- Modifier recalculates instantly
+
+#### **Character Info**
+- **Player Name** — inline text input
+- **Nickname** — inline text input
+- **Gender** — dropdown selector (Male / Female / Other)
+- **Age, Height, Weight** — inline text inputs
+- Empty fields become visible when DM Mode is on so they can be filled in
+
+**Why This Matters**: DMs can now adjust any character stat on the fly during sessions without leaving the Overview tab.
+
+---
+
 ## Version 0.4.17-alpha - March 2, 2026
 
 **Alpha Release Notice**: The New Day button is now on the Overview tab for quick daily income collection.
