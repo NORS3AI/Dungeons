@@ -175,7 +175,7 @@ export interface CraftingSkills {
 /**
  * Sailor role within their seafaring profession
  */
-export type SailorRole = 'captain' | 'crew' | 'navy'
+export type SailorRole = 'admiral' | 'captain' | 'crew'
 
 /**
  * Ship details for sailor/captain characters
@@ -190,6 +190,10 @@ export interface ShipDetails {
   cargoCapacity: number // tons
   cannons: number
   crew: number         // required crew size
+  fleetCount: number   // Lord Admiral: number of ships in fleet
+  militiaCount: number // Lord Admiral: militia aboard main ship
+  standingMilitary: number // Lord Admiral: soldiers per ship
+  fleetCrew: number    // Lord Admiral: total crew across the fleet
   notes: string
 }
 

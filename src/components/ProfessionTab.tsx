@@ -192,6 +192,12 @@ const DEFAULT_FLAVOUR: ProfessionFlavour = {
 
 const SAILOR_ROLES: { id: SailorRole; label: string; icon: string; description: string }[] = [
   {
+    id: 'admiral',
+    label: 'Lord Admiral',
+    icon: '👑',
+    description: 'You command an entire fleet. Multiple ships sail under your banner, crewed by your sailors and soldiers.',
+  },
+  {
     id: 'captain',
     label: 'Captain',
     icon: '⚓',
@@ -202,12 +208,6 @@ const SAILOR_ROLES: { id: SailorRole; label: string; icon: string; description: 
     label: 'Crew Member',
     icon: '🪝',
     description: 'You sail under another captain. You earn your wage but someone else calls the shots.',
-  },
-  {
-    id: 'navy',
-    label: 'Navy Sailor',
-    icon: '🎖️',
-    description: 'You serve the crown or a military order. You have rank, discipline, and a chain of command.',
   },
 ]
 
@@ -221,7 +221,51 @@ const EMPTY_SHIP: ShipDetails = {
   cargoCapacity: 100,
   cannons: 0,
   crew: 20,
+  fleetCount: 0,
+  militiaCount: 0,
+  standingMilitary: 0,
+  fleetCrew: 0,
   notes: '',
+}
+
+function InfoPopup({ text, onClose }: { text: string; onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/60" />
+      <div
+        className="relative bg-gray-800 border border-gray-600 rounded-xl p-5 max-w-sm shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <p className="text-sm text-gray-200 leading-relaxed">{text}</p>
+        <button
+          onClick={onClose}
+          className="mt-4 px-4 py-1.5 bg-blue-700 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors w-full"
+        >
+          Got it
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function InfoLabel({ label, info }: { label: string; info: string }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <>
+      <label className="flex items-center gap-1 text-xs text-gray-400 mb-1">
+        {label}
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="w-4 h-4 rounded-full bg-blue-700/60 text-[10px] text-blue-200 font-bold leading-none hover:bg-blue-600 transition-colors"
+          title="More info"
+        >
+          ?
+        </button>
+      </label>
+      {open && <InfoPopup text={info} onClose={() => setOpen(false)} />}
+    </>
+  )
 }
 
 function ShipDetailsForm({
@@ -233,7 +277,7 @@ function ShipDetailsForm({
   role: SailorRole
   onChange: (updated: Partial<ShipDetails>) => void
 }) {
-  const isCapt = role === 'captain'
+  const isCapt = role === 'captain' || role === 'admiral'
   const captainLabel = isCapt ? 'Your Name (Captain)' : 'Captain\'s First Name'
 
   return (
@@ -357,6 +401,7 @@ function ShipDetailsForm({
           { label: 'Crew', value: ship.crew, color: 'bg-yellow-900/40 border-yellow-700/50 text-yellow-300' },
           { label: '⚙ Cargo', value: `${ship.cargoCapacity}t`, color: 'bg-purple-900/40 border-purple-700/50 text-purple-300' },
           ...(ship.cannons > 0 ? [{ label: '💣 Cannons', value: ship.cannons, color: 'bg-orange-900/40 border-orange-700/50 text-orange-300' }] : []),
+          ...(role === 'admiral' && ship.fleetCount > 0 ? [{ label: '⚓ Fleet', value: ship.fleetCount, color: 'bg-cyan-900/40 border-cyan-700/50 text-cyan-300' }] : []),
         ].map((chip) => (
           <span
             key={chip.label}
@@ -366,6 +411,69 @@ function ShipDetailsForm({
           </span>
         ))}
       </div>
+
+      {/* Lord Admiral — Fleet Fields */}
+      {role === 'admiral' && (
+        <div className="space-y-4 pt-2 border-t border-yellow-700/30">
+          <h4 className="text-sm font-bold text-yellow-400 uppercase tracking-wide flex items-center gap-2">
+            👑 Fleet Command
+          </h4>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <InfoLabel
+                label="Fleet Count"
+                info="This is the count of how many ships are in the Lord Admiral's fleet."
+              />
+              <input
+                type="number"
+                min={0}
+                value={ship.fleetCount}
+                onChange={(e) => onChange({ fleetCount: Number(e.target.value) })}
+                className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+              />
+            </div>
+            <div>
+              <InfoLabel
+                label="Militia Count"
+                info="This is the count of how many militia are on the main ship."
+              />
+              <input
+                type="number"
+                min={0}
+                value={ship.militiaCount}
+                onChange={(e) => onChange({ militiaCount: Number(e.target.value) })}
+                className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+              />
+            </div>
+            <div>
+              <InfoLabel
+                label="Standing Military"
+                info="This is the count of how many military soldiers stand on each of the ships. This is notwithstanding how many crew members are aboard the fleet."
+              />
+              <input
+                type="number"
+                min={0}
+                value={ship.standingMilitary}
+                onChange={(e) => onChange({ standingMilitary: Number(e.target.value) })}
+                className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+              />
+            </div>
+            <div>
+              <InfoLabel
+                label="Fleet Crew"
+                info="This is the count of the total number of crew members for the whole of the fleet."
+              />
+              <input
+                type="number"
+                min={0}
+                value={ship.fleetCrew}
+                onChange={(e) => onChange({ fleetCrew: Number(e.target.value) })}
+                className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Notes */}
       <div>
@@ -403,7 +511,10 @@ export function ProfessionTab({ character }: { character: Character }) {
 
   // Is this a maritime profession?
   const isMaritime = ['sailor', 'ship-captain'].includes(profId)
-  const sailorRole: SailorRole = professionData.sailorRole ?? (profId === 'ship-captain' ? 'captain' : 'crew')
+  const rawRole = professionData.sailorRole
+  const sailorRole: SailorRole = (rawRole === 'admiral' || rawRole === 'captain' || rawRole === 'crew')
+    ? rawRole
+    : (profId === 'ship-captain' ? 'captain' : 'crew')
   const ship: ShipDetails = professionData.ship ?? { ...EMPTY_SHIP }
 
   // Track unsaved ship changes locally so we don't save on every keystroke
