@@ -216,7 +216,7 @@ interface CharacterState {
   changeMaterialQuantity: (materialId: string, change: number) => void
   incrementCraftingSkill: (skill: keyof CraftingSkills, amount?: number) => void
   disenchantItem: (itemId: string) => void // Break down item into Magical Dust or Shards
-  setDailyIncome: (professionName: string, amount: number, currency: 'copper' | 'silver' | 'gold') => void
+  setDailyIncome: (professionName: string, amount: number, currency: 'copper' | 'silver' | 'gold' | 'platinum') => void
   setProfessionData: (data: Partial<ProfessionData>) => void
   setFightingStance: (stance: FightingStance) => void
 
@@ -937,7 +937,7 @@ export const useCharacterStore = create<CharacterState>()(
           })
         },
 
-        setDailyIncome: (professionName: string, amount: number, currency: 'copper' | 'silver' | 'gold') => {
+        setDailyIncome: (professionName: string, amount: number, currency: 'copper' | 'silver' | 'gold' | 'platinum') => {
           const { currentCharacter, history } = get()
           if (!currentCharacter) return
 

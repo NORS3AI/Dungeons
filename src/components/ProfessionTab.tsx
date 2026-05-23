@@ -1,22 +1,11 @@
 import { useState } from 'react'
 import type { Character, SailorRole, ShipDetails } from '../types'
 import { useCharacterStore } from '../stores/characterStore'
-import { ALL_PROFESSIONS, CATEGORY_INFO } from '../data/professions'
+import { ALL_PROFESSIONS, CATEGORY_INFO, PROFESSION_COST_LADDER, getProfessionByRoll, formatIncome, type Profession } from '../data/professions'
 
-// ------------------------------------------------------------------
-// Profession flavour data — traits, perks, duties per profession ID
-// ------------------------------------------------------------------
-
-interface ProfessionFlavour {
-  icon: string
-  duties: string[]
-  perks: string[]
-  skills: string[]
-}
-
-const PROFESSION_FLAVOUR: Record<string, ProfessionFlavour> = {
+// Sailor/Ship Captain flavour (not in PROFESSIONS data since they're handled specially)
+const SAILOR_FLAVOUR = {
   sailor: {
-    icon: '⚓',
     duties: [
       'Maintain rigging, sails, and hull integrity',
       'Stand watch and navigate by stars',
@@ -31,10 +20,8 @@ const PROFESSION_FLAVOUR: Record<string, ProfessionFlavour> = {
       'Free passage on most merchant vessels',
       'Network of sailors, dock-hands, and harbour masters',
     ],
-    skills: ['Athletics', 'Perception', 'Navigation', 'Knot-tying'],
   },
   'ship-captain': {
-    icon: '🚢',
     duties: [
       'Command the crew and set the ship\'s course',
       'Manage cargo manifests and trade agreements',
@@ -49,141 +36,12 @@ const PROFESSION_FLAVOUR: Record<string, ProfessionFlavour> = {
       'Established trade contacts in multiple ports',
       'Command of a fully crewed merchant or war vessel',
     ],
-    skills: ['Athletics', 'Perception', 'Persuasion', 'Navigation', 'Leadership'],
-  },
-  soldier: {
-    icon: '⚔️',
-    duties: [
-      'Patrol assigned routes and guard posts',
-      'Train daily with arms and formation drills',
-      'Obey orders from commanding officers',
-      'Maintain armour, weapons, and kit',
-      'Participate in campaigns and sieges',
-    ],
-    perks: [
-      'Proficiency with all martial weapons',
-      'Military rank — guards and soldiers show deference',
-      'Access to military supply depots and fortifications',
-      'Veteran\'s instinct — advantage on Initiative rolls',
-      'Brotherhood — fellow soldiers will vouch for you',
-    ],
-    skills: ['Athletics', 'Intimidation', 'Survival', 'History (military)'],
-  },
-  merchant: {
-    icon: '💰',
-    duties: [
-      'Source and purchase goods at competitive prices',
-      'Transport merchandise safely to market',
-      'Negotiate deals and manage supplier relationships',
-      'Keep accurate accounts and ledgers',
-      'Hire guards and staff as needed',
-    ],
-    perks: [
-      'Proficiency with merchant\'s scales and ledgers',
-      'Advantage on Insight to detect dishonest deals',
-      'Network of buyers, sellers, and money changers',
-      'Access to rare goods and black market contacts',
-      'Letters of credit accepted at major cities',
-    ],
-    skills: ['Persuasion', 'Insight', 'Deception', 'History (trade)'],
-  },
-  scholar: {
-    icon: '📚',
-    duties: [
-      'Research assigned topics and compile findings',
-      'Teach students or apprentices',
-      'Copy and preserve important texts',
-      'Advise nobles or institutions on matters of learning',
-      'Translate ancient languages and decipher documents',
-    ],
-    perks: [
-      'Access to university libraries and rare manuscripts',
-      'Advantage on History and Arcana checks',
-      'Scholarly correspondence network across the realm',
-      'Respected in educated circles — invitations to salons',
-      'Institutional backing for legitimate research',
-    ],
-    skills: ['History', 'Arcana', 'Investigation', 'Linguistics'],
-  },
-  physician: {
-    icon: '⚕️',
-    duties: [
-      'Diagnose and treat injuries and ailments',
-      'Prepare medicines, salves, and tinctures',
-      'Advise patients on diet, rest, and lifestyle',
-      'Perform surgery when necessary',
-      'Keep detailed patient records',
-    ],
-    perks: [
-      'Proficiency with healer\'s kit and herbalism kit',
-      'Advantage on Medicine checks',
-      'Access to rare medicinal ingredients',
-      'Clients in wealthy and noble circles',
-      'Legal authority to prescribe controlled substances',
-    ],
-    skills: ['Medicine', 'Nature', 'Perception', 'Alchemy'],
-  },
-  craftsman: {
-    icon: '🔨',
-    duties: [
-      'Produce goods to order and to standard',
-      'Maintain tools, forge, or workshop',
-      'Source quality raw materials',
-      'Train apprentices in the craft',
-      'Fulfil guild contracts and quotas',
-    ],
-    perks: [
-      'Proficiency with relevant artisan\'s tools',
-      'Advantage on checks to appraise crafted goods',
-      'Guild membership — legal protection and support',
-      'Wholesale pricing on materials',
-      'Reputation among buyers who seek quality work',
-    ],
-    skills: ['Relevant tool proficiency', 'History (craft)', 'Athletics'],
-  },
-  priest: {
-    icon: '🛐',
-    duties: [
-      'Lead religious ceremonies and rites',
-      'Counsel and comfort the faithful',
-      'Maintain the temple and its grounds',
-      'Collect tithes and manage temple finances',
-      'Carry out the will and edicts of the faith',
-    ],
-    perks: [
-      'Advantage on Religion checks',
-      'Shelter and aid at any temple of your faith',
-      'Access to divine spellcasting components',
-      'Moral authority over the faithful',
-      'Channel through temple communication network',
-    ],
-    skills: ['Religion', 'Persuasion', 'Medicine', 'Insight'],
-  },
-  hunter: {
-    icon: '🏹',
-    duties: [
-      'Track, stalk, and take game in the wilderness',
-      'Prepare and sell hides, meat, and trophies',
-      'Maintain traps, snares, and hunting gear',
-      'Know the territory and seasonal patterns',
-      'Cull dangerous animals threatening settlements',
-    ],
-    perks: [
-      'Proficiency with ranged weapons and hunting tools',
-      'Advantage on Survival checks in the wild',
-      'Favoured terrain — your hunting grounds',
-      'Contacts among trappers, fur traders, and rangers',
-      'Monster-hunting reputation if you tackle big prey',
-    ],
-    skills: ['Survival', 'Stealth', 'Perception', 'Nature'],
   },
 }
 
-const DEFAULT_FLAVOUR: ProfessionFlavour = {
-  icon: '🪙',
+const DEFAULT_FLAVOUR = {
   duties: ['Perform your trade faithfully each day', 'Maintain your reputation and contacts'],
   perks: ['Steady daily income', 'Professional network in your field'],
-  skills: ['Relevant profession skills'],
 }
 
 // ------------------------------------------------------------------
@@ -501,13 +359,17 @@ export function ProfessionTab({ character }: { character: Character }) {
   const income = character.dailyIncome
 
   // Find full profession record from data file
-  const profId = income
+  const profRecord = income
     ? ALL_PROFESSIONS.find(
         (p) => p.name.toLowerCase() === income.professionName.toLowerCase()
-      )?.id ?? ''
-    : ''
+      )
+    : null
+  const profId = profRecord?.id ?? ''
 
-  const flavour = PROFESSION_FLAVOUR[profId] ?? DEFAULT_FLAVOUR
+  // Use flavour from data file, fall back to sailor flavour or default
+  const flavour = profRecord?.flavour
+    ?? (SAILOR_FLAVOUR as Record<string, typeof DEFAULT_FLAVOUR>)[profId]
+    ?? DEFAULT_FLAVOUR
 
   // Is this a maritime profession?
   const isMaritime = ['sailor', 'ship-captain'].includes(profId)
@@ -556,7 +418,7 @@ export function ProfessionTab({ character }: { character: Character }) {
   ] : null
 
   const incomeStr = income
-    ? `${income.amount} ${income.currency === 'gold' ? 'GP' : income.currency === 'silver' ? 'SP' : 'CP'}/day`
+    ? `${income.amount} ${income.currency === 'platinum' ? 'PP' : income.currency === 'gold' ? 'GP' : income.currency === 'silver' ? 'SP' : 'CP'}/day`
     : null
 
   return (
@@ -565,7 +427,7 @@ export function ProfessionTab({ character }: { character: Character }) {
       <div className="bg-gray-800/60 rounded-xl p-5 border border-gray-700">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
-            <span className="text-4xl">{flavour.icon}</span>
+            <span className="text-4xl">💼</span>
             <div>
               <h2 className="text-2xl font-bold text-dnd-gold">{income.professionName}</h2>
               {categoryInfo && (
@@ -616,20 +478,6 @@ export function ProfessionTab({ character }: { character: Character }) {
           </ul>
         </div>
       </div>
-
-      {/* Relevant Skills */}
-      {flavour.skills.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {flavour.skills.map((skill) => (
-            <span
-              key={skill}
-              className="px-3 py-1 rounded-full bg-blue-900/30 border border-blue-700/40 text-blue-300 text-xs font-medium"
-            >
-              {skill}
-            </span>
-          ))}
-        </div>
-      )}
 
       {/* Maritime Section */}
       {isMaritime && (
@@ -682,10 +530,273 @@ export function ProfessionTab({ character }: { character: Character }) {
         </div>
       )}
 
+      {/* Additional Professions */}
+      <AdditionalProfessionSection character={character} />
+
       {/* Income reminder */}
       <div className="text-xs text-gray-500 text-center">
         Daily income is collected via the <span className="text-gray-400 font-medium">New Day</span> button on the Overview tab.
       </div>
+    </div>
+  )
+}
+
+// ------------------------------------------------------------------
+// Multi-profession purchase & roll UI
+// ------------------------------------------------------------------
+
+function AdditionalProfessionSection({ character }: { character: Character }) {
+  const { setProfessionData, updateCurrency, saveCharacter } = useCharacterStore()
+
+  const professionData = character.professionData ?? {}
+  const purchased = professionData.professionsPurchased ?? 0
+  const additionalProfessions = professionData.additionalProfessions ?? []
+  const canBuyMore = purchased < 10
+  const nextCost = canBuyMore ? PROFESSION_COST_LADDER[purchased] : null
+
+  const [showRoller, setShowRoller] = useState(false)
+  const [rolledProfession, setRolledProfession] = useState<Profession | null>(null)
+  const [rollResult, setRollResult] = useState<number | null>(null)
+  const [isRolling, setIsRolling] = useState(false)
+  const [confirmed, setConfirmed] = useState(false)
+
+  const playerGold = character.currency.gold
+
+  const handlePurchaseAndRoll = () => {
+    if (!nextCost || playerGold < nextCost) return
+    setShowRoller(true)
+    setRolledProfession(null)
+    setRollResult(null)
+    setConfirmed(false)
+  }
+
+  const handleRoll = () => {
+    if (isRolling) return
+    setIsRolling(true)
+    setRolledProfession(null)
+    setConfirmed(false)
+
+    let count = 0
+    const interval = setInterval(() => {
+      const d1 = Math.floor(Math.random() * 100) + 1
+      const d2 = Math.floor(Math.random() * 100) + 1
+      setRollResult(d1 + d2)
+      count++
+      if (count >= 15) {
+        clearInterval(interval)
+        const f1 = Math.floor(Math.random() * 100) + 1
+        const f2 = Math.floor(Math.random() * 100) + 1
+        const finalRoll = f1 + f2
+        setRollResult(finalRoll)
+        setRolledProfession(getProfessionByRoll(finalRoll))
+        setIsRolling(false)
+      }
+    }, 50)
+  }
+
+  const handleConfirmPurchase = () => {
+    if (!rolledProfession || !nextCost) return
+
+    // Deduct gold
+    const newGold = character.currency.gold - nextCost
+    updateCurrency({ gold: newGold })
+
+    // Add to additional professions
+    const newAdditional = [
+      ...additionalProfessions,
+      {
+        professionName: rolledProfession.name,
+        amount: rolledProfession.dailyIncome.amount,
+        currency: rolledProfession.dailyIncome.currency as 'copper' | 'silver' | 'gold' | 'platinum',
+      },
+    ]
+
+    setProfessionData({
+      additionalProfessions: newAdditional,
+      professionsPurchased: purchased + 1,
+    })
+
+    setConfirmed(true)
+    saveCharacter()
+  }
+
+  return (
+    <div className="bg-gray-800/40 rounded-xl p-5 border border-yellow-800/40 space-y-4">
+      <h3 className="text-sm font-bold text-dnd-gold uppercase tracking-wide flex items-center gap-2">
+        💼 Additional Professions
+      </h3>
+
+      <p className="text-xs text-gray-400">
+        Keep your current profession and pay gold to roll for another. You can hold up to 10 additional professions.
+        Each additional profession earns its own daily income when you press New Day.
+      </p>
+
+      {/* Current additional professions */}
+      {additionalProfessions.length > 0 && (
+        <div className="space-y-2">
+          {additionalProfessions.map((ap, i) => {
+            const match = ALL_PROFESSIONS.find(
+              (p) => p.name.toLowerCase() === ap.professionName.toLowerCase()
+            )
+            const catInfo = match ? CATEGORY_INFO[match.category] : null
+            const currLabel = ap.currency === 'platinum' ? 'PP' : ap.currency === 'gold' ? 'GP' : ap.currency === 'silver' ? 'SP' : 'CP'
+            return (
+              <div
+                key={i}
+                className="flex items-center justify-between bg-gray-900/60 rounded-lg px-3 py-2 border border-gray-700"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-500 font-mono w-5">#{i + 1}</span>
+                  <span className={`font-medium text-sm ${catInfo?.color ?? 'text-gray-300'}`}>
+                    {ap.professionName}
+                  </span>
+                  {catInfo && (
+                    <span className={`text-xs ${catInfo.color} opacity-60`}>
+                      ({catInfo.name})
+                    </span>
+                  )}
+                </div>
+                <span className="text-yellow-400 text-sm font-bold">
+                  {ap.amount} {currLabel}/day
+                </span>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {/* Cost ladder */}
+      <div className="flex flex-wrap gap-1.5">
+        {PROFESSION_COST_LADDER.map((cost, i) => (
+          <span
+            key={i}
+            className={`px-2 py-0.5 rounded text-xs font-mono border ${
+              i < purchased
+                ? 'bg-green-900/30 border-green-700/40 text-green-400 line-through'
+                : i === purchased
+                ? 'bg-yellow-900/40 border-yellow-600/60 text-yellow-300 font-bold'
+                : 'bg-gray-900/40 border-gray-700/40 text-gray-500'
+            }`}
+          >
+            {cost.toLocaleString()}g
+          </span>
+        ))}
+      </div>
+
+      {/* Purchase button */}
+      {canBuyMore && nextCost && (
+        <button
+          onClick={handlePurchaseAndRoll}
+          disabled={playerGold < nextCost}
+          className={`w-full py-3 rounded-lg font-bold text-sm transition-all ${
+            playerGold >= nextCost
+              ? 'bg-gradient-to-r from-yellow-700 to-amber-800 hover:from-yellow-600 hover:to-amber-700 text-white border border-yellow-500'
+              : 'bg-gray-800 text-gray-500 border border-gray-700 cursor-not-allowed'
+          }`}
+        >
+          {playerGold >= nextCost
+            ? `Roll for Additional Profession (${nextCost.toLocaleString()} GP)`
+            : `Need ${nextCost.toLocaleString()} GP (have ${playerGold.toLocaleString()} GP)`}
+        </button>
+      )}
+
+      {!canBuyMore && (
+        <div className="text-center text-xs text-gray-500 italic">
+          Maximum additional professions reached (10/10).
+        </div>
+      )}
+
+      {/* Roll modal */}
+      {showRoller && nextCost && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => { if (!isRolling) setShowRoller(false) }}>
+          <div
+            className="bg-gray-800 rounded-xl p-6 w-full max-w-lg border border-yellow-700 max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-yellow-400 text-lg">💼</span>
+              <h3 className="text-xl font-bold text-dnd-gold">Roll Additional Profession</h3>
+            </div>
+            <p className="text-sm text-gray-400 mb-4">
+              Cost: <span className="text-yellow-400 font-bold">{nextCost.toLocaleString()} GP</span>
+              {' '}&mdash; Purchase #{purchased + 1} of 10
+            </p>
+
+            <div className="bg-gray-900 rounded-lg p-4 mb-4">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-white font-medium">Roll 2d100</span>
+                <button
+                  onClick={handleRoll}
+                  disabled={isRolling || confirmed}
+                  className="px-4 py-2 bg-yellow-700 text-white rounded-lg font-medium hover:bg-yellow-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isRolling ? 'Rolling...' : rolledProfession && !confirmed ? 'Reroll' : confirmed ? 'Done' : 'Roll 2d100'}
+                </button>
+              </div>
+              {rollResult !== null && (
+                <div className="text-center">
+                  <div className="text-4xl font-bold text-yellow-300 mb-2">{rollResult}</div>
+                  {rolledProfession && !isRolling && (
+                    <div className="text-white">
+                      <span className={CATEGORY_INFO[rolledProfession.category].color}>
+                        {rolledProfession.name}
+                      </span>
+                      <span className="text-gray-400 ml-2">
+                        ({formatIncome(rolledProfession.dailyIncome)}/day)
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {rolledProfession && !isRolling && (
+              <div className="bg-gray-900 rounded-lg p-4 mb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className={`text-lg font-bold ${CATEGORY_INFO[rolledProfession.category].color}`}>
+                    {rolledProfession.name}
+                  </h4>
+                  <span className="text-dnd-gold font-bold">
+                    {formatIncome(rolledProfession.dailyIncome)}/day
+                  </span>
+                </div>
+                <p className="text-gray-400 text-sm mb-2">{rolledProfession.description}</p>
+                <div className="text-sm">
+                  <span className="text-gray-500">Lifestyle: </span>
+                  <span className={CATEGORY_INFO[rolledProfession.category].color}>
+                    {CATEGORY_INFO[rolledProfession.category].name}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {confirmed && (
+              <div className="bg-green-900/30 border border-green-600 rounded-lg p-3 mb-4 text-center">
+                <p className="text-green-400 font-medium text-sm">
+                  Added {rolledProfession?.name}! Spent {nextCost.toLocaleString()} GP.
+                </p>
+              </div>
+            )}
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowRoller(false)}
+                className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+              >
+                {confirmed ? 'Done' : 'Cancel'}
+              </button>
+              {rolledProfession && !isRolling && !confirmed && (
+                <button
+                  onClick={handleConfirmPurchase}
+                  className="flex-1 px-4 py-2 bg-green-700 text-white rounded-lg font-medium hover:bg-green-600 transition-colors"
+                >
+                  Confirm &amp; Pay {nextCost.toLocaleString()} GP
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

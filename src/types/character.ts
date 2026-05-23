@@ -200,10 +200,19 @@ export interface ShipDetails {
 /**
  * Profession-specific extra data (varies by profession type)
  */
+export interface AdditionalProfession {
+  professionName: string
+  amount: number
+  currency: 'copper' | 'silver' | 'gold' | 'platinum'
+}
+
 export interface ProfessionData {
   // Sailor / Ship Captain
   sailorRole?: SailorRole
   ship?: ShipDetails
+  // Multi-profession system
+  additionalProfessions?: AdditionalProfession[]
+  professionsPurchased?: number // 0-10, how many times they've bought extra professions
 }
 
 /**
@@ -292,7 +301,7 @@ export interface Character {
   dailyIncome?: {
     professionName: string
     amount: number
-    currency: 'copper' | 'silver' | 'gold'
+    currency: 'copper' | 'silver' | 'gold' | 'platinum'
   }
 
   // Crafting (Work tab)
