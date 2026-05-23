@@ -1,5 +1,31 @@
 # Dungeons - Patch Notes
 
+## Version 0.4.19-alpha - May 22, 2026
+
+**Alpha Release Notice**: Sailor profession now features the Lord Admiral role with full fleet command fields.
+
+### ✨ Lord Admiral Role — Fleet Command
+
+The Sailor role picker has been updated: **Navy Sailor** has been removed and **Lord Admiral** has been added as the top-tier maritime role.
+
+#### **Lord Admiral**
+A Lord Admiral commands an entire fleet. They get all the ship fields a Captain has, plus four additional fleet management fields:
+- **Fleet Count** — number of ships in the fleet (tap ? for info)
+- **Militia Count** — militia aboard the main ship (tap ? for info)
+- **Standing Military** — soldiers stationed on each ship (tap ? for info)
+- **Fleet Crew** — total crew across the whole fleet (tap ? for info)
+
+Each field has a clickable **?** info button that opens a popup explaining what it tracks.
+
+#### **Updated Role Options**
+1. **Lord Admiral** — Commands a fleet of multiple ships
+2. **Captain** — Owns and commands a single vessel
+3. **Crew Member** — Serves aboard another's ship
+
+**Why This Matters**: Players who grow their maritime power can now track their full fleet — ships, soldiers, militia, and crew — all in one place.
+
+---
+
 ## Version 0.4.18-alpha - May 21, 2026
 
 **Alpha Release Notice**: DM Mode now enables full inline editing of every stat on the Overview tab.
