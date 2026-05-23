@@ -1,5 +1,35 @@
 # Dungeons - Patch Notes
 
+## Version 0.4.20-alpha - May 23, 2026
+
+**Alpha Release Notice**: The Actions tab now opens with a Daily Actions section — eat, drink, roll ocean weather, and change professions all in one place.
+
+### ✨ Daily Actions — Actions Tab
+
+A new **Daily Actions** sub-header sits at the top of the Actions tab, grouping all once-per-day actions together.
+
+#### **Eat Rations**
+Consume 1 day of food rations. Shows remaining days. Disabled when empty.
+
+#### **Drink Water**
+Consume 1 day of water supply. Shows remaining days. Disabled when empty.
+
+#### **Ocean Weather (d20)**
+Roll the Daily Ocean Weather Table each morning. The d20 animates during the roll, then displays the result with colour-coded severity:
+- **Green** — fair weather (clear skies, fair wind)
+- **Blue** — moderate conditions (fog, rain, chop)
+- **Orange** — dangerous (rough seas, thunderstorms)
+- **Red** — catastrophic (hurricane, waterspouts, The Dead Sky)
+
+Full 20-entry weather table from calm seas to supernatural dread.
+
+#### **Change Profession**
+Opens the d100 profession roller so a player can switch careers mid-campaign. Shows current profession if one is set.
+
+**Why This Matters**: Players can handle all their morning-of-the-day bookkeeping from a single row of buttons before diving into combat actions.
+
+---
+
 ## Version 0.4.19-alpha - May 22, 2026
 
 **Alpha Release Notice**: Sailor profession now features the Lord Admiral role with full fleet command fields.

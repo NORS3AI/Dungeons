@@ -122,6 +122,8 @@ export function CharacterSheetPage() {
   // Disenchant notification
   const [disenchantNotif, setDisenchantNotif] = useState<{ itemName: string; received: string; isShards: boolean } | null>(null)
   const disenchantNotifTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [weatherResult, setWeatherResult] = useState<{ roll: number; text: string } | null>(null)
+  const [weatherRolling, setWeatherRolling] = useState(false)
   // Collapsible section state for inventory
   const [showBagsSection, setShowBagsSection] = useState(false)
   const [showArmorAddons, setShowArmorAddons] = useState(false)
@@ -3066,6 +3068,152 @@ export function CharacterSheetPage() {
             <p className="text-sm sm:text-base text-gray-300">
               All your available actions, attacks, spells, and consumables in one place. Perfect for quick reference during combat!
             </p>
+          </div>
+
+          {/* Daily Actions */}
+          <div className="card bg-gradient-to-br from-amber-900/30 to-orange-900/30 border-2 border-amber-600 p-4 sm:p-6">
+            <h3 className="text-xl sm:text-2xl font-bold text-amber-400 mb-3 sm:mb-4">☀️ Daily Actions</h3>
+            <p className="text-sm text-gray-300 mb-4">
+              Once-per-day actions. Eat, drink, check the weather, or change your profession.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+              {/* Eat */}
+              <button
+                onClick={() => {
+                  if (character.foodRations > 0) {
+                    addFoodRations(-1)
+                    saveCharacter()
+                  }
+                }}
+                disabled={character.foodRations <= 0}
+                className={`p-4 rounded-lg border-2 transition-all transform hover:scale-105 active:scale-95 text-left ${
+                  character.foodRations > 0
+                    ? 'bg-gradient-to-br from-green-700 to-green-900 border-green-500 hover:from-green-600 hover:to-green-800'
+                    : 'bg-gray-800/50 border-gray-700 opacity-50 cursor-not-allowed'
+                }`}
+              >
+                <div className="text-3xl mb-1">🍖</div>
+                <div className="font-bold text-white text-sm">Eat Rations</div>
+                <div className="text-xs text-green-200 mt-1">{character.foodRations} days remaining</div>
+              </button>
+
+              {/* Drink */}
+              <button
+                onClick={() => {
+                  if (character.waterSupply > 0) {
+                    addWaterSupply(-1)
+                    saveCharacter()
+                  }
+                }}
+                disabled={character.waterSupply <= 0}
+                className={`p-4 rounded-lg border-2 transition-all transform hover:scale-105 active:scale-95 text-left ${
+                  character.waterSupply > 0
+                    ? 'bg-gradient-to-br from-teal-700 to-teal-900 border-teal-500 hover:from-teal-600 hover:to-teal-800'
+                    : 'bg-gray-800/50 border-gray-700 opacity-50 cursor-not-allowed'
+                }`}
+              >
+                <div className="text-3xl mb-1">💧</div>
+                <div className="font-bold text-white text-sm">Drink Water</div>
+                <div className="text-xs text-teal-200 mt-1">{character.waterSupply} days remaining</div>
+              </button>
+
+              {/* Ocean Weather */}
+              <button
+                onClick={() => {
+                  setWeatherRolling(true)
+                  setWeatherResult(null)
+                  let ticks = 0
+                  const interval = setInterval(() => {
+                    ticks++
+                    setWeatherResult({ roll: Math.floor(Math.random() * 20) + 1, text: '' })
+                    if (ticks >= 12) {
+                      clearInterval(interval)
+                      const finalRoll = Math.floor(Math.random() * 20) + 1
+                      const OCEAN_WEATHER: Record<number, string> = {
+                        1: 'Clear skies. No penalties. Crew morale lifts.',
+                        2: 'Thick fog. Visibility 60 ft. Navigation and Perception at disadvantage.',
+                        3: 'Clear skies, light cloud. No penalties. Good day for repairs or drills.',
+                        4: 'Stiff crosswind. Ship speed -5 ft. Deck ranged attacks at disadvantage.',
+                        5: 'Thunderstorm. Perception at disadvantage. DC 12 for deck tasks.',
+                        6: 'Glassy calm, no wind. Half speed. Crew gets superstitious.',
+                        7: 'Hazy. Long-range Perception at disadvantage. Navigation +2 DC.',
+                        8: 'Light rain and chop. Deck slick, DC 10 Acrobatics or fall prone.',
+                        9: 'Clear skies, high heat. DC 12 Con check or exhaustion by nightfall.',
+                        10: 'Brisk fair wind. Ship speed +10 ft. Morale high.',
+                        11: 'Rolling swells. DC 13 for precise deck work. Cannon fire at disadvantage.',
+                        12: 'Overcast and cold. No penalties. Grim mood.',
+                        13: 'Squall line. Ship takes 2d6 damage unless DC 14 crew check.',
+                        14: 'Drizzle and mist. Visibility 120 ft. Minor Perception penalty.',
+                        15: 'Rough seas. Ship takes 2d8 damage unless DC 14 check. Deck checks at disadvantage.',
+                        16: 'Thunderstorm with lightning. Roll 1d6 hourly, on a 1 a strike hits for 3d10 lightning.',
+                        17: 'Heavy fog bank. Visibility 30 ft. Navigation near blind. Ambush weather.',
+                        18: 'Hurricane/typhoon. Ship takes 6d10 damage, DC 16 checks. Deck = DC 15 Str save or overboard.',
+                        19: 'Waterspouts. Navigate between them, DC 15 checks. Direct hit 5d10 damage, can dismast.',
+                        20: 'The Dead Sky. Unnatural windless stillness. Morale drops. Something is coming.',
+                      }
+                      setWeatherResult({ roll: finalRoll, text: OCEAN_WEATHER[finalRoll] })
+                      setWeatherRolling(false)
+                    }
+                  }, 60)
+                }}
+                disabled={weatherRolling}
+                className="p-4 bg-gradient-to-br from-sky-700 to-sky-900 hover:from-sky-600 hover:to-sky-800 border-2 border-sky-500 rounded-lg transition-all transform hover:scale-105 active:scale-95 text-left"
+              >
+                <div className="text-3xl mb-1">🌊</div>
+                <div className="font-bold text-white text-sm">Ocean Weather</div>
+                <div className="text-xs text-sky-200 mt-1">Roll d20 for today's weather</div>
+              </button>
+
+              {/* Change Profession */}
+              <button
+                onClick={() => setShowIncomeRoller(true)}
+                className="p-4 bg-gradient-to-br from-yellow-700 to-amber-900 hover:from-yellow-600 hover:to-amber-800 border-2 border-yellow-500 rounded-lg transition-all transform hover:scale-105 active:scale-95 text-left"
+              >
+                <div className="text-3xl mb-1">💼</div>
+                <div className="font-bold text-white text-sm">
+                  {character.dailyIncome ? 'Change Profession' : 'Roll Profession'}
+                </div>
+                <div className="text-xs text-yellow-200 mt-1">
+                  {character.dailyIncome
+                    ? `Currently: ${character.dailyIncome.professionName}`
+                    : 'Roll d100 for a profession'}
+                </div>
+              </button>
+            </div>
+
+            {/* Weather Result */}
+            {weatherResult && weatherResult.text && (
+              <div className={`mt-4 p-4 rounded-lg border-2 ${
+                weatherResult.roll <= 3 || weatherResult.roll === 10 || weatherResult.roll === 12
+                  ? 'bg-green-900/30 border-green-600'
+                  : weatherResult.roll >= 18
+                  ? 'bg-red-900/30 border-red-600'
+                  : weatherResult.roll >= 15
+                  ? 'bg-orange-900/30 border-orange-600'
+                  : 'bg-sky-900/30 border-sky-600'
+              }`}>
+                <div className="flex items-start gap-3">
+                  <div className="text-2xl font-bold text-white bg-gray-900 rounded-lg w-10 h-10 flex items-center justify-center shrink-0 border border-gray-600">
+                    {weatherResult.roll}
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-400 uppercase tracking-wide mb-1">Daily Ocean Weather (d20)</div>
+                    <p className="text-sm text-gray-200 leading-relaxed">{weatherResult.text}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+            {weatherRolling && (
+              <div className="mt-4 p-4 rounded-lg border-2 bg-sky-900/30 border-sky-600 animate-pulse">
+                <div className="flex items-center gap-3">
+                  <div className="text-2xl font-bold text-white bg-gray-900 rounded-lg w-10 h-10 flex items-center justify-center shrink-0 border border-gray-600">
+                    {weatherResult?.roll ?? '?'}
+                  </div>
+                  <span className="text-sky-300 font-medium">Rolling for weather...</span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Rest System */}
