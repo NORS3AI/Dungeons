@@ -25,7 +25,7 @@ export interface Profession {
 
 // Cost ladder for purchasing additional professions (up to 10)
 export const PROFESSION_COST_LADDER = [
-  1_000, 3_000, 5_000, 7_000, 10_000, 20_000, 30_000, 50_000, 75_000, 100_000,
+  100, 300, 500, 700, 1_000, 2_000, 3_000, 5_000, 7_500, 10_000,
 ] as const
 
 // =====================================================================
