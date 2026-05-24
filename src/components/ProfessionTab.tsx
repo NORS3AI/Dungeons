@@ -634,10 +634,10 @@ function AdditionalProfessionSection({ character }: { character: Character }) {
   const [isRolling, setIsRolling] = useState(false)
   const [confirmed, setConfirmed] = useState(false)
 
-  const playerGold = character.currency.gold
+  const playerGoldEquivalent = character.currency.gold + (character.currency.platinum * 100)
 
   const handlePurchaseAndRoll = () => {
-    if (!nextCost || playerGold < nextCost) return
+    if (!nextCost || playerGoldEquivalent < nextCost) return
     setShowRoller(true)
     setRolledProfession(null)
     setRollResult(null)
@@ -671,9 +671,20 @@ function AdditionalProfessionSection({ character }: { character: Character }) {
   const handleConfirmPurchase = () => {
     if (!rolledProfession || !nextCost) return
 
-    // Deduct gold
-    const newGold = character.currency.gold - nextCost
-    updateCurrency({ gold: newGold })
+    // Deduct cost: spend gold first, convert platinum if needed
+    let remaining = nextCost
+    let newGold = character.currency.gold
+    let newPlatinum = character.currency.platinum
+    if (newGold >= remaining) {
+      newGold -= remaining
+    } else {
+      remaining -= newGold
+      newGold = 0
+      const ppNeeded = Math.ceil(remaining / 100)
+      newPlatinum -= ppNeeded
+      newGold += (ppNeeded * 100) - remaining
+    }
+    updateCurrency({ gold: newGold, platinum: newPlatinum })
 
     // Add to additional professions
     const newAdditional = [
@@ -761,16 +772,16 @@ function AdditionalProfessionSection({ character }: { character: Character }) {
       {canBuyMore && nextCost && (
         <button
           onClick={handlePurchaseAndRoll}
-          disabled={playerGold < nextCost}
+          disabled={playerGoldEquivalent < nextCost}
           className={`w-full py-3 rounded-lg font-bold text-sm transition-all ${
-            playerGold >= nextCost
+            playerGoldEquivalent >= nextCost
               ? 'bg-gradient-to-r from-yellow-700 to-amber-800 hover:from-yellow-600 hover:to-amber-700 text-white border border-yellow-500'
               : 'bg-gray-800 text-gray-500 border border-gray-700 cursor-not-allowed'
           }`}
         >
-          {playerGold >= nextCost
+          {playerGoldEquivalent >= nextCost
             ? `Roll for Additional Profession (${nextCost.toLocaleString()} GP)`
-            : `Need ${nextCost.toLocaleString()} GP (have ${playerGold.toLocaleString()} GP)`}
+            : `Need ${nextCost.toLocaleString()} GP (have ${playerGoldEquivalent.toLocaleString()} GP equiv.)`}
         </button>
       )}
 
