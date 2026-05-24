@@ -20,7 +20,7 @@ import {
   RANGER,
   SORCERER,
 } from '../types'
-import { CATEGORY_INFO, formatIncome, getProfessionByRoll, type Profession } from '../data/professions'
+import { ALL_PROFESSIONS, CATEGORY_INFO, formatIncome, getProfessionByRoll, type Profession } from '../data/professions'
 import { exportCharacterToJSON, exportCharacterToPDF } from '../utils/characterIO'
 import { QuickRefTooltip } from '../components/QuickRefTooltip'
 import { SPELLS } from '../data/references/spells'
@@ -3074,6 +3074,68 @@ export function CharacterSheetPage() {
               <p className="text-gray-300 whitespace-pre-wrap">{character.backstory}</p>
             </div>
           )}
+
+          {/* Profession Perks — collected from primary + additional professions */}
+          {character.dailyIncome && (() => {
+            const ownedNames: string[] = [character.dailyIncome!.professionName]
+            for (const ap of (character.professionData?.additionalProfessions ?? [])) {
+              ownedNames.push(ap.professionName)
+            }
+            const ownedProfs = ownedNames
+              .map((n) => ALL_PROFESSIONS.find((p) => p.name.toLowerCase() === n.toLowerCase()))
+              .filter((p): p is Profession => p != null)
+
+            const allPerks: { perk: string; source: string; color: string }[] = []
+            const allDuties: { duty: string; source: string; color: string }[] = []
+            for (const prof of ownedProfs) {
+              const catInfo = CATEGORY_INFO[prof.category]
+              if (prof.flavour) {
+                for (const perk of prof.flavour.perks) {
+                  allPerks.push({ perk, source: prof.name, color: catInfo.color })
+                }
+                for (const duty of prof.flavour.duties) {
+                  allDuties.push({ duty, source: prof.name, color: catInfo.color })
+                }
+              }
+            }
+
+            if (allPerks.length === 0) return null
+
+            return (
+              <div className="card bg-gray-800 border-gray-700 p-4">
+                <h3 className="text-lg font-bold text-white mb-4">Profession Abilities & Perks</h3>
+                <div className="space-y-4">
+                  {/* Perks at a glance */}
+                  <div>
+                    <h4 className="text-sm font-bold text-green-400 uppercase tracking-wide mb-2">Perks & Benefits</h4>
+                    <div className="space-y-1.5">
+                      {allPerks.map((item, i) => (
+                        <div key={i} className="flex items-start gap-2 text-sm">
+                          <span className="text-green-500 shrink-0 mt-0.5">✓</span>
+                          <span className="text-gray-300">{item.perk}</span>
+                          <span className={`text-xs shrink-0 opacity-60 ${item.color}`}>({item.source})</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Duties at a glance */}
+                  <div>
+                    <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wide mb-2">Duties & Responsibilities</h4>
+                    <div className="space-y-1.5">
+                      {allDuties.map((item, i) => (
+                        <div key={i} className="flex items-start gap-2 text-sm">
+                          <span className="text-gray-600 shrink-0 mt-0.5">•</span>
+                          <span className="text-gray-400">{item.duty}</span>
+                          <span className={`text-xs shrink-0 opacity-60 ${item.color}`}>({item.source})</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )
+          })()}
         </div>
       )}
 

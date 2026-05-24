@@ -210,6 +210,9 @@ export interface ProfessionData {
   // Sailor / Ship Captain
   sailorRole?: SailorRole
   ship?: ShipDetails
+  // Sub-profession specialisation
+  subProfessionId?: string
+  subProfessionFields?: Record<string, string | number>
   // Multi-profession system
   additionalProfessions?: AdditionalProfession[]
   professionsPurchased?: number // 0-10, how many times they've bought extra professions

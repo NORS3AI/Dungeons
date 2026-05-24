@@ -1,5 +1,74 @@
 # Dungeons - Patch Notes
 
+## Version 0.4.25-alpha - May 24, 2026
+
+**Alpha Release Notice**: Major multi-profession overhaul — pay-then-roll with no cancelling, duplicate blocking, DM delete, profession detail popups, collapsible detail view, total daily income display, and profession perks on the Features tab.
+
+### Multi-Profession Overhaul
+
+Complete rework of the additional profession system with several new mechanics and UI improvements.
+
+#### **Pay-Then-Roll (No Cancel)**
+- Gold is deducted **immediately** when you click "Roll for Additional Profession"
+- The roll happens automatically — no separate "Roll" button
+- What you get is what you get. No rerolling, no cancelling
+- Only a DM can remove a profession using DM Tools
+
+#### **Duplicate Profession Blocking**
+- You can never roll a profession you already have (primary or additional)
+- The system automatically re-rolls up to 200 times to find a unique profession
+
+#### **DM Delete Toggle**
+- When DM mode is enabled, each additional profession shows a red ✕ button
+- Removing a profession does NOT refund the gold spent
+
+#### **Profession Detail Popups**
+- Click any additional profession name to see a full popup with description, duties, perks, and income tier
+- Works for all 93 professions
+
+#### **Collapsible Multi-Profession Details**
+- New "Show Profession Details" toggle below the profession list
+- Expands to show full information for every additional profession including all duties and perks
+
+#### **Total Daily Income Display**
+- When you have additional professions, the header now shows total daily income across all professions
+- Aggregated into gold-equivalent for easy reading
+
+### Features Tab: Profession Perks
+
+The Features tab now includes a **Profession Abilities & Perks** section that categorises all perks and duties from your primary and additional professions in a single at-a-glance list. Each entry shows which profession it comes from.
+
+### Fix: Sub-Profession Key Mismatch
+
+Fixed `washer` → `washerwoman` key in the sub-professions registry so the Washer profession correctly shows its specialisation options.
+
+**Why This Matters**: The profession system now feels like a real commitment — you pay your gold, roll the dice, and live with what fate gives you. The DM retains full control to fix mistakes or adjust for story purposes.
+
+---
+
+## Version 0.4.24-alpha - May 24, 2026
+
+**Alpha Release Notice**: Sub-profession specialisation system — every profession now supports unique role variants with custom detail fields.
+
+### ✨ Sub-Profession Specialisations
+
+Every profession can now have specialised sub-roles. For example, an Outcast can specialise as an Exile or Hermit, each with unique detail fields to track (bounty, former homeland, years in solitude, etc.).
+
+#### **How It Works**
+- When you have a profession with available specialisations, a new **Specialisation** section appears on the Profession tab
+- Pick a sub-role from the card grid to see its description and editable fields
+- Fields include text inputs (names, locations) and number inputs (gold amounts, counts)
+- Your selection and field values are saved per-character
+
+#### **Coverage**
+- **189 sub-professions** across **40 professions** from every lifestyle tier
+- Includes specialisations for Wretched (Exile, Hermit, Cutpurse), Poverty (Rat Catcher variants), Poor (Fisherman types), Modest (Sailor, Soldier, Cook roles), Comfortable (Innkeeper, Merchant, Scholar types), Wealthy (Physician, Court Wizard, Admiral variants), Land Owner (Knight, Baron, Duke roles), and Nobility (Prince, King, Emperor variants)
+- Each sub-profession has 2-4 custom detail fields specific to that role
+
+**Why This Matters**: Adds deep character flavour without complexity — pick a specialisation and fill in the details that matter to your character's story.
+
+---
+
 ## Version 0.4.23-alpha - May 24, 2026
 
 **Alpha Release Notice**: Major Work tab and crafting fixes — enchanting overhaul with 10 new materials and 25 redesigned recipes, material consolidation bug fix, and Roll Profession now works from Daily Actions.
