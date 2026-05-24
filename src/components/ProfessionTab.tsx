@@ -404,6 +404,107 @@ function DMProfessionPicker({
 }
 
 // ------------------------------------------------------------------
+// Total daily income display (aggregated across all professions)
+// ------------------------------------------------------------------
+
+function toGoldEquivalent(amount: number, currency: string): number {
+  if (currency === 'platinum') return amount * 100
+  if (currency === 'gold') return amount
+  if (currency === 'silver') return amount / 100
+  return amount / 10000
+}
+
+function TotalDailyIncome({
+  primary,
+  additional,
+}: {
+  primary: { amount: number; currency: string }
+  additional: { amount: number; currency: string }[]
+}) {
+  let totalGpEquiv = toGoldEquivalent(primary.amount, primary.currency)
+  for (const ap of additional) {
+    totalGpEquiv += toGoldEquivalent(ap.amount, ap.currency)
+  }
+  const display = totalGpEquiv >= 100
+    ? `${(totalGpEquiv / 100).toFixed(1)} PP`
+    : totalGpEquiv >= 1
+    ? `${totalGpEquiv.toFixed(1)} GP`
+    : `${(totalGpEquiv * 100).toFixed(0)} SP`
+
+  return (
+    <div className="mt-1 text-xs text-green-400">
+      Total: ~{display}/day
+    </div>
+  )
+}
+
+// ------------------------------------------------------------------
+// Profession detail popup (shows full info for any profession)
+// ------------------------------------------------------------------
+
+function ProfessionDetailPopup({
+  profession,
+  onClose,
+}: {
+  profession: Profession
+  onClose: () => void
+}) {
+  const catInfo = CATEGORY_INFO[profession.category]
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/60" />
+      <div
+        className="relative bg-gray-800 border border-gray-600 rounded-xl p-5 max-w-md w-full shadow-2xl max-h-[80vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-3">
+          <h3 className={`text-lg font-bold ${catInfo.color}`}>{profession.name}</h3>
+          <span className="text-dnd-gold font-bold text-sm">{formatIncome(profession.dailyIncome)}/day</span>
+        </div>
+        <p className="text-sm text-gray-300 mb-3">{profession.description}</p>
+        <div className="text-xs mb-3">
+          <span className="text-gray-500">Lifestyle: </span>
+          <span className={catInfo.color}>{catInfo.name}</span>
+          <span className="text-gray-600 ml-2">| Roll: {profession.d100Range[0]}–{profession.d100Range[1]}</span>
+        </div>
+
+        {profession.flavour && (
+          <div className="grid grid-cols-1 gap-3">
+            <div className="bg-gray-900/60 rounded-lg p-3">
+              <h4 className="text-xs font-bold text-gray-400 uppercase mb-2">Duties</h4>
+              <ul className="space-y-1">
+                {profession.flavour.duties.map((d, i) => (
+                  <li key={i} className="flex gap-2 text-xs text-gray-400">
+                    <span className="text-gray-600 shrink-0">•</span>{d}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="bg-gray-900/60 rounded-lg p-3">
+              <h4 className="text-xs font-bold text-gray-400 uppercase mb-2">Perks</h4>
+              <ul className="space-y-1">
+                {profession.flavour.perks.map((p, i) => (
+                  <li key={i} className="flex gap-2 text-xs text-gray-400">
+                    <span className="text-green-500 shrink-0">✓</span>{p}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
+
+        <button
+          onClick={onClose}
+          className="mt-4 px-4 py-2 bg-blue-700 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors w-full"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// ------------------------------------------------------------------
 // Main ProfessionTab component
 // ------------------------------------------------------------------
 
@@ -503,8 +604,11 @@ export function ProfessionTab({ character }: { character: Character }) {
           </div>
           {incomeStr && (
             <div className="text-right shrink-0">
-              <div className="text-xs text-gray-400 uppercase tracking-wide">Daily Income</div>
+              <div className="text-xs text-gray-400 uppercase tracking-wide">Primary Income</div>
               <div className="text-xl font-bold text-yellow-400">{incomeStr}</div>
+              {(professionData.additionalProfessions ?? []).length > 0 && (
+                <TotalDailyIncome primary={income} additional={professionData.additionalProfessions ?? []} />
+              )}
             </div>
           )}
         </div>
@@ -758,6 +862,7 @@ function SubProfessionSection({
 
 function AdditionalProfessionSection({ character }: { character: Character }) {
   const { setProfessionData, updateCurrency, saveCharacter } = useCharacterStore()
+  const { dmModeEnabled } = useSettingsStore()
 
   const professionData = character.professionData ?? {}
   const purchased = professionData.professionsPurchased ?? 0
@@ -770,45 +875,34 @@ function AdditionalProfessionSection({ character }: { character: Character }) {
   const [rollResult, setRollResult] = useState<number | null>(null)
   const [isRolling, setIsRolling] = useState(false)
   const [confirmed, setConfirmed] = useState(false)
+  const [goldDeducted, setGoldDeducted] = useState(false)
+  const [detailPopup, setDetailPopup] = useState<Profession | null>(null)
+  const [showDetails, setShowDetails] = useState(false)
 
   const playerGoldEquivalent = character.currency.gold + (character.currency.platinum * 100)
 
+  const allOwnedNames = new Set<string>()
+  if (character.dailyIncome) allOwnedNames.add(character.dailyIncome.professionName.toLowerCase())
+  for (const ap of additionalProfessions) allOwnedNames.add(ap.professionName.toLowerCase())
+
+  function rollNonDuplicate(): { roll: number; prof: Profession } {
+    let attempts = 0
+    while (attempts < 200) {
+      const f1 = Math.floor(Math.random() * 100) + 1
+      const f2 = Math.floor(Math.random() * 100) + 1
+      const roll = f1 + f2
+      const prof = getProfessionByRoll(roll)
+      if (!allOwnedNames.has(prof.name.toLowerCase())) return { roll, prof }
+      attempts++
+    }
+    const f1 = Math.floor(Math.random() * 100) + 1
+    const f2 = Math.floor(Math.random() * 100) + 1
+    return { roll: f1 + f2, prof: getProfessionByRoll(f1 + f2) }
+  }
+
   const handlePurchaseAndRoll = () => {
     if (!nextCost || playerGoldEquivalent < nextCost) return
-    setShowRoller(true)
-    setRolledProfession(null)
-    setRollResult(null)
-    setConfirmed(false)
-  }
 
-  const handleRoll = () => {
-    if (isRolling) return
-    setIsRolling(true)
-    setRolledProfession(null)
-    setConfirmed(false)
-
-    let count = 0
-    const interval = setInterval(() => {
-      const d1 = Math.floor(Math.random() * 100) + 1
-      const d2 = Math.floor(Math.random() * 100) + 1
-      setRollResult(d1 + d2)
-      count++
-      if (count >= 15) {
-        clearInterval(interval)
-        const f1 = Math.floor(Math.random() * 100) + 1
-        const f2 = Math.floor(Math.random() * 100) + 1
-        const finalRoll = f1 + f2
-        setRollResult(finalRoll)
-        setRolledProfession(getProfessionByRoll(finalRoll))
-        setIsRolling(false)
-      }
-    }, 50)
-  }
-
-  const handleConfirmPurchase = () => {
-    if (!rolledProfession || !nextCost) return
-
-    // Deduct cost: spend gold first, convert platinum if needed
     let remaining = nextCost
     let newGold = character.currency.gold
     let newPlatinum = character.currency.platinum
@@ -823,22 +917,47 @@ function AdditionalProfessionSection({ character }: { character: Character }) {
     }
     updateCurrency({ gold: newGold, platinum: newPlatinum })
 
-    // Add to additional professions
-    const newAdditional = [
-      ...additionalProfessions,
-      {
-        professionName: rolledProfession.name,
-        amount: rolledProfession.dailyIncome.amount,
-        currency: rolledProfession.dailyIncome.currency as 'copper' | 'silver' | 'gold' | 'platinum',
-      },
-    ]
+    setShowRoller(true)
+    setRolledProfession(null)
+    setRollResult(null)
+    setConfirmed(false)
+    setGoldDeducted(true)
+    setIsRolling(true)
 
-    setProfessionData({
-      additionalProfessions: newAdditional,
-      professionsPurchased: purchased + 1,
-    })
+    let count = 0
+    const interval = setInterval(() => {
+      const d1 = Math.floor(Math.random() * 100) + 1
+      const d2 = Math.floor(Math.random() * 100) + 1
+      setRollResult(d1 + d2)
+      count++
+      if (count >= 15) {
+        clearInterval(interval)
+        const result = rollNonDuplicate()
+        setRollResult(result.roll)
+        setRolledProfession(result.prof)
+        setIsRolling(false)
 
-    setConfirmed(true)
+        const newAdditional = [
+          ...additionalProfessions,
+          {
+            professionName: result.prof.name,
+            amount: result.prof.dailyIncome.amount,
+            currency: result.prof.dailyIncome.currency as 'copper' | 'silver' | 'gold' | 'platinum',
+          },
+        ]
+        setProfessionData({
+          additionalProfessions: newAdditional,
+          professionsPurchased: purchased + 1,
+        })
+        setConfirmed(true)
+        saveCharacter()
+      }
+    }, 50)
+  }
+
+  const handleDeleteProfession = (index: number) => {
+    const updated = additionalProfessions.filter((_, i) => i !== index)
+    setProfessionData({ additionalProfessions: updated })
     saveCharacter()
   }
 
@@ -849,11 +968,11 @@ function AdditionalProfessionSection({ character }: { character: Character }) {
       </h3>
 
       <p className="text-xs text-gray-400">
-        Keep your current profession and pay gold to roll for another. You can hold up to 10 additional professions.
-        Each additional profession earns its own daily income when you press New Day.
+        Pay gold to roll for another profession. You can hold up to 10 additional professions.
+        Each earns its own daily income. Duplicates are blocked — you will never roll a profession you already have.
       </p>
 
-      {/* Current additional professions */}
+      {/* Current additional professions — compact list */}
       {additionalProfessions.length > 0 && (
         <div className="space-y-2">
           {additionalProfessions.map((ap, i) => {
@@ -869,21 +988,93 @@ function AdditionalProfessionSection({ character }: { character: Character }) {
               >
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-gray-500 font-mono w-5">#{i + 1}</span>
-                  <span className={`font-medium text-sm ${catInfo?.color ?? 'text-gray-300'}`}>
+                  <button
+                    onClick={() => match && setDetailPopup(match)}
+                    className={`font-medium text-sm underline decoration-dotted underline-offset-2 hover:brightness-125 ${catInfo?.color ?? 'text-gray-300'}`}
+                  >
                     {ap.professionName}
-                  </span>
+                  </button>
                   {catInfo && (
                     <span className={`text-xs ${catInfo.color} opacity-60`}>
                       ({catInfo.name})
                     </span>
                   )}
                 </div>
-                <span className="text-yellow-400 text-sm font-bold">
-                  {ap.amount} {currLabel}/day
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-yellow-400 text-sm font-bold">
+                    {ap.amount} {currLabel}/day
+                  </span>
+                  {dmModeEnabled && (
+                    <button
+                      onClick={() => handleDeleteProfession(i)}
+                      className="text-red-500 hover:text-red-400 text-sm px-1 transition-colors"
+                      title="Remove profession (DM only, no refund)"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
               </div>
             )
           })}
+        </div>
+      )}
+
+      {/* Collapsible full details */}
+      {additionalProfessions.length > 0 && (
+        <div>
+          <button
+            onClick={() => setShowDetails(!showDetails)}
+            className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors"
+          >
+            <span className={`transform transition-transform ${showDetails ? 'rotate-90' : ''}`}>▶</span>
+            {showDetails ? 'Hide' : 'Show'} Profession Details ({additionalProfessions.length})
+          </button>
+
+          {showDetails && (
+            <div className="mt-3 space-y-3">
+              {additionalProfessions.map((ap, i) => {
+                const match = ALL_PROFESSIONS.find(
+                  (p) => p.name.toLowerCase() === ap.professionName.toLowerCase()
+                )
+                if (!match) return null
+                const catInfo = CATEGORY_INFO[match.category]
+                return (
+                  <div key={i} className="bg-gray-900/60 rounded-lg p-4 border border-gray-700 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <h4 className={`font-bold ${catInfo.color}`}>{match.name}</h4>
+                      <span className="text-dnd-gold text-sm font-bold">{formatIncome(match.dailyIncome)}/day</span>
+                    </div>
+                    <p className="text-xs text-gray-400">{match.description}</p>
+                    {match.flavour && (
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <h5 className="text-[10px] font-bold text-gray-500 uppercase mb-1">Duties</h5>
+                          <ul className="space-y-0.5">
+                            {match.flavour.duties.map((d, j) => (
+                              <li key={j} className="text-[11px] text-gray-500 flex gap-1">
+                                <span className="shrink-0">•</span>{d}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div>
+                          <h5 className="text-[10px] font-bold text-gray-500 uppercase mb-1">Perks</h5>
+                          <ul className="space-y-0.5">
+                            {match.flavour.perks.map((p, j) => (
+                              <li key={j} className="text-[11px] text-green-500/70 flex gap-1">
+                                <span className="shrink-0">✓</span>{p}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </div>
       )}
 
@@ -928,32 +1119,26 @@ function AdditionalProfessionSection({ character }: { character: Character }) {
         </div>
       )}
 
-      {/* Roll modal */}
-      {showRoller && nextCost && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => { if (!isRolling) setShowRoller(false) }}>
+      {/* Roll modal — no cancel, payment already deducted */}
+      {showRoller && goldDeducted && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div
             className="bg-gray-800 rounded-xl p-6 w-full max-w-lg border border-yellow-700 max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center gap-2 mb-1">
               <span className="text-yellow-400 text-lg">💼</span>
-              <h3 className="text-xl font-bold text-dnd-gold">Roll Additional Profession</h3>
+              <h3 className="text-xl font-bold text-dnd-gold">Rolling Additional Profession</h3>
             </div>
             <p className="text-sm text-gray-400 mb-4">
-              Cost: <span className="text-yellow-400 font-bold">{nextCost.toLocaleString()} GP</span>
-              {' '}&mdash; Purchase #{purchased + 1} of 10
+              Paid: <span className="text-yellow-400 font-bold">{nextCost ? nextCost.toLocaleString() : PROFESSION_COST_LADDER[purchased - 1]?.toLocaleString()} GP</span>
+              {' '}&mdash; Purchase #{purchased + (confirmed ? 0 : 1)} of 10
             </p>
 
             <div className="bg-gray-900 rounded-lg p-4 mb-4">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-white font-medium">Roll 2d100</span>
-                <button
-                  onClick={handleRoll}
-                  disabled={isRolling || confirmed}
-                  className="px-4 py-2 bg-yellow-700 text-white rounded-lg font-medium hover:bg-yellow-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isRolling ? 'Rolling...' : rolledProfession && !confirmed ? 'Reroll' : confirmed ? 'Done' : 'Roll 2d100'}
-                </button>
+                {isRolling && <span className="text-yellow-400 text-sm animate-pulse">Rolling...</span>}
               </div>
               {rollResult !== null && (
                 <div className="text-center">
@@ -995,29 +1180,26 @@ function AdditionalProfessionSection({ character }: { character: Character }) {
             {confirmed && (
               <div className="bg-green-900/30 border border-green-600 rounded-lg p-3 mb-4 text-center">
                 <p className="text-green-400 font-medium text-sm">
-                  Added {rolledProfession?.name}! Spent {nextCost.toLocaleString()} GP.
+                  Added {rolledProfession?.name}!
                 </p>
               </div>
             )}
 
-            <div className="flex gap-3">
+            {confirmed && (
               <button
-                onClick={() => setShowRoller(false)}
-                className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                onClick={() => { setShowRoller(false); setGoldDeducted(false) }}
+                className="w-full px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-600 transition-colors"
               >
-                {confirmed ? 'Done' : 'Cancel'}
+                Done
               </button>
-              {rolledProfession && !isRolling && !confirmed && (
-                <button
-                  onClick={handleConfirmPurchase}
-                  className="flex-1 px-4 py-2 bg-green-700 text-white rounded-lg font-medium hover:bg-green-600 transition-colors"
-                >
-                  Confirm &amp; Pay {nextCost.toLocaleString()} GP
-                </button>
-              )}
-            </div>
+            )}
           </div>
         </div>
+      )}
+
+      {/* Detail popup */}
+      {detailPopup && (
+        <ProfessionDetailPopup profession={detailPopup} onClose={() => setDetailPopup(null)} />
       )}
     </div>
   )

@@ -334,7 +334,7 @@ export const SUB_PROFESSIONS_REGISTRY: Record<string, SubProfessionFlavour[]> = 
       ]
     }
   ],
-  washer: [
+  washerwoman: [
     {
       id: 'riverside',
       label: 'Riverside Washer',
