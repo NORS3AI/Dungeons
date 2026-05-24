@@ -71,8 +71,16 @@ const MATERIAL_NAMES: Record<string, string> = {
   'rare-herb-phoenix': 'Phoenix Feather',
   'legendary-herb-starbloom': 'Starbloom',
   'legendary-herb-soulroot': 'Soulroot',
-  'magical-dust': 'Magical Dust',
-  'magical-shard': 'Magical Shard',
+  'strange-dust': 'Strange Dust',
+  'lesser-magical-essence': 'Lesser Magical Essence',
+  'soul-dust': 'Soul Dust',
+  'greater-magical-essence': 'Greater Magical Essence',
+  'vision-dust': 'Vision Dust',
+  'light-shard': 'Light Shard',
+  'dream-dust': 'Dream Dust',
+  'small-brilliant-shard': 'Small Brilliant Shard',
+  'crystal-dust': 'Crystal Dust',
+  'large-brilliant-shard': 'Large Brilliant Shard',
 }
 
 const matName = (id: string) =>

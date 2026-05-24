@@ -327,7 +327,7 @@ export function CharacterSheetPage() {
     if (lootItem.category === 'Crafting Material') {
       // Determine material category based on name
       const nameLower = lootItem.name.toLowerCase()
-      let materialCategory: 'herb' | 'ore' | 'leather' | 'hide' | 'gem' | 'other' = 'other'
+      let materialCategory: Material['category'] = 'other'
 
       if (nameLower.includes('herb') || nameLower.includes('lavender') || nameLower.includes('mint') ||
           nameLower.includes('sage') || nameLower.includes('thyme') || nameLower.includes('basil') ||
@@ -338,6 +338,10 @@ export function CharacterSheetPage() {
                  nameLower.includes('iron') || nameLower.includes('copper') || nameLower.includes('gold') ||
                  nameLower.includes('silver') || nameLower.includes('mithril') || nameLower.includes('adamantine')) {
         materialCategory = 'ore'
+      } else if (nameLower.includes('dust') || nameLower.includes('essence')) {
+        materialCategory = 'dust'
+      } else if (nameLower.includes('shard')) {
+        materialCategory = 'shard'
       } else if (nameLower.includes('leather')) {
         materialCategory = 'leather'
       } else if (nameLower.includes('hide') || nameLower.includes('pelt') || nameLower.includes('fur')) {
@@ -2977,37 +2981,38 @@ export function CharacterSheetPage() {
             />
           )}
 
-          {/* Daily Income Roller */}
-          {showIncomeRoller && (
-            <DailyIncomeRoller
-              onEarn={(currency) => {
-                const newCurrency = { ...character.currency }
-                for (const [key, value] of Object.entries(currency)) {
-                  newCurrency[key as keyof Currency] += value
-                }
-                updateCurrency(newCurrency)
-                saveCharacter()
-              }}
-              onSetProfession={(professionName, amount, currency) => {
-                setDailyIncome(professionName, amount, currency)
-                saveCharacter()
-              }}
-              onClose={() => setShowIncomeRoller(false)}
-            />
-          )}
-
-          {/* DM Profession Reroller */}
-          {showDMReroll && (
-            <DMRerollModal
-              currentProfession={character.dailyIncome?.professionName}
-              onSetProfession={(professionName, amount, currency) => {
-                setDailyIncome(professionName, amount, currency)
-                saveCharacter()
-              }}
-              onClose={() => setShowDMReroll(false)}
-            />
-          )}
         </div>
+      )}
+
+      {/* Daily Income Roller - rendered outside tab conditionals so it works from any tab */}
+      {showIncomeRoller && (
+        <DailyIncomeRoller
+          onEarn={(currency) => {
+            const newCurrency = { ...character.currency }
+            for (const [key, value] of Object.entries(currency)) {
+              newCurrency[key as keyof Currency] += value
+            }
+            updateCurrency(newCurrency)
+            saveCharacter()
+          }}
+          onSetProfession={(professionName, amount, currency) => {
+            setDailyIncome(professionName, amount, currency)
+            saveCharacter()
+          }}
+          onClose={() => setShowIncomeRoller(false)}
+        />
+      )}
+
+      {/* DM Profession Reroller - rendered outside tab conditionals so it works from any tab */}
+      {showDMReroll && (
+        <DMRerollModal
+          currentProfession={character.dailyIncome?.professionName}
+          onSetProfession={(professionName, amount, currency) => {
+            setDailyIncome(professionName, amount, currency)
+            saveCharacter()
+          }}
+          onClose={() => setShowDMReroll(false)}
+        />
       )}
 
       {activeTab === 'features' && (

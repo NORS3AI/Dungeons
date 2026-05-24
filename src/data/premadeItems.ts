@@ -595,6 +595,20 @@ export const PREMADE_MATERIALS: (Material & { label: string })[] = [
   { id: 'rare-herb-phoenix',     name: 'Phoenix Feather Grass',label:'Herb',category: 'herb', rarity: 'epic',     quantity: 1, weight: 0.1, worth: { gold: 0, silver: 9  }, description: 'Herb for resurrection elixirs' },
   { id: 'legendary-herb-starbloom',name:'Starbloom Petal',  label: 'Herb', category: 'herb',  rarity: 'legendary',quantity: 1, weight: 0.05,worth: { gold: 1, silver: 2  }, description: 'Blooms only under starlight' },
   { id: 'legendary-herb-soulroot',name: 'Soulroot',         label: 'Herb', category: 'herb',  rarity: 'legendary',quantity: 1, weight: 0.05,worth: { gold: 1, silver: 4  }, description: 'Herb from the Feywild' },
+
+  // Enchanting Materials — Dust
+  { id: 'strange-dust',           name: 'Strange Dust',           label: 'Enchanting', category: 'dust',  rarity: 'common',   quantity: 1, weight: 0.05, worth: { gold: 0, silver: 1  }, description: 'Fine arcane dust from common enchanted items' },
+  { id: 'soul-dust',              name: 'Soul Dust',              label: 'Enchanting', category: 'dust',  rarity: 'uncommon', quantity: 1, weight: 0.05, worth: { gold: 0, silver: 3  }, description: 'Shimmering dust infused with residual soul energy' },
+  { id: 'vision-dust',            name: 'Vision Dust',            label: 'Enchanting', category: 'dust',  rarity: 'rare',     quantity: 1, weight: 0.05, worth: { gold: 0, silver: 7  }, description: 'Luminous dust that glows with inner sight' },
+  { id: 'dream-dust',             name: 'Dream Dust',             label: 'Enchanting', category: 'dust',  rarity: 'epic',     quantity: 1, weight: 0.05, worth: { gold: 0, silver: 9  }, description: 'Ethereal dust harvested from the Plane of Dreams' },
+  { id: 'crystal-dust',           name: 'Crystal Dust',           label: 'Enchanting', category: 'dust',  rarity: 'legendary',quantity: 1, weight: 0.05, worth: { gold: 1, silver: 5  }, description: 'Pristine crystalline dust of immense magical potency' },
+
+  // Enchanting Materials — Essence / Shard
+  { id: 'lesser-magical-essence', name: 'Lesser Magical Essence', label: 'Enchanting', category: 'shard', rarity: 'common',   quantity: 1, weight: 0.1,  worth: { gold: 0, silver: 2  }, description: 'A faint wisp of magical essence' },
+  { id: 'greater-magical-essence',name: 'Greater Magical Essence',label: 'Enchanting', category: 'shard', rarity: 'uncommon', quantity: 1, weight: 0.1,  worth: { gold: 0, silver: 5  }, description: 'A strong concentration of magical essence' },
+  { id: 'light-shard',            name: 'Light Shard',            label: 'Enchanting', category: 'shard', rarity: 'rare',     quantity: 1, weight: 0.1,  worth: { gold: 0, silver: 8  }, description: 'A crystalline shard radiating pale light' },
+  { id: 'small-brilliant-shard',  name: 'Small Brilliant Shard',  label: 'Enchanting', category: 'shard', rarity: 'epic',     quantity: 1, weight: 0.1,  worth: { gold: 0, silver: 10 }, description: 'A small shard pulsing with brilliant magical energy' },
+  { id: 'large-brilliant-shard',  name: 'Large Brilliant Shard',  label: 'Enchanting', category: 'shard', rarity: 'legendary',quantity: 1, weight: 0.1,  worth: { gold: 2, silver: 0  }, description: 'A massive shard of overwhelming arcane brilliance' },
 ]
 
 // ─── Shop Items — All purchasable D&D 5e items ───────────────────────────────

@@ -1,6 +1,20 @@
 import type { Character } from '../types'
+import type { Material } from '../types/equipment'
 import { DEFAULT_ABILITY_SCORES, EMPTY_CURRENCY } from '../types'
 import { calculateCarryingCapacity } from '../types/character'
+
+function consolidateMaterials(materials: Material[]): Material[] {
+  const map = new Map<string, Material>()
+  for (const m of materials) {
+    const existing = map.get(m.id)
+    if (existing) {
+      map.set(m.id, { ...existing, quantity: existing.quantity + m.quantity })
+    } else {
+      map.set(m.id, { ...m })
+    }
+  }
+  return Array.from(map.values())
+}
 
 /**
  * Migrates a character from old data format to new format
@@ -104,7 +118,7 @@ export function migrateCharacter(character: Partial<Character>): Character {
     // Equipment
     equipment: character.equipment || [],
     currency: character.currency || { ...EMPTY_CURRENCY },
-    materials: character.materials || [], // NEW: Crafting materials array
+    materials: consolidateMaterials(character.materials || []),
 
     // Carrying Capacity & Supplies
     carryingCapacity: character.carryingCapacity || {

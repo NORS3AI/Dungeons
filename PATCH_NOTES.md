@@ -1,5 +1,49 @@
 # Dungeons - Patch Notes
 
+## Version 0.4.23-alpha - May 24, 2026
+
+**Alpha Release Notice**: Major Work tab and crafting fixes — enchanting overhaul with 10 new materials and 25 redesigned recipes, material consolidation bug fix, and Roll Profession now works from Daily Actions.
+
+### Fix: Roll Profession Button in Daily Actions
+
+The "Roll Profession" / "Change Profession" button on the Actions tab now works correctly. Previously the modal was only rendered inside the Inventory tab's conditional block, so clicking the button on the Actions tab did nothing. The modal now renders globally and appears regardless of which tab is active.
+
+### Fix: Material Consolidation (Duplicate Stacking)
+
+Materials with the same ID now properly merge into a single stack. If your inventory showed "Mint Leaves x5" twice, it will now consolidate to "Mint Leaves x10". This fix applies to:
+- **Adding materials** — all existing entries with the same ID are summed before adding
+- **Character loading** — migration step consolidates any existing duplicates
+- Works across all four crafting categories (Blacksmithing, Tailoring, Alchemy, Enchanting)
+
+### Fix: Loot Material Categorization
+
+Enchanting materials (dusts, essences, shards) now correctly get categorized as `dust` or `shard` when obtained from loot, so they appear in the Enchanting section of the Work tab.
+
+### Enchanting System Overhaul
+
+Complete rewrite of the enchanting crafting system with 10 new materials and 25 redesigned recipes.
+
+#### **New Enchanting Materials (10 total)**
+
+| Tier | Dust | Essence/Shard |
+|------|------|--------------|
+| Common | Strange Dust | Lesser Magical Essence |
+| Uncommon | Soul Dust | Greater Magical Essence |
+| Rare | Vision Dust | Light Shard |
+| Epic | Dream Dust | Small Brilliant Shard |
+| Legendary | Crystal Dust | Large Brilliant Shard |
+
+Every recipe now requires BOTH a dust and an essence/shard from its tier.
+
+#### **25 Recipes (5 per tier)**
+- **Common**: Minor Fortitude (+5 HP), Minor Swiftness (+5 ft speed), Minor Warding (+1 AC), Minor Strength (+1 STR), Minor Intellect (+1 INT)
+- **Uncommon**: Lesser versions (+10 HP, +10 ft, +2 AC/STR/INT)
+- **Rare**: Greater versions (+20 HP, +15 ft, +3 AC/STR/INT, can exceed 20)
+- **Epic**: Superior versions (+35 HP, +20 ft, +4 AC/STR/INT)
+- **Legendary**: Mongoose, Berserking, Colossus, Primal Haste, Infinite AC (powerful weapon/armor enchantments)
+
+**Why This Matters**: The enchanting system now has meaningful material variety per tier, recipes require two material types for strategic depth, and all crafting tabs properly recognize inventory materials.
+
 ## Version 0.4.22-alpha - May 24, 2026
 
 **Alpha Release Notice**: Multi-profession costs reduced by 10x, and DMs can now manually assign any profession via a dropdown.

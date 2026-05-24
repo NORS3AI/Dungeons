@@ -150,6 +150,9 @@ const COMMON_LOOT: LootItem[] = [
   // Crafting Materials — Herb
   { id: 'common-herb-lavender', name: 'Lavender', category: 'Crafting Material', description: 'Common herb for alchemy and healing salves', rarity: 'common', value: 2, quantity: 5, worth: { gold: 0, silver: 1 } },
   { id: 'common-herb-mint', name: 'Mint Leaves', category: 'Crafting Material', description: 'Common herb for alchemy and potions', rarity: 'common', value: 2, quantity: 5, worth: { gold: 0, silver: 1 } },
+  // Crafting Materials — Enchanting
+  { id: 'strange-dust', name: 'Strange Dust', category: 'Crafting Material', description: 'Fine arcane dust from common enchanted items', rarity: 'common', value: 2, quantity: 3, worth: { gold: 0, silver: 1 } },
+  { id: 'lesser-magical-essence', name: 'Lesser Magical Essence', category: 'Crafting Material', description: 'A faint wisp of magical essence for enchanting', rarity: 'common', value: 4, quantity: 2, worth: { gold: 0, silver: 2 } },
 ]
 
 /**
@@ -175,6 +178,9 @@ const UNCOMMON_LOOT: LootItem[] = [
   // Crafting Materials — Herb
   { id: 'uncommon-herb-foxglove', name: 'Foxglove', category: 'Crafting Material', description: 'Uncommon herb for potent potions and antidotes', rarity: 'uncommon', value: 15, quantity: 3, worth: { gold: 0, silver: 3 } },
   { id: 'uncommon-herb-wolfsbane', name: 'Wolfsbane', category: 'Crafting Material', description: 'Uncommon herb for alchemy, effective against lycanthropes', rarity: 'uncommon', value: 18, quantity: 3, worth: { gold: 0, silver: 4 } },
+  // Crafting Materials — Enchanting
+  { id: 'soul-dust', name: 'Soul Dust', category: 'Crafting Material', description: 'Shimmering dust infused with residual soul energy', rarity: 'uncommon', value: 12, quantity: 3, worth: { gold: 0, silver: 3 } },
+  { id: 'greater-magical-essence', name: 'Greater Magical Essence', category: 'Crafting Material', description: 'A strong concentration of magical essence for enchanting', rarity: 'uncommon', value: 20, quantity: 2, worth: { gold: 0, silver: 5 } },
 ]
 
 /**
@@ -201,6 +207,9 @@ const RARE_LOOT: LootItem[] = [
   // Crafting Materials — Herb
   { id: 'rare-herb-mandrake', name: 'Mandrake Root', category: 'Crafting Material', description: 'Rare herb for powerful alchemical concoctions', rarity: 'rare', value: 75, quantity: 2, worth: { gold: 0, silver: 7 } },
   { id: 'rare-herb-bloodthorn', name: 'Bloodthorn', category: 'Crafting Material', description: 'Rare herb for healing potions and resurrection elixirs', rarity: 'rare', value: 80, quantity: 2, worth: { gold: 0, silver: 8 } },
+  // Crafting Materials — Enchanting
+  { id: 'vision-dust', name: 'Vision Dust', category: 'Crafting Material', description: 'Luminous dust that glows with inner sight', rarity: 'rare', value: 60, quantity: 2, worth: { gold: 0, silver: 7 } },
+  { id: 'light-shard', name: 'Light Shard', category: 'Crafting Material', description: 'A crystalline shard radiating pale light', rarity: 'rare', value: 80, quantity: 2, worth: { gold: 0, silver: 8 } },
 ]
 
 /**
@@ -224,6 +233,9 @@ const MORE_EPIC_LOOT: LootItem[] = [
   // Crafting Materials — Herb
   { id: 'rare-herb-nightshade', name: 'Arcane Nightshade', category: 'Crafting Material', description: 'Extremely rare herb for legendary potions and elixirs', rarity: 'epic', value: 400, quantity: 1, worth: { gold: 0, silver: 8 } },
   { id: 'rare-herb-phoenix', name: 'Phoenix Feather Grass', category: 'Crafting Material', description: 'Extremely rare herb for resurrection and immortality elixirs', rarity: 'epic', value: 450, quantity: 1, worth: { gold: 0, silver: 9 } },
+  // Crafting Materials — Enchanting
+  { id: 'dream-dust', name: 'Dream Dust', category: 'Crafting Material', description: 'Ethereal dust harvested from the Plane of Dreams', rarity: 'epic', value: 350, quantity: 2, worth: { gold: 0, silver: 9 } },
+  { id: 'small-brilliant-shard', name: 'Small Brilliant Shard', category: 'Crafting Material', description: 'A small shard pulsing with brilliant magical energy', rarity: 'epic', value: 450, quantity: 1, worth: { gold: 0, silver: 10 } },
 ]
 
 /**
@@ -264,6 +276,9 @@ const LEGENDARY_LOOT: LootItem[] = [
   // Crafting Materials — Herb
   { id: 'legendary-herb-starbloom', name: 'Starbloom Petal', category: 'Crafting Material', description: 'Legendary herb that blooms only under starlight, for supreme elixirs', rarity: 'legendary', value: 1200, quantity: 1, worth: { gold: 0, silver: 10 } },
   { id: 'legendary-herb-soulroot', name: 'Soulroot', category: 'Crafting Material', description: 'Legendary herb from the Feywild, said to restore the soul itself', rarity: 'legendary', value: 1400, quantity: 1, worth: { gold: 0, silver: 10 } },
+  // Crafting Materials — Enchanting
+  { id: 'crystal-dust', name: 'Crystal Dust', category: 'Crafting Material', description: 'Pristine crystalline dust of immense magical potency', rarity: 'legendary', value: 1500, quantity: 1, worth: { gold: 1, silver: 5 } },
+  { id: 'large-brilliant-shard', name: 'Large Brilliant Shard', category: 'Crafting Material', description: 'A massive shard of overwhelming arcane brilliance', rarity: 'legendary', value: 2000, quantity: 1, worth: { gold: 2, silver: 0 } },
 ]
 
 /**
