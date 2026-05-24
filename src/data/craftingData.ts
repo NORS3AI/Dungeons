@@ -822,295 +822,235 @@ export const ALCHEMY_RECIPES: CraftedItem[] = [
 ]
 
 // ---------------------------------------------------------------------------
-// ENCHANTING RECIPES (scrolls, uses Magical Dust/Shards)
+// ENCHANTING RECIPES (scrolls, uses tiered Dust + Essence/Shard materials)
 // ---------------------------------------------------------------------------
 
 export const ENCHANTING_MATERIALS_BY_TIER: Record<CraftingTier, string[]> = {
-  common:    ['magical-dust'],
-  uncommon:  ['magical-dust'],
-  rare:      ['magical-dust'],
-  epic:      ['magical-shard'],
-  legendary: ['magical-shard'],
+  common:    ['strange-dust', 'lesser-magical-essence'],
+  uncommon:  ['soul-dust', 'greater-magical-essence'],
+  rare:      ['vision-dust', 'light-shard'],
+  epic:      ['dream-dust', 'small-brilliant-shard'],
+  legendary: ['crystal-dust', 'large-brilliant-shard'],
 }
 
 export const ENCHANTING_RECIPES: CraftedItem[] = [
   // ── Common (Tier 1) ───────────────────────────────────────────────────────
   {
-    id: 'craft-scroll-minor-dex', name: 'Scroll of Minor Dexterity', tier: 'common', minSkill: 1,
-    materials: [{ materialId: 'magical-dust', label: 'Magical Dust', quantity: 2 }],
-    weight: 0.1, bonus: '+1 DEX (max 20)', worth: { gold: 0, silver: 2 },
+    id: 'craft-scroll-minor-fortitude', name: 'Scroll of Minor Fortitude', tier: 'common', minSkill: 1,
+    materials: [
+      { materialId: 'strange-dust', label: 'Strange Dust', quantity: 3 },
+      { materialId: 'lesser-magical-essence', label: 'Lesser Magical Essence', quantity: 1 },
+    ],
+    weight: 0.1, bonus: '+5 max HP', worth: { gold: 0, silver: 3 },
   },
   {
-    id: 'craft-scroll-minor-cha', name: 'Scroll of Minor Charisma', tier: 'common', minSkill: 1,
-    materials: [{ materialId: 'magical-dust', label: 'Magical Dust', quantity: 2 }],
-    weight: 0.1, bonus: '+1 CHA (max 20)', worth: { gold: 0, silver: 2 },
+    id: 'craft-scroll-minor-swiftness', name: 'Scroll of Minor Swiftness', tier: 'common', minSkill: 1,
+    materials: [
+      { materialId: 'strange-dust', label: 'Strange Dust', quantity: 2 },
+      { materialId: 'lesser-magical-essence', label: 'Lesser Magical Essence', quantity: 1 },
+    ],
+    weight: 0.1, bonus: '+5 ft walking speed', worth: { gold: 0, silver: 3 },
   },
   {
-    id: 'craft-scroll-minor-str', name: 'Scroll of Minor Strength', tier: 'common', minSkill: 1,
-    materials: [{ materialId: 'magical-dust', label: 'Magical Dust', quantity: 2 }],
-    weight: 0.1, bonus: '+1 STR (max 20)', worth: { gold: 0, silver: 2 },
-  },
-  {
-    id: 'craft-scroll-minor-con', name: 'Scroll of Minor Constitution', tier: 'common', minSkill: 1,
-    materials: [{ materialId: 'magical-dust', label: 'Magical Dust', quantity: 2 }],
-    weight: 0.1, bonus: '+1 CON (max 20)', worth: { gold: 0, silver: 2 },
-  },
-  {
-    id: 'craft-scroll-minor-wis', name: 'Scroll of Minor Wisdom', tier: 'common', minSkill: 1,
-    materials: [{ materialId: 'magical-dust', label: 'Magical Dust', quantity: 2 }],
-    weight: 0.1, bonus: '+1 WIS (max 20)', worth: { gold: 0, silver: 2 },
-  },
-  {
-    id: 'craft-scroll-minor-int', name: 'Scroll of Minor Intellect', tier: 'common', minSkill: 1,
-    materials: [{ materialId: 'magical-dust', label: 'Magical Dust', quantity: 2 }],
-    weight: 0.1, bonus: '+1 INT (max 20)', worth: { gold: 0, silver: 2 },
-  },
-  {
-    id: 'craft-scroll-minor-ac', name: 'Scroll of Minor AC', tier: 'common', minSkill: 1,
-    materials: [{ materialId: 'magical-dust', label: 'Magical Dust', quantity: 3 }],
+    id: 'craft-scroll-minor-warding', name: 'Scroll of Minor Warding', tier: 'common', minSkill: 1,
+    materials: [
+      { materialId: 'strange-dust', label: 'Strange Dust', quantity: 3 },
+      { materialId: 'lesser-magical-essence', label: 'Lesser Magical Essence', quantity: 2 },
+    ],
     weight: 0.1, bonus: '+1 AC applied to armor', worth: { gold: 0, silver: 3 },
   },
   {
-    id: 'craft-scroll-minor-haste', name: 'Scroll of Minor Haste', tier: 'common', minSkill: 1,
-    materials: [{ materialId: 'magical-dust', label: 'Magical Dust', quantity: 3 }],
-    weight: 0.1, bonus: '+5 ft base walking speed', worth: { gold: 0, silver: 3 },
+    id: 'craft-scroll-minor-strength', name: 'Scroll of Minor Strength', tier: 'common', minSkill: 1,
+    materials: [
+      { materialId: 'strange-dust', label: 'Strange Dust', quantity: 2 },
+      { materialId: 'lesser-magical-essence', label: 'Lesser Magical Essence', quantity: 1 },
+    ],
+    weight: 0.1, bonus: '+1 STR (max 20)', worth: { gold: 0, silver: 3 },
   },
   {
-    id: 'craft-scroll-minor-perception', name: 'Scroll of Minor Perception', tier: 'common', minSkill: 1,
-    materials: [{ materialId: 'magical-dust', label: 'Magical Dust', quantity: 2 }],
-    weight: 0.1, bonus: '+1 Perception checks', worth: { gold: 0, silver: 2 },
-  },
-  {
-    id: 'craft-scroll-minor-stealth', name: 'Scroll of Minor Stealth', tier: 'common', minSkill: 1,
-    materials: [{ materialId: 'magical-dust', label: 'Magical Dust', quantity: 2 }],
-    weight: 0.1, bonus: '+1 Stealth checks', worth: { gold: 0, silver: 2 },
+    id: 'craft-scroll-minor-intellect', name: 'Scroll of Minor Intellect', tier: 'common', minSkill: 1,
+    materials: [
+      { materialId: 'strange-dust', label: 'Strange Dust', quantity: 2 },
+      { materialId: 'lesser-magical-essence', label: 'Lesser Magical Essence', quantity: 1 },
+    ],
+    weight: 0.1, bonus: '+1 INT (max 20)', worth: { gold: 0, silver: 3 },
   },
 
   // ── Uncommon (Tier 2) ─────────────────────────────────────────────────────
   {
-    id: 'craft-scroll-lesser-dex', name: 'Scroll of Lesser Dexterity', tier: 'uncommon', minSkill: 26,
-    materials: [{ materialId: 'magical-dust', label: 'Magical Dust', quantity: 4 }],
-    weight: 0.1, bonus: '+2 DEX (max 20)', worth: { gold: 1, silver: 0 },
+    id: 'craft-scroll-lesser-fortitude', name: 'Scroll of Lesser Fortitude', tier: 'uncommon', minSkill: 26,
+    materials: [
+      { materialId: 'soul-dust', label: 'Soul Dust', quantity: 5 },
+      { materialId: 'greater-magical-essence', label: 'Greater Magical Essence', quantity: 2 },
+    ],
+    weight: 0.1, bonus: '+10 max HP', worth: { gold: 1, silver: 5 },
   },
   {
-    id: 'craft-scroll-lesser-cha', name: 'Scroll of Lesser Charisma', tier: 'uncommon', minSkill: 26,
-    materials: [{ materialId: 'magical-dust', label: 'Magical Dust', quantity: 4 }],
-    weight: 0.1, bonus: '+2 CHA (max 20)', worth: { gold: 1, silver: 0 },
+    id: 'craft-scroll-lesser-swiftness', name: 'Scroll of Lesser Swiftness', tier: 'uncommon', minSkill: 26,
+    materials: [
+      { materialId: 'soul-dust', label: 'Soul Dust', quantity: 4 },
+      { materialId: 'greater-magical-essence', label: 'Greater Magical Essence', quantity: 2 },
+    ],
+    weight: 0.1, bonus: '+10 ft walking speed', worth: { gold: 1, silver: 5 },
   },
   {
-    id: 'craft-scroll-lesser-str', name: 'Scroll of Lesser Strength', tier: 'uncommon', minSkill: 26,
-    materials: [{ materialId: 'magical-dust', label: 'Magical Dust', quantity: 4 }],
-    weight: 0.1, bonus: '+2 STR (max 20)', worth: { gold: 1, silver: 0 },
-  },
-  {
-    id: 'craft-scroll-lesser-con', name: 'Scroll of Lesser Constitution', tier: 'uncommon', minSkill: 26,
-    materials: [{ materialId: 'magical-dust', label: 'Magical Dust', quantity: 4 }],
-    weight: 0.1, bonus: '+2 CON (max 20)', worth: { gold: 1, silver: 0 },
-  },
-  {
-    id: 'craft-scroll-lesser-wis', name: 'Scroll of Lesser Wisdom', tier: 'uncommon', minSkill: 26,
-    materials: [{ materialId: 'magical-dust', label: 'Magical Dust', quantity: 4 }],
-    weight: 0.1, bonus: '+2 WIS (max 20)', worth: { gold: 1, silver: 0 },
-  },
-  {
-    id: 'craft-scroll-lesser-int', name: 'Scroll of Lesser Intellect', tier: 'uncommon', minSkill: 26,
-    materials: [{ materialId: 'magical-dust', label: 'Magical Dust', quantity: 4 }],
-    weight: 0.1, bonus: '+2 INT (max 20)', worth: { gold: 1, silver: 0 },
-  },
-  {
-    id: 'craft-scroll-lesser-ac', name: 'Scroll of Lesser AC', tier: 'uncommon', minSkill: 26,
-    materials: [{ materialId: 'magical-dust', label: 'Magical Dust', quantity: 5 }],
+    id: 'craft-scroll-lesser-warding', name: 'Scroll of Lesser Warding', tier: 'uncommon', minSkill: 26,
+    materials: [
+      { materialId: 'soul-dust', label: 'Soul Dust', quantity: 5 },
+      { materialId: 'greater-magical-essence', label: 'Greater Magical Essence', quantity: 3 },
+    ],
     weight: 0.1, bonus: '+2 AC applied to armor', worth: { gold: 1, silver: 5 },
   },
   {
-    id: 'craft-scroll-lesser-haste', name: 'Scroll of Lesser Haste', tier: 'uncommon', minSkill: 26,
-    materials: [{ materialId: 'magical-dust', label: 'Magical Dust', quantity: 5 }],
-    weight: 0.1, bonus: '+10 ft base walking speed', worth: { gold: 1, silver: 5 },
+    id: 'craft-scroll-lesser-strength', name: 'Scroll of Lesser Strength', tier: 'uncommon', minSkill: 26,
+    materials: [
+      { materialId: 'soul-dust', label: 'Soul Dust', quantity: 4 },
+      { materialId: 'greater-magical-essence', label: 'Greater Magical Essence', quantity: 2 },
+    ],
+    weight: 0.1, bonus: '+2 STR (max 20)', worth: { gold: 1, silver: 5 },
   },
   {
-    id: 'craft-scroll-lesser-perception', name: 'Scroll of Lesser Perception', tier: 'uncommon', minSkill: 26,
-    materials: [{ materialId: 'magical-dust', label: 'Magical Dust', quantity: 4 }],
-    weight: 0.1, bonus: '+2 Perception checks', worth: { gold: 1, silver: 0 },
-  },
-  {
-    id: 'craft-scroll-lesser-stealth', name: 'Scroll of Lesser Stealth', tier: 'uncommon', minSkill: 26,
-    materials: [{ materialId: 'magical-dust', label: 'Magical Dust', quantity: 4 }],
-    weight: 0.1, bonus: '+2 Stealth checks', worth: { gold: 1, silver: 0 },
+    id: 'craft-scroll-lesser-intellect', name: 'Scroll of Lesser Intellect', tier: 'uncommon', minSkill: 26,
+    materials: [
+      { materialId: 'soul-dust', label: 'Soul Dust', quantity: 4 },
+      { materialId: 'greater-magical-essence', label: 'Greater Magical Essence', quantity: 2 },
+    ],
+    weight: 0.1, bonus: '+2 INT (max 20)', worth: { gold: 1, silver: 5 },
   },
 
   // ── Rare (Tier 3) ─────────────────────────────────────────────────────────
   {
-    id: 'craft-scroll-greater-dex', name: 'Scroll of Greater Dexterity', tier: 'rare', minSkill: 51,
-    materials: [{ materialId: 'magical-dust', label: 'Magical Dust', quantity: 6 }],
-    weight: 0.1, bonus: '+3 DEX (can exceed 20, max 22)', worth: { gold: 3, silver: 0 },
+    id: 'craft-scroll-greater-fortitude', name: 'Scroll of Greater Fortitude', tier: 'rare', minSkill: 51,
+    materials: [
+      { materialId: 'vision-dust', label: 'Vision Dust', quantity: 6 },
+      { materialId: 'light-shard', label: 'Light Shard', quantity: 2 },
+    ],
+    weight: 0.1, bonus: '+20 max HP', worth: { gold: 4, silver: 0 },
   },
   {
-    id: 'craft-scroll-greater-cha', name: 'Scroll of Greater Charisma', tier: 'rare', minSkill: 51,
-    materials: [{ materialId: 'magical-dust', label: 'Magical Dust', quantity: 6 }],
-    weight: 0.1, bonus: '+3 CHA (can exceed 20, max 22)', worth: { gold: 3, silver: 0 },
+    id: 'craft-scroll-greater-swiftness', name: 'Scroll of Greater Swiftness', tier: 'rare', minSkill: 51,
+    materials: [
+      { materialId: 'vision-dust', label: 'Vision Dust', quantity: 5 },
+      { materialId: 'light-shard', label: 'Light Shard', quantity: 2 },
+    ],
+    weight: 0.1, bonus: '+15 ft walking speed', worth: { gold: 4, silver: 0 },
   },
   {
-    id: 'craft-scroll-greater-str', name: 'Scroll of Greater Strength', tier: 'rare', minSkill: 51,
-    materials: [{ materialId: 'magical-dust', label: 'Magical Dust', quantity: 6 }],
-    weight: 0.1, bonus: '+3 STR (can exceed 20, max 22)', worth: { gold: 3, silver: 0 },
-  },
-  {
-    id: 'craft-scroll-greater-con', name: 'Scroll of Greater Constitution', tier: 'rare', minSkill: 51,
-    materials: [{ materialId: 'magical-dust', label: 'Magical Dust', quantity: 6 }],
-    weight: 0.1, bonus: '+3 CON (can exceed 20, max 22)', worth: { gold: 3, silver: 0 },
-  },
-  {
-    id: 'craft-scroll-greater-wis', name: 'Scroll of Greater Wisdom', tier: 'rare', minSkill: 51,
-    materials: [{ materialId: 'magical-dust', label: 'Magical Dust', quantity: 6 }],
-    weight: 0.1, bonus: '+3 WIS (can exceed 20, max 22)', worth: { gold: 3, silver: 0 },
-  },
-  {
-    id: 'craft-scroll-greater-int', name: 'Scroll of Greater Intellect', tier: 'rare', minSkill: 51,
-    materials: [{ materialId: 'magical-dust', label: 'Magical Dust', quantity: 6 }],
-    weight: 0.1, bonus: '+3 INT (can exceed 20, max 22)', worth: { gold: 3, silver: 0 },
-  },
-  {
-    id: 'craft-scroll-greater-ac', name: 'Scroll of Greater AC', tier: 'rare', minSkill: 51,
-    materials: [{ materialId: 'magical-dust', label: 'Magical Dust', quantity: 8 }],
+    id: 'craft-scroll-greater-warding', name: 'Scroll of Greater Warding', tier: 'rare', minSkill: 51,
+    materials: [
+      { materialId: 'vision-dust', label: 'Vision Dust', quantity: 7 },
+      { materialId: 'light-shard', label: 'Light Shard', quantity: 3 },
+    ],
     weight: 0.1, bonus: '+3 AC applied to armor', worth: { gold: 4, silver: 0 },
   },
   {
-    id: 'craft-scroll-greater-haste', name: 'Scroll of Greater Haste', tier: 'rare', minSkill: 51,
-    materials: [{ materialId: 'magical-dust', label: 'Magical Dust', quantity: 8 }],
-    weight: 0.1, bonus: '+15 ft base walking speed', worth: { gold: 4, silver: 5 },
+    id: 'craft-scroll-greater-strength', name: 'Scroll of Greater Strength', tier: 'rare', minSkill: 51,
+    materials: [
+      { materialId: 'vision-dust', label: 'Vision Dust', quantity: 6 },
+      { materialId: 'light-shard', label: 'Light Shard', quantity: 2 },
+    ],
+    weight: 0.1, bonus: '+3 STR (can exceed 20, max 22)', worth: { gold: 4, silver: 0 },
   },
   {
-    id: 'craft-scroll-greater-perception', name: 'Scroll of Greater Perception', tier: 'rare', minSkill: 51,
-    materials: [{ materialId: 'magical-dust', label: 'Magical Dust', quantity: 6 }],
-    weight: 0.1, bonus: '+3 Perception checks', worth: { gold: 3, silver: 5 },
-  },
-  {
-    id: 'craft-scroll-greater-stealth', name: 'Scroll of Greater Stealth', tier: 'rare', minSkill: 51,
-    materials: [{ materialId: 'magical-dust', label: 'Magical Dust', quantity: 6 }],
-    weight: 0.1, bonus: '+3 Stealth checks', worth: { gold: 3, silver: 5 },
+    id: 'craft-scroll-greater-intellect', name: 'Scroll of Greater Intellect', tier: 'rare', minSkill: 51,
+    materials: [
+      { materialId: 'vision-dust', label: 'Vision Dust', quantity: 6 },
+      { materialId: 'light-shard', label: 'Light Shard', quantity: 2 },
+    ],
+    weight: 0.1, bonus: '+3 INT (can exceed 20, max 22)', worth: { gold: 4, silver: 0 },
   },
 
   // ── Epic (Tier 4) ─────────────────────────────────────────────────────────
   {
-    id: 'craft-scroll-superior-dex', name: 'Scroll of Superior Dexterity', tier: 'epic', minSkill: 76,
-    materials: [{ materialId: 'magical-shard', label: 'Magical Shards', quantity: 2 }],
-    weight: 0.1, bonus: '+4 DEX (max 24)', worth: { gold: 6, silver: 0 },
+    id: 'craft-scroll-superior-fortitude', name: 'Scroll of Superior Fortitude', tier: 'epic', minSkill: 76,
+    materials: [
+      { materialId: 'dream-dust', label: 'Dream Dust', quantity: 4 },
+      { materialId: 'small-brilliant-shard', label: 'Small Brilliant Shard', quantity: 2 },
+    ],
+    weight: 0.1, bonus: '+35 max HP', worth: { gold: 7, silver: 0 },
   },
   {
-    id: 'craft-scroll-superior-cha', name: 'Scroll of Superior Charisma', tier: 'epic', minSkill: 76,
-    materials: [{ materialId: 'magical-shard', label: 'Magical Shards', quantity: 2 }],
-    weight: 0.1, bonus: '+4 CHA (max 24)', worth: { gold: 6, silver: 0 },
+    id: 'craft-scroll-superior-swiftness', name: 'Scroll of Superior Swiftness', tier: 'epic', minSkill: 76,
+    materials: [
+      { materialId: 'dream-dust', label: 'Dream Dust', quantity: 3 },
+      { materialId: 'small-brilliant-shard', label: 'Small Brilliant Shard', quantity: 2 },
+    ],
+    weight: 0.1, bonus: '+20 ft walking speed, advantage on Initiative', worth: { gold: 7, silver: 0 },
   },
   {
-    id: 'craft-scroll-superior-str', name: 'Scroll of Superior Strength', tier: 'epic', minSkill: 76,
-    materials: [{ materialId: 'magical-shard', label: 'Magical Shards', quantity: 2 }],
-    weight: 0.1, bonus: '+4 STR (max 24)', worth: { gold: 6, silver: 0 },
-  },
-  {
-    id: 'craft-scroll-superior-con', name: 'Scroll of Superior Constitution', tier: 'epic', minSkill: 76,
-    materials: [{ materialId: 'magical-shard', label: 'Magical Shards', quantity: 2 }],
-    weight: 0.1, bonus: '+4 CON (max 24)', worth: { gold: 6, silver: 0 },
-  },
-  {
-    id: 'craft-scroll-superior-wis', name: 'Scroll of Superior Wisdom', tier: 'epic', minSkill: 76,
-    materials: [{ materialId: 'magical-shard', label: 'Magical Shards', quantity: 2 }],
-    weight: 0.1, bonus: '+4 WIS (max 24)', worth: { gold: 6, silver: 0 },
-  },
-  {
-    id: 'craft-scroll-superior-int', name: 'Scroll of Superior Intellect', tier: 'epic', minSkill: 76,
-    materials: [{ materialId: 'magical-shard', label: 'Magical Shards', quantity: 2 }],
-    weight: 0.1, bonus: '+4 INT (max 24)', worth: { gold: 6, silver: 0 },
-  },
-  {
-    id: 'craft-scroll-superior-ac', name: 'Scroll of Superior AC', tier: 'epic', minSkill: 76,
-    materials: [{ materialId: 'magical-shard', label: 'Magical Shards', quantity: 3 }],
+    id: 'craft-scroll-superior-warding', name: 'Scroll of Superior Warding', tier: 'epic', minSkill: 76,
+    materials: [
+      { materialId: 'dream-dust', label: 'Dream Dust', quantity: 5 },
+      { materialId: 'small-brilliant-shard', label: 'Small Brilliant Shard', quantity: 3 },
+    ],
     weight: 0.1, bonus: '+4 AC applied to armor', worth: { gold: 7, silver: 0 },
   },
   {
-    id: 'craft-scroll-superior-haste', name: 'Scroll of Superior Haste', tier: 'epic', minSkill: 76,
-    materials: [{ materialId: 'magical-shard', label: 'Magical Shards', quantity: 3 }],
-    weight: 0.1, bonus: '+20 ft base walking speed', worth: { gold: 7, silver: 5 },
+    id: 'craft-scroll-superior-strength', name: 'Scroll of Superior Strength', tier: 'epic', minSkill: 76,
+    materials: [
+      { materialId: 'dream-dust', label: 'Dream Dust', quantity: 4 },
+      { materialId: 'small-brilliant-shard', label: 'Small Brilliant Shard', quantity: 2 },
+    ],
+    weight: 0.1, bonus: '+4 STR (max 24)', worth: { gold: 7, silver: 0 },
   },
   {
-    id: 'craft-scroll-superior-perception', name: 'Scroll of Superior Perception', tier: 'epic', minSkill: 76,
-    materials: [{ materialId: 'magical-shard', label: 'Magical Shards', quantity: 2 }],
-    weight: 0.1, bonus: '+5 Perception (Expertise)', worth: { gold: 6, silver: 5 },
-  },
-  {
-    id: 'craft-scroll-superior-stealth', name: 'Scroll of Superior Stealth', tier: 'epic', minSkill: 76,
-    materials: [{ materialId: 'magical-shard', label: 'Magical Shards', quantity: 2 }],
-    weight: 0.1, bonus: '+5 Stealth (Expertise)', worth: { gold: 6, silver: 5 },
+    id: 'craft-scroll-superior-intellect', name: 'Scroll of Superior Intellect', tier: 'epic', minSkill: 76,
+    materials: [
+      { materialId: 'dream-dust', label: 'Dream Dust', quantity: 4 },
+      { materialId: 'small-brilliant-shard', label: 'Small Brilliant Shard', quantity: 2 },
+    ],
+    weight: 0.1, bonus: '+4 INT (max 24); spell save DC +1', worth: { gold: 7, silver: 0 },
   },
 
   // ── Legendary (Tier 5) ────────────────────────────────────────────────────
   {
     id: 'craft-scroll-mongoose', name: 'Scroll of Mongoose', tier: 'legendary', minSkill: 91,
-    materials: [{ materialId: 'magical-shard', label: 'Magical Shards', quantity: 4 }],
+    materials: [
+      { materialId: 'crystal-dust', label: 'Crystal Dust', quantity: 5 },
+      { materialId: 'large-brilliant-shard', label: 'Large Brilliant Shard', quantity: 3 },
+    ],
     weight: 0.1,
     bonus: 'Weapon: +2 Attack; 10% chance per hit to gain +2 AC and extra Bonus Action next turn',
-    worth: { gold: 9, silver: 0 },
+    worth: { gold: 10, silver: 0 },
   },
   {
     id: 'craft-scroll-berserking', name: 'Scroll of Berserking', tier: 'legendary', minSkill: 91,
-    materials: [{ materialId: 'magical-shard', label: 'Magical Shards', quantity: 4 }],
+    materials: [
+      { materialId: 'crystal-dust', label: 'Crystal Dust', quantity: 5 },
+      { materialId: 'large-brilliant-shard', label: 'Large Brilliant Shard', quantity: 3 },
+    ],
     weight: 0.1,
     bonus: 'Weapon: −5 Attack for +10 Damage; crits grant 20 Temp HP',
-    worth: { gold: 9, silver: 5 },
-  },
-  {
-    id: 'craft-scroll-executioner', name: 'Scroll of Executioner', tier: 'legendary', minSkill: 91,
-    materials: [{ materialId: 'magical-shard', label: 'Magical Shards', quantity: 4 }],
-    weight: 0.1,
-    bonus: 'Weapon: Ignore resistances; target below 50 HP makes DC 17 CON save or drops to 0',
-    worth: { gold: 10, silver: 0 },
-  },
-  {
-    id: 'craft-scroll-power-torrent', name: 'Scroll of Power Torrent', tier: 'legendary', minSkill: 91,
-    materials: [{ materialId: 'magical-shard', label: 'Magical Shards', quantity: 4 }],
-    weight: 0.1,
-    bonus: 'Staff/Wand: Spell Save DC +2; roll d6 on cast, on 6 spell slot not consumed',
-    worth: { gold: 9, silver: 0 },
-  },
-  {
-    id: 'craft-scroll-landslide', name: 'Scroll of Landslide', tier: 'legendary', minSkill: 91,
-    materials: [{ materialId: 'magical-shard', label: 'Magical Shards', quantity: 4 }],
-    weight: 0.1,
-    bonus: 'Heavy weapon: +2d10 Force damage; DC 18 STR save or target knocked prone and pushed 10 ft',
-    worth: { gold: 10, silver: 0 },
-  },
-  {
-    id: 'craft-scroll-windfury', name: 'Scroll of Windfury', tier: 'legendary', minSkill: 91,
-    materials: [{ materialId: 'magical-shard', label: 'Magical Shards', quantity: 4 }],
-    weight: 0.1,
-    bonus: 'Melee weapon: When you Attack, make one additional weapon attack (once per turn)',
-    worth: { gold: 9, silver: 5 },
-  },
-  {
-    id: 'craft-scroll-eternal-stats', name: 'Scroll of Eternal Stats', tier: 'legendary', minSkill: 91,
-    materials: [{ materialId: 'magical-shard', label: 'Magical Shards', quantity: 5 }],
-    weight: 0.1,
-    bonus: 'Armor/Cloak: STR, DEX, CON permanently +2 (max 22)',
-    worth: { gold: 10, silver: 0 },
-  },
-  {
-    id: 'craft-scroll-primal-haste', name: 'Scroll of Primal Haste', tier: 'legendary', minSkill: 91,
-    materials: [{ materialId: 'magical-shard', label: 'Magical Shards', quantity: 5 }],
-    weight: 0.1,
-    bonus: 'Armor: Permanent Haste (no lethargy), speed doubled, +2 AC',
-    worth: { gold: 9, silver: 5 },
-  },
-  {
-    id: 'craft-scroll-infinite-ac', name: 'Scroll of Infinite AC', tier: 'legendary', minSkill: 91,
-    materials: [{ materialId: 'magical-shard', label: 'Magical Shards', quantity: 5 }],
-    weight: 0.1,
-    bonus: 'Armor: AC becomes 22 if lower; immunity to crits (crits become normal hits)',
     worth: { gold: 10, silver: 0 },
   },
   {
     id: 'craft-scroll-colossus', name: 'Scroll of Colossus', tier: 'legendary', minSkill: 91,
-    materials: [{ materialId: 'magical-shard', label: 'Magical Shards', quantity: 5 }],
+    materials: [
+      { materialId: 'crystal-dust', label: 'Crystal Dust', quantity: 6 },
+      { materialId: 'large-brilliant-shard', label: 'Large Brilliant Shard', quantity: 4 },
+    ],
     weight: 0.1,
     bonus: 'Chest/Shield: Grow one size; Resistance to B/P/S damage; melee attacks deal extra 1d12',
+    worth: { gold: 10, silver: 0 },
+  },
+  {
+    id: 'craft-scroll-primal-haste', name: 'Scroll of Primal Haste', tier: 'legendary', minSkill: 91,
+    materials: [
+      { materialId: 'crystal-dust', label: 'Crystal Dust', quantity: 6 },
+      { materialId: 'large-brilliant-shard', label: 'Large Brilliant Shard', quantity: 4 },
+    ],
+    weight: 0.1,
+    bonus: 'Armor: Permanent Haste (no lethargy), speed doubled, +2 AC',
+    worth: { gold: 10, silver: 0 },
+  },
+  {
+    id: 'craft-scroll-infinite-ac', name: 'Scroll of Infinite AC', tier: 'legendary', minSkill: 91,
+    materials: [
+      { materialId: 'crystal-dust', label: 'Crystal Dust', quantity: 7 },
+      { materialId: 'large-brilliant-shard', label: 'Large Brilliant Shard', quantity: 4 },
+    ],
+    weight: 0.1,
+    bonus: 'Armor: AC becomes 22 if lower; immunity to crits (crits become normal hits)',
     worth: { gold: 10, silver: 0 },
   },
 ]

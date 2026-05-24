@@ -804,19 +804,15 @@ export const useCharacterStore = create<CharacterState>()(
           const { currentCharacter, history } = get()
           if (!currentCharacter) return
 
-          // Check if material already exists - consolidate by ID
-          const existingIndex = currentCharacter.materials.findIndex((m) => m.id === material.id)
-
-          let materials: Material[]
-          if (existingIndex >= 0) {
-            // Material exists - add to quantity
-            materials = currentCharacter.materials.map((m, index) =>
-              index === existingIndex ? { ...m, quantity: m.quantity + material.quantity } : m
-            )
-          } else {
-            // New material - add to array
-            materials = [...currentCharacter.materials, material]
-          }
+          // Consolidate: sum ALL existing entries with this ID, then add new quantity
+          const existingTotal = currentCharacter.materials
+            .filter((m) => m.id === material.id)
+            .reduce((sum, m) => sum + m.quantity, 0)
+          const without = currentCharacter.materials.filter((m) => m.id !== material.id)
+          const materials: Material[] = [
+            ...without,
+            { ...material, quantity: existingTotal + material.quantity },
+          ]
 
           set({
             currentCharacter: {
@@ -898,15 +894,20 @@ export const useCharacterStore = create<CharacterState>()(
           const rarity = item.rarity
           if (!rarity || rarity === 'trash' || rarity === 'common') return
 
-          // Determine what material to award
-          const isDust = rarity === 'uncommon' || rarity === 'rare'
-          const materialId = isDust ? 'magical-dust' : 'magical-shard'
-          const materialName = isDust ? 'Magical Dust' : 'Magical Shards'
-          const materialDescription = isDust
-            ? 'Fine enchanting dust harvested from disenchanted magic items'
-            : 'Potent crystalline shards from powerful enchanted items'
-          const materialRarity: Material['rarity'] = isDust ? 'uncommon' : 'epic'
-          const materialCategory: Material['category'] = isDust ? 'dust' : 'shard'
+          // Determine what material to award based on item rarity
+          const dustByRarity: Record<string, { id: string; name: string; desc: string; rarity: Material['rarity'] }> = {
+            uncommon:  { id: 'strange-dust',  name: 'Strange Dust',  desc: 'Fine arcane dust from common enchanted items',          rarity: 'common'   },
+            rare:      { id: 'soul-dust',      name: 'Soul Dust',     desc: 'Shimmering dust infused with residual soul energy',     rarity: 'uncommon' },
+            epic:      { id: 'vision-dust',    name: 'Vision Dust',   desc: 'Luminous dust that glows with inner sight',             rarity: 'rare'     },
+            legendary: { id: 'dream-dust',     name: 'Dream Dust',    desc: 'Ethereal dust harvested from the Plane of Dreams',      rarity: 'epic'     },
+            artifact:  { id: 'crystal-dust',   name: 'Crystal Dust',  desc: 'Pristine crystalline dust of immense magical potency',  rarity: 'legendary'},
+          }
+          const dustInfo = dustByRarity[rarity] ?? dustByRarity['uncommon']!
+          const materialId = dustInfo.id
+          const materialName = dustInfo.name
+          const materialDescription = dustInfo.desc
+          const materialRarity: Material['rarity'] = dustInfo.rarity
+          const materialCategory: Material['category'] = 'dust'
 
           // Remove the disenchanted item
           const equipment = currentCharacter.equipment.filter((e) => e.id !== itemId)
@@ -926,8 +927,8 @@ export const useCharacterStore = create<CharacterState>()(
                   category: materialCategory,
                   quantity: 1,
                   rarity: materialRarity,
-                  weight: 0.1,
-                  worth: isDust ? { gold: 0, silver: 7 } : { gold: 0, silver: 10 },
+                  weight: 0.05,
+                  worth: { gold: 0, silver: 5 },
                 },
               ]
 
