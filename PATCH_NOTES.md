@@ -1,5 +1,43 @@
 # Dungeons - Patch Notes
 
+## Version 0.4.21-alpha - May 23, 2026
+
+**Alpha Release Notice**: Massive profession system overhaul — 90+ professions across 9 lifestyle tiers, 2d100 rolling, multi-profession purchasing, and platinum currency support.
+
+### ✨ Expanded Profession System (2d100)
+
+The profession roller now uses **2d100** (range 2–200) instead of 1d100, covering 90+ unique professions across 9 lifestyle tiers from Wretched to Nobility.
+
+#### **9 Lifestyle Tiers**
+- **Wretched** (1–15 cp/day) — Outcasts, beggars, gravediggers, rat catchers
+- **Poverty** (35–75 cp/day) — Dockworkers, lamplighters, street sweepers, stable hands
+- **Poor** (2–10 sp/day) — Farmhands, miners, potters, tanners, weavers
+- **Lower Modest** (35–75 sp/day) — Butchers, chandlers, couriers, farriers, midwives
+- **Modest** (1–10 gp/day) — Soldiers, merchants, innkeepers, scribes, carpenters
+- **Comfortable** (15–35 gp/day) — Architects, barristers, master smiths, shipwrights
+- **Wealthy** (40–75 gp/day) — Gem cutters, war profiteers, privateers, grand alchemists
+- **Land Owner** (1–10 pp/day) — Lords, Dukes, Counts, Margraves, Archdukes
+- **Nobility** (12–25 pp/day) — Princes, High Chancellors, Grand Marshals, Sovereign Rulers
+
+Every profession includes a description, duties, and perks that display on the Profession tab.
+
+#### **Multi-Profession Purchasing**
+Players can now keep their current profession and pay gold to roll for an additional one — up to 10 extra professions total. Cost escalates: 1,000 → 3,000 → 5,000 → 7,000 → 10,000 → 20,000 → 30,000 → 50,000 → 75,000 → 100,000 GP.
+
+- Visual cost ladder shows which purchases are complete, current cost, and upcoming costs
+- All additional professions are listed with their tier and daily income
+- New Day collects income from ALL held professions simultaneously
+- Purchase roller uses the same animated 2d100 system
+
+#### **Platinum Currency**
+Land Owner and Nobility professions pay in platinum pieces (PP). All income collection, display, and rollers now handle platinum alongside copper, silver, and gold.
+
+### ✨ Profession Tab — Dynamic Flavour
+
+The Profession tab now pulls duties and perks directly from the profession data file instead of a hardcoded list. All 90+ professions display their unique duties and perks when selected.
+
+**Why This Matters**: The profession system is now a rich economic layer — players can invest gold into building a portfolio of professions for diversified daily income, with real flavour text that brings each career to life.
+
 ## Version 0.4.20-alpha - May 23, 2026
 
 **Alpha Release Notice**: The Actions tab now opens with a Daily Actions section — eat, drink, roll ocean weather, and change professions all in one place.

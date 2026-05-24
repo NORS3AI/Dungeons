@@ -1729,7 +1729,8 @@ export function CharacterSheetPage() {
                 <h3 className="text-lg font-bold text-white">Daily Actions</h3>
                 {character.dailyIncome && (
                   <span className="text-xs text-gray-400">
-                    {character.dailyIncome.professionName} — {character.dailyIncome.amount} {character.dailyIncome.currency === 'gold' ? 'GP' : character.dailyIncome.currency === 'silver' ? 'SP' : 'CP'}/day
+                    {character.dailyIncome.professionName} — {character.dailyIncome.amount} {character.dailyIncome.currency === 'platinum' ? 'PP' : character.dailyIncome.currency === 'gold' ? 'GP' : character.dailyIncome.currency === 'silver' ? 'SP' : 'CP'}/day
+                    {(character.professionData?.additionalProfessions?.length ?? 0) > 0 && ` +${character.professionData!.additionalProfessions!.length} more`}
                   </span>
                 )}
               </div>
@@ -1746,15 +1747,20 @@ export function CharacterSheetPage() {
                     onClick={() => {
                       if (!character.dailyIncome) return
 
-                      const earned: Partial<Currency> = {}
-                      if (character.dailyIncome.currency === 'gold') earned.gold = character.dailyIncome.amount
-                      else if (character.dailyIncome.currency === 'silver') earned.silver = character.dailyIncome.amount
-                      else if (character.dailyIncome.currency === 'copper') earned.copper = character.dailyIncome.amount
-
                       const newCurrency = { ...character.currency }
-                      for (const [key, value] of Object.entries(earned)) {
-                        newCurrency[key as keyof Currency] += value
+
+                      const addIncome = (amount: number, currency: string) => {
+                        if (currency === 'platinum') newCurrency.platinum += amount
+                        else if (currency === 'gold') newCurrency.gold += amount
+                        else if (currency === 'silver') newCurrency.silver += amount
+                        else if (currency === 'copper') newCurrency.copper += amount
                       }
+
+                      addIncome(character.dailyIncome.amount, character.dailyIncome.currency)
+
+                      const extras = character.professionData?.additionalProfessions ?? []
+                      extras.forEach((ap) => addIncome(ap.amount, ap.currency))
+
                       updateCurrency(newCurrency)
 
                       if (character.foodRations > 0) {
@@ -1764,7 +1770,7 @@ export function CharacterSheetPage() {
                       saveCharacter()
                     }}
                     className="px-4 py-2 text-sm bg-blue-700 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
-                    title={`Collect ${character.dailyIncome.amount} ${character.dailyIncome.currency === 'gold' ? 'GP' : character.dailyIncome.currency === 'silver' ? 'SP' : 'CP'} from ${character.dailyIncome.professionName} (Consumes 1 food)`}
+                    title={`Collect daily income from ${1 + (character.professionData?.additionalProfessions?.length ?? 0)} profession(s) (Consumes 1 food)`}
                   >
                     ☀️ New Day
                   </button>
@@ -2069,19 +2075,25 @@ export function CharacterSheetPage() {
                     onClick={() => {
                       if (!character.dailyIncome) return
 
-                      // Earn daily income
-                      const earned: Partial<Currency> = {}
-                      if (character.dailyIncome.currency === 'gold') earned.gold = character.dailyIncome.amount
-                      else if (character.dailyIncome.currency === 'silver') earned.silver = character.dailyIncome.amount
-                      else if (character.dailyIncome.currency === 'copper') earned.copper = character.dailyIncome.amount
-
                       const newCurrency = { ...character.currency }
-                      for (const [key, value] of Object.entries(earned)) {
-                        newCurrency[key as keyof Currency] += value
+
+                      // Helper to add income
+                      const addIncome = (amount: number, currency: string) => {
+                        if (currency === 'platinum') newCurrency.platinum += amount
+                        else if (currency === 'gold') newCurrency.gold += amount
+                        else if (currency === 'silver') newCurrency.silver += amount
+                        else if (currency === 'copper') newCurrency.copper += amount
                       }
+
+                      // Primary profession income
+                      addIncome(character.dailyIncome.amount, character.dailyIncome.currency)
+
+                      // Additional professions income
+                      const extras = character.professionData?.additionalProfessions ?? []
+                      extras.forEach((ap) => addIncome(ap.amount, ap.currency))
+
                       updateCurrency(newCurrency)
 
-                      // Consume 1 food ration per day
                       if (character.foodRations > 0) {
                         addFoodRations(-1)
                       }
@@ -2089,7 +2101,7 @@ export function CharacterSheetPage() {
                       saveCharacter()
                     }}
                     className="px-3 py-1 text-sm bg-blue-700 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                    title={character.dailyIncome ? `Collect ${character.dailyIncome.amount} ${character.dailyIncome.currency === 'gold' ? 'GP' : character.dailyIncome.currency === 'silver' ? 'SP' : 'CP'} from ${character.dailyIncome.professionName} (Consumes 1 food)` : 'New Day'}
+                    title={character.dailyIncome ? `Collect daily income from ${1 + (character.professionData?.additionalProfessions?.length ?? 0)} profession(s) (Consumes 1 food)` : 'New Day'}
                   >
                     New Day
                   </button>
@@ -3177,7 +3189,7 @@ export function CharacterSheetPage() {
                 <div className="text-xs text-yellow-200 mt-1">
                   {character.dailyIncome
                     ? `Currently: ${character.dailyIncome.professionName}`
-                    : 'Roll d100 for a profession'}
+                    : 'Roll 2d100 for a profession'}
                 </div>
               </button>
             </div>
@@ -5037,7 +5049,7 @@ function DMRerollModal({
   onClose,
 }: {
   currentProfession?: string
-  onSetProfession: (professionName: string, amount: number, currency: 'copper' | 'silver' | 'gold') => void
+  onSetProfession: (professionName: string, amount: number, currency: 'copper' | 'silver' | 'gold' | 'platinum') => void
   onClose: () => void
 }) {
   const [selectedProfession, setSelectedProfession] = useState<Profession | null>(null)
@@ -5053,11 +5065,15 @@ function DMRerollModal({
 
     let count = 0
     const interval = setInterval(() => {
-      setRollResult(Math.floor(Math.random() * 100) + 1)
+      const d1 = Math.floor(Math.random() * 100) + 1
+      const d2 = Math.floor(Math.random() * 100) + 1
+      setRollResult(d1 + d2)
       count++
       if (count >= 15) {
         clearInterval(interval)
-        const finalRoll = Math.floor(Math.random() * 100) + 1
+        const f1 = Math.floor(Math.random() * 100) + 1
+        const f2 = Math.floor(Math.random() * 100) + 1
+        const finalRoll = f1 + f2
         setRollResult(finalRoll)
         setSelectedProfession(getProfessionByRoll(finalRoll))
         setIsRolling(false)
@@ -5092,13 +5108,13 @@ function DMRerollModal({
         {/* Roll section */}
         <div className="bg-gray-900 rounded-lg p-4 mb-4">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-white font-medium">Roll d100</span>
+            <span className="text-white font-medium">Roll 2d100</span>
             <button
               onClick={handleRoll}
               disabled={isRolling}
               className="px-4 py-2 bg-purple-700 text-white rounded-lg font-medium hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isRolling ? 'Rolling...' : rollResult !== null ? 'Reroll' : 'Roll d100'}
+              {isRolling ? 'Rolling...' : rollResult !== null ? 'Reroll' : 'Roll 2d100'}
             </button>
           </div>
           {rollResult !== null && (
@@ -5176,7 +5192,7 @@ function DailyIncomeRoller({
   onClose,
 }: {
   onEarn: (currency: Partial<Currency>) => void
-  onSetProfession: (professionName: string, amount: number, currency: 'copper' | 'silver' | 'gold') => void
+  onSetProfession: (professionName: string, amount: number, currency: 'copper' | 'silver' | 'gold' | 'platinum') => void
   onClose: () => void
 }) {
   const [selectedProfession, setSelectedProfession] = useState<Profession | null>(null)
@@ -5188,15 +5204,17 @@ function DailyIncomeRoller({
     setIsRolling(true)
     setEarnedAmount(null)
 
-    // Animate the roll
     let count = 0
     const interval = setInterval(() => {
-      const roll = Math.floor(Math.random() * 100) + 1
-      setRollResult(roll)
+      const d1 = Math.floor(Math.random() * 100) + 1
+      const d2 = Math.floor(Math.random() * 100) + 1
+      setRollResult(d1 + d2)
       count++
       if (count >= 15) {
         clearInterval(interval)
-        const finalRoll = Math.floor(Math.random() * 100) + 1
+        const f1 = Math.floor(Math.random() * 100) + 1
+        const f2 = Math.floor(Math.random() * 100) + 1
+        const finalRoll = f1 + f2
         setRollResult(finalRoll)
         const profession = getProfessionByRoll(finalRoll)
         setSelectedProfession(profession)
@@ -5214,9 +5232,9 @@ function DailyIncomeRoller({
     // Save profession permanently
     onSetProfession(selectedProfession.name, amount, currency)
 
-    // Convert to currency object
     const earned: Partial<Currency> = {}
-    if (currency === 'gold') earned.gold = amount
+    if (currency === 'platinum') earned.platinum = amount
+    else if (currency === 'gold') earned.gold = amount
     else if (currency === 'silver') earned.silver = amount
     else if (currency === 'copper') earned.copper = amount
 
@@ -5228,7 +5246,7 @@ function DailyIncomeRoller({
       <div className="bg-gray-800 rounded-xl p-6 w-full max-w-lg border border-gray-700 max-h-[90vh] overflow-y-auto">
         <h3 className="text-xl font-bold text-dnd-gold mb-4">Daily Income Roller</h3>
         <p className="text-gray-400 text-sm mb-4">
-          Roll d100 once to determine your daily profession and earnings.
+          Roll 2d100 to determine your daily profession and earnings.
         </p>
 
         {/* Roll Section */}
@@ -5240,7 +5258,7 @@ function DailyIncomeRoller({
               disabled={isRolling || selectedProfession !== null}
               className="px-4 py-2 bg-dnd-gold text-gray-900 rounded-lg font-medium hover:bg-yellow-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isRolling ? 'Rolling...' : selectedProfession ? 'Already Rolled' : 'Roll d100'}
+              {isRolling ? 'Rolling...' : selectedProfession ? 'Already Rolled' : 'Roll 2d100'}
             </button>
           </div>
           {rollResult !== null && (
@@ -5285,7 +5303,7 @@ function DailyIncomeRoller({
         {earnedAmount && (
           <div className="bg-green-900/30 border border-green-600 rounded-lg p-4 mb-4 text-center">
             <p className="text-green-400 font-medium">
-              Collected {earnedAmount.amount} {earnedAmount.currency === 'gold' ? 'GP' : earnedAmount.currency === 'silver' ? 'SP' : 'CP'}!
+              Collected {earnedAmount.amount} {earnedAmount.currency === 'platinum' ? 'PP' : earnedAmount.currency === 'gold' ? 'GP' : earnedAmount.currency === 'silver' ? 'SP' : 'CP'}!
             </p>
           </div>
         )}

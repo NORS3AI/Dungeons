@@ -16,6 +16,7 @@ export type {
   CraftingSkills,
   SailorRole,
   ShipDetails,
+  AdditionalProfession,
   ProfessionData,
   Character,
 } from './character'
