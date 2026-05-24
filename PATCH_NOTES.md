@@ -1,5 +1,19 @@
 # Dungeons - Patch Notes
 
+## Version 0.4.22-alpha - May 24, 2026
+
+**Alpha Release Notice**: Multi-profession costs reduced by 10x, and DMs can now manually assign any profession via a dropdown.
+
+### ✨ Reduced Multi-Profession Costs
+
+The escalating gold cost to purchase additional professions has been reduced by one order of magnitude: 100 → 300 → 500 → 700 → 1,000 → 2,000 → 3,000 → 5,000 → 7,500 → 10,000 GP.
+
+### ✨ DM Manual Profession Picker
+
+When DM mode is enabled, a new dropdown appears on the Profession tab allowing the DM to directly assign any of the 90+ professions to a character. Professions are grouped by lifestyle tier with income ranges shown. Works both when a profession is already set (shows "Current: ...") and when no profession exists yet.
+
+**Why This Matters**: DMs can now override rolled professions for narrative reasons without needing to hack values, and the lower purchase costs make multi-profession builds accessible earlier in a campaign.
+
 ## Version 0.4.21-alpha - May 23, 2026
 
 **Alpha Release Notice**: Massive profession system overhaul — 90+ professions across 9 lifestyle tiers, 2d100 rolling, multi-profession purchasing, and platinum currency support.

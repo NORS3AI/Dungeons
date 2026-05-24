@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { Character, SailorRole, ShipDetails } from '../types'
 import { useCharacterStore } from '../stores/characterStore'
+import { useSettingsStore } from '../stores/settingsStore'
 import { ALL_PROFESSIONS, CATEGORY_INFO, PROFESSION_COST_LADDER, getProfessionByRoll, formatIncome, type Profession } from '../data/professions'
 
 // Sailor/Ship Captain flavour (not in PROFESSIONS data since they're handled specially)
@@ -349,11 +350,65 @@ function ShipDetailsForm({
 }
 
 // ------------------------------------------------------------------
+// DM: Manual profession picker dropdown
+// ------------------------------------------------------------------
+
+function DMProfessionPicker({
+  currentProfession,
+  onSelect,
+}: {
+  currentProfession?: string
+  onSelect: (profession: Profession) => void
+}) {
+  const [selectedId, setSelectedId] = useState('')
+
+  const grouped = Object.entries(CATEGORY_INFO).map(([cat, info]) => ({
+    category: cat as Profession['category'],
+    label: info.name,
+    color: info.color,
+    professions: ALL_PROFESSIONS.filter((p) => p.category === cat),
+  }))
+
+  const handleChange = (id: string) => {
+    setSelectedId(id)
+    const prof = ALL_PROFESSIONS.find((p) => p.id === id)
+    if (prof) onSelect(prof)
+  }
+
+  return (
+    <div className="bg-purple-900/20 border border-purple-700/50 rounded-lg p-3">
+      <div className="flex items-center gap-2 mb-2">
+        <span className="text-purple-400 text-xs font-bold uppercase tracking-wide">DM: Assign Profession</span>
+      </div>
+      <select
+        value={selectedId}
+        onChange={(e) => handleChange(e.target.value)}
+        className="w-full bg-gray-900 border border-purple-700/60 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-purple-500 cursor-pointer"
+      >
+        <option value="">
+          {currentProfession ? `Current: ${currentProfession}` : '— Select a profession —'}
+        </option>
+        {grouped.map((g) => (
+          <optgroup key={g.category} label={`${g.label} (${formatIncome(g.professions[0]?.dailyIncome)} – ${formatIncome(g.professions[g.professions.length - 1]?.dailyIncome)}/day)`}>
+            {g.professions.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name} — {formatIncome(p.dailyIncome)}/day
+              </option>
+            ))}
+          </optgroup>
+        ))}
+      </select>
+    </div>
+  )
+}
+
+// ------------------------------------------------------------------
 // Main ProfessionTab component
 // ------------------------------------------------------------------
 
 export function ProfessionTab({ character }: { character: Character }) {
-  const { setProfessionData, saveCharacter } = useCharacterStore()
+  const { setProfessionData, setDailyIncome, saveCharacter } = useCharacterStore()
+  const { dmModeEnabled } = useSettingsStore()
 
   const professionData = character.professionData ?? {}
   const income = character.dailyIncome
@@ -405,10 +460,18 @@ export function ProfessionTab({ character }: { character: Character }) {
       <div className="p-6 text-center text-gray-400">
         <div className="text-4xl mb-3">💼</div>
         <p className="text-lg font-medium text-gray-300 mb-1">No Profession Set</p>
-        <p className="text-sm">
+        <p className="text-sm mb-4">
           Roll for daily income using the <span className="text-dnd-gold">New Day</span> button on
           the Overview tab to assign a profession.
         </p>
+        {dmModeEnabled && (
+          <DMProfessionPicker
+            onSelect={(prof) => {
+              setDailyIncome(prof.name, prof.dailyIncome.amount, prof.dailyIncome.currency)
+              saveCharacter()
+            }}
+          />
+        )}
       </div>
     )
   }
@@ -445,6 +508,17 @@ export function ProfessionTab({ character }: { character: Character }) {
           )}
         </div>
       </div>
+
+      {/* DM: Manual profession picker */}
+      {dmModeEnabled && (
+        <DMProfessionPicker
+          currentProfession={income.professionName}
+          onSelect={(prof) => {
+            setDailyIncome(prof.name, prof.dailyIncome.amount, prof.dailyIncome.currency)
+            saveCharacter()
+          }}
+        />
+      )}
 
       {/* Duties & Perks */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
