@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import type { Character, SailorRole, ShipDetails } from '../types'
+import type { Character, SailorRole, ShipDetails, ProfessionData } from '../types'
 import { useCharacterStore } from '../stores/characterStore'
 import { useSettingsStore } from '../stores/settingsStore'
 import { ALL_PROFESSIONS, CATEGORY_INFO, PROFESSION_COST_LADDER, getProfessionByRoll, formatIncome, type Profession } from '../data/professions'
+import { getSubProfessionsForId, type SubProfessionFlavour, type DynamicFieldConfig } from '../data/subProfessions'
 
 // Sailor/Ship Captain flavour (not in PROFESSIONS data since they're handled specially)
 const SAILOR_FLAVOUR = {
@@ -553,6 +554,16 @@ export function ProfessionTab({ character }: { character: Character }) {
         </div>
       </div>
 
+      {/* Sub-Profession Specialisation */}
+      <SubProfessionSection
+        profId={profId}
+        professionData={professionData}
+        onSave={(subId, fields) => {
+          setProfessionData({ subProfessionId: subId, subProfessionFields: fields })
+          saveCharacter()
+        }}
+      />
+
       {/* Maritime Section */}
       {isMaritime && (
         <div className="bg-gray-800/40 rounded-xl p-5 border border-blue-800/50 space-y-5">
@@ -611,6 +622,132 @@ export function ProfessionTab({ character }: { character: Character }) {
       <div className="text-xs text-gray-500 text-center">
         Daily income is collected via the <span className="text-gray-400 font-medium">New Day</span> button on the Overview tab.
       </div>
+    </div>
+  )
+}
+
+// ------------------------------------------------------------------
+// Sub-profession specialisation UI
+// ------------------------------------------------------------------
+
+function SubProfessionSection({
+  profId,
+  professionData,
+  onSave,
+}: {
+  profId: string
+  professionData: ProfessionData
+  onSave: (subId: string, fields: Record<string, string | number>) => void
+}) {
+  const subOptions = getSubProfessionsForId(profId)
+  const currentSubId = (professionData.subProfessionId as string) ?? ''
+  const savedFields = (professionData.subProfessionFields as Record<string, string | number>) ?? {}
+
+  const [selectedId, setSelectedId] = useState(currentSubId)
+  const [localFields, setLocalFields] = useState<Record<string, string | number>>(savedFields)
+  const [dirty, setDirty] = useState(false)
+
+  if (subOptions.length === 0) return null
+
+  const selected = subOptions.find((s) => s.id === selectedId) ?? null
+
+  function handleSelect(sub: SubProfessionFlavour) {
+    setSelectedId(sub.id)
+    if (sub.id !== currentSubId) {
+      const defaults: Record<string, string | number> = {}
+      for (const f of sub.fields) {
+        defaults[f.key] = f.type === 'number' ? (f.min ?? 0) : ''
+      }
+      setLocalFields(defaults)
+      setDirty(true)
+    } else {
+      setLocalFields(savedFields)
+      setDirty(false)
+    }
+  }
+
+  function handleFieldChange(key: string, value: string | number) {
+    setLocalFields((prev) => ({ ...prev, [key]: value }))
+    setDirty(true)
+  }
+
+  function handleSave() {
+    onSave(selectedId, localFields)
+    setDirty(false)
+  }
+
+  return (
+    <div className="bg-gray-800/40 rounded-xl p-5 border border-indigo-800/40 space-y-4">
+      <h3 className="text-sm font-bold text-indigo-300 uppercase tracking-wide flex items-center gap-2">
+        🎭 Specialisation
+      </h3>
+
+      {/* Sub-profession cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+        {subOptions.map((sub) => (
+          <button
+            key={sub.id}
+            onClick={() => handleSelect(sub)}
+            className={`rounded-xl p-3 border text-left transition-all ${
+              selectedId === sub.id
+                ? 'bg-indigo-900/50 border-indigo-500 text-white'
+                : 'bg-gray-900/50 border-gray-700 text-gray-400 hover:border-gray-500'
+            }`}
+          >
+            <div className="text-xl mb-1">{sub.icon}</div>
+            <div className="text-xs font-bold truncate">{sub.label}</div>
+          </button>
+        ))}
+      </div>
+
+      {/* Description */}
+      {selected && (
+        <p className="text-xs text-gray-400 italic">{selected.description}</p>
+      )}
+
+      {/* Dynamic fields */}
+      {selected && selected.fields.length > 0 && (
+        <div className="space-y-3">
+          {selected.fields.map((field: DynamicFieldConfig) => (
+            <div key={field.key}>
+              {field.info ? (
+                <InfoLabel label={field.label} info={field.info} />
+              ) : (
+                <label className="block text-xs text-gray-400 mb-1">{field.label}</label>
+              )}
+              {field.type === 'number' ? (
+                <input
+                  type="number"
+                  min={field.min ?? 0}
+                  value={(localFields[field.key] as number) ?? 0}
+                  onChange={(e) => handleFieldChange(field.key, Number(e.target.value))}
+                  className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-indigo-500"
+                />
+              ) : (
+                <input
+                  type="text"
+                  value={(localFields[field.key] as string) ?? ''}
+                  onChange={(e) => handleFieldChange(field.key, e.target.value)}
+                  placeholder={field.placeholder ?? ''}
+                  className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500"
+                />
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Save button */}
+      {dirty && selectedId && (
+        <div className="flex justify-end">
+          <button
+            onClick={handleSave}
+            className="px-4 py-2 bg-indigo-700 text-white rounded-lg text-sm font-medium hover:bg-indigo-600 transition-colors"
+          >
+            Save Specialisation
+          </button>
+        </div>
+      )}
     </div>
   )
 }
