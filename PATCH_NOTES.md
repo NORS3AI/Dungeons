@@ -1,5 +1,36 @@
 # Dungeons - Patch Notes
 
+## Version 0.4.27-alpha - May 25, 2026
+
+**Alpha Release Notice**: Loot Cache improvements — Add All button, sorting by name/quality/resource type, and filtering by crafting profession.
+
+### Loot Cache: Add All Button
+
+Both the Legendary Loot and Standard Loot sections now have an **Add All** button next to Clear All. When a filter is active, Add All only adds the filtered items (and shows the count).
+
+### Loot Cache: Sort System
+
+New sort controls appear above loot results with four options:
+- **Default** — original generation order
+- **Name** — alphabetical A→Z
+- **Quality** — highest rarity first (Artifact → Legendary → ... → Trash)
+- **Resource Type** — groups by crafting profession, then alphabetical
+
+### Loot Cache: Resource Filter
+
+Filter buttons let you show only materials for a specific crafting profession:
+- **All** — show everything (default)
+- **Mining** (⚒️) — ores and metals for Blacksmithing
+- **Tailoring** (🧵) — cloth, hide, and leather
+- **Herbalism** (⚗️) — herbs for Alchemy
+- **Enchanting** (✨) — dusts, essences, and shards
+
+Filters and sorts apply to both Legendary Loot and Standard Loot sections independently.
+
+**Why This Matters**: When generating large batches of loot, you can now quickly find and add just the materials you need without scrolling through dozens of items.
+
+---
+
 ## Version 0.4.26-alpha - May 25, 2026
 
 **Alpha Release Notice**: Profession slot system rework — DM-deleted professions reopen slots at the correct price, and primary profession is always free to re-roll daily.

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { generateLoot, generateLegendaryLoot, RARITY_COLORS, type LootItem, type LootRarity } from '../data/lootGenerator'
 import {
   BLACKSMITHING_ORE_BY_TIER,
@@ -86,12 +86,131 @@ const MATERIAL_NAMES: Record<string, string> = {
 const matName = (id: string) =>
   MATERIAL_NAMES[id] ?? id.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
 
+// Build lookup sets for resource type filtering
+const ALL_MINING_IDS = new Set(Object.values(BLACKSMITHING_ORE_BY_TIER).flat())
+const ALL_TAILORING_IDS = new Set(Object.values(TAILORING_MATERIALS_BY_TIER).flat())
+const ALL_HERBALISM_IDS = new Set(Object.values(ALCHEMY_HERB_BY_TIER).flat())
+const ALL_ENCHANTING_IDS = new Set(Object.values(ENCHANTING_MATERIALS_BY_TIER).flat())
+
+type ResourceFilter = 'all' | 'mining' | 'tailoring' | 'herbalism' | 'enchanting'
+type SortMode = 'default' | 'name' | 'quality' | 'resource'
+
+const RESOURCE_FILTERS: { id: ResourceFilter; label: string; icon: string }[] = [
+  { id: 'all', label: 'All', icon: '📦' },
+  { id: 'mining', label: 'Mining', icon: '⚒️' },
+  { id: 'tailoring', label: 'Tailoring', icon: '🧵' },
+  { id: 'herbalism', label: 'Herbalism', icon: '⚗️' },
+  { id: 'enchanting', label: 'Enchanting', icon: '✨' },
+]
+
+const SORT_OPTIONS: { id: SortMode; label: string }[] = [
+  { id: 'default', label: 'Default' },
+  { id: 'name', label: 'Name' },
+  { id: 'quality', label: 'Quality' },
+  { id: 'resource', label: 'Resource Type' },
+]
+
+const RARITY_ORDER: Record<string, number> = {
+  trash: 0, common: 1, uncommon: 2, rare: 3, epic: 4, legendary: 5, artifact: 6,
+}
+
+function getResourceType(item: LootItem): ResourceFilter {
+  if (ALL_MINING_IDS.has(item.id)) return 'mining'
+  if (ALL_TAILORING_IDS.has(item.id)) return 'tailoring'
+  if (ALL_HERBALISM_IDS.has(item.id)) return 'herbalism'
+  if (ALL_ENCHANTING_IDS.has(item.id)) return 'enchanting'
+  return 'all'
+}
+
+function filterAndSortLoot(items: LootItem[], filter: ResourceFilter, sort: SortMode): LootItem[] {
+  let filtered = items
+  if (filter !== 'all') {
+    filtered = items.filter((item) => getResourceType(item) === filter)
+  }
+
+  if (sort === 'name') {
+    return [...filtered].sort((a, b) => a.name.localeCompare(b.name))
+  }
+  if (sort === 'quality') {
+    return [...filtered].sort((a, b) => (RARITY_ORDER[b.rarity] ?? 0) - (RARITY_ORDER[a.rarity] ?? 0))
+  }
+  if (sort === 'resource') {
+    return [...filtered].sort((a, b) => {
+      const ra = getResourceType(a)
+      const rb = getResourceType(b)
+      if (ra !== rb) return ra.localeCompare(rb)
+      return a.name.localeCompare(b.name)
+    })
+  }
+  return filtered
+}
+
 const WORK_SKILLS: { key: string; label: string; icon: string; byTier: Record<CraftingTier, string[]> }[] = [
   { key: 'blacksmithing', label: 'Blacksmithing', icon: '⚒️', byTier: BLACKSMITHING_ORE_BY_TIER },
   { key: 'tailoring', label: 'Tailoring', icon: '🧵', byTier: TAILORING_MATERIALS_BY_TIER },
   { key: 'alchemy', label: 'Alchemy', icon: '⚗️', byTier: ALCHEMY_HERB_BY_TIER },
   { key: 'enchanting', label: 'Enchanting', icon: '✨', byTier: ENCHANTING_MATERIALS_BY_TIER },
 ]
+
+function SortFilterBar({
+  sort,
+  onSortChange,
+  filter,
+  onFilterChange,
+  totalCount,
+  filteredCount,
+}: {
+  sort: SortMode
+  onSortChange: (s: SortMode) => void
+  filter: ResourceFilter
+  onFilterChange: (f: ResourceFilter) => void
+  totalCount: number
+  filteredCount: number
+}) {
+  return (
+    <div className="mb-4 space-y-2">
+      {/* Filter row */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-xs text-gray-500 font-bold uppercase">Filter:</span>
+        {RESOURCE_FILTERS.map((rf) => (
+          <button
+            key={rf.id}
+            onClick={() => onFilterChange(rf.id)}
+            className={`px-2.5 py-1 rounded text-xs font-medium border transition-all ${
+              filter === rf.id
+                ? 'bg-blue-900/50 border-blue-500 text-blue-300'
+                : 'bg-gray-900/50 border-gray-700 text-gray-500 hover:border-gray-500'
+            }`}
+          >
+            {rf.icon} {rf.label}
+          </button>
+        ))}
+        {filter !== 'all' && filteredCount !== totalCount && (
+          <span className="text-xs text-gray-500">
+            ({filteredCount} of {totalCount})
+          </span>
+        )}
+      </div>
+      {/* Sort row */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-xs text-gray-500 font-bold uppercase">Sort:</span>
+        {SORT_OPTIONS.map((so) => (
+          <button
+            key={so.id}
+            onClick={() => onSortChange(so.id)}
+            className={`px-2.5 py-1 rounded text-xs font-medium border transition-all ${
+              sort === so.id
+                ? 'bg-purple-900/50 border-purple-500 text-purple-300'
+                : 'bg-gray-900/50 border-gray-700 text-gray-500 hover:border-gray-500'
+            }`}
+          >
+            {so.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 function CollapseToggle({ open, onToggle, label }: { open: boolean; onToggle: () => void; label: string }) {
   return (
@@ -126,6 +245,21 @@ export function LootCache({ character, onAddToInventory, dmModeEnabled = false }
   const [showLegendaryResults, setShowLegendaryResults] = useState(true)
   const [showGeneratedLoot, setShowGeneratedLoot] = useState(true)
   const [showMatsReference, setShowMatsReference] = useState(false)
+
+  // Sort & filter
+  const [legendarySort, setLegendarySort] = useState<SortMode>('default')
+  const [legendaryFilter, setLegendaryFilter] = useState<ResourceFilter>('all')
+  const [standardSort, setStandardSort] = useState<SortMode>('default')
+  const [standardFilter, setStandardFilter] = useState<ResourceFilter>('all')
+
+  const filteredLegendary = useMemo(
+    () => filterAndSortLoot(legendaryLoot, legendaryFilter, legendarySort),
+    [legendaryLoot, legendaryFilter, legendarySort]
+  )
+  const filteredStandard = useMemo(
+    () => filterAndSortLoot(generatedLoot, standardFilter, standardSort),
+    [generatedLoot, standardFilter, standardSort]
+  )
 
   const handleGenerateLoot = () => {
     setIsGenerating(true)
@@ -305,6 +439,17 @@ export function LootCache({ character, onAddToInventory, dmModeEnabled = false }
                 label="loot"
               />
               <button
+                onClick={() => {
+                  for (const item of filteredLegendary) {
+                    if (onAddToInventory) onAddToInventory(item)
+                  }
+                  setLegendaryLoot((prev) => prev.filter((i) => !filteredLegendary.includes(i)))
+                }}
+                className="px-3 py-1 bg-green-700 hover:bg-green-600 text-white text-sm rounded transition-all"
+              >
+                Add All{legendaryFilter !== 'all' ? ` (${filteredLegendary.length})` : ''}
+              </button>
+              <button
                 onClick={() => setLegendaryLoot([])}
                 className="px-3 py-1 bg-red-700 hover:bg-red-600 text-white text-sm rounded transition-all"
               >
@@ -313,8 +458,17 @@ export function LootCache({ character, onAddToInventory, dmModeEnabled = false }
             </div>
           </div>
           {showLegendaryResults && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-              {legendaryLoot.map((item) => (
+            <>
+              <SortFilterBar
+                sort={legendarySort}
+                onSortChange={setLegendarySort}
+                filter={legendaryFilter}
+                onFilterChange={setLegendaryFilter}
+                totalCount={legendaryLoot.length}
+                filteredCount={filteredLegendary.length}
+              />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              {filteredLegendary.map((item) => (
                 <div
                   key={item.id}
                   className={`p-3 sm:p-4 rounded-lg border-2 ${RARITY_COLORS[item.rarity].border} ${RARITY_COLORS[item.rarity].bg} ${RARITY_COLORS[item.rarity].glow} transition-all hover:scale-105`}
@@ -342,7 +496,8 @@ export function LootCache({ character, onAddToInventory, dmModeEnabled = false }
                   </div>
                 </div>
               ))}
-            </div>
+              </div>
+            </>
           )}
         </div>
       )}
@@ -391,17 +546,44 @@ export function LootCache({ character, onAddToInventory, dmModeEnabled = false }
         <div className="card bg-gray-800 border-gray-700 p-4 sm:p-6">
           <div className="flex items-center justify-between mb-3 sm:mb-4">
             <h3 className="text-lg sm:text-xl font-bold text-white">Generated Loot</h3>
-            <CollapseToggle
-              open={showGeneratedLoot}
-              onToggle={() => setShowGeneratedLoot(!showGeneratedLoot)}
-              label="loot"
-            />
+            <div className="flex items-center gap-3">
+              <CollapseToggle
+                open={showGeneratedLoot}
+                onToggle={() => setShowGeneratedLoot(!showGeneratedLoot)}
+                label="loot"
+              />
+              <button
+                onClick={() => {
+                  for (const item of filteredStandard) {
+                    if (onAddToInventory) onAddToInventory(item)
+                  }
+                  setGeneratedLoot((prev) => prev.filter((i) => !filteredStandard.includes(i)))
+                }}
+                className="px-3 py-1 bg-green-700 hover:bg-green-600 text-white text-sm rounded transition-all"
+              >
+                Add All{standardFilter !== 'all' ? ` (${filteredStandard.length})` : ''}
+              </button>
+              <button
+                onClick={() => setGeneratedLoot([])}
+                className="px-3 py-1 bg-red-700 hover:bg-red-600 text-white text-sm rounded transition-all"
+              >
+                Clear All
+              </button>
+            </div>
           </div>
 
           {showGeneratedLoot && (
             <>
+              <SortFilterBar
+                sort={standardSort}
+                onSortChange={setStandardSort}
+                filter={standardFilter}
+                onFilterChange={setStandardFilter}
+                totalCount={generatedLoot.length}
+                filteredCount={filteredStandard.length}
+              />
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-                {generatedLoot.map((item) => {
+                {filteredStandard.map((item) => {
                   const rarityColors = RARITY_COLORS[item.rarity] || RARITY_COLORS.common
                   return (
                     <div
