@@ -214,6 +214,7 @@ interface CharacterState {
   addMaterial: (material: Material) => void // Auto-consolidates if material already exists
   removeMaterial: (materialId: string) => void
   changeMaterialQuantity: (materialId: string, change: number) => void
+  consolidateMaterials: () => void
   incrementCraftingSkill: (skill: keyof CraftingSkills, amount?: number) => void
   disenchantItem: (itemId: string) => void // Break down item into Magical Dust or Shards
   setDailyIncome: (professionName: string, amount: number, currency: 'copper' | 'silver' | 'gold' | 'platinum') => void
@@ -861,6 +862,29 @@ export const useCharacterStore = create<CharacterState>()(
               ...currentCharacter,
               materials,
             },
+            history: addToHistory(history, currentCharacter),
+          })
+        },
+
+        consolidateMaterials: () => {
+          const { currentCharacter, history } = get()
+          if (!currentCharacter) return
+
+          const map = new Map<string, Material>()
+          for (const m of currentCharacter.materials) {
+            const existing = map.get(m.id)
+            if (existing) {
+              map.set(m.id, { ...existing, quantity: existing.quantity + m.quantity })
+            } else {
+              map.set(m.id, { ...m })
+            }
+          }
+          const materials = Array.from(map.values())
+
+          if (materials.length === currentCharacter.materials.length) return
+
+          set({
+            currentCharacter: { ...currentCharacter, materials },
             history: addToHistory(history, currentCharacter),
           })
         },
