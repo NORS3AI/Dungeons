@@ -1,5 +1,25 @@
 # Dungeons - Patch Notes
 
+## Version 0.4.28-alpha - May 25, 2026
+
+**Alpha Release Notice**: Work tab Merge button — manually consolidate duplicate materials in each crafting section.
+
+### Work Tab: Merge Button
+
+Each material section now has a **Merge** button that consolidates all duplicate entries into single stacks. If you have "Iron Ore x3" appearing twice, tapping Merge combines them into "Iron Ore x6".
+
+#### **Renamed Sections**
+- "Ores in Inventory" → **Ores**
+- "Cloth & Hides in Inventory" → **Cloth & Hides**
+- "Herbs in Inventory" → **Herbs**
+- "Dust & Shards in Inventory" → **Dust & Shards**
+
+The button appears in all four crafting sections (Blacksmithing, Tailoring, Alchemy, Enchanting) and only shows when materials are present. While the v0.4.23 auto-consolidation fix handles most cases, this gives players a manual fallback for any edge cases where duplicates persist.
+
+**Why This Matters**: One-tap cleanup for messy inventories — no more scrolling past duplicate stacks.
+
+---
+
 ## Version 0.4.27-alpha - May 25, 2026
 
 **Alpha Release Notice**: Loot Cache improvements — Add All button, sorting by name/quality/resource type, and filtering by crafting profession.

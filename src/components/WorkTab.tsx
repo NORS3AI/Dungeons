@@ -209,7 +209,7 @@ function CraftCard({ item, skill, materialsMap, onCraft }: CraftCardProps) {
 }
 
 export function WorkTab({ character }: WorkTabProps) {
-  const { incrementCraftingSkill, addEquipment, changeMaterialQuantity } =
+  const { incrementCraftingSkill, addEquipment, changeMaterialQuantity, consolidateMaterials } =
     useCharacterStore()
 
   const [activeProfession, setActiveProfession] = useState<Profession>('blacksmithing')
@@ -352,7 +352,17 @@ export function WorkTab({ character }: WorkTabProps) {
 
       {/* Available materials */}
       <div className="p-4 bg-gray-800 rounded-lg border border-gray-700">
-        <h3 className="text-sm font-semibold text-gray-300 mb-2">{info.matLabel} in Inventory</h3>
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-sm font-semibold text-gray-300">{info.matLabel}</h3>
+          {ownedMats.length > 0 && (
+            <button
+              onClick={() => consolidateMaterials()}
+              className="px-2.5 py-1 bg-blue-800 hover:bg-blue-700 text-blue-200 text-xs font-medium rounded transition-colors"
+            >
+              Merge
+            </button>
+          )}
+        </div>
         {ownedMats.length === 0 ? (
           <p className="text-sm text-gray-500">
             No {info.matLabel.toLowerCase()} found. Go explore and gather materials!
