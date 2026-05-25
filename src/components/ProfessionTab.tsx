@@ -865,10 +865,10 @@ function AdditionalProfessionSection({ character }: { character: Character }) {
   const { dmModeEnabled } = useSettingsStore()
 
   const professionData = character.professionData ?? {}
-  const purchased = professionData.professionsPurchased ?? 0
   const additionalProfessions = professionData.additionalProfessions ?? []
-  const canBuyMore = purchased < 10
-  const nextCost = canBuyMore ? PROFESSION_COST_LADDER[purchased] : null
+  const slotsFilled = additionalProfessions.length
+  const canBuyMore = slotsFilled < 10
+  const nextCost = canBuyMore ? PROFESSION_COST_LADDER[slotsFilled] : null
 
   const [showRoller, setShowRoller] = useState(false)
   const [rolledProfession, setRolledProfession] = useState<Profession | null>(null)
@@ -876,6 +876,7 @@ function AdditionalProfessionSection({ character }: { character: Character }) {
   const [isRolling, setIsRolling] = useState(false)
   const [confirmed, setConfirmed] = useState(false)
   const [goldDeducted, setGoldDeducted] = useState(false)
+  const [paidCost, setPaidCost] = useState(0)
   const [detailPopup, setDetailPopup] = useState<Profession | null>(null)
   const [showDetails, setShowDetails] = useState(false)
 
@@ -903,7 +904,8 @@ function AdditionalProfessionSection({ character }: { character: Character }) {
   const handlePurchaseAndRoll = () => {
     if (!nextCost || playerGoldEquivalent < nextCost) return
 
-    let remaining = nextCost
+    const cost = nextCost
+    let remaining = cost
     let newGold = character.currency.gold
     let newPlatinum = character.currency.platinum
     if (newGold >= remaining) {
@@ -917,6 +919,7 @@ function AdditionalProfessionSection({ character }: { character: Character }) {
     }
     updateCurrency({ gold: newGold, platinum: newPlatinum })
 
+    setPaidCost(cost)
     setShowRoller(true)
     setRolledProfession(null)
     setRollResult(null)
@@ -945,10 +948,7 @@ function AdditionalProfessionSection({ character }: { character: Character }) {
             currency: result.prof.dailyIncome.currency as 'copper' | 'silver' | 'gold' | 'platinum',
           },
         ]
-        setProfessionData({
-          additionalProfessions: newAdditional,
-          professionsPurchased: purchased + 1,
-        })
+        setProfessionData({ additionalProfessions: newAdditional })
         setConfirmed(true)
         saveCharacter()
       }
@@ -968,8 +968,9 @@ function AdditionalProfessionSection({ character }: { character: Character }) {
       </h3>
 
       <p className="text-xs text-gray-400">
-        Pay gold to roll for another profession. You can hold up to 10 additional professions.
-        Each earns its own daily income. Duplicates are blocked — you will never roll a profession you already have.
+        Your primary profession can be re-rolled for free each day via <span className="text-gray-300">New Day</span>.
+        Pay gold to add up to 10 additional professions — each earns its own daily income.
+        Duplicates are blocked. If a DM removes one, the slot opens back up at the correct price.
       </p>
 
       {/* Current additional professions — compact list */}
@@ -1084,9 +1085,9 @@ function AdditionalProfessionSection({ character }: { character: Character }) {
           <span
             key={i}
             className={`px-2 py-0.5 rounded text-xs font-mono border ${
-              i < purchased
+              i < slotsFilled
                 ? 'bg-green-900/30 border-green-700/40 text-green-400 line-through'
-                : i === purchased
+                : i === slotsFilled
                 ? 'bg-yellow-900/40 border-yellow-600/60 text-yellow-300 font-bold'
                 : 'bg-gray-900/40 border-gray-700/40 text-gray-500'
             }`}
@@ -1115,7 +1116,7 @@ function AdditionalProfessionSection({ character }: { character: Character }) {
 
       {!canBuyMore && (
         <div className="text-center text-xs text-gray-500 italic">
-          Maximum additional professions reached (10/10).
+          Maximum additional professions reached ({slotsFilled}/10).
         </div>
       )}
 
@@ -1131,8 +1132,8 @@ function AdditionalProfessionSection({ character }: { character: Character }) {
               <h3 className="text-xl font-bold text-dnd-gold">Rolling Additional Profession</h3>
             </div>
             <p className="text-sm text-gray-400 mb-4">
-              Paid: <span className="text-yellow-400 font-bold">{nextCost ? nextCost.toLocaleString() : PROFESSION_COST_LADDER[purchased - 1]?.toLocaleString()} GP</span>
-              {' '}&mdash; Purchase #{purchased + (confirmed ? 0 : 1)} of 10
+              Paid: <span className="text-yellow-400 font-bold">{paidCost.toLocaleString()} GP</span>
+              {' '}&mdash; Slot #{slotsFilled + (confirmed ? 0 : 1)} of 10
             </p>
 
             <div className="bg-gray-900 rounded-lg p-4 mb-4">

@@ -1,5 +1,24 @@
 # Dungeons - Patch Notes
 
+## Version 0.4.26-alpha - May 25, 2026
+
+**Alpha Release Notice**: Profession slot system rework — DM-deleted professions reopen slots at the correct price, and primary profession is always free to re-roll daily.
+
+### Profession Slot Rework
+
+#### **DM Delete Reopens Slots**
+- When a DM removes an additional profession, the slot becomes available again
+- The next purchase costs the price matching the current number of held professions, not how many were ever purchased
+- Example: if a player has 3 additional professions (slots 1-3 filled), deleting slot 2 drops them to 2 held professions, so the next purchase costs the slot-3 price (500 GP), not slot-4
+
+#### **Primary Profession Is Free**
+- Your primary profession can be re-rolled for free each day via the **New Day** button on the Overview tab
+- Only additional professions (slots 1-10) cost gold
+
+**Why This Matters**: DMs can freely adjust a player's profession lineup without permanently burning gold or locking out slots.
+
+---
+
 ## Version 0.4.25-alpha - May 24, 2026
 
 **Alpha Release Notice**: Major multi-profession overhaul — pay-then-roll with no cancelling, duplicate blocking, DM delete, profession detail popups, collapsible detail view, total daily income display, and profession perks on the Features tab.
