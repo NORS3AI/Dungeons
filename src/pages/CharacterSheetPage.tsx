@@ -352,7 +352,7 @@ export function CharacterSheetPage() {
       }
 
       const material: Material = {
-        id: lootItem.id, // Use consistent ID for consolidation
+        id: lootItem.baseId ?? lootItem.id,
         name: lootItem.name,
         description: lootItem.description,
         category: materialCategory,

@@ -23,6 +23,7 @@ export const RARITY_COLORS: Record<LootRarity, { text: string; bg: string; borde
  */
 export interface LootItem {
   id: string
+  baseId?: string
   name: string
   category: string
   description: string
@@ -389,6 +390,7 @@ export function generateLegendaryLoot(rarity: LootRarity, quantity: number, mate
     loot.push({
       ...randomItem,
       id: `${randomItem.id}-${Date.now()}-${i}`,
+      baseId: randomItem.id,
     })
   }
 
@@ -417,10 +419,10 @@ export function generateLoot(params: {
     // Random selection from pool
     const randomItem = pool[Math.floor(Math.random() * pool.length)]
 
-    // Clone and give unique ID
     loot.push({
       ...randomItem,
       id: `${randomItem.id}-${Date.now()}-${i}`,
+      baseId: randomItem.id,
     })
   }
 

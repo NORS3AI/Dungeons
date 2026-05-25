@@ -1,5 +1,28 @@
 # Dungeons - Patch Notes
 
+## Version 0.4.29-alpha - May 25, 2026
+
+**Alpha Release Notice**: Critical fix — Loot Cache filters/sorting and material merging now work correctly. Quantities have no cap.
+
+### Bug Fix: Loot Cache Filters & Sorting Now Work
+
+The filter (Mining/Tailoring/Herbalism/Enchanting) and sort (Name/Quality/Resource Type) buttons in the Loot Cache were broken because generated items had unique timestamped IDs that didn't match the crafting material registry. Items now carry a `baseId` that correctly identifies their material type, so filtering and sorting work as expected.
+
+### Bug Fix: Merge Button Now Works
+
+The Merge button in each Work tab section was silently doing nothing because every material had a unique ID — there were never "duplicates" to merge. Materials added from loot now use their canonical base ID (`iron-ore` instead of `iron-ore-1716000000000-0`), so:
+- The `addMaterial` store method properly stacks identical materials on add
+- The Merge button correctly consolidates any legacy duplicates
+- Crafting recipe material checks now match correctly
+
+### No Quantity Cap
+
+Material stacks have no upper limit — a resource can have 999,999,999+ quantity with no cap.
+
+**Why This Matters**: Filters, sorting, merging, and crafting all depend on consistent material IDs. This fix makes the entire crafting/loot pipeline work end to end.
+
+---
+
 ## Version 0.4.28-alpha - May 25, 2026
 
 **Alpha Release Notice**: Work tab Merge button — manually consolidate duplicate materials in each crafting section.
