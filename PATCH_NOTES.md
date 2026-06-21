@@ -1,66 +1,5 @@
 # Dungeons - Patch Notes
 
-## Version 0.5.2-beta - June 21, 2026
-
-**Beta Release Notice**: Content sync system, cascading character cleanup, and data integrity improvements.
-
-### Content Sync System
-
-When the app updates with new classes, features, or balance changes, a popup now appears prompting you to sync your saved characters. Syncing refreshes embedded class features, race traits, and subclass data without touching your HP, inventory, or chosen spells.
-
-#### **Sync Popup**
-- Appears automatically on app load when new content is detected
-- Shows exactly what will be synced vs. what stays the same
-- "Sync Now" button updates all characters instantly with a detailed change report
-- "Later" dismisses until the next content update
-
-#### **Manual Sync in Settings**
-- A new **Sync Content** button in Settings lets you sync anytime
-- Shows a gold indicator dot when an update is pending
-- Reports which characters were updated and what changed
-
-### Cascading Character Cleanup
-
-Deleting a character now properly cleans up all associated data across the app:
-
-- **Adventure store**: Ends any active adventure tied to the deleted character
-- **Campaign party**: Removes the character from the party roster
-- **Session notes**: Removes all notes referencing the deleted character
-- **Initiative tracker**: Removes any initiative entries for the deleted character
-- **Scroll positions**: Clears saved scroll positions for the deleted character
-
-**Why This Matters**: Previously, deleting a character left orphaned references in the campaign, adventure, and localStorage — causing ghost entries and potential errors when loading stale IDs.
-
----
-
-## Version 0.5.1-beta - June 21, 2026
-
-**Beta Release Notice**: Bug fixes for the Adventure System — combat buttons, death saves, streaming display, and sidebar reactivity all repaired.
-
-### Bug Fixes
-
-#### **Attack Quick-Action Button**
-- The Attack button in combat now works correctly — previously it did nothing due to a React state batching issue where `setInput` and `handleSubmit` fired in the same tick
-
-#### **Death Save on Enter**
-- You can now press Enter with an empty input to roll a death save, as the placeholder text always suggested — the Send button also changes to "Roll" during death saves
-
-#### **Combat Victory Messages**
-- Victory messages and XP rewards now display properly when combat ends via AI actions — previously the store swallowed `combat_end` actions before the page handler could show them
-
-#### **Streaming Display**
-- `<game_actions>` tags no longer leak as visible text during AI response streaming — partial tags are suppressed until the block is fully received
-
-#### **Sidebar Reactivity**
-- XP earned and quest log in the sidebar now update in real-time — previously they used `getState()` snapshots that never re-rendered
-
-#### **Dead Code Cleanup**
-- Removed `(combatState || true)` guard that always evaluated to true
-
-**Why This Matters**: These fixes make combat, death saves, and the sidebar work as intended — the adventure experience is now much more polished.
-
----
-
 ## Version 0.5.0-beta - June 21, 2026
 
 **Beta Release Notice**: The Adventure System is here. An AI Dungeon Master powered by Claude guides a fully playable text RPG adventure using your character sheet, equipment, spells, and abilities.
@@ -117,7 +56,32 @@ When you launch an adventure, you choose how it begins:
 - HP, conditions, and spell slot changes persist to your character sheet
 - Quest log in the sidebar tracks objectives given by the DM
 
-### Password Protection (v0.4.30)
+### Content Sync System
+
+When the app updates with new classes, features, or balance changes, a popup now appears prompting you to sync your saved characters. Syncing refreshes embedded class features, race traits, and subclass data without touching your HP, inventory, or chosen spells.
+
+#### **Sync Popup**
+- Appears automatically on app load when new content is detected
+- Shows exactly what will be synced vs. what stays the same
+- "Sync Now" button updates all characters instantly with a detailed change report
+- "Later" dismisses until the next content update
+
+#### **Manual Sync in Settings**
+- A new **Sync Content** button in Settings lets you sync anytime
+- Shows a gold indicator dot when an update is pending
+- Reports which characters were updated and what changed
+
+### Cascading Character Cleanup
+
+Deleting a character now properly cleans up all associated data across the app:
+
+- **Adventure store**: Ends any active adventure tied to the deleted character
+- **Campaign party**: Removes the character from the party roster
+- **Session notes**: Removes all notes referencing the deleted character
+- **Initiative tracker**: Removes any initiative entries for the deleted character
+- **Scroll positions**: Clears saved scroll positions for the deleted character
+
+### Password Protection
 
 The app is now locked behind a passcode screen. Claude API key is entered once in Settings and stored locally.
 
