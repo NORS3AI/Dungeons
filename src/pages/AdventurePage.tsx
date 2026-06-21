@@ -73,8 +73,10 @@ export function AdventurePage() {
     isAIResponding, conversationContext,
     startAdventure, addMessage, setIsAIResponding,
     addConversationEntry, processGameActions,
-    startCombat, updateCombat, endCombat, setGameState,
+    startCombat, updateCombat, endCombat, setGameState, addXP,
   } = useAdventureStore()
+  const totalXPEarned = useAdventureStore((s) => s.totalXPEarned)
+  const questLog = useAdventureStore((s) => s.questLog)
 
   const [input, setInput] = useState('')
   const [streamingText, setStreamingText] = useState('')
@@ -140,6 +142,7 @@ export function AdventurePage() {
         }
         case 'combat_end': {
           endCombat()
+          if (action.xpReward) addXP(action.xpReward)
           addMessage('system', action.victory
             ? `Victory! ${action.xpReward ? `You earn ${action.xpReward} XP.` : ''}`
             : 'The battle ends...',
@@ -196,7 +199,7 @@ export function AdventurePage() {
         }
       }
     }
-  }, [character, processGameActions, updateHitPoints, addMessage, startCombat, endCombat, setGameState, addCondition, removeCondition, useSpellSlot])
+  }, [character, processGameActions, updateHitPoints, addMessage, startCombat, endCombat, setGameState, addCondition, removeCondition, useSpellSlot, updateCurrency, saveCharacter, addXP])
 
   const sendMessage = useCallback(async (playerText: string) => {
     if (!character || !apiKey || isAIResponding) return
@@ -219,7 +222,7 @@ export function AdventurePage() {
         currentLocation,
         conversationContext,
         fullMessage,
-        (chunk) => setStreamingText((prev) => prev + chunk),
+        (displayText) => setStreamingText(displayText),
       )
 
       setStreamingText('')
@@ -238,13 +241,7 @@ export function AdventurePage() {
     }
   }, [character, apiKey, isAIResponding, gameState, combatState, currentLocation, conversationContext, addMessage, addConversationEntry, setIsAIResponding, executeGameActions])
 
-  const handleSubmit = useCallback((e: React.FormEvent) => {
-    e.preventDefault()
-    const text = input.trim()
-    if (!text) return
-    setInput('')
-
-    // Handle special commands
+  const handleCommand = useCallback((text: string) => {
     const lower = text.toLowerCase()
 
     // Roll for pending action
@@ -286,7 +283,7 @@ export function AdventurePage() {
       return
     }
 
-    // Death save
+    // Death save (works with empty input — just press Enter)
     if (gameState === 'death' && character) {
       const result = rollDeathSave()
       addMessage('roll', 'Death Save', result)
@@ -329,7 +326,7 @@ export function AdventurePage() {
           addMessage('system', `${target.name} is defeated!`)
         }
 
-        const { over, victory } = isCombatOver(newCombat)
+        const { over } = isCombatOver(newCombat)
         if (over) {
           endCombat()
           sendMessage(`[Combat resolved: The player attacked ${target.name} for ${damageResult.total} ${type} damage${attackResult.critical ? ' (CRITICAL HIT!)' : ''}. ${target.name} is defeated. All enemies defeated - victory!]`)
@@ -356,9 +353,17 @@ export function AdventurePage() {
       return
     }
 
-    // Regular message
+    if (!text) return
     sendMessage(text)
-  }, [input, character, pendingAction, gameState, combatState, addMessage, sendMessage, shortRest, longRest, updateHitPoints, setGameState, updateCombat, endCombat])
+  }, [character, pendingAction, gameState, combatState, addMessage, sendMessage, shortRest, longRest, updateHitPoints, setGameState, updateCombat, endCombat])
+
+  const handleSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault()
+    const text = input.trim()
+    if (!text && gameState !== 'death') return
+    setInput('')
+    handleCommand(text)
+  }, [input, gameState, handleCommand])
 
   if (!character) {
     return (
@@ -534,12 +539,12 @@ export function AdventurePage() {
               />
               <button
                 type="submit"
-                disabled={isAIResponding || !input.trim()}
+                disabled={isAIResponding || (!input.trim() && gameState !== 'death')}
                 className="px-5 py-3 bg-dnd-gold text-gray-900 font-bold rounded-xl
                          hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed
                          transition-colors whitespace-nowrap"
               >
-                {isAIResponding ? '...' : 'Send'}
+                {isAIResponding ? '...' : gameState === 'death' ? 'Roll' : 'Send'}
               </button>
             </form>
 
@@ -548,7 +553,7 @@ export function AdventurePage() {
               <div className="flex gap-2 mt-2 max-w-5xl mx-auto flex-wrap">
                 <button
                   type="button"
-                  onClick={() => { setInput('attack'); handleSubmit({ preventDefault: () => {} } as React.FormEvent) }}
+                  onClick={() => handleCommand('attack')}
                   className="px-3 py-1.5 bg-red-700/50 text-red-300 text-xs font-medium rounded-lg border border-red-700 hover:bg-red-700/70 transition-colors"
                 >
                   Attack
@@ -587,7 +592,7 @@ export function AdventurePage() {
         </div>
 
         {/* Side panel — combat / quest info */}
-        {showSidebar && (combatState || true) && (
+        {showSidebar && (
           <div className="w-72 border-l border-gray-700 bg-gray-900/50 overflow-y-auto p-4 space-y-4 hidden lg:block">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider">Adventure</h3>
@@ -660,16 +665,16 @@ export function AdventurePage() {
               </div>
               <div className="flex items-center justify-between text-sm mt-1">
                 <span className="text-blue-400">XP Earned</span>
-                <span className="font-bold text-blue-300">{useAdventureStore.getState().totalXPEarned}</span>
+                <span className="font-bold text-blue-300">{totalXPEarned}</span>
               </div>
             </div>
 
             {/* Quest log */}
-            {useAdventureStore.getState().questLog.length > 0 && (
+            {questLog.length > 0 && (
               <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-3">
                 <div className="text-xs font-bold text-gray-500 uppercase mb-2">Quests</div>
                 <div className="space-y-1.5">
-                  {useAdventureStore.getState().questLog.map((quest) => (
+                  {questLog.map((quest) => (
                     <div key={quest.id} className={`text-xs ${quest.isComplete ? 'text-gray-600 line-through' : 'text-gray-300'}`}>
                       {quest.isComplete ? '&#x2714; ' : '&#x25CB; '}{quest.title}
                     </div>

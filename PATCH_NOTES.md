@@ -1,5 +1,33 @@
 # Dungeons - Patch Notes
 
+## Version 0.5.1-beta - June 21, 2026
+
+**Beta Release Notice**: Bug fixes for the Adventure System — combat buttons, death saves, streaming display, and sidebar reactivity all repaired.
+
+### Bug Fixes
+
+#### **Attack Quick-Action Button**
+- The Attack button in combat now works correctly — previously it did nothing due to a React state batching issue where `setInput` and `handleSubmit` fired in the same tick
+
+#### **Death Save on Enter**
+- You can now press Enter with an empty input to roll a death save, as the placeholder text always suggested — the Send button also changes to "Roll" during death saves
+
+#### **Combat Victory Messages**
+- Victory messages and XP rewards now display properly when combat ends via AI actions — previously the store swallowed `combat_end` actions before the page handler could show them
+
+#### **Streaming Display**
+- `<game_actions>` tags no longer leak as visible text during AI response streaming — partial tags are suppressed until the block is fully received
+
+#### **Sidebar Reactivity**
+- XP earned and quest log in the sidebar now update in real-time — previously they used `getState()` snapshots that never re-rendered
+
+#### **Dead Code Cleanup**
+- Removed `(combatState || true)` guard that always evaluated to true
+
+**Why This Matters**: These fixes make combat, death saves, and the sidebar work as intended — the adventure experience is now much more polished.
+
+---
+
 ## Version 0.5.0-beta - June 21, 2026
 
 **Beta Release Notice**: The Adventure System is here. An AI Dungeon Master powered by Claude guides a fully playable text RPG adventure using your character sheet, equipment, spells, and abilities.

@@ -299,10 +299,13 @@ async function streamResponse(
       try {
         const parsed = JSON.parse(data)
         if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
-          const chunk = parsed.delta.text
-          fullText += chunk
-          const cleanChunk = chunk.replace(/<game_actions>[\s\S]*?<\/game_actions>/g, '')
-          if (cleanChunk) onStream(cleanChunk)
+          fullText += parsed.delta.text
+          let displayText = fullText.replace(/<game_actions>[\s\S]*?<\/game_actions>/g, '')
+          const partialIdx = displayText.indexOf('<game_actions>')
+          if (partialIdx !== -1) {
+            displayText = displayText.slice(0, partialIdx)
+          }
+          onStream(displayText.trim())
         }
       } catch {
         // Skip non-JSON lines

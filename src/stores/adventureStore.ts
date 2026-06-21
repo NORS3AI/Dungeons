@@ -6,7 +6,6 @@ import type {
   GameState,
   CombatState,
   CombatEnemy,
-  ConversationEntry,
   GameAction,
   QuestEntry,
   RollResult,
@@ -181,10 +180,6 @@ export const useAdventureStore = create<AdventureStore>()(
               break
             case 'location_change':
               get().setLocation(action.location)
-              break
-            case 'combat_end':
-              get().endCombat()
-              if (action.xpReward) get().addXP(action.xpReward)
               break
             default:
               pendingActions.push(action)
