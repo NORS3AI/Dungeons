@@ -23,6 +23,25 @@ import {
 import { calculateModifier } from '../utils/calculations'
 import type { GameAction, CombatEnemy } from '../types/adventure'
 
+const RANDOM_HOOKS = [
+  { label: 'Dungeon Crawl', icon: '&#x1F3DA;', prompt: 'I enter a mysterious dungeon that locals have warned me about. Strange sounds echo from within.' },
+  { label: 'Tavern Brawl', icon: '&#x1F37A;', prompt: 'I\'m sitting in a rowdy tavern when a fight breaks out nearby.' },
+  { label: 'Ambush on the Road', icon: '&#x1F332;', prompt: 'I\'m traveling down a forest road when I notice signs of an ambush ahead.' },
+  { label: 'Missing Person', icon: '&#x1F50D;', prompt: 'A desperate villager begs me to find their missing child who wandered into the old ruins.' },
+  { label: 'Dragon Sighting', icon: '&#x1F409;', prompt: 'A dragon has been spotted near the village. The townsfolk are terrified and looking for a hero.' },
+  { label: 'Haunted Manor', icon: '&#x1F47B;', prompt: 'I approach an abandoned manor on a hill. Locals say it\'s haunted and no one who enters comes back.' },
+  { label: 'Merchant Escort', icon: '&#x1F6D2;', prompt: 'A wealthy merchant hires me to escort their caravan through bandit territory.' },
+  { label: 'Arena Champion', icon: '&#x2694;&#xFE0F;', prompt: 'I sign up for the gladiatorial arena, where the champion has been undefeated for years.' },
+  { label: 'Shipwreck', icon: '&#x1F30A;', prompt: 'I wash ashore after a terrible storm destroyed my ship. I have only what I\'m carrying.' },
+  { label: 'Political Intrigue', icon: '&#x1F451;', prompt: 'The king\'s advisor pulls me aside at a feast and whispers that there\'s a plot to assassinate the king tonight.' },
+  { label: 'Undead Rising', icon: '&#x1F480;', prompt: 'The dead are rising from the cemetery outside town. Something dark is at work.' },
+  { label: 'Lost Temple', icon: '&#x26EA;', prompt: 'I discover an ancient map leading to a temple that holds a legendary artifact.' },
+  { label: 'Peaceful Life', icon: '&#x1F33E;', prompt: 'I arrive in a quiet farming village looking to settle down and live a simple life for a while.' },
+  { label: 'The Heist', icon: '&#x1F4B0;', prompt: 'A thieves\' guild recruits me for an elaborate heist on the noble quarter\'s treasury.' },
+  { label: 'Planar Rift', icon: '&#x1F31F;', prompt: 'A glowing rift tears open in the sky above the town square, and strange creatures begin pouring through.' },
+  { label: 'Surprise Me', icon: '&#x1F3B2;', prompt: 'Begin an adventure that fits my character. Surprise me with something creative and unexpected.' },
+]
+
 const ABILITY_MAP: Record<string, 'strength' | 'dexterity' | 'constitution' | 'intelligence' | 'wisdom' | 'charisma'> = {
   strength: 'strength', str: 'strength',
   dexterity: 'dexterity', dex: 'dexterity',
@@ -45,7 +64,7 @@ const SKILL_ABILITY: Record<string, string> = {
 export function AdventurePage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { loadCharacter, updateHitPoints, addCondition, removeCondition, useSpellSlot, shortRest, longRest } = useCharacterStore()
+  const { loadCharacter, updateHitPoints, addCondition, removeCondition, useSpellSlot, shortRest, longRest, updateCurrency, saveCharacter } = useCharacterStore()
   const character = useCharacterStore((s) => s.currentCharacter)
   const { apiKey } = useSettingsStore()
 
@@ -68,11 +87,15 @@ export function AdventurePage() {
     if (id) loadCharacter(id)
   }, [id, loadCharacter])
 
+  const savedCharacterId = useAdventureStore((s) => s.characterId)
+
   useEffect(() => {
-    if (character && !isActive) {
+    if (!character) return
+    // Only start fresh if no adventure exists for this character
+    if (!isActive || savedCharacterId !== character.id) {
       startAdventure(character.id)
     }
-  }, [character, isActive, startAdventure])
+  }, [character?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!isAIResponding) inputRef.current?.focus()
@@ -89,6 +112,7 @@ export function AdventurePage() {
           if (action.target === 'player') {
             const newHP = Math.max(0, character.hitPoints.current - action.amount)
             updateHitPoints({ current: newHP })
+            saveCharacter()
             addMessage('system', `You take ${action.amount} ${action.damageType} damage! (HP: ${newHP}/${character.hitPoints.maximum})`)
             if (newHP === 0) {
               setGameState('death')
@@ -101,6 +125,7 @@ export function AdventurePage() {
           if (action.target === 'player') {
             const newHP = Math.min(character.hitPoints.maximum, character.hitPoints.current + action.amount)
             updateHitPoints({ current: newHP })
+            saveCharacter()
             addMessage('system', `You are healed for ${action.amount} HP! (HP: ${newHP}/${character.hitPoints.maximum})`)
           }
           break
@@ -123,7 +148,12 @@ export function AdventurePage() {
         }
         case 'loot': {
           const parts: string[] = []
-          if (action.gold) parts.push(`${action.gold} gold`)
+          if (action.gold) {
+            parts.push(`${action.gold} gold`)
+            const currentGold = character.currency?.gold ?? 0
+            updateCurrency({ gold: currentGold + action.gold })
+            saveCharacter()
+          }
           if (action.items?.length) parts.push(action.items.join(', '))
           if (parts.length > 0) addMessage('system', `Loot acquired: ${parts.join(', ')}`)
           break
@@ -367,6 +397,93 @@ export function AdventurePage() {
     )
   }
 
+  // Adventure starter screen — shown when no messages yet
+  if (messages.length === 0 && !isAIResponding) {
+    return (
+      <div className="flex flex-col h-[calc(100vh-64px)]">
+        <CharacterStatusBar
+          character={character}
+          combatState={null}
+          gameState="exploring"
+          location="Unknown"
+        />
+        <div className="flex-1 overflow-y-auto">
+          <div className="max-w-3xl mx-auto px-4 py-8">
+            <div className="text-center mb-8">
+              <div className="text-6xl mb-3">&#x2694;&#xFE0F;</div>
+              <h1 className="text-3xl font-bold text-dnd-gold mb-2">Begin Your Adventure</h1>
+              <p className="text-gray-400 max-w-md mx-auto">
+                Choose an adventure hook below, or write your own opening. The AI Dungeon Master will take it from there.
+              </p>
+            </div>
+
+            {/* Random adventure hooks */}
+            <div className="mb-8">
+              <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">Adventure Hooks</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                {RANDOM_HOOKS.map((hook) => (
+                  <button
+                    key={hook.label}
+                    onClick={() => sendMessage(hook.prompt)}
+                    className="p-3 bg-gray-800 border border-gray-700 rounded-xl text-left hover:border-dnd-gold/50 hover:bg-gray-800/80 transition-all group"
+                  >
+                    <div className="text-xl mb-1" dangerouslySetInnerHTML={{ __html: hook.icon }} />
+                    <div className="text-sm font-medium text-gray-300 group-hover:text-dnd-gold transition-colors">
+                      {hook.label}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Custom opening */}
+            <div>
+              <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">Or Write Your Own</h2>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  if (input.trim()) {
+                    sendMessage(input.trim())
+                    setInput('')
+                  }
+                }}
+                className="flex gap-2"
+              >
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="I walk into a dark forest looking for treasure..."
+                  className="flex-1 px-4 py-3 bg-gray-900 border border-gray-600 rounded-xl text-white
+                           placeholder:text-gray-500 focus:outline-none focus:border-dnd-gold transition-colors"
+                />
+                <button
+                  type="submit"
+                  disabled={!input.trim()}
+                  className="px-5 py-3 bg-dnd-gold text-gray-900 font-bold rounded-xl
+                           hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Begin
+                </button>
+              </form>
+            </div>
+
+            {/* Back button */}
+            <div className="mt-8 text-center">
+              <button
+                onClick={() => navigate(`/character/${character.id}`)}
+                className="text-sm text-gray-500 hover:text-gray-300 transition-colors"
+              >
+                &#x2190; Back to Character Sheet
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-col h-[calc(100vh-64px)]">
       <CharacterStatusBar
@@ -530,6 +647,33 @@ export function AdventurePage() {
                       </div>
                     )
                   })}
+                </div>
+              </div>
+            )}
+
+            {/* Gold & XP */}
+            <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-3">
+              <div className="text-xs font-bold text-gray-500 uppercase mb-2">Resources</div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-yellow-400">Gold</span>
+                <span className="font-bold text-yellow-300">{character.currency?.gold ?? 0}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm mt-1">
+                <span className="text-blue-400">XP Earned</span>
+                <span className="font-bold text-blue-300">{useAdventureStore.getState().totalXPEarned}</span>
+              </div>
+            </div>
+
+            {/* Quest log */}
+            {useAdventureStore.getState().questLog.length > 0 && (
+              <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-3">
+                <div className="text-xs font-bold text-gray-500 uppercase mb-2">Quests</div>
+                <div className="space-y-1.5">
+                  {useAdventureStore.getState().questLog.map((quest) => (
+                    <div key={quest.id} className={`text-xs ${quest.isComplete ? 'text-gray-600 line-through' : 'text-gray-300'}`}>
+                      {quest.isComplete ? '&#x2714; ' : '&#x25CB; '}{quest.title}
+                    </div>
+                  ))}
                 </div>
               </div>
             )}

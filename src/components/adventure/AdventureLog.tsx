@@ -106,16 +106,6 @@ export function AdventureLog({ messages, streamingText, isAIResponding }: Advent
       ref={containerRef}
       className="flex-1 overflow-y-auto px-4 py-6 space-y-1"
     >
-      {messages.length === 0 && !isAIResponding && (
-        <div className="flex flex-col items-center justify-center h-full text-center">
-          <div className="text-6xl mb-4">&#x2694;&#xFE0F;</div>
-          <h2 className="text-2xl font-bold text-dnd-gold mb-2">Your Adventure Awaits</h2>
-          <p className="text-gray-500 max-w-md">
-            The Dungeon Master is preparing your story. Type anything to begin your journey.
-          </p>
-        </div>
-      )}
-
       {messages.map((msg) => (
         <MessageBubble key={msg.id} message={msg} />
       ))}

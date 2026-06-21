@@ -42,6 +42,20 @@ Click the gold **Adventure** button on any character sheet to begin a fully AI-d
 #### **Game States**
 The adventure flows between states: Exploring, Combat, Dialogue, Rest, Shopping, and Death — each with appropriate UI and input prompts.
 
+#### **Adventure Starter Screen**
+When you launch an adventure, you choose how it begins:
+- **16 Adventure Hooks** — pre-built scenarios like Dungeon Crawl, Tavern Brawl, Dragon Sighting, Haunted Manor, Arena Champion, Shipwreck, Political Intrigue, and more
+- **"Surprise Me"** — let the AI create something unexpected based on your character
+- **Custom Opening** — type your own scenario and the AI takes it from there
+
+#### **Persistence & Rewards**
+- Adventure state auto-saves between sessions (come back and pick up where you left off)
+- **Continue Adventure** button appears on the character sheet when a saved adventure exists
+- Gold rewards from loot flow directly into your character's wallet
+- XP earned tracked in the sidebar
+- HP, conditions, and spell slot changes persist to your character sheet
+- Quest log in the sidebar tracks objectives given by the DM
+
 ### Password Protection (v0.4.30)
 
 The app is now locked behind a passcode screen. Claude API key is entered once in Settings and stored locally.
