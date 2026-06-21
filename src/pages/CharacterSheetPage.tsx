@@ -1258,6 +1258,14 @@ export function CharacterSheetPage() {
           >
             Edit Details
           </button>
+          <button
+            onClick={() => navigate(`/adventure/${character.id}`)}
+            className="px-4 py-2 bg-dnd-gold hover:bg-yellow-500 text-gray-900 font-bold rounded-lg
+                     transition-colors focus:outline-none focus:ring-2 focus:ring-dnd-gold"
+            title="Start an AI-guided adventure with this character"
+          >
+            Adventure
+          </button>
         </div>
       </div>
 

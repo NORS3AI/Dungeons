@@ -8,6 +8,7 @@ const HomePage = lazy(() => import('./pages/HomePage').then(m => ({ default: m.H
 const CharacterCreatePage = lazy(() => import('./pages/CharacterCreatePage').then(m => ({ default: m.CharacterCreatePage })))
 const CharacterSheetPage = lazy(() => import('./pages/CharacterSheetPage').then(m => ({ default: m.CharacterSheetPage })))
 const CampaignPage = lazy(() => import('./pages/CampaignPage').then(m => ({ default: m.CampaignPage })))
+const AdventurePage = lazy(() => import('./pages/AdventurePage').then(m => ({ default: m.AdventurePage })))
 
 // Loading component for Suspense fallback
 function PageLoader() {
@@ -30,6 +31,7 @@ function App() {
           <Route path="create" element={<Suspense fallback={<PageLoader />}><CharacterCreatePage /></Suspense>} />
           <Route path="character/:id" element={<Suspense fallback={<PageLoader />}><CharacterSheetPage /></Suspense>} />
           <Route path="campaign" element={<Suspense fallback={<PageLoader />}><CampaignPage /></Suspense>} />
+          <Route path="adventure/:id" element={<Suspense fallback={<PageLoader />}><AdventurePage /></Suspense>} />
           <Route path="register" element={<Suspense fallback={<PageLoader />}><HomePage /></Suspense>} />
         </Route>
       </Routes>

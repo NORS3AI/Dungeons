@@ -1,5 +1,55 @@
 # Dungeons - Patch Notes
 
+## Version 0.5.0-beta - June 21, 2026
+
+**Beta Release Notice**: The Adventure System is here. An AI Dungeon Master powered by Claude guides a fully playable text RPG adventure using your character sheet, equipment, spells, and abilities.
+
+### Adventure Mode
+
+Click the gold **Adventure** button on any character sheet to begin a fully AI-driven text RPG. The AI Dungeon Master weaves narrative, combat encounters, skill checks, and treasure based on your character's actual stats, equipment, and spells.
+
+#### **AI Dungeon Master**
+- Powered by Claude (your API key, stored locally, never leaves your browser)
+- Narrates in second person — "You walk into a dimly lit tavern..."
+- Reacts to free-form player input — type anything and the world responds
+- Scales encounters to your character's level
+- Streaming responses with live typing indicator
+
+#### **Full Combat System**
+- Initiative rolls using your DEX modifier
+- Attack rolls using your equipped weapon's stats and bonuses
+- Damage rolls with critical hit doubling
+- Enemy HP tracking with visual health bars
+- Turn-based combat with round tracking
+- Quick-action buttons: Attack, Cast Spell, Dodge, Disengage, Use Item
+- Death saves with Natural 20 revival and Natural 1 double-failure
+
+#### **Deep Character Integration**
+- HP, AC, conditions, and spell slots tracked live during the adventure
+- Skill checks use your actual ability scores and proficiency bonuses
+- Saving throws respect your class proficiencies
+- Equipped weapons determine attack/damage dice
+- Short and long rests restore resources using the existing rest system
+- Conditions applied mid-adventure persist on your character sheet
+
+#### **Adventure UI**
+- Scrolling narrative log with styled message bubbles
+- Character status bar (HP bar, AC, conditions, game state, location)
+- Side panel with combat info, ability scores, and spell slot tracking
+- Roll results displayed inline with success/fail/crit/fumble indicators
+- System messages for damage, healing, loot, and state changes
+
+#### **Game States**
+The adventure flows between states: Exploring, Combat, Dialogue, Rest, Shopping, and Death — each with appropriate UI and input prompts.
+
+### Password Protection (v0.4.30)
+
+The app is now locked behind a passcode screen. Claude API key is entered once in Settings and stored locally.
+
+**Why This Matters**: This is the core vision of Dungeons — a next-gen text RPG where an AI DM guides your adventure using your actual character. No scripts, no fixed paths. Every choice is yours.
+
+---
+
 ## Version 0.4.30-alpha - June 21, 2026
 
 **Alpha Release Notice**: Password gate and API key management — the app is now locked behind a passcode.
