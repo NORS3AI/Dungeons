@@ -1,5 +1,25 @@
 # Dungeons - Patch Notes
 
+## Version 0.4.30-alpha - June 21, 2026
+
+**Alpha Release Notice**: Password gate and API key management — the app is now locked behind a passcode.
+
+### Password Gate
+
+The entire app is now protected behind a passcode screen. No part of the app is accessible without entering the correct code. Your session persists in localStorage so you only need to enter it once per browser.
+
+### Claude API Key (Settings)
+
+A new **Claude API Key** section in Settings lets you securely store your Anthropic API key for upcoming AI Dungeon Master features. The key is saved locally in your browser only — it never leaves your device or touches the codebase.
+
+#### **New Settings Options**
+- **Claude API Key** input with show/hide toggle
+- **Lock App (Logout)** button to return to the passcode screen without losing data
+
+**Why This Matters**: Protects your API key and the app from unauthorized access while keeping the setup simple for a small group of players.
+
+---
+
 ## Version 0.4.29-alpha - May 25, 2026
 
 **Alpha Release Notice**: Critical fix — Loot Cache filters/sorting and material merging now work correctly. Quantities have no cap.

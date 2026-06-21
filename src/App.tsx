@@ -1,6 +1,7 @@
 import { Suspense, lazy } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { Layout } from './components/Layout'
+import { PasswordGate } from './components/PasswordGate'
 
 // Lazy load pages for code splitting
 const HomePage = lazy(() => import('./pages/HomePage').then(m => ({ default: m.HomePage })))
@@ -22,15 +23,17 @@ function PageLoader() {
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route index element={<Suspense fallback={<PageLoader />}><HomePage /></Suspense>} />
-        <Route path="create" element={<Suspense fallback={<PageLoader />}><CharacterCreatePage /></Suspense>} />
-        <Route path="character/:id" element={<Suspense fallback={<PageLoader />}><CharacterSheetPage /></Suspense>} />
-        <Route path="campaign" element={<Suspense fallback={<PageLoader />}><CampaignPage /></Suspense>} />
-        <Route path="register" element={<Suspense fallback={<PageLoader />}><HomePage /></Suspense>} />
-      </Route>
-    </Routes>
+    <PasswordGate>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Suspense fallback={<PageLoader />}><HomePage /></Suspense>} />
+          <Route path="create" element={<Suspense fallback={<PageLoader />}><CharacterCreatePage /></Suspense>} />
+          <Route path="character/:id" element={<Suspense fallback={<PageLoader />}><CharacterSheetPage /></Suspense>} />
+          <Route path="campaign" element={<Suspense fallback={<PageLoader />}><CampaignPage /></Suspense>} />
+          <Route path="register" element={<Suspense fallback={<PageLoader />}><HomePage /></Suspense>} />
+        </Route>
+      </Routes>
+    </PasswordGate>
   )
 }
 
