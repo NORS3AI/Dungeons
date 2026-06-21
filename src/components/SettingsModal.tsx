@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useSettingsStore, THEME_NAMES, FONT_SIZE_VALUES, FONT_FAMILY_NAMES, type Theme, type FontSize, type FontFamily } from '../stores/settingsStore'
+import { useCharacterStore } from '../stores/characterStore'
+import { CONTENT_VERSION } from '../data/contentVersion'
 
 interface SettingsModalProps {
   isOpen: boolean
@@ -10,7 +12,9 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const modalRef = useRef<HTMLDivElement>(null)
   const [showResetConfirm, setShowResetConfirm] = useState(false)
   const [showApiKey, setShowApiKey] = useState(false)
-  const { theme, fontSize, fontFamily, showQuickRefTooltips, apiKey, setTheme, setFontSize, setFontFamily, toggleQuickRefTooltips, setApiKey, logout, resetAllCache } = useSettingsStore()
+  const [syncStatus, setSyncStatus] = useState<string | null>(null)
+  const { theme, fontSize, fontFamily, showQuickRefTooltips, apiKey, lastSyncedContentVersion, setTheme, setFontSize, setFontFamily, toggleQuickRefTooltips, setApiKey, setLastSyncedContentVersion, logout, resetAllCache } = useSettingsStore()
+  const { syncAllContent } = useCharacterStore()
 
   // Close on escape key
   useEffect(() => {
@@ -238,6 +242,43 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             {apiKey && (
               <p className="text-xs text-green-400 mt-2">
                 API key saved
+              </p>
+            )}
+          </div>
+
+          {/* Content Sync */}
+          <div className="pt-4 border-t border-gray-700">
+            <label className="block text-sm font-semibold text-gray-300 mb-2">Content Sync</label>
+            <p className="text-xs text-gray-500 mb-3">
+              Refreshes class features, race traits, and subclass data on all characters to match the latest game content.
+            </p>
+            <button
+              onClick={() => {
+                const result = syncAllContent()
+                setLastSyncedContentVersion(CONTENT_VERSION)
+                if (result.synced > 0) {
+                  setSyncStatus(`Updated ${result.synced} character${result.synced !== 1 ? 's' : ''}: ${result.changes.join('; ')}`)
+                } else {
+                  setSyncStatus('All characters are already up to date.')
+                }
+                setTimeout(() => setSyncStatus(null), 5000)
+              }}
+              className="w-full px-4 py-2 bg-gray-700 text-gray-300 font-medium rounded-lg
+                       hover:bg-gray-600 border border-gray-600 transition-colors
+                       focus:outline-none focus:ring-2 focus:ring-dnd-gold flex items-center justify-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              Sync Content
+              {lastSyncedContentVersion < CONTENT_VERSION && (
+                <span className="w-2 h-2 bg-dnd-gold rounded-full animate-pulse" />
+              )}
+            </button>
+            {syncStatus && (
+              <p className={`text-xs mt-2 ${syncStatus.startsWith('All') ? 'text-blue-400' : 'text-green-400'}`}>
+                {syncStatus}
               </p>
             )}
           </div>

@@ -1,5 +1,38 @@
 # Dungeons - Patch Notes
 
+## Version 0.5.2-beta - June 21, 2026
+
+**Beta Release Notice**: Content sync system, cascading character cleanup, and data integrity improvements.
+
+### Content Sync System
+
+When the app updates with new classes, features, or balance changes, a popup now appears prompting you to sync your saved characters. Syncing refreshes embedded class features, race traits, and subclass data without touching your HP, inventory, or chosen spells.
+
+#### **Sync Popup**
+- Appears automatically on app load when new content is detected
+- Shows exactly what will be synced vs. what stays the same
+- "Sync Now" button updates all characters instantly with a detailed change report
+- "Later" dismisses until the next content update
+
+#### **Manual Sync in Settings**
+- A new **Sync Content** button in Settings lets you sync anytime
+- Shows a gold indicator dot when an update is pending
+- Reports which characters were updated and what changed
+
+### Cascading Character Cleanup
+
+Deleting a character now properly cleans up all associated data across the app:
+
+- **Adventure store**: Ends any active adventure tied to the deleted character
+- **Campaign party**: Removes the character from the party roster
+- **Session notes**: Removes all notes referencing the deleted character
+- **Initiative tracker**: Removes any initiative entries for the deleted character
+- **Scroll positions**: Clears saved scroll positions for the deleted character
+
+**Why This Matters**: Previously, deleting a character left orphaned references in the campaign, adventure, and localStorage — causing ghost entries and potential errors when loading stale IDs.
+
+---
+
 ## Version 0.5.1-beta - June 21, 2026
 
 **Beta Release Notice**: Bug fixes for the Adventure System — combat buttons, death saves, streaming display, and sidebar reactivity all repaired.

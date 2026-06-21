@@ -3,11 +3,22 @@ import { Outlet, Link } from 'react-router-dom'
 import { SettingsModal } from './SettingsModal'
 import { KeyboardShortcutsModal } from './KeyboardShortcutsModal'
 import { PatchNotesModal } from './PatchNotesModal'
+import { SyncUpdateModal } from './SyncUpdateModal'
+import { useSettingsStore } from '../stores/settingsStore'
+import { CONTENT_VERSION } from '../data/contentVersion'
 
 export function Layout() {
   const [showSettings, setShowSettings] = useState(false)
   const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false)
   const [showPatchNotes, setShowPatchNotes] = useState(false)
+  const [showSyncModal, setShowSyncModal] = useState(false)
+  const lastSyncedVersion = useSettingsStore((s) => s.lastSyncedContentVersion)
+
+  useEffect(() => {
+    if (lastSyncedVersion < CONTENT_VERSION) {
+      setShowSyncModal(true)
+    }
+  }, [lastSyncedVersion])
 
   // Global keyboard shortcut listener
   useEffect(() => {
@@ -118,6 +129,9 @@ export function Layout() {
 
       {/* Patch Notes Modal */}
       <PatchNotesModal isOpen={showPatchNotes} onClose={() => setShowPatchNotes(false)} />
+
+      {/* Content Sync Modal */}
+      <SyncUpdateModal isOpen={showSyncModal} onClose={() => setShowSyncModal(false)} />
     </div>
   )
 }

@@ -27,6 +27,7 @@ interface SettingsState {
   dmModeEnabled: boolean
   isAuthenticated: boolean
   apiKey: string
+  lastSyncedContentVersion: number
 
   // Actions
   setTheme: (theme: Theme) => void
@@ -38,6 +39,7 @@ interface SettingsState {
   authenticate: () => void
   logout: () => void
   setApiKey: (key: string) => void
+  setLastSyncedContentVersion: (version: number) => void
   resetAllCache: () => void
 }
 
@@ -86,6 +88,7 @@ export const useSettingsStore = create<SettingsState>()(
       dmModeEnabled: false,
       isAuthenticated: false,
       apiKey: '',
+      lastSyncedContentVersion: 0,
 
       setTheme: (theme: Theme) => {
         set({ theme })
@@ -129,6 +132,10 @@ export const useSettingsStore = create<SettingsState>()(
 
       setApiKey: (key: string) => {
         set({ apiKey: key })
+      },
+
+      setLastSyncedContentVersion: (version: number) => {
+        set({ lastSyncedContentVersion: version })
       },
 
       resetAllCache: () => {
