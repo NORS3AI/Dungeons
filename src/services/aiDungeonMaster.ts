@@ -1,9 +1,14 @@
 import type { Character } from '../types'
 import type { GameState, ConversationEntry, GameAction, CombatEnemy } from '../types/adventure'
 import { buildCharacterSummary } from '../utils/adventureCombat'
+import type { AIProvider } from '../stores/settingsStore'
 
-const API_URL = 'https://api.anthropic.com/v1/messages'
-const MODEL = 'claude-sonnet-4-6'
+const CLAUDE_API_URL = 'https://api.anthropic.com/v1/messages'
+const CLAUDE_MODEL = 'claude-opus-4-7'
+
+const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
+const GROQ_MODEL = 'llama-3.3-70b-versatile'
+
 const MAX_CONTEXT_MESSAGES = 40
 
 interface DMResponse {
@@ -198,63 +203,15 @@ function trimContext(history: ConversationEntry[]): ConversationEntry[] {
   return history.slice(-MAX_CONTEXT_MESSAGES)
 }
 
-export async function sendToAIDM(
-  apiKey: string,
-  character: Character,
-  gameState: GameState,
-  location: string,
-  conversationHistory: ConversationEntry[],
-  playerMessage: string,
-  onStream?: (chunk: string) => void,
-): Promise<DMResponse> {
-  const systemPrompt = buildSystemPrompt(character, gameState, location)
-  const trimmed = trimContext(conversationHistory)
+// --- Claude (Anthropic) provider ---
 
-  const messages = [
-    ...trimmed.map((entry) => ({
-      role: entry.role as 'user' | 'assistant',
-      content: entry.content,
-    })),
-    { role: 'user' as const, content: playerMessage },
-  ]
-
-  if (onStream) {
-    return streamResponse(apiKey, systemPrompt, messages, onStream)
-  }
-
-  const response = await fetch(API_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true',
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      max_tokens: 1024,
-      system: systemPrompt,
-      messages,
-    }),
-  })
-
-  if (!response.ok) {
-    const errorText = await response.text()
-    throw new Error(`AI DM error (${response.status}): ${errorText}`)
-  }
-
-  const data = await response.json()
-  const text = data.content?.[0]?.text ?? ''
-  return parseGameActions(text)
-}
-
-async function streamResponse(
+async function sendClaude(
   apiKey: string,
   systemPrompt: string,
   messages: { role: 'user' | 'assistant'; content: string }[],
-  onStream: (chunk: string) => void,
-): Promise<DMResponse> {
-  const response = await fetch(API_URL, {
+  onStream?: (text: string) => void,
+): Promise<string> {
+  const response = await fetch(CLAUDE_API_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -263,17 +220,22 @@ async function streamResponse(
       'anthropic-dangerous-direct-browser-access': 'true',
     },
     body: JSON.stringify({
-      model: MODEL,
+      model: CLAUDE_MODEL,
       max_tokens: 1024,
       system: systemPrompt,
       messages,
-      stream: true,
+      stream: !!onStream,
     }),
   })
 
   if (!response.ok) {
     const errorText = await response.text()
     throw new Error(`AI DM error (${response.status}): ${errorText}`)
+  }
+
+  if (!onStream) {
+    const data = await response.json()
+    return data.content?.[0]?.text ?? ''
   }
 
   const reader = response.body?.getReader()
@@ -313,6 +275,112 @@ async function streamResponse(
     }
   }
 
+  return fullText
+}
+
+// --- Groq (Llama) provider ---
+
+async function sendGroq(
+  apiKey: string,
+  systemPrompt: string,
+  messages: { role: 'user' | 'assistant'; content: string }[],
+  onStream?: (text: string) => void,
+): Promise<string> {
+  const groqMessages = [
+    { role: 'system' as const, content: systemPrompt },
+    ...messages,
+  ]
+
+  const response = await fetch(GROQ_API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: GROQ_MODEL,
+      max_tokens: 1024,
+      messages: groqMessages,
+      stream: !!onStream,
+    }),
+  })
+
+  if (!response.ok) {
+    const errorText = await response.text()
+    throw new Error(`AI DM error (${response.status}): ${errorText}`)
+  }
+
+  if (!onStream) {
+    const data = await response.json()
+    return data.choices?.[0]?.message?.content ?? ''
+  }
+
+  const reader = response.body?.getReader()
+  if (!reader) throw new Error('No response body')
+
+  const decoder = new TextDecoder()
+  let fullText = ''
+  let buffer = ''
+
+  while (true) {
+    const { done, value } = await reader.read()
+    if (done) break
+
+    buffer += decoder.decode(value, { stream: true })
+    const lines = buffer.split('\n')
+    buffer = lines.pop() ?? ''
+
+    for (const line of lines) {
+      if (!line.startsWith('data: ')) continue
+      const data = line.slice(6).trim()
+      if (data === '[DONE]') continue
+
+      try {
+        const parsed = JSON.parse(data)
+        const content = parsed.choices?.[0]?.delta?.content
+        if (content) {
+          fullText += content
+          let displayText = fullText.replace(/<game_actions>[\s\S]*?<\/game_actions>/g, '')
+          const partialIdx = displayText.indexOf('<game_actions>')
+          if (partialIdx !== -1) {
+            displayText = displayText.slice(0, partialIdx)
+          }
+          onStream(displayText.trim())
+        }
+      } catch {
+        // Skip non-JSON lines
+      }
+    }
+  }
+
+  return fullText
+}
+
+// --- Public API ---
+
+export async function sendToAIDM(
+  apiKey: string,
+  character: Character,
+  gameState: GameState,
+  location: string,
+  conversationHistory: ConversationEntry[],
+  playerMessage: string,
+  onStream?: (chunk: string) => void,
+  provider: AIProvider = 'groq',
+): Promise<DMResponse> {
+  const systemPrompt = buildSystemPrompt(character, gameState, location)
+  const trimmed = trimContext(conversationHistory)
+
+  const messages = [
+    ...trimmed.map((entry) => ({
+      role: entry.role as 'user' | 'assistant',
+      content: entry.content,
+    })),
+    { role: 'user' as const, content: playerMessage },
+  ]
+
+  const send = provider === 'claude' ? sendClaude : sendGroq
+  const fullText = await send(apiKey, systemPrompt, messages, onStream)
   return parseGameActions(fullText)
 }
 

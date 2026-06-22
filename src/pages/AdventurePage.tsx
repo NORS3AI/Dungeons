@@ -66,7 +66,8 @@ export function AdventurePage() {
   const navigate = useNavigate()
   const { loadCharacter, updateHitPoints, addCondition, removeCondition, useSpellSlot, shortRest, longRest, updateCurrency, saveCharacter } = useCharacterStore()
   const character = useCharacterStore((s) => s.currentCharacter)
-  const { apiKey } = useSettingsStore()
+  const { aiProvider, apiKey, groqApiKey } = useSettingsStore()
+  const activeApiKey = aiProvider === 'claude' ? apiKey : groqApiKey
 
   const {
     isActive, gameState, messages, combatState, currentLocation,
@@ -202,7 +203,7 @@ export function AdventurePage() {
   }, [character, processGameActions, updateHitPoints, addMessage, startCombat, endCombat, setGameState, addCondition, removeCondition, useSpellSlot, updateCurrency, saveCharacter, addXP])
 
   const sendMessage = useCallback(async (playerText: string) => {
-    if (!character || !apiKey || isAIResponding) return
+    if (!character || !activeApiKey || isAIResponding) return
 
     setError(null)
     setStreamingText('')
@@ -216,13 +217,14 @@ export function AdventurePage() {
 
     try {
       const response = await sendToAIDM(
-        apiKey,
+        activeApiKey,
         character,
         gameState,
         currentLocation,
         conversationContext,
         fullMessage,
         (displayText) => setStreamingText(displayText),
+        aiProvider,
       )
 
       setStreamingText('')
@@ -239,7 +241,7 @@ export function AdventurePage() {
     } finally {
       setIsAIResponding(false)
     }
-  }, [character, apiKey, isAIResponding, gameState, combatState, currentLocation, conversationContext, addMessage, addConversationEntry, setIsAIResponding, executeGameActions])
+  }, [character, activeApiKey, aiProvider, isAIResponding, gameState, combatState, currentLocation, conversationContext, addMessage, addConversationEntry, setIsAIResponding, executeGameActions])
 
   const handleCommand = useCallback((text: string) => {
     const lower = text.toLowerCase()
@@ -382,14 +384,20 @@ export function AdventurePage() {
     )
   }
 
-  if (!apiKey) {
+  if (!activeApiKey) {
+    const providerName = aiProvider === 'claude' ? 'Claude' : 'Groq'
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center max-w-md">
           <div className="text-6xl mb-4">&#x1F511;</div>
           <h2 className="text-xl text-gray-400 mb-2">API Key Required</h2>
           <p className="text-gray-500 mb-4">
-            Open Settings and add your Claude API key to use the AI Dungeon Master.
+            Open Settings and add your {providerName} API key to use the AI Dungeon Master.
+            {aiProvider === 'groq' && (
+              <span className="block mt-2 text-green-400/70">
+                Groq is free — get a key at console.groq.com
+              </span>
+            )}
           </p>
           <button
             onClick={() => navigate('/')}

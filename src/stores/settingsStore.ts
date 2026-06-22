@@ -17,6 +17,11 @@ export type FontSize = 'small' | 'medium' | 'large' | 'xlarge'
 export type FontFamily = 'default' | 'dyslexic'
 
 /**
+ * AI provider options
+ */
+export type AIProvider = 'groq' | 'claude'
+
+/**
  * Settings state
  */
 interface SettingsState {
@@ -26,7 +31,9 @@ interface SettingsState {
   showQuickRefTooltips: boolean
   dmModeEnabled: boolean
   isAuthenticated: boolean
+  aiProvider: AIProvider
   apiKey: string
+  groqApiKey: string
   lastSyncedContentVersion: number
 
   // Actions
@@ -38,7 +45,9 @@ interface SettingsState {
   setDMMode: (enabled: boolean) => void
   authenticate: () => void
   logout: () => void
+  setAIProvider: (provider: AIProvider) => void
   setApiKey: (key: string) => void
+  setGroqApiKey: (key: string) => void
   setLastSyncedContentVersion: (version: number) => void
   resetAllCache: () => void
 }
@@ -87,7 +96,9 @@ export const useSettingsStore = create<SettingsState>()(
       showQuickRefTooltips: true,
       dmModeEnabled: false,
       isAuthenticated: false,
+      aiProvider: 'groq',
       apiKey: '',
+      groqApiKey: '',
       lastSyncedContentVersion: 0,
 
       setTheme: (theme: Theme) => {
@@ -130,8 +141,16 @@ export const useSettingsStore = create<SettingsState>()(
         set({ isAuthenticated: false })
       },
 
+      setAIProvider: (provider: AIProvider) => {
+        set({ aiProvider: provider })
+      },
+
       setApiKey: (key: string) => {
         set({ apiKey: key })
+      },
+
+      setGroqApiKey: (key: string) => {
+        set({ groqApiKey: key })
       },
 
       setLastSyncedContentVersion: (version: number) => {
