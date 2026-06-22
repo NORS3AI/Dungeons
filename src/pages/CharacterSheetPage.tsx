@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useCharacterStore } from '../stores/characterStore'
 import { useSettingsStore } from '../stores/settingsStore'
+import { useAdventureStore } from '../stores/adventureStore'
 import { DiceRollerButton, DiceRollerModal } from '../components/DiceRoller'
 import { calculateModifier, calculateProficiencyBonus, rollDice } from '../types/dice'
 import { isWeapon, isArmor, isShield, isCloak, autoConvertCurrency, EMPTY_CURRENCY } from '../types/equipment'
@@ -352,7 +353,7 @@ export function CharacterSheetPage() {
       }
 
       const material: Material = {
-        id: lootItem.id, // Use consistent ID for consolidation
+        id: lootItem.baseId ?? lootItem.id,
         name: lootItem.name,
         description: lootItem.description,
         category: materialCategory,
@@ -1258,6 +1259,20 @@ export function CharacterSheetPage() {
           >
             Edit Details
           </button>
+          {(() => {
+            const advStore = useAdventureStore.getState()
+            const hasActiveAdventure = advStore.isActive && advStore.characterId === character.id && advStore.messages.length > 0
+            return (
+              <button
+                onClick={() => navigate(`/adventure/${character.id}`)}
+                className="px-4 py-2 bg-dnd-gold hover:bg-yellow-500 text-gray-900 font-bold rounded-lg
+                         transition-colors focus:outline-none focus:ring-2 focus:ring-dnd-gold"
+                title={hasActiveAdventure ? 'Continue your saved adventure' : 'Start an AI-guided adventure with this character'}
+              >
+                {hasActiveAdventure ? 'Continue Adventure' : 'Adventure'}
+              </button>
+            )
+          })()}
         </div>
       </div>
 

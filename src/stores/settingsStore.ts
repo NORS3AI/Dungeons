@@ -25,6 +25,9 @@ interface SettingsState {
   fontFamily: FontFamily
   showQuickRefTooltips: boolean
   dmModeEnabled: boolean
+  isAuthenticated: boolean
+  apiKey: string
+  lastSyncedContentVersion: number
 
   // Actions
   setTheme: (theme: Theme) => void
@@ -33,6 +36,10 @@ interface SettingsState {
   toggleQuickRefTooltips: () => void
   unlockDMMode: (code: string) => boolean
   setDMMode: (enabled: boolean) => void
+  authenticate: () => void
+  logout: () => void
+  setApiKey: (key: string) => void
+  setLastSyncedContentVersion: (version: number) => void
   resetAllCache: () => void
 }
 
@@ -79,6 +86,9 @@ export const useSettingsStore = create<SettingsState>()(
       fontFamily: 'default',
       showQuickRefTooltips: true,
       dmModeEnabled: false,
+      isAuthenticated: false,
+      apiKey: '',
+      lastSyncedContentVersion: 0,
 
       setTheme: (theme: Theme) => {
         set({ theme })
@@ -110,6 +120,22 @@ export const useSettingsStore = create<SettingsState>()(
 
       setDMMode: (enabled: boolean) => {
         set({ dmModeEnabled: enabled })
+      },
+
+      authenticate: () => {
+        set({ isAuthenticated: true })
+      },
+
+      logout: () => {
+        set({ isAuthenticated: false })
+      },
+
+      setApiKey: (key: string) => {
+        set({ apiKey: key })
+      },
+
+      setLastSyncedContentVersion: (version: number) => {
+        set({ lastSyncedContentVersion: version })
       },
 
       resetAllCache: () => {

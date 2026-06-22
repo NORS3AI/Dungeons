@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useSettingsStore, THEME_NAMES, FONT_SIZE_VALUES, FONT_FAMILY_NAMES, type Theme, type FontSize, type FontFamily } from '../stores/settingsStore'
+import { useCharacterStore } from '../stores/characterStore'
+import { CONTENT_VERSION } from '../data/contentVersion'
 
 interface SettingsModalProps {
   isOpen: boolean
@@ -9,7 +11,10 @@ interface SettingsModalProps {
 export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const modalRef = useRef<HTMLDivElement>(null)
   const [showResetConfirm, setShowResetConfirm] = useState(false)
-  const { theme, fontSize, fontFamily, showQuickRefTooltips, setTheme, setFontSize, setFontFamily, toggleQuickRefTooltips, resetAllCache } = useSettingsStore()
+  const [showApiKey, setShowApiKey] = useState(false)
+  const [syncStatus, setSyncStatus] = useState<string | null>(null)
+  const { theme, fontSize, fontFamily, showQuickRefTooltips, apiKey, lastSyncedContentVersion, setTheme, setFontSize, setFontFamily, toggleQuickRefTooltips, setApiKey, setLastSyncedContentVersion, logout, resetAllCache } = useSettingsStore()
+  const { syncAllContent } = useCharacterStore()
 
   // Close on escape key
   useEffect(() => {
@@ -196,6 +201,103 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             </label>
             <p className="text-xs text-gray-500 mt-1">
               Show tooltips when hovering over spells, abilities, and other game terms.
+            </p>
+          </div>
+
+          {/* Claude API Key */}
+          <div className="pt-4 border-t border-gray-700">
+            <label className="block text-sm font-semibold text-gray-300 mb-2">Claude API Key</label>
+            <p className="text-xs text-gray-500 mb-3">
+              Required for AI Dungeon Master adventures. Your key is stored locally in your browser only.
+            </p>
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <input
+                  type={showApiKey ? 'text' : 'password'}
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                  placeholder="sk-ant-..."
+                  className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg text-white text-sm
+                           placeholder:text-gray-600 focus:outline-none focus:border-dnd-gold transition-colors pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowApiKey(!showApiKey)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+                  aria-label={showApiKey ? 'Hide API key' : 'Show API key'}
+                >
+                  {showApiKey ? (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+            </div>
+            {apiKey && (
+              <p className="text-xs text-green-400 mt-2">
+                API key saved
+              </p>
+            )}
+          </div>
+
+          {/* Content Sync */}
+          <div className="pt-4 border-t border-gray-700">
+            <label className="block text-sm font-semibold text-gray-300 mb-2">Content Sync</label>
+            <p className="text-xs text-gray-500 mb-3">
+              Refreshes class features, race traits, and subclass data on all characters to match the latest game content.
+            </p>
+            <button
+              onClick={() => {
+                const result = syncAllContent()
+                setLastSyncedContentVersion(CONTENT_VERSION)
+                if (result.synced > 0) {
+                  setSyncStatus(`Updated ${result.synced} character${result.synced !== 1 ? 's' : ''}: ${result.changes.join('; ')}`)
+                } else {
+                  setSyncStatus('All characters are already up to date.')
+                }
+                setTimeout(() => setSyncStatus(null), 5000)
+              }}
+              className="w-full px-4 py-2 bg-gray-700 text-gray-300 font-medium rounded-lg
+                       hover:bg-gray-600 border border-gray-600 transition-colors
+                       focus:outline-none focus:ring-2 focus:ring-dnd-gold flex items-center justify-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              Sync Content
+              {lastSyncedContentVersion < CONTENT_VERSION && (
+                <span className="w-2 h-2 bg-dnd-gold rounded-full animate-pulse" />
+              )}
+            </button>
+            {syncStatus && (
+              <p className={`text-xs mt-2 ${syncStatus.startsWith('All') ? 'text-blue-400' : 'text-green-400'}`}>
+                {syncStatus}
+              </p>
+            )}
+          </div>
+
+          {/* Logout */}
+          <div className="pt-4 border-t border-gray-700">
+            <button
+              onClick={() => {
+                logout()
+                onClose()
+              }}
+              className="w-full px-4 py-2 bg-gray-700 text-gray-300 font-medium rounded-lg
+                       hover:bg-gray-600 border border-gray-600 transition-colors
+                       focus:outline-none focus:ring-2 focus:ring-gray-500"
+            >
+              Lock App (Logout)
+            </button>
+            <p className="text-xs text-gray-500 mt-2">
+              Locks the app behind the passcode screen. Your data and API key remain saved.
             </p>
           </div>
 

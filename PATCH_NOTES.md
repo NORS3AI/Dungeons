@@ -1,5 +1,137 @@
 # Dungeons - Patch Notes
 
+## Version 0.5.0-beta - June 21, 2026
+
+**Beta Release Notice**: The Adventure System is here. An AI Dungeon Master powered by Claude guides a fully playable text RPG adventure using your character sheet, equipment, spells, and abilities.
+
+### Adventure Mode
+
+Click the gold **Adventure** button on any character sheet to begin a fully AI-driven text RPG. The AI Dungeon Master weaves narrative, combat encounters, skill checks, and treasure based on your character's actual stats, equipment, and spells.
+
+#### **AI Dungeon Master**
+- Powered by Claude (your API key, stored locally, never leaves your browser)
+- Narrates in second person — "You walk into a dimly lit tavern..."
+- Reacts to free-form player input — type anything and the world responds
+- Scales encounters to your character's level
+- Streaming responses with live typing indicator
+
+#### **Full Combat System**
+- Initiative rolls using your DEX modifier
+- Attack rolls using your equipped weapon's stats and bonuses
+- Damage rolls with critical hit doubling
+- Enemy HP tracking with visual health bars
+- Turn-based combat with round tracking
+- Quick-action buttons: Attack, Cast Spell, Dodge, Disengage, Use Item
+- Death saves with Natural 20 revival and Natural 1 double-failure
+
+#### **Deep Character Integration**
+- HP, AC, conditions, and spell slots tracked live during the adventure
+- Skill checks use your actual ability scores and proficiency bonuses
+- Saving throws respect your class proficiencies
+- Equipped weapons determine attack/damage dice
+- Short and long rests restore resources using the existing rest system
+- Conditions applied mid-adventure persist on your character sheet
+
+#### **Adventure UI**
+- Scrolling narrative log with styled message bubbles
+- Character status bar (HP bar, AC, conditions, game state, location)
+- Side panel with combat info, ability scores, and spell slot tracking
+- Roll results displayed inline with success/fail/crit/fumble indicators
+- System messages for damage, healing, loot, and state changes
+
+#### **Game States**
+The adventure flows between states: Exploring, Combat, Dialogue, Rest, Shopping, and Death — each with appropriate UI and input prompts.
+
+#### **Adventure Starter Screen**
+When you launch an adventure, you choose how it begins:
+- **16 Adventure Hooks** — pre-built scenarios like Dungeon Crawl, Tavern Brawl, Dragon Sighting, Haunted Manor, Arena Champion, Shipwreck, Political Intrigue, and more
+- **"Surprise Me"** — let the AI create something unexpected based on your character
+- **Custom Opening** — type your own scenario and the AI takes it from there
+
+#### **Persistence & Rewards**
+- Adventure state auto-saves between sessions (come back and pick up where you left off)
+- **Continue Adventure** button appears on the character sheet when a saved adventure exists
+- Gold rewards from loot flow directly into your character's wallet
+- XP earned tracked in the sidebar
+- HP, conditions, and spell slot changes persist to your character sheet
+- Quest log in the sidebar tracks objectives given by the DM
+
+### Content Sync System
+
+When the app updates with new classes, features, or balance changes, a popup now appears prompting you to sync your saved characters. Syncing refreshes embedded class features, race traits, and subclass data without touching your HP, inventory, or chosen spells.
+
+#### **Sync Popup**
+- Appears automatically on app load when new content is detected
+- Shows exactly what will be synced vs. what stays the same
+- "Sync Now" button updates all characters instantly with a detailed change report
+- "Later" dismisses until the next content update
+
+#### **Manual Sync in Settings**
+- A new **Sync Content** button in Settings lets you sync anytime
+- Shows a gold indicator dot when an update is pending
+- Reports which characters were updated and what changed
+
+### Cascading Character Cleanup
+
+Deleting a character now properly cleans up all associated data across the app:
+
+- **Adventure store**: Ends any active adventure tied to the deleted character
+- **Campaign party**: Removes the character from the party roster
+- **Session notes**: Removes all notes referencing the deleted character
+- **Initiative tracker**: Removes any initiative entries for the deleted character
+- **Scroll positions**: Clears saved scroll positions for the deleted character
+
+### Password Protection
+
+The app is now locked behind a passcode screen. Claude API key is entered once in Settings and stored locally.
+
+**Why This Matters**: This is the core vision of Dungeons — a next-gen text RPG where an AI DM guides your adventure using your actual character. No scripts, no fixed paths. Every choice is yours.
+
+---
+
+## Version 0.4.30-alpha - June 21, 2026
+
+**Alpha Release Notice**: Password gate and API key management — the app is now locked behind a passcode.
+
+### Password Gate
+
+The entire app is now protected behind a passcode screen. No part of the app is accessible without entering the correct code. Your session persists in localStorage so you only need to enter it once per browser.
+
+### Claude API Key (Settings)
+
+A new **Claude API Key** section in Settings lets you securely store your Anthropic API key for upcoming AI Dungeon Master features. The key is saved locally in your browser only — it never leaves your device or touches the codebase.
+
+#### **New Settings Options**
+- **Claude API Key** input with show/hide toggle
+- **Lock App (Logout)** button to return to the passcode screen without losing data
+
+**Why This Matters**: Protects your API key and the app from unauthorized access while keeping the setup simple for a small group of players.
+
+---
+
+## Version 0.4.29-alpha - May 25, 2026
+
+**Alpha Release Notice**: Critical fix — Loot Cache filters/sorting and material merging now work correctly. Quantities have no cap.
+
+### Bug Fix: Loot Cache Filters & Sorting Now Work
+
+The filter (Mining/Tailoring/Herbalism/Enchanting) and sort (Name/Quality/Resource Type) buttons in the Loot Cache were broken because generated items had unique timestamped IDs that didn't match the crafting material registry. Items now carry a `baseId` that correctly identifies their material type, so filtering and sorting work as expected.
+
+### Bug Fix: Merge Button Now Works
+
+The Merge button in each Work tab section was silently doing nothing because every material had a unique ID — there were never "duplicates" to merge. Materials added from loot now use their canonical base ID (`iron-ore` instead of `iron-ore-1716000000000-0`), so:
+- The `addMaterial` store method properly stacks identical materials on add
+- The Merge button correctly consolidates any legacy duplicates
+- Crafting recipe material checks now match correctly
+
+### No Quantity Cap
+
+Material stacks have no upper limit — a resource can have 999,999,999+ quantity with no cap.
+
+**Why This Matters**: Filters, sorting, merging, and crafting all depend on consistent material IDs. This fix makes the entire crafting/loot pipeline work end to end.
+
+---
+
 ## Version 0.4.28-alpha - May 25, 2026
 
 **Alpha Release Notice**: Work tab Merge button — manually consolidate duplicate materials in each crafting section.

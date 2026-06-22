@@ -24,6 +24,7 @@ import type {
 } from '../types'
 import { DEFAULT_ABILITY_SCORES, EMPTY_CURRENCY, autoConvertCurrency } from '../types'
 import { migrateCharacter, needsMigration } from '../utils/characterMigration'
+import { syncAllCharacters } from '../utils/contentSync'
 
 /**
  * Character creation step
@@ -185,6 +186,7 @@ interface CharacterState {
   migrateCharacterById: (id: string) => void
   needsMigration: () => boolean
   needsMigrationById: (id: string) => boolean
+  syncAllContent: () => { synced: number; changes: string[] }
 
   // Creation wizard
   setCreationStep: (step: CreationStep) => void
@@ -333,6 +335,37 @@ export const useCharacterStore = create<CharacterState>()(
             characters: state.characters.filter((c) => c.id !== id),
             currentCharacter: state.currentCharacter?.id === id ? null : state.currentCharacter,
           }))
+
+          // Cascade: clean up adventure store if it references this character
+          try {
+            const { useAdventureStore } = require('./adventureStore')
+            const adventureState = useAdventureStore.getState()
+            if (adventureState.characterId === id) {
+              adventureState.endAdventure()
+            }
+          } catch { /* adventure store may not be loaded */ }
+
+          // Cascade: remove from campaign party and session notes
+          try {
+            const { useCampaignStore } = require('./campaignStore')
+            const campaignState = useCampaignStore.getState()
+            if (campaignState.partyCharacterIds.includes(id)) {
+              campaignState.removeFromParty(id)
+            }
+            const orphanedNotes = campaignState.sessionNotes.filter((n: { characterId: string }) => n.characterId === id)
+            for (const note of orphanedNotes) {
+              campaignState.deleteSessionNote(note.id)
+            }
+            const orphanedInit = campaignState.initiativeOrder.filter((e: { characterId?: string }) => e.characterId === id)
+            for (const entry of orphanedInit) {
+              campaignState.removeFromInitiative(entry.id)
+            }
+          } catch { /* campaign store may not be loaded */ }
+
+          // Cascade: remove scroll tracker
+          try {
+            localStorage.removeItem(`scroll-tracker-${id}`)
+          } catch { /* localStorage may not be available */ }
         },
 
         importCharacter: (character: Character) => {
@@ -388,6 +421,18 @@ export const useCharacterStore = create<CharacterState>()(
           const { characters } = get()
           const character = characters.find((c) => c.id === id)
           return character ? needsMigration(character) : false
+        },
+
+        syncAllContent: () => {
+          const { characters, currentCharacter } = get()
+          const { characters: synced, result } = syncAllCharacters(characters)
+
+          const updatedCurrent = currentCharacter
+            ? synced.find((c) => c.id === currentCharacter.id) ?? currentCharacter
+            : null
+
+          set({ characters: synced, currentCharacter: updatedCurrent })
+          return result
         },
 
         setCreationStep: (step: CreationStep) => {

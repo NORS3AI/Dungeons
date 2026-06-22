@@ -1,12 +1,14 @@
 import { Suspense, lazy } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { Layout } from './components/Layout'
+import { PasswordGate } from './components/PasswordGate'
 
 // Lazy load pages for code splitting
 const HomePage = lazy(() => import('./pages/HomePage').then(m => ({ default: m.HomePage })))
 const CharacterCreatePage = lazy(() => import('./pages/CharacterCreatePage').then(m => ({ default: m.CharacterCreatePage })))
 const CharacterSheetPage = lazy(() => import('./pages/CharacterSheetPage').then(m => ({ default: m.CharacterSheetPage })))
 const CampaignPage = lazy(() => import('./pages/CampaignPage').then(m => ({ default: m.CampaignPage })))
+const AdventurePage = lazy(() => import('./pages/AdventurePage').then(m => ({ default: m.AdventurePage })))
 
 // Loading component for Suspense fallback
 function PageLoader() {
@@ -22,15 +24,18 @@ function PageLoader() {
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route index element={<Suspense fallback={<PageLoader />}><HomePage /></Suspense>} />
-        <Route path="create" element={<Suspense fallback={<PageLoader />}><CharacterCreatePage /></Suspense>} />
-        <Route path="character/:id" element={<Suspense fallback={<PageLoader />}><CharacterSheetPage /></Suspense>} />
-        <Route path="campaign" element={<Suspense fallback={<PageLoader />}><CampaignPage /></Suspense>} />
-        <Route path="register" element={<Suspense fallback={<PageLoader />}><HomePage /></Suspense>} />
-      </Route>
-    </Routes>
+    <PasswordGate>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Suspense fallback={<PageLoader />}><HomePage /></Suspense>} />
+          <Route path="create" element={<Suspense fallback={<PageLoader />}><CharacterCreatePage /></Suspense>} />
+          <Route path="character/:id" element={<Suspense fallback={<PageLoader />}><CharacterSheetPage /></Suspense>} />
+          <Route path="campaign" element={<Suspense fallback={<PageLoader />}><CampaignPage /></Suspense>} />
+          <Route path="adventure/:id" element={<Suspense fallback={<PageLoader />}><AdventurePage /></Suspense>} />
+          <Route path="register" element={<Suspense fallback={<PageLoader />}><HomePage /></Suspense>} />
+        </Route>
+      </Routes>
+    </PasswordGate>
   )
 }
 

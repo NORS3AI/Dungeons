@@ -115,10 +115,11 @@ const RARITY_ORDER: Record<string, number> = {
 }
 
 function getResourceType(item: LootItem): ResourceFilter {
-  if (ALL_MINING_IDS.has(item.id)) return 'mining'
-  if (ALL_TAILORING_IDS.has(item.id)) return 'tailoring'
-  if (ALL_HERBALISM_IDS.has(item.id)) return 'herbalism'
-  if (ALL_ENCHANTING_IDS.has(item.id)) return 'enchanting'
+  const id = item.baseId ?? item.id
+  if (ALL_MINING_IDS.has(id)) return 'mining'
+  if (ALL_TAILORING_IDS.has(id)) return 'tailoring'
+  if (ALL_HERBALISM_IDS.has(id)) return 'herbalism'
+  if (ALL_ENCHANTING_IDS.has(id)) return 'enchanting'
   return 'all'
 }
 
