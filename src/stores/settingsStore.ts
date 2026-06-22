@@ -19,7 +19,7 @@ export type FontFamily = 'default' | 'dyslexic'
 /**
  * AI provider options
  */
-export type AIProvider = 'groq' | 'claude'
+export type AIProvider = 'gemini' | 'claude'
 
 /**
  * Settings state
@@ -33,7 +33,7 @@ interface SettingsState {
   isAuthenticated: boolean
   aiProvider: AIProvider
   apiKey: string
-  groqApiKey: string
+  geminiApiKey: string
   lastSyncedContentVersion: number
 
   // Actions
@@ -47,7 +47,7 @@ interface SettingsState {
   logout: () => void
   setAIProvider: (provider: AIProvider) => void
   setApiKey: (key: string) => void
-  setGroqApiKey: (key: string) => void
+  setGeminiApiKey: (key: string) => void
   setLastSyncedContentVersion: (version: number) => void
   resetAllCache: () => void
 }
@@ -96,9 +96,9 @@ export const useSettingsStore = create<SettingsState>()(
       showQuickRefTooltips: true,
       dmModeEnabled: false,
       isAuthenticated: false,
-      aiProvider: 'groq',
+      aiProvider: 'gemini',
       apiKey: '',
-      groqApiKey: '',
+      geminiApiKey: '',
       lastSyncedContentVersion: 0,
 
       setTheme: (theme: Theme) => {
@@ -149,8 +149,8 @@ export const useSettingsStore = create<SettingsState>()(
         set({ apiKey: key })
       },
 
-      setGroqApiKey: (key: string) => {
-        set({ groqApiKey: key })
+      setGeminiApiKey: (key: string) => {
+        set({ geminiApiKey: key })
       },
 
       setLastSyncedContentVersion: (version: number) => {

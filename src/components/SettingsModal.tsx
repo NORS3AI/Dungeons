@@ -13,7 +13,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const [showResetConfirm, setShowResetConfirm] = useState(false)
   const [showApiKey, setShowApiKey] = useState(false)
   const [syncStatus, setSyncStatus] = useState<string | null>(null)
-  const { theme, fontSize, fontFamily, showQuickRefTooltips, aiProvider, apiKey, groqApiKey, lastSyncedContentVersion, setTheme, setFontSize, setFontFamily, toggleQuickRefTooltips, setAIProvider, setApiKey, setGroqApiKey, setLastSyncedContentVersion, logout, resetAllCache } = useSettingsStore()
+  const { theme, fontSize, fontFamily, showQuickRefTooltips, aiProvider, apiKey, geminiApiKey, lastSyncedContentVersion, setTheme, setFontSize, setFontFamily, toggleQuickRefTooltips, setAIProvider, setApiKey, setGeminiApiKey, setLastSyncedContentVersion, logout, resetAllCache } = useSettingsStore()
   const { syncAllContent } = useCharacterStore()
 
   // Close on escape key
@@ -208,11 +208,11 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
           <div className="pt-4 border-t border-gray-700">
             <label className="block text-sm font-semibold text-gray-300 mb-2">AI Dungeon Master</label>
             <p className="text-xs text-gray-500 mb-3">
-              Choose the AI provider for adventures. Groq runs Llama 3.3 70B for free.
+              Choose the AI provider for adventures. Gemini 2.5 Flash is free.
             </p>
             <div className="grid grid-cols-2 gap-2 mb-4">
               {([
-                { id: 'groq' as AIProvider, label: 'Groq (Free)', desc: 'Llama 3.3 70B' },
+                { id: 'gemini' as AIProvider, label: 'Gemini (Free)', desc: '2.5 Flash' },
                 { id: 'claude' as AIProvider, label: 'Claude (Paid)', desc: 'Opus 4.7' },
               ]).map((p) => (
                 <button
@@ -231,18 +231,18 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               ))}
             </div>
 
-            {/* Groq API Key */}
-            {aiProvider === 'groq' && (
+            {/* Gemini API Key */}
+            {aiProvider === 'gemini' && (
               <div>
                 <label className="block text-xs font-medium text-gray-400 mb-1">
-                  Groq API Key <span className="text-green-400/70">(free at console.groq.com)</span>
+                  Gemini API Key <span className="text-green-400/70">(free at aistudio.google.com)</span>
                 </label>
                 <div className="relative">
                   <input
                     type={showApiKey ? 'text' : 'password'}
-                    value={groqApiKey}
-                    onChange={(e) => setGroqApiKey(e.target.value)}
-                    placeholder="gsk_..."
+                    value={geminiApiKey}
+                    onChange={(e) => setGeminiApiKey(e.target.value)}
+                    placeholder="AIza..."
                     className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg text-white text-sm
                              placeholder:text-gray-600 focus:outline-none focus:border-dnd-gold transition-colors pr-10"
                   />
@@ -264,8 +264,8 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                     )}
                   </button>
                 </div>
-                {groqApiKey && (
-                  <p className="text-xs text-green-400 mt-2">Groq key saved</p>
+                {geminiApiKey && (
+                  <p className="text-xs text-green-400 mt-2">Gemini key saved</p>
                 )}
               </div>
             )}
