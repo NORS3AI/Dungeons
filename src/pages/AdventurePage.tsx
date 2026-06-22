@@ -82,6 +82,7 @@ export function AdventurePage() {
   const [input, setInput] = useState('')
   const [streamingText, setStreamingText] = useState('')
   const [showSidebar, setShowSidebar] = useState(true)
+  const [sidebarTab, setSidebarTab] = useState<'adventure' | 'spells' | 'skills' | 'gear'>('adventure')
   const [error, setError] = useState<string | null>(null)
   const [pendingAction, setPendingAction] = useState<GameAction | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -599,121 +600,400 @@ export function AdventurePage() {
           </div>
         </div>
 
-        {/* Side panel — combat / quest info */}
-        {showSidebar && (
-          <div className="w-72 border-l border-gray-700 bg-gray-900/50 overflow-y-auto p-4 space-y-4 hidden lg:block">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider">Adventure</h3>
-              <button
-                onClick={() => setShowSidebar(false)}
-                className="text-gray-600 hover:text-gray-400 text-xs"
-              >
-                Hide
-              </button>
-            </div>
-
-            {/* Combat panel */}
-            {combatState && <CombatPanel combat={combatState} />}
-
-            {/* Character quick stats */}
-            <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-3 space-y-2">
-              <div className="text-xs font-bold text-gray-500 uppercase">Quick Stats</div>
-              <div className="grid grid-cols-3 gap-2 text-center">
-                {(['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'] as const).map((ability) => {
-                  const score = character.abilityScores[ability]
-                  const mod = calculateModifier(score)
-                  return (
-                    <div key={ability} className="bg-gray-900/50 rounded p-1.5">
-                      <div className="text-xs text-gray-500 uppercase">{ability.slice(0, 3)}</div>
-                      <div className="text-sm font-bold text-white">{score}</div>
-                      <div className="text-xs text-gray-400">{mod >= 0 ? '+' : ''}{mod}</div>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-
-            {/* Spell slots */}
-            {character.knownSpells.length > 0 && (
-              <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-3 space-y-2">
-                <div className="text-xs font-bold text-gray-500 uppercase">Spell Slots</div>
-                <div className="space-y-1">
-                  {Object.entries(character.spellSlots || {}).map(([level, slot]) => {
-                    const s = slot as { max: number; used: number }
-                    if (!s.max) return null
-                    const remaining = s.max - (s.used || 0)
-                    return (
-                      <div key={level} className="flex items-center gap-2 text-xs">
-                        <span className="text-gray-500 w-6">L{level}</span>
-                        <div className="flex gap-0.5">
-                          {Array.from({ length: s.max }, (_, i) => (
-                            <div
-                              key={i}
-                              className={`w-3 h-3 rounded-full border ${
-                                i < remaining
-                                  ? 'bg-blue-500 border-blue-400'
-                                  : 'bg-gray-700 border-gray-600'
-                              }`}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Gold & XP */}
-            <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-3">
-              <div className="text-xs font-bold text-gray-500 uppercase mb-2">Resources</div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-yellow-400">Gold</span>
-                <span className="font-bold text-yellow-300">{character.currency?.gold ?? 0}</span>
-              </div>
-              <div className="flex items-center justify-between text-sm mt-1">
-                <span className="text-blue-400">XP Earned</span>
-                <span className="font-bold text-blue-300">{totalXPEarned}</span>
-              </div>
-            </div>
-
-            {/* Quest log */}
-            {questLog.length > 0 && (
-              <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-3">
-                <div className="text-xs font-bold text-gray-500 uppercase mb-2">Quests</div>
-                <div className="space-y-1.5">
-                  {questLog.map((quest) => (
-                    <div key={quest.id} className={`text-xs ${quest.isComplete ? 'text-gray-600 line-through' : 'text-gray-300'}`}>
-                      {quest.isComplete ? '&#x2714; ' : '&#x25CB; '}{quest.title}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* End adventure */}
-            <button
-              onClick={() => {
-                if (window.confirm('End this adventure? Your progress will be lost.')) {
-                  useAdventureStore.getState().endAdventure()
-                  navigate(`/character/${character.id}`)
-                }
-              }}
-              className="w-full px-3 py-2 bg-gray-800 text-gray-500 text-xs rounded-lg border border-gray-700 hover:border-red-700 hover:text-red-400 transition-colors"
-            >
-              End Adventure
-            </button>
-          </div>
-        )}
-
-        {/* Sidebar toggle when hidden */}
+        {/* Sidebar toggle tab — always visible on large screens */}
         {!showSidebar && (
           <button
             onClick={() => setShowSidebar(true)}
-            className="absolute right-2 top-20 px-2 py-1 bg-gray-800 border border-gray-700 rounded text-xs text-gray-400 hover:text-white transition-colors hidden lg:block"
+            className="hidden lg:flex items-center justify-center w-8 border-l border-gray-700 bg-gray-900/50 hover:bg-gray-800 transition-colors group"
+            title="Show panel"
           >
-            Show Panel
+            <svg className="w-4 h-4 text-gray-500 group-hover:text-dnd-gold transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
           </button>
+        )}
+
+        {/* Side panel */}
+        {showSidebar && (
+          <div className="w-80 border-l border-gray-700 bg-gray-900/50 flex flex-col hidden lg:flex">
+            {/* Sidebar header with tabs */}
+            <div className="border-b border-gray-700 px-2 pt-2">
+              <div className="flex items-center justify-between mb-2 px-1">
+                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Character Panel</h3>
+                <button
+                  onClick={() => setShowSidebar(false)}
+                  className="text-gray-600 hover:text-gray-400 transition-colors"
+                  title="Hide panel"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+              <div className="flex gap-1">
+                {([
+                  { id: 'adventure' as const, label: 'Adventure' },
+                  { id: 'spells' as const, label: 'Spells' },
+                  { id: 'skills' as const, label: 'Skills' },
+                  { id: 'gear' as const, label: 'Gear' },
+                ]).map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setSidebarTab(tab.id)}
+                    className={`flex-1 px-2 py-1.5 text-xs font-medium rounded-t-lg transition-colors
+                      ${sidebarTab === tab.id
+                        ? 'bg-gray-800 text-dnd-gold border-t border-x border-gray-700'
+                        : 'text-gray-500 hover:text-gray-300'
+                      }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Scrollable content */}
+            <div className="flex-1 overflow-y-auto p-3 space-y-3">
+
+              {/* === ADVENTURE TAB === */}
+              {sidebarTab === 'adventure' && (
+                <>
+                  {combatState && <CombatPanel combat={combatState} />}
+
+                  {/* Ability scores */}
+                  <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-3 space-y-2">
+                    <div className="text-xs font-bold text-gray-500 uppercase">Ability Scores</div>
+                    <div className="grid grid-cols-3 gap-2 text-center">
+                      {(['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'] as const).map((ability) => {
+                        const score = character.abilityScores[ability]
+                        const mod = calculateModifier(score)
+                        return (
+                          <div key={ability} className="bg-gray-900/50 rounded p-1.5">
+                            <div className="text-xs text-gray-500 uppercase">{ability.slice(0, 3)}</div>
+                            <div className="text-sm font-bold text-white">{score}</div>
+                            <div className="text-xs text-gray-400">{mod >= 0 ? '+' : ''}{mod}</div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Spell slots */}
+                  {character.knownSpells.length > 0 && (
+                    <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-3 space-y-2">
+                      <div className="text-xs font-bold text-gray-500 uppercase">Spell Slots</div>
+                      <div className="space-y-1">
+                        {Object.entries(character.spellSlots || {}).map(([level, slot]) => {
+                          const s = slot as { max: number; used: number }
+                          if (!s.max) return null
+                          const remaining = s.max - (s.used || 0)
+                          return (
+                            <div key={level} className="flex items-center gap-2 text-xs">
+                              <span className="text-gray-500 w-6">L{level}</span>
+                              <div className="flex gap-0.5">
+                                {Array.from({ length: s.max }, (_, i) => (
+                                  <div
+                                    key={i}
+                                    className={`w-3 h-3 rounded-full border ${
+                                      i < remaining
+                                        ? 'bg-blue-500 border-blue-400'
+                                        : 'bg-gray-700 border-gray-600'
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Gold & XP */}
+                  <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-3">
+                    <div className="text-xs font-bold text-gray-500 uppercase mb-2">Resources</div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-yellow-400">Gold</span>
+                      <span className="font-bold text-yellow-300">{character.currency?.gold ?? 0}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm mt-1">
+                      <span className="text-blue-400">XP Earned</span>
+                      <span className="font-bold text-blue-300">{totalXPEarned}</span>
+                    </div>
+                  </div>
+
+                  {/* Quest log */}
+                  {questLog.length > 0 && (
+                    <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-3">
+                      <div className="text-xs font-bold text-gray-500 uppercase mb-2">Quests</div>
+                      <div className="space-y-1.5">
+                        {questLog.map((quest) => (
+                          <div key={quest.id} className={`text-xs ${quest.isComplete ? 'text-gray-600 line-through' : 'text-gray-300'}`}>
+                            {quest.isComplete ? '&#x2714; ' : '&#x25CB; '}{quest.title}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* End adventure */}
+                  <button
+                    onClick={() => {
+                      if (window.confirm('End this adventure? Your progress will be lost.')) {
+                        useAdventureStore.getState().endAdventure()
+                        navigate(`/character/${character.id}`)
+                      }
+                    }}
+                    className="w-full px-3 py-2 bg-gray-800 text-gray-500 text-xs rounded-lg border border-gray-700 hover:border-red-700 hover:text-red-400 transition-colors"
+                  >
+                    End Adventure
+                  </button>
+                </>
+              )}
+
+              {/* === SPELLS TAB === */}
+              {sidebarTab === 'spells' && (
+                <>
+                  {/* Spell slots at top */}
+                  {Object.keys(character.spellSlots || {}).length > 0 && (
+                    <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-3 space-y-2">
+                      <div className="text-xs font-bold text-gray-500 uppercase">Spell Slots</div>
+                      <div className="space-y-1">
+                        {Object.entries(character.spellSlots || {}).map(([level, slot]) => {
+                          const s = slot as { max: number; used: number }
+                          if (!s.max) return null
+                          const remaining = s.max - (s.used || 0)
+                          return (
+                            <div key={level} className="flex items-center gap-2 text-xs">
+                              <span className="text-gray-500 w-8">Lvl {level}</span>
+                              <div className="flex gap-0.5 flex-1">
+                                {Array.from({ length: s.max }, (_, i) => (
+                                  <div
+                                    key={i}
+                                    className={`w-3.5 h-3.5 rounded-full border ${
+                                      i < remaining
+                                        ? 'bg-blue-500 border-blue-400'
+                                        : 'bg-gray-700 border-gray-600'
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                              <span className="text-gray-500 text-xs">{remaining}/{s.max}</span>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Known spells grouped by level */}
+                  {character.knownSpells.length > 0 ? (
+                    (() => {
+                      const grouped = character.knownSpells.reduce<Record<number, typeof character.knownSpells>>((acc, spell) => {
+                        const lvl = spell.level ?? 0
+                        if (!acc[lvl]) acc[lvl] = []
+                        acc[lvl].push(spell)
+                        return acc
+                      }, {})
+                      return Object.entries(grouped).sort(([a], [b]) => Number(a) - Number(b)).map(([level, spells]) => (
+                        <div key={level} className="bg-gray-800/60 border border-gray-700 rounded-xl p-3">
+                          <div className="text-xs font-bold text-gray-500 uppercase mb-2">
+                            {Number(level) === 0 ? 'Cantrips' : `Level ${level} Spells`}
+                          </div>
+                          <div className="space-y-1.5">
+                            {spells.map((spell) => (
+                              <div key={spell.name} className="text-xs">
+                                <div className="font-medium text-gray-200">{spell.name}</div>
+                                {spell.school && (
+                                  <div className="text-gray-500">{spell.school}{spell.castingTime ? ` · ${spell.castingTime}` : ''}{spell.range ? ` · ${spell.range}` : ''}</div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))
+                    })()
+                  ) : (
+                    <div className="text-center text-gray-600 text-xs py-6">No spells known</div>
+                  )}
+                </>
+              )}
+
+              {/* === SKILLS TAB === */}
+              {sidebarTab === 'skills' && (
+                <>
+                  {/* Saving throws */}
+                  <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-3">
+                    <div className="text-xs font-bold text-gray-500 uppercase mb-2">Saving Throws</div>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {(['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'] as const).map((ability) => {
+                        const score = character.abilityScores[ability]
+                        const mod = calculateModifier(score)
+                        const proficient = character.savingThrows[ability] ?? false
+                        const profBonus = Math.floor((character.level - 1) / 4) + 2
+                        const total = mod + (proficient ? profBonus : 0)
+                        return (
+                          <div key={ability} className="flex items-center gap-1.5 text-xs">
+                            <div className={`w-2 h-2 rounded-full ${proficient ? 'bg-dnd-gold' : 'bg-gray-700'}`} />
+                            <span className="text-gray-400 uppercase w-7">{ability.slice(0, 3)}</span>
+                            <span className={`font-medium ${proficient ? 'text-white' : 'text-gray-500'}`}>
+                              {total >= 0 ? '+' : ''}{total}
+                            </span>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Skills list */}
+                  <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-3">
+                    <div className="text-xs font-bold text-gray-500 uppercase mb-2">Skills</div>
+                    <div className="space-y-1">
+                      {Object.entries(SKILL_ABILITY).sort(([a], [b]) => a.localeCompare(b)).map(([skill, ability]) => {
+                        const score = character.abilityScores[ability as keyof typeof character.abilityScores] ?? 10
+                        const mod = calculateModifier(score)
+                        const profLevel = character.skills[skill as keyof typeof character.skills] ?? 'none'
+                        const proficient = profLevel !== 'none'
+                        const expertise = profLevel === 'expertise'
+                        const profBonus = Math.floor((character.level - 1) / 4) + 2
+                        const total = mod + (proficient ? profBonus : 0) + (expertise ? profBonus : 0)
+                        const displayName = skill.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase())
+                        return (
+                          <div key={skill} className="flex items-center gap-1.5 text-xs">
+                            <div className={`w-2 h-2 rounded-full ${expertise ? 'bg-purple-400' : proficient ? 'bg-dnd-gold' : 'bg-gray-700'}`} />
+                            <span className="flex-1 text-gray-300">{displayName}</span>
+                            <span className="text-gray-600 text-[10px] uppercase">{(ability as string).slice(0, 3)}</span>
+                            <span className={`font-medium w-6 text-right ${proficient ? 'text-white' : 'text-gray-500'}`}>
+                              {total >= 0 ? '+' : ''}{total}
+                            </span>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Proficiency bonus */}
+                  <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-3">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-bold text-gray-500 uppercase">Proficiency Bonus</span>
+                      <span className="font-bold text-dnd-gold text-sm">+{Math.floor((character.level - 1) / 4) + 2}</span>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* === GEAR TAB === */}
+              {sidebarTab === 'gear' && (
+                <>
+                  {/* Equipped items */}
+                  {(() => {
+                    const equippedWeapon = character.equipment.find((e) => e.equipped && e.category === 'weapon') as any
+                    const equippedArmor = character.equipment.find((e) => e.equipped && (e.category === 'armor' || e.category === 'shield')) as any
+                    return (
+                      <>
+                        {equippedWeapon && (
+                          <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-3">
+                            <div className="text-xs font-bold text-gray-500 uppercase mb-2">Equipped Weapon</div>
+                            <div className="text-sm font-medium text-red-300">{equippedWeapon.name}</div>
+                            <div className="text-xs text-gray-400 mt-0.5">
+                              {equippedWeapon.damage?.dice} {equippedWeapon.damage?.type}
+                              {equippedWeapon.properties?.length ? ` · ${equippedWeapon.properties.join(', ')}` : ''}
+                            </div>
+                          </div>
+                        )}
+                        {equippedArmor && (
+                          <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-3">
+                            <div className="text-xs font-bold text-gray-500 uppercase mb-2">Equipped Armor</div>
+                            <div className="text-sm font-medium text-blue-300">{equippedArmor.name}</div>
+                            <div className="text-xs text-gray-400 mt-0.5">
+                              AC {equippedArmor.baseAC ?? equippedArmor.acBonus}{equippedArmor.armorType ? ` · ${equippedArmor.armorType}` : ''}
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    )
+                  })()}
+
+                  {/* Equipment list */}
+                  <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-3">
+                    <div className="text-xs font-bold text-gray-500 uppercase mb-2">Equipment</div>
+                    {character.equipment.length > 0 ? (
+                      <div className="space-y-1">
+                        {character.equipment.map((item) => (
+                          <div key={item.id} className="flex items-center justify-between text-xs">
+                            <span className={item.equipped ? 'text-gray-200' : 'text-gray-500'}>
+                              {item.equipped && <span className="text-dnd-gold mr-1">E</span>}
+                              {item.name}
+                            </span>
+                            {item.quantity > 1 && (
+                              <span className="text-gray-600">x{item.quantity}</span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-gray-600 text-xs">No equipment</div>
+                    )}
+                  </div>
+
+                  {/* Currency */}
+                  <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-3">
+                    <div className="text-xs font-bold text-gray-500 uppercase mb-2">Currency</div>
+                    <div className="grid grid-cols-4 gap-1.5 text-center">
+                      {([
+                        { key: 'copper', label: 'CP', color: 'text-orange-400' },
+                        { key: 'silver', label: 'SP', color: 'text-gray-300' },
+                        { key: 'gold', label: 'GP', color: 'text-yellow-400' },
+                        { key: 'platinum', label: 'PP', color: 'text-cyan-300' },
+                      ] as const).map((c) => (
+                        <div key={c.key} className="bg-gray-900/50 rounded p-1.5">
+                          <div className={`text-[10px] ${c.color}`}>{c.label}</div>
+                          <div className="text-xs font-bold text-white">{character.currency?.[c.key] ?? 0}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Class features */}
+                  {character.class && (
+                    <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-3">
+                      <div className="text-xs font-bold text-gray-500 uppercase mb-2">
+                        {character.class.name} Features
+                      </div>
+                      <div className="space-y-1.5">
+                        {character.class.features
+                          ?.filter((f) => f.level <= character.level)
+                          .map((feature, i) => (
+                            <div key={i} className="text-xs">
+                              <div className="font-medium text-gray-200">
+                                {feature.name}
+                                <span className="text-gray-600 ml-1">Lv{feature.level}</span>
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Race traits */}
+                  {character.race && (
+                    <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-3">
+                      <div className="text-xs font-bold text-gray-500 uppercase mb-2">
+                        {character.race.name} Traits
+                      </div>
+                      <div className="space-y-1.5">
+                        {character.race.traits?.map((trait, i) => (
+                          <div key={i} className="text-xs">
+                            <div className="font-medium text-gray-200">{trait.name}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
         )}
       </div>
     </div>
