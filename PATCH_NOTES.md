@@ -1,15 +1,33 @@
 # Dungeons - Patch Notes
 
+## Version 0.5.1-beta - June 22, 2026
+
+**Beta Release Notice**: The AI Dungeon Master now supports free Llama 3.3 70B via Groq alongside the existing Claude option. No paid API credits required.
+
+### Free AI Provider (Groq + Llama)
+
+The Adventure System now defaults to **Groq's Llama 3.3 70B** — a completely free AI provider. No credit card, no paid API credits.
+
+#### **What Changed**
+- New AI provider selector in Settings: **Groq (Free)** or **Claude (Paid)**
+- Groq uses Llama 3.3 70B with free API key from console.groq.com
+- Claude option still available using Opus 4.7 for users with API credits
+- Streaming works identically on both providers
+- All game mechanics (combat, skill checks, loot) work the same regardless of provider
+
+---
+
 ## Version 0.5.0-beta - June 21, 2026
 
-**Beta Release Notice**: The Adventure System is here. An AI Dungeon Master powered by Claude guides a fully playable text RPG adventure using your character sheet, equipment, spells, and abilities.
+**Beta Release Notice**: The Adventure System is here. An AI Dungeon Master guides a fully playable text RPG adventure using your character sheet, equipment, spells, and abilities.
 
 ### Adventure Mode
 
 Click the gold **Adventure** button on any character sheet to begin a fully AI-driven text RPG. The AI Dungeon Master weaves narrative, combat encounters, skill checks, and treasure based on your character's actual stats, equipment, and spells.
 
 #### **AI Dungeon Master**
-- Powered by Claude (your API key, stored locally, never leaves your browser)
+- Choose between Groq (Llama 3.3, free) or Claude (Opus 4.7, paid) in Settings
+- Your API key is stored locally, never leaves your browser
 - Narrates in second person — "You walk into a dimly lit tavern..."
 - Reacts to free-form player input — type anything and the world responds
 - Scales encounters to your character's level

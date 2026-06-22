@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useSettingsStore, THEME_NAMES, FONT_SIZE_VALUES, FONT_FAMILY_NAMES, type Theme, type FontSize, type FontFamily } from '../stores/settingsStore'
+import { useSettingsStore, THEME_NAMES, FONT_SIZE_VALUES, FONT_FAMILY_NAMES, type Theme, type FontSize, type FontFamily, type AIProvider } from '../stores/settingsStore'
 import { useCharacterStore } from '../stores/characterStore'
 import { CONTENT_VERSION } from '../data/contentVersion'
 
@@ -13,7 +13,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const [showResetConfirm, setShowResetConfirm] = useState(false)
   const [showApiKey, setShowApiKey] = useState(false)
   const [syncStatus, setSyncStatus] = useState<string | null>(null)
-  const { theme, fontSize, fontFamily, showQuickRefTooltips, apiKey, lastSyncedContentVersion, setTheme, setFontSize, setFontFamily, toggleQuickRefTooltips, setApiKey, setLastSyncedContentVersion, logout, resetAllCache } = useSettingsStore()
+  const { theme, fontSize, fontFamily, showQuickRefTooltips, aiProvider, apiKey, groqApiKey, lastSyncedContentVersion, setTheme, setFontSize, setFontFamily, toggleQuickRefTooltips, setAIProvider, setApiKey, setGroqApiKey, setLastSyncedContentVersion, logout, resetAllCache } = useSettingsStore()
   const { syncAllContent } = useCharacterStore()
 
   // Close on escape key
@@ -204,46 +204,112 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             </p>
           </div>
 
-          {/* Claude API Key */}
+          {/* AI Provider */}
           <div className="pt-4 border-t border-gray-700">
-            <label className="block text-sm font-semibold text-gray-300 mb-2">Claude API Key</label>
+            <label className="block text-sm font-semibold text-gray-300 mb-2">AI Dungeon Master</label>
             <p className="text-xs text-gray-500 mb-3">
-              Required for AI Dungeon Master adventures. Your key is stored locally in your browser only.
+              Choose the AI provider for adventures. Groq runs Llama 3.3 70B for free.
             </p>
-            <div className="flex gap-2">
-              <div className="relative flex-1">
-                <input
-                  type={showApiKey ? 'text' : 'password'}
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                  placeholder="sk-ant-..."
-                  className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg text-white text-sm
-                           placeholder:text-gray-600 focus:outline-none focus:border-dnd-gold transition-colors pr-10"
-                />
+            <div className="grid grid-cols-2 gap-2 mb-4">
+              {([
+                { id: 'groq' as AIProvider, label: 'Groq (Free)', desc: 'Llama 3.3 70B' },
+                { id: 'claude' as AIProvider, label: 'Claude (Paid)', desc: 'Opus 4.7' },
+              ]).map((p) => (
                 <button
-                  type="button"
-                  onClick={() => setShowApiKey(!showApiKey)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
-                  aria-label={showApiKey ? 'Hide API key' : 'Show API key'}
+                  key={p.id}
+                  onClick={() => setAIProvider(p.id)}
+                  className={`px-3 py-2.5 rounded-lg text-sm font-medium transition-all
+                             focus:outline-none focus:ring-2 focus:ring-dnd-gold text-left
+                             ${aiProvider === p.id
+                               ? 'bg-dnd-gold text-gray-900'
+                               : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                             }`}
                 >
-                  {showApiKey ? (
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
-                    </svg>
-                  ) : (
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                  )}
+                  <div>{p.label}</div>
+                  <div className={`text-xs ${aiProvider === p.id ? 'text-gray-700' : 'text-gray-500'}`}>{p.desc}</div>
                 </button>
-              </div>
+              ))}
             </div>
-            {apiKey && (
-              <p className="text-xs text-green-400 mt-2">
-                API key saved
-              </p>
+
+            {/* Groq API Key */}
+            {aiProvider === 'groq' && (
+              <div>
+                <label className="block text-xs font-medium text-gray-400 mb-1">
+                  Groq API Key <span className="text-green-400/70">(free at console.groq.com)</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type={showApiKey ? 'text' : 'password'}
+                    value={groqApiKey}
+                    onChange={(e) => setGroqApiKey(e.target.value)}
+                    placeholder="gsk_..."
+                    className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg text-white text-sm
+                             placeholder:text-gray-600 focus:outline-none focus:border-dnd-gold transition-colors pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowApiKey(!showApiKey)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+                    aria-label={showApiKey ? 'Hide API key' : 'Show API key'}
+                  >
+                    {showApiKey ? (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                      </svg>
+                    ) : (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
+                {groqApiKey && (
+                  <p className="text-xs text-green-400 mt-2">Groq key saved</p>
+                )}
+              </div>
             )}
+
+            {/* Claude API Key */}
+            {aiProvider === 'claude' && (
+              <div>
+                <label className="block text-xs font-medium text-gray-400 mb-1">Claude API Key</label>
+                <div className="relative">
+                  <input
+                    type={showApiKey ? 'text' : 'password'}
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    placeholder="sk-ant-..."
+                    className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg text-white text-sm
+                             placeholder:text-gray-600 focus:outline-none focus:border-dnd-gold transition-colors pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowApiKey(!showApiKey)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+                    aria-label={showApiKey ? 'Hide API key' : 'Show API key'}
+                  >
+                    {showApiKey ? (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                      </svg>
+                    ) : (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
+                {apiKey && (
+                  <p className="text-xs text-green-400 mt-2">Claude key saved</p>
+                )}
+              </div>
+            )}
+
+            <p className="text-xs text-gray-500 mt-2">
+              Your key is stored locally in your browser only.
+            </p>
           </div>
 
           {/* Content Sync */}
