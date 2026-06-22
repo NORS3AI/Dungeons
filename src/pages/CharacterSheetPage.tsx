@@ -42,7 +42,7 @@ import { RARITY_COLORS } from '../data/lootGenerator'
 import type { Spell } from '../types'
 import { WorkTab } from '../components/WorkTab'
 import { ProfessionTab } from '../components/ProfessionTab'
-import { getLanguageById } from '../data/languages'
+import { getLanguageById, ALL_LANGUAGES } from '../data/languages'
 
 const ABILITY_NAMES: Record<Ability, string> = {
   strength: 'STR',
@@ -81,7 +81,7 @@ const SKILLS: { name: string; ability: Ability; key: SkillKey; refId: string }[]
 export function CharacterSheetPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { characters, loadCharacter, currentCharacter, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, changeEquipmentQuantity, renameEquipment, setFightingStance, addEquipment, addMaterial, removeMaterial, changeMaterialQuantity, updateHitPoints, addSpell, removeSpell, saveCharacter, addFoodRations, addWaterSupply, addItemFeature, setAlignment, setAbilityScores, migrateCurrentCharacter, needsMigration, setLevelWithHP, shortRest, longRest, initializeResourcePools, initializeFeatureCharges, useFeatureCharge, spendResource, disenchantItem, dmUpdateField, dmUpdateSkill, dmUpdateSavingThrow } = useCharacterStore()
+  const { characters, loadCharacter, currentCharacter, levelDown, updateCurrency, setDailyIncome, updateCharacterDetails, removeEquipment, toggleEquipment, changeEquipmentQuantity, renameEquipment, setFightingStance, addEquipment, addMaterial, removeMaterial, changeMaterialQuantity, updateHitPoints, addSpell, removeSpell, saveCharacter, addFoodRations, addWaterSupply, addItemFeature, setAlignment, setAbilityScores, migrateCurrentCharacter, needsMigration, setLevelWithHP, shortRest, longRest, initializeResourcePools, initializeFeatureCharges, useFeatureCharge, spendResource, disenchantItem, dmUpdateField, dmUpdateSkill, dmUpdateSavingThrow, setLanguages, setVisionOverride } = useCharacterStore()
   const { dmModeEnabled } = useSettingsStore()
   const [showDiceRoller, setShowDiceRoller] = useState(false)
   const [activeTab, setActiveTab] = useState<'main' | 'actions' | 'spells' | 'inventory' | 'features' | 'story' | 'work' | 'profession' | 'loot'>('main')
@@ -125,6 +125,11 @@ export function CharacterSheetPage() {
   const disenchantNotifTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [weatherResult, setWeatherResult] = useState<{ roll: number; text: string } | null>(null)
   const [weatherRolling, setWeatherRolling] = useState(false)
+  const [showActionsMenu, setShowActionsMenu] = useState(false)
+  const actionsMenuRef = useRef<HTMLDivElement>(null)
+  const [showLanguageEditor, setShowLanguageEditor] = useState(false)
+  const [newLanguageInput, setNewLanguageInput] = useState('')
+  const [dmWeatherOverride, setDmWeatherOverride] = useState<number | null>(null)
   // Collapsible section state for inventory
   const [showBagsSection, setShowBagsSection] = useState(false)
   const [showArmorAddons, setShowArmorAddons] = useState(false)
@@ -163,6 +168,17 @@ export function CharacterSheetPage() {
       initializeFeatureCharges()
     }
   }, [currentCharacter?.id, currentCharacter?.class?.id, currentCharacter?.level, initializeFeatureCharges])
+
+  useEffect(() => {
+    if (!showActionsMenu) return
+    const handleClick = (e: MouseEvent) => {
+      if (actionsMenuRef.current && !actionsMenuRef.current.contains(e.target as Node)) {
+        setShowActionsMenu(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [showActionsMenu])
 
   const character = currentCharacter
 
@@ -1201,64 +1217,67 @@ export function CharacterSheetPage() {
             <p className="text-gray-500">{character.background.name} Background</p>
           )}
         </div>
-        <div className="flex gap-2 flex-wrap">
-          <button
-            onClick={handleLevelUp}
-            disabled={character.level >= 20}
-            className="px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-lg
-                     transition-colors focus:outline-none focus:ring-2 focus:ring-green-500
-                     disabled:opacity-50 disabled:cursor-not-allowed"
-            title="Advance to next level"
-          >
-            Level Up
-          </button>
-          <button
-            onClick={() => {
-              levelDown()
-              saveCharacter()
-            }}
-            disabled={character.level <= 1}
-            className="px-4 py-2 bg-red-700 hover:bg-red-600 text-white rounded-lg
-                     transition-colors focus:outline-none focus:ring-2 focus:ring-red-500
-                     disabled:opacity-50 disabled:cursor-not-allowed"
-            title="Decrease character level"
-          >
-            Level Down
-          </button>
-          <button
-            onClick={() => window.print()}
-            className="px-4 py-2 bg-purple-700 hover:bg-purple-600 text-white rounded-lg
-                     transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500"
-            title="Print character sheet"
-          >
-            Print
-          </button>
-          <button
-            onClick={handleExportPDF}
-            disabled={isExportingPDF}
-            className="px-4 py-2 bg-red-700 hover:bg-red-600 text-white rounded-lg
-                     transition-colors focus:outline-none focus:ring-2 focus:ring-red-500
-                     disabled:opacity-50 disabled:cursor-not-allowed"
-            title="Export character as PDF file"
-          >
-            {isExportingPDF ? 'Exporting...' : 'Export PDF'}
-          </button>
-          <button
-            onClick={() => exportCharacterToJSON(character)}
-            className="px-4 py-2 bg-blue-700 hover:bg-blue-600 text-white rounded-lg
-                     transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
-            title="Export character as JSON file"
-          >
-            Export JSON
-          </button>
-          <button
-            onClick={() => setShowEditModal(true)}
-            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg
-                     transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500"
-            title="Edit character details"
-          >
-            Edit Details
-          </button>
+        <div className="flex gap-2 items-center">
+          {/* Actions dropdown */}
+          <div className="relative" ref={actionsMenuRef}>
+            <button
+              onClick={() => setShowActionsMenu(!showActionsMenu)}
+              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg
+                       transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 flex items-center gap-2"
+            >
+              Actions
+              <svg className={`w-4 h-4 transition-transform ${showActionsMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {showActionsMenu && (
+              <div className="absolute right-0 mt-1 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50 py-1 overflow-hidden">
+                <button
+                  onClick={() => { handleLevelUp(); setShowActionsMenu(false) }}
+                  disabled={character.level >= 20}
+                  className="w-full px-4 py-2 text-left text-sm text-green-400 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Level Up
+                </button>
+                <button
+                  onClick={() => { levelDown(); saveCharacter(); setShowActionsMenu(false) }}
+                  disabled={character.level <= 1}
+                  className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Level Down
+                </button>
+                <div className="border-t border-gray-700 my-1" />
+                <button
+                  onClick={() => { setShowEditModal(true); setShowActionsMenu(false) }}
+                  className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 transition-colors"
+                >
+                  Edit Details
+                </button>
+                <div className="border-t border-gray-700 my-1" />
+                <button
+                  onClick={() => { window.print(); setShowActionsMenu(false) }}
+                  className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 transition-colors"
+                >
+                  Print
+                </button>
+                <button
+                  onClick={() => { handleExportPDF(); setShowActionsMenu(false) }}
+                  disabled={isExportingPDF}
+                  className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 disabled:opacity-50 transition-colors"
+                >
+                  {isExportingPDF ? 'Exporting...' : 'Export PDF'}
+                </button>
+                <button
+                  onClick={() => { exportCharacterToJSON(character); setShowActionsMenu(false) }}
+                  className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 transition-colors"
+                >
+                  Export JSON
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Adventure button */}
           {(() => {
             const advStore = useAdventureStore.getState()
             const hasActiveAdventure = advStore.isActive && advStore.characterId === character.id && advStore.messages.length > 0
@@ -1688,35 +1707,121 @@ export function CharacterSheetPage() {
                     )}
                   </div>
                 )}
-                {character.race?.vision && (
-                  <div className="flex justify-between">
-                    <QuickRefTooltip
-                      type="rule"
-                      id={
-                        character.race.vision === 'superiorDarkvision' ? 'superior-darkvision' :
-                        character.race.vision === 'darkvision' ? 'darkvision' :
-                        'vision'
-                      }
-                    >
-                      <span className="text-gray-500 cursor-pointer hover:text-gray-300">Vision</span>
-                    </QuickRefTooltip>
-                    <span className="text-gray-300">
-                      {character.race.vision === 'superiorDarkvision'
-                        ? `Superior Darkvision (${character.race.visionRange} ft)`
-                        : character.race.vision === 'darkvision'
-                        ? `Darkvision (${character.race.visionRange} ft)`
-                        : 'Normal'}
-                    </span>
-                  </div>
-                )}
-                {character.languages && character.languages.length > 0 && (
-                  <div className="flex justify-between">
-                    <QuickRefTooltip type="rule" id="languages">
-                      <span className="text-gray-500 cursor-pointer hover:text-gray-300">Languages</span>
-                    </QuickRefTooltip>
-                    <span className="text-gray-300">
-                      {character.languages.map(id => getLanguageById(id)?.name ?? id.charAt(0).toUpperCase() + id.slice(1)).join(', ')}
-                    </span>
+                {(character.race?.vision || dmModeEnabled) && (() => {
+                  const effectiveVision = character.visionOverride ?? character.race?.vision ?? 'normal'
+                  const effectiveRange = character.visionRangeOverride ?? character.race?.visionRange
+                  return (
+                    <div className="flex justify-between items-center">
+                      <QuickRefTooltip
+                        type="rule"
+                        id={
+                          effectiveVision === 'superiorDarkvision' ? 'superior-darkvision' :
+                          effectiveVision === 'darkvision' ? 'darkvision' :
+                          'vision'
+                        }
+                      >
+                        <span className="text-gray-500 cursor-pointer hover:text-gray-300">Vision</span>
+                      </QuickRefTooltip>
+                      {dmModeEnabled ? (
+                        <select
+                          value={effectiveVision}
+                          onChange={(e) => {
+                            const v = e.target.value
+                            const ranges: Record<string, number> = { darkvision: 60, superiorDarkvision: 120, blindsight: 30, truesight: 120 }
+                            setVisionOverride(v === 'normal' ? undefined : v, ranges[v])
+                            saveCharacter()
+                          }}
+                          className="bg-gray-900 border border-gray-600 rounded px-2 py-0.5 text-gray-300 text-sm focus:outline-none focus:border-dnd-gold"
+                        >
+                          <option value="normal">Normal</option>
+                          <option value="darkvision">Darkvision (60 ft)</option>
+                          <option value="superiorDarkvision">Superior Darkvision (120 ft)</option>
+                          <option value="blindsight">Blindsight (30 ft)</option>
+                          <option value="truesight">Truesight (120 ft)</option>
+                        </select>
+                      ) : (
+                        <span className="text-gray-300">
+                          {effectiveVision === 'superiorDarkvision'
+                            ? `Superior Darkvision (${effectiveRange} ft)`
+                            : effectiveVision === 'darkvision'
+                            ? `Darkvision (${effectiveRange} ft)`
+                            : effectiveVision === 'blindsight'
+                            ? `Blindsight (${effectiveRange} ft)`
+                            : effectiveVision === 'truesight'
+                            ? `Truesight (${effectiveRange} ft)`
+                            : 'Normal'}
+                        </span>
+                      )}
+                    </div>
+                  )
+                })()}
+                {(character.languages?.length > 0 || dmModeEnabled) && (
+                  <div>
+                    <div className="flex justify-between items-center">
+                      <QuickRefTooltip type="rule" id="languages">
+                        <span className="text-gray-500 cursor-pointer hover:text-gray-300">Languages</span>
+                      </QuickRefTooltip>
+                      <div className="flex items-center gap-2">
+                        <span className="text-gray-300">
+                          {character.languages?.map(id => getLanguageById(id)?.name ?? id.charAt(0).toUpperCase() + id.slice(1)).join(', ') || 'None'}
+                        </span>
+                        {dmModeEnabled && (
+                          <button
+                            onClick={() => setShowLanguageEditor(!showLanguageEditor)}
+                            className="text-xs text-dnd-gold hover:text-yellow-400 ml-1"
+                            title="Edit languages"
+                          >
+                            {showLanguageEditor ? '✕' : '✎'}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    {showLanguageEditor && dmModeEnabled && (
+                      <div className="mt-2 p-3 bg-gray-900 rounded-lg border border-gray-600">
+                        <div className="flex flex-wrap gap-1 mb-2">
+                          {character.languages?.map(langId => {
+                            const lang = getLanguageById(langId)
+                            return (
+                              <span key={langId} className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-700 rounded text-xs text-gray-300">
+                                {lang?.name ?? langId}
+                                <button
+                                  onClick={() => {
+                                    setLanguages(character.languages.filter(l => l !== langId))
+                                    saveCharacter()
+                                  }}
+                                  className="text-red-400 hover:text-red-300"
+                                >×</button>
+                              </span>
+                            )
+                          })}
+                        </div>
+                        <div className="flex gap-2">
+                          <select
+                            value={newLanguageInput}
+                            onChange={(e) => setNewLanguageInput(e.target.value)}
+                            className="flex-1 bg-gray-800 border border-gray-600 rounded px-2 py-1 text-sm text-gray-300 focus:outline-none focus:border-dnd-gold"
+                          >
+                            <option value="">Add a language...</option>
+                            {ALL_LANGUAGES.filter(l => !character.languages?.includes(l.id)).map(l => (
+                              <option key={l.id} value={l.id}>{l.name} ({l.type})</option>
+                            ))}
+                          </select>
+                          <button
+                            onClick={() => {
+                              if (newLanguageInput) {
+                                setLanguages([...(character.languages || []), newLanguageInput])
+                                setNewLanguageInput('')
+                                saveCharacter()
+                              }
+                            }}
+                            disabled={!newLanguageInput}
+                            className="px-3 py-1 bg-dnd-gold text-gray-900 rounded text-sm font-medium hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            Add
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
                 {character.race?.damageResistances && character.race.damageResistances.length > 0 && (
@@ -2059,7 +2164,7 @@ export function CharacterSheetPage() {
                               <div className="cursor-pointer flex-1 pr-20">
                                 <div className="font-medium text-purple-400 hover:text-purple-300">{spell.name}</div>
                                 <div className="text-xs text-gray-500">
-                                  {spell.school} | {spell.castingTime.amount} {spell.castingTime.unit}
+                                  {spell.school}{spell.castingTime ? ` | ${spell.castingTime.amount} ${spell.castingTime.unit}` : ''}
                                 </div>
                               </div>
                             </QuickRefTooltip>
@@ -3213,51 +3318,101 @@ export function CharacterSheetPage() {
               </button>
 
               {/* Ocean Weather */}
-              <button
-                onClick={() => {
-                  setWeatherRolling(true)
-                  setWeatherResult(null)
-                  let ticks = 0
-                  const interval = setInterval(() => {
-                    ticks++
-                    setWeatherResult({ roll: Math.floor(Math.random() * 20) + 1, text: '' })
-                    if (ticks >= 12) {
-                      clearInterval(interval)
-                      const finalRoll = Math.floor(Math.random() * 20) + 1
-                      const OCEAN_WEATHER: Record<number, string> = {
-                        1: 'Clear skies. No penalties. Crew morale lifts.',
-                        2: 'Thick fog. Visibility 60 ft. Navigation and Perception at disadvantage.',
-                        3: 'Clear skies, light cloud. No penalties. Good day for repairs or drills.',
-                        4: 'Stiff crosswind. Ship speed -5 ft. Deck ranged attacks at disadvantage.',
-                        5: 'Thunderstorm. Perception at disadvantage. DC 12 for deck tasks.',
-                        6: 'Glassy calm, no wind. Half speed. Crew gets superstitious.',
-                        7: 'Hazy. Long-range Perception at disadvantage. Navigation +2 DC.',
-                        8: 'Light rain and chop. Deck slick, DC 10 Acrobatics or fall prone.',
-                        9: 'Clear skies, high heat. DC 12 Con check or exhaustion by nightfall.',
-                        10: 'Brisk fair wind. Ship speed +10 ft. Morale high.',
-                        11: 'Rolling swells. DC 13 for precise deck work. Cannon fire at disadvantage.',
-                        12: 'Overcast and cold. No penalties. Grim mood.',
-                        13: 'Squall line. Ship takes 2d6 damage unless DC 14 crew check.',
-                        14: 'Drizzle and mist. Visibility 120 ft. Minor Perception penalty.',
-                        15: 'Rough seas. Ship takes 2d8 damage unless DC 14 check. Deck checks at disadvantage.',
-                        16: 'Thunderstorm with lightning. Roll 1d6 hourly, on a 1 a strike hits for 3d10 lightning.',
-                        17: 'Heavy fog bank. Visibility 30 ft. Navigation near blind. Ambush weather.',
-                        18: 'Hurricane/typhoon. Ship takes 6d10 damage, DC 16 checks. Deck = DC 15 Str save or overboard.',
-                        19: 'Waterspouts. Navigate between them, DC 15 checks. Direct hit 5d10 damage, can dismast.',
-                        20: 'The Dead Sky. Unnatural windless stillness. Morale drops. Something is coming.',
-                      }
-                      setWeatherResult({ roll: finalRoll, text: OCEAN_WEATHER[finalRoll] })
-                      setWeatherRolling(false)
-                    }
-                  }, 60)
-                }}
-                disabled={weatherRolling}
-                className="p-4 bg-gradient-to-br from-sky-700 to-sky-900 hover:from-sky-600 hover:to-sky-800 border-2 border-sky-500 rounded-lg transition-all transform hover:scale-105 active:scale-95 text-left"
-              >
-                <div className="text-3xl mb-1">🌊</div>
-                <div className="font-bold text-white text-sm">Ocean Weather</div>
-                <div className="text-xs text-sky-200 mt-1">Roll d20 for today's weather</div>
-              </button>
+              {(() => {
+                const OCEAN_WEATHER: Record<number, string> = {
+                  1: 'Clear skies. No penalties. Crew morale lifts.',
+                  2: 'Thick fog. Visibility 60 ft. Navigation and Perception at disadvantage.',
+                  3: 'Clear skies, light cloud. No penalties. Good day for repairs or drills.',
+                  4: 'Stiff crosswind. Ship speed -5 ft. Deck ranged attacks at disadvantage.',
+                  5: 'Thunderstorm. Perception at disadvantage. DC 12 for deck tasks.',
+                  6: 'Glassy calm, no wind. Half speed. Crew gets superstitious.',
+                  7: 'Hazy. Long-range Perception at disadvantage. Navigation +2 DC.',
+                  8: 'Light rain and chop. Deck slick, DC 10 Acrobatics or fall prone.',
+                  9: 'Clear skies, high heat. DC 12 Con check or exhaustion by nightfall.',
+                  10: 'Brisk fair wind. Ship speed +10 ft. Morale high.',
+                  11: 'Rolling swells. DC 13 for precise deck work. Cannon fire at disadvantage.',
+                  12: 'Overcast and cold. No penalties. Grim mood.',
+                  13: 'Squall line. Ship takes 2d6 damage unless DC 14 crew check.',
+                  14: 'Drizzle and mist. Visibility 120 ft. Minor Perception penalty.',
+                  15: 'Rough seas. Ship takes 2d8 damage unless DC 14 check. Deck checks at disadvantage.',
+                  16: 'Thunderstorm with lightning. Roll 1d6 hourly, on a 1 a strike hits for 3d10 lightning.',
+                  17: 'Heavy fog bank. Visibility 30 ft. Navigation near blind. Ambush weather.',
+                  18: 'Hurricane/typhoon. Ship takes 6d10 damage, DC 16 checks. Deck = DC 15 Str save or overboard.',
+                  19: 'Waterspouts. Navigate between them, DC 15 checks. Direct hit 5d10 damage, can dismast.',
+                  20: 'The Dead Sky. Unnatural windless stillness. Morale drops. Something is coming.',
+                }
+                return (
+                  <div className="p-4 bg-gradient-to-br from-sky-700 to-sky-900 border-2 border-sky-500 rounded-lg text-left">
+                    <div className="text-3xl mb-1">🌊</div>
+                    <div className="font-bold text-white text-sm mb-2">Ocean Weather</div>
+                    {dmModeEnabled ? (
+                      <div>
+                        <select
+                          value={dmWeatherOverride ?? ''}
+                          onChange={(e) => {
+                            const val = e.target.value ? Number(e.target.value) : null
+                            setDmWeatherOverride(val)
+                            if (val) {
+                              setWeatherResult({ roll: val, text: OCEAN_WEATHER[val] })
+                            }
+                          }}
+                          className="w-full bg-gray-900 border border-gray-600 rounded px-2 py-1 text-xs text-gray-300 focus:outline-none focus:border-dnd-gold mb-2"
+                        >
+                          <option value="">Choose weather...</option>
+                          {Object.entries(OCEAN_WEATHER).map(([roll, desc]) => (
+                            <option key={roll} value={roll}>{roll}. {desc.split('.')[0]}</option>
+                          ))}
+                        </select>
+                        <button
+                          onClick={() => {
+                            setWeatherRolling(true)
+                            setWeatherResult(null)
+                            setDmWeatherOverride(null)
+                            let ticks = 0
+                            const interval = setInterval(() => {
+                              ticks++
+                              setWeatherResult({ roll: Math.floor(Math.random() * 20) + 1, text: '' })
+                              if (ticks >= 12) {
+                                clearInterval(interval)
+                                const finalRoll = Math.floor(Math.random() * 20) + 1
+                                setWeatherResult({ roll: finalRoll, text: OCEAN_WEATHER[finalRoll] })
+                                setDmWeatherOverride(finalRoll)
+                                setWeatherRolling(false)
+                              }
+                            }, 60)
+                          }}
+                          disabled={weatherRolling}
+                          className="w-full text-xs py-1 bg-sky-600 hover:bg-sky-500 rounded text-white transition-colors"
+                        >
+                          Random Roll (d20)
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          setWeatherRolling(true)
+                          setWeatherResult(null)
+                          let ticks = 0
+                          const interval = setInterval(() => {
+                            ticks++
+                            setWeatherResult({ roll: Math.floor(Math.random() * 20) + 1, text: '' })
+                            if (ticks >= 12) {
+                              clearInterval(interval)
+                              const finalRoll = Math.floor(Math.random() * 20) + 1
+                              setWeatherResult({ roll: finalRoll, text: OCEAN_WEATHER[finalRoll] })
+                              setWeatherRolling(false)
+                            }
+                          }, 60)
+                        }}
+                        disabled={weatherRolling}
+                        className="text-xs text-sky-200 hover:text-white transition-colors"
+                      >
+                        Roll d20 for today's weather
+                      </button>
+                    )}
+                  </div>
+                )
+              })()}
 
               {/* Change Profession */}
               <button
@@ -3636,16 +3791,20 @@ export function CharacterSheetPage() {
                                   )}
                                 </div>
                               )}
-                              <div className="flex items-center gap-2 text-gray-300">
-                                <span className="text-blue-400">⏱</span>
-                                <span>{spell.castingTime.amount} {spell.castingTime.unit}</span>
-                              </div>
-                              <div className="flex items-center gap-2 text-gray-300">
-                                <span className="text-green-400">📏</span>
-                                <span>
-                                  Range: {spell.range.type === 'ranged' ? `${spell.range.distance} ft` : spell.range.type}
-                                </span>
-                              </div>
+                              {spell.castingTime && (
+                                <div className="flex items-center gap-2 text-gray-300">
+                                  <span className="text-blue-400">⏱</span>
+                                  <span>{spell.castingTime.amount} {spell.castingTime.unit}</span>
+                                </div>
+                              )}
+                              {spell.range && (
+                                <div className="flex items-center gap-2 text-gray-300">
+                                  <span className="text-green-400">📏</span>
+                                  <span>
+                                    Range: {spell.range.type === 'ranged' ? `${spell.range.distance} ft` : spell.range.type}
+                                  </span>
+                                </div>
+                              )}
                               {spell.concentration && (
                                 <div className="flex items-center gap-2">
                                   <span className="px-2 py-0.5 bg-yellow-900/30 text-yellow-400 text-xs rounded">
@@ -5567,6 +5726,7 @@ function ManualSpellAdderModal({
             type: 'instantaneous' as const,
           },
           ritual: false,
+          concentration: false,
           classes: spell.classes,
         } as Spell))
     : []
@@ -5713,6 +5873,7 @@ function SpellScrollModal({
         type: 'instantaneous' as const,
       },
       ritual: false,
+      concentration: false,
       classes: spell.classes,
     } as Spell))
 

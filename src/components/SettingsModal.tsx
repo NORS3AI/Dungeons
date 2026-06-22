@@ -13,6 +13,8 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const [showResetConfirm, setShowResetConfirm] = useState(false)
   const [showApiKey, setShowApiKey] = useState(false)
   const [syncStatus, setSyncStatus] = useState<string | null>(null)
+  const [testStatus, setTestStatus] = useState<{ ok: boolean; msg: string } | null>(null)
+  const [isTesting, setIsTesting] = useState(false)
   const { theme, fontSize, fontFamily, showQuickRefTooltips, aiProvider, apiKey, geminiApiKey, lastSyncedContentVersion, setTheme, setFontSize, setFontFamily, toggleQuickRefTooltips, setAIProvider, setApiKey, setGeminiApiKey, setLastSyncedContentVersion, logout, resetAllCache } = useSettingsStore()
   const { syncAllContent } = useCharacterStore()
 
@@ -264,9 +266,51 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                     )}
                   </button>
                 </div>
-                {geminiApiKey && (
-                  <p className="text-xs text-green-400 mt-2">Gemini key saved</p>
-                )}
+                <div className="flex items-center gap-2 mt-2">
+                  {geminiApiKey && (
+                    <button
+                      onClick={async () => {
+                        setIsTesting(true)
+                        setTestStatus(null)
+                        try {
+                          const res = await fetch('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${geminiApiKey}` },
+                            body: JSON.stringify({ model: 'gemini-2.5-flash', max_tokens: 10, messages: [{ role: 'user', content: 'Say OK' }] }),
+                          })
+                          if (res.ok) {
+                            setTestStatus({ ok: true, msg: 'Connection successful!' })
+                          } else {
+                            const err = await res.text()
+                            setTestStatus({ ok: false, msg: `Error ${res.status}: ${err.slice(0, 100)}` })
+                          }
+                        } catch (e) {
+                          setTestStatus({ ok: false, msg: 'Network error — check your connection' })
+                        }
+                        setIsTesting(false)
+                        setTimeout(() => setTestStatus(null), 5000)
+                      }}
+                      disabled={isTesting}
+                      className="px-3 py-1 bg-gray-700 text-gray-300 text-xs rounded-lg hover:bg-gray-600 disabled:opacity-50 transition-colors"
+                    >
+                      {isTesting ? 'Testing...' : 'Test Connection'}
+                    </button>
+                  )}
+                  {geminiApiKey && !testStatus && (
+                    <span className="text-xs text-green-400">Key saved</span>
+                  )}
+                  {testStatus && (
+                    <span className={`text-xs ${testStatus.ok ? 'text-green-400' : 'text-red-400'}`}>{testStatus.msg}</span>
+                  )}
+                </div>
+                <a
+                  href="https://aistudio.google.com/apikey"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block mt-2 text-xs text-blue-400 hover:text-blue-300 underline transition-colors"
+                >
+                  Get a free Gemini API key at aistudio.google.com
+                </a>
               </div>
             )}
 

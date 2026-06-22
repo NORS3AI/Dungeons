@@ -49,18 +49,22 @@ function getTypeColors(type: RefType): { border: string; bg: string; accent: str
  * Render spell reference content
  */
 function SpellContent({ spell }: { spell: SpellRef }) {
+  if (!spell || !spell.name) {
+    return <p className="text-gray-400 text-sm">Spell data is unavailable.</p>
+  }
+
   return (
     <>
       <div className="text-sm text-gray-400 mb-3">
-        {spell.level === 'cantrip' ? 'Cantrip' : `Level ${spell.level}`} {spell.school}
+        {spell.level === 'cantrip' ? 'Cantrip' : `Level ${spell.level}`} {spell.school || ''}
       </div>
       <div className="grid grid-cols-2 gap-2 mb-3 text-sm">
-        <div><span className="text-gray-500">Casting Time:</span> <span className="text-white">{spell.castingTime}</span></div>
-        <div><span className="text-gray-500">Range:</span> <span className="text-white">{spell.range}</span></div>
-        <div className="col-span-2"><span className="text-gray-500">Components:</span> <span className="text-white">{spell.components}</span></div>
-        <div className="col-span-2"><span className="text-gray-500">Duration:</span> <span className="text-white">{spell.duration}</span></div>
+        <div><span className="text-gray-500">Casting Time:</span> <span className="text-white">{spell.castingTime || 'Unknown'}</span></div>
+        <div><span className="text-gray-500">Range:</span> <span className="text-white">{spell.range || 'Unknown'}</span></div>
+        <div className="col-span-2"><span className="text-gray-500">Components:</span> <span className="text-white">{spell.components || 'Unknown'}</span></div>
+        <div className="col-span-2"><span className="text-gray-500">Duration:</span> <span className="text-white">{spell.duration || 'Unknown'}</span></div>
       </div>
-      <p className="text-gray-300 text-sm">{spell.description}</p>
+      <p className="text-gray-300 text-sm">{spell.description || 'No description available.'}</p>
       {spell.higherLevels && (
         <p className="text-purple-300 text-sm mt-2 italic">{spell.higherLevels}</p>
       )}
@@ -301,26 +305,37 @@ function RuleContent({ rule }: { rule: RuleRef }) {
 }
 
 /**
- * Render content based on reference type
+ * Render content based on reference type.
+ * Wrapped in error handling to prevent crashes from malformed data.
  */
 function ReferenceContent({ type, data }: { type: RefType; data: AnyRef }) {
-  switch (type) {
-    case 'spell':
-      return <SpellContent spell={data as SpellRef} />
-    case 'skill':
-      return <SkillContent skill={data as SkillRef} />
-    case 'ability':
-      return <AbilityContent ability={data as AbilityRef} />
-    case 'weapon':
-      return <WeaponContent weapon={data as WeaponRef} />
-    case 'armor':
-      return <ArmorContent armor={data as ArmorRef} />
-    case 'condition':
-      return <ConditionContent condition={data as ConditionRef} />
-    case 'trait':
-      return <TraitContent trait={data as TraitRef} />
-    case 'rule':
-      return <RuleContent rule={data as RuleRef} />
+  try {
+    switch (type) {
+      case 'spell':
+        return <SpellContent spell={data as SpellRef} />
+      case 'skill':
+        return <SkillContent skill={data as SkillRef} />
+      case 'ability':
+        return <AbilityContent ability={data as AbilityRef} />
+      case 'weapon':
+        return <WeaponContent weapon={data as WeaponRef} />
+      case 'armor':
+        return <ArmorContent armor={data as ArmorRef} />
+      case 'condition':
+        return <ConditionContent condition={data as ConditionRef} />
+      case 'trait':
+        return <TraitContent trait={data as TraitRef} />
+      case 'rule':
+        return <RuleContent rule={data as RuleRef} />
+      default:
+        return <p className="text-gray-400 text-sm">Unknown reference type.</p>
+    }
+  } catch {
+    return (
+      <p className="text-red-400 text-sm">
+        Error loading reference data. The data may be incomplete.
+      </p>
+    )
   }
 }
 
@@ -331,6 +346,8 @@ function ReferenceContent({ type, data }: { type: RefType; data: AnyRef }) {
 export function QuickRefTooltip({ type, id, children, className = '' }: QuickRefTooltipProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [data, setData] = useState<AnyRef | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(false)
   const cache = useRef<Map<string, AnyRef>>(new Map())
 
   const colors = getTypeColors(type)
@@ -339,17 +356,30 @@ export function QuickRefTooltip({ type, id, children, className = '' }: QuickRef
     if (isOpen) {
       const cacheKey = `${type}:${id}`
 
+      // Reset error state for new tooltip open
+      setError(false)
+
       // Check cache first
       const cached = cache.current.get(cacheKey)
       if (cached) {
         setData(cached)
+        setLoading(false)
       } else {
+        setData(null)
+        setLoading(true)
         // getReference is now async, so we need to await it
         getReference(type, id).then((refData) => {
           if (refData) {
             cache.current.set(cacheKey, refData)
             setData(refData)
+          } else {
+            setData(null)
           }
+          setLoading(false)
+        }).catch(() => {
+          setData(null)
+          setLoading(false)
+          setError(true)
         })
       }
     }
@@ -385,15 +415,24 @@ export function QuickRefTooltip({ type, id, children, className = '' }: QuickRef
 
       {isOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          onClick={handleClose}
+          className="fixed inset-0 z-[60] flex items-center justify-center p-4"
+          onClick={(e) => { e.stopPropagation(); handleClose(); }}
         >
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
           <div
             className={`relative bg-gray-900 ${colors.border} border-2 rounded-xl p-5 max-w-md w-full shadow-2xl max-h-[80vh] overflow-y-auto`}
             onClick={(e) => e.stopPropagation()}
           >
-            {data ? (
+            {loading ? (
+              <div className="text-center py-8 text-gray-400">
+                <p>Loading...</p>
+              </div>
+            ) : error ? (
+              <div className="text-center py-8 text-gray-400">
+                <p>Failed to load reference data.</p>
+                <button onClick={handleClose} className="mt-2 text-sm underline hover:text-white">Close</button>
+              </div>
+            ) : data ? (
               <>
                 <div className="flex items-start justify-between mb-3">
                   <h3 className={`text-xl font-bold ${colors.accent}`}>{data.name}</h3>
@@ -412,6 +451,7 @@ export function QuickRefTooltip({ type, id, children, className = '' }: QuickRef
             ) : (
               <div className="text-center py-8 text-gray-400">
                 <p>Reference not found: {id}</p>
+                <button onClick={handleClose} className="mt-2 text-sm underline hover:text-white">Close</button>
               </div>
             )}
           </div>

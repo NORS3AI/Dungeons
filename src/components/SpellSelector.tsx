@@ -127,6 +127,8 @@ export function SpellSelector({
 }: SpellSelectorProps) {
   const [selectedCantrips, setSelectedCantrips] = useState<Spell[]>([])
   const [selectedSpells, setSelectedSpells] = useState<Spell[]>([])
+  const [schoolFilter, setSchoolFilter] = useState<string>('all')
+  const [classFilter, setClassFilter] = useState<string>('mine')
 
   // Build a set of already-known spell IDs for fast lookup
   const existingSpellIds = useMemo(
@@ -489,6 +491,61 @@ export function SpellSelector({
   const remainingCantripSlots = Math.max(0, cantripsKnown - existingCantripCount)
   const remainingSpellSlots = Math.max(0, spellsKnown - existingSpellCount)
 
+  const SPELL_SCHOOLS = ['abjuration', 'conjuration', 'divination', 'enchantment', 'evocation', 'illusion', 'necromancy', 'transmutation'] as const
+
+  const myClassId = characterClass?.id?.toLowerCase() ?? ''
+
+  const sortByClass = (spells: Spell[]) => {
+    if (classFilter === 'mine' && myClassId) {
+      const mine: Spell[] = []
+      const others: Spell[] = []
+      spells.forEach(s => {
+        if (s.classes?.some(c => c.toLowerCase() === myClassId)) {
+          mine.push(s)
+        } else {
+          others.push(s)
+        }
+      })
+      return [...mine, ...others]
+    }
+    if (classFilter !== 'all' && classFilter !== 'mine') {
+      const matched: Spell[] = []
+      const rest: Spell[] = []
+      spells.forEach(s => {
+        if (s.classes?.some(c => c.toLowerCase() === classFilter.toLowerCase())) {
+          matched.push(s)
+        } else {
+          rest.push(s)
+        }
+      })
+      return [...matched, ...rest]
+    }
+    return spells
+  }
+
+  const filterBySchool = (spells: Spell[]) => {
+    if (schoolFilter === 'all') return spells
+    return spells.filter(s => s.school?.toLowerCase() === schoolFilter.toLowerCase())
+  }
+
+  const filteredCantrips = useMemo(
+    () => sortByClass(filterBySchool(selectableCantrips)),
+    [selectableCantrips, schoolFilter, classFilter, myClassId],
+  )
+
+  const filteredSpells = useMemo(
+    () => sortByClass(filterBySchool(selectableSpells)),
+    [selectableSpells, schoolFilter, classFilter, myClassId],
+  )
+
+  const allClassIds = useMemo(() => {
+    const classSet = new Set<string>()
+    ;[...selectableCantrips, ...selectableSpells].forEach(s => {
+      s.classes?.forEach(c => classSet.add(c.toLowerCase()))
+    })
+    return Array.from(classSet).sort()
+  }, [selectableCantrips, selectableSpells])
+
   // Handle cantrip toggle
   const handleCantripToggle = (spell: Spell) => {
     setSelectedCantrips((prev: Spell[]) => {
@@ -593,8 +650,47 @@ export function SpellSelector({
         </div>
       )}
 
+      {/* Filter Bar */}
+      <div className="mb-6 flex flex-wrap gap-3 items-center">
+        <div className="flex items-center gap-2">
+          <label className="text-sm text-gray-400">School:</label>
+          <select
+            value={schoolFilter}
+            onChange={(e) => setSchoolFilter(e.target.value)}
+            className="bg-gray-800 border border-gray-600 rounded px-2 py-1 text-sm text-gray-300 focus:outline-none focus:border-dnd-gold capitalize"
+          >
+            <option value="all">All Schools</option>
+            {SPELL_SCHOOLS.map(s => (
+              <option key={s} value={s} className="capitalize">{s.charAt(0).toUpperCase() + s.slice(1)}</option>
+            ))}
+          </select>
+        </div>
+        <div className="flex items-center gap-2">
+          <label className="text-sm text-gray-400">Sort by class:</label>
+          <select
+            value={classFilter}
+            onChange={(e) => setClassFilter(e.target.value)}
+            className="bg-gray-800 border border-gray-600 rounded px-2 py-1 text-sm text-gray-300 focus:outline-none focus:border-dnd-gold capitalize"
+          >
+            <option value="mine">{characterClass?.name ?? 'My Class'} First</option>
+            <option value="all">No Sorting</option>
+            {allClassIds.filter(c => c !== myClassId).map(c => (
+              <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)} First</option>
+            ))}
+          </select>
+        </div>
+        {(schoolFilter !== 'all' || classFilter !== 'mine') && (
+          <button
+            onClick={() => { setSchoolFilter('all'); setClassFilter('mine') }}
+            className="text-xs text-red-400 hover:text-red-300 underline"
+          >
+            Clear filters
+          </button>
+        )}
+      </div>
+
       {/* Cantrips Section - Only show if class has cantrips */}
-      {(cantripsKnown > 0 || !isCharacterCreation) && selectableCantrips.length > 0 && (
+      {(cantripsKnown > 0 || !isCharacterCreation) && filteredCantrips.length > 0 && (
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-xl font-bold text-white">
@@ -611,7 +707,7 @@ export function SpellSelector({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {selectableCantrips.map((spell) => (
+            {filteredCantrips.map((spell) => (
               <SpellCard
                 key={spell.id}
                 spell={spell}
@@ -639,7 +735,7 @@ export function SpellSelector({
       )}
 
       {/* Spells Section - Group by level */}
-      {(spellsKnown > 0 || !isCharacterCreation) && selectableSpells.length > 0 && (
+      {(spellsKnown > 0 || !isCharacterCreation) && filteredSpells.length > 0 && (
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-xl font-bold text-white">
@@ -657,7 +753,7 @@ export function SpellSelector({
 
           {/* Group spells by level and display each level separately */}
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((spellLevel) => {
-            const spellsOfLevel = selectableSpells.filter((s) => s.level === spellLevel)
+            const spellsOfLevel = filteredSpells.filter((s) => s.level === spellLevel)
             if (spellsOfLevel.length === 0) return null
 
             return (
@@ -710,10 +806,12 @@ export function SpellSelector({
       {/* Selected Summary */}
       {(selectedCantrips.length > 0 || selectedSpells.length > 0) && (
         <div className="mb-8 p-6 bg-gray-800 rounded-xl border border-dnd-gold/30">
-          <h3 className="text-lg font-bold text-dnd-gold mb-4">Selected Spells</h3>
+          <h3 className="text-lg font-bold text-dnd-gold mb-4">
+            Selected Spells ({selectedCantrips.length + selectedSpells.length})
+          </h3>
 
           {selectedCantrips.length > 0 && (
-            <div className="mb-4">
+            <div className="mb-2">
               <span className="text-sm text-gray-400">Cantrips: </span>
               <span className="text-white">
                 {selectedCantrips.map((s) => s.name).join(', ')}
@@ -721,14 +819,30 @@ export function SpellSelector({
             </div>
           )}
 
-          {selectedSpells.length > 0 && (
-            <div>
-              <span className="text-sm text-gray-400">1st Level: </span>
-              <span className="text-white">
-                {selectedSpells.map((s) => s.name).join(', ')}
-              </span>
-            </div>
-          )}
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(lvl => {
+            const spellsAtLvl = selectedSpells.filter(s => s.level === lvl)
+            if (spellsAtLvl.length === 0) return null
+            return (
+              <div key={lvl} className="mb-1">
+                <span className="text-sm text-gray-400">
+                  {lvl === 1 ? '1st' : lvl === 2 ? '2nd' : lvl === 3 ? '3rd' : `${lvl}th`} Level:{' '}
+                </span>
+                <span className="text-white">
+                  {spellsAtLvl.map((s) => s.name).join(', ')}
+                </span>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {/* No results for current filter */}
+      {(filteredCantrips.length === 0 && filteredSpells.length === 0) && (selectableCantrips.length > 0 || selectableSpells.length > 0) && schoolFilter !== 'all' && (
+        <div className="mb-8 p-4 bg-gray-800/50 rounded-lg border border-gray-700 text-center">
+          <p className="text-gray-400">No spells match the current filter.</p>
+          <button onClick={() => { setSchoolFilter('all'); setClassFilter('mine') }} className="mt-2 text-sm text-dnd-gold hover:text-yellow-400 underline">
+            Clear filters
+          </button>
         </div>
       )}
 
@@ -780,7 +894,9 @@ export function SpellSelector({
                            : 'bg-gray-700 text-gray-500 cursor-not-allowed'
                        }`}
           >
-            {isCharacterCreation ? 'Next: Equipment' : 'Done'}
+            {isCharacterCreation
+              ? 'Next: Equipment'
+              : `Add ${selectedCantrips.length + selectedSpells.length} Spell${selectedCantrips.length + selectedSpells.length !== 1 ? 's' : ''}`}
           </button>
         </div>
       </div>

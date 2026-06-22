@@ -202,6 +202,7 @@ interface CharacterState {
   setAlignment: (alignment: Alignment) => void
   setAbilityScores: (scores: AbilityScores) => void
   setLanguages: (languages: string[]) => void
+  setVisionOverride: (vision: string | undefined, range?: number) => void
   addSpell: (spell: Spell) => void
   removeSpell: (spellId: string) => void
   addEquipment: (item: Equipment) => void
@@ -599,6 +600,19 @@ export const useCharacterStore = create<CharacterState>()(
 
           set({
             currentCharacter: { ...currentCharacter, languages: languagesWithCommon },
+            history: addToHistory(history, currentCharacter),
+          })
+        },
+
+        setVisionOverride: (vision: string | undefined, range?: number) => {
+          const { currentCharacter, history } = get()
+          if (!currentCharacter) return
+          set({
+            currentCharacter: {
+              ...currentCharacter,
+              visionOverride: vision as any,
+              visionRangeOverride: range,
+            },
             history: addToHistory(history, currentCharacter),
           })
         },
