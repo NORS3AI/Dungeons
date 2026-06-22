@@ -1,5 +1,20 @@
 # Dungeons - Patch Notes
 
+## Version 0.5.4-beta - June 22, 2026
+
+**Beta Release Notice**: Critical fix — character creation was blocked on fresh browser sessions by the Content Sync modal.
+
+### Bug Fix: Character Creation Blocked by Sync Modal
+
+The "Content Update Available" sync modal was appearing on every fresh browser session (empty localStorage) and blocking all UI interaction, including the entire character creation flow. The modal covered the full screen at z-index 60, intercepting all pointer events.
+
+#### **What Changed**
+- The sync modal now only appears when there are existing saved characters that could benefit from syncing
+- On fresh sessions with no characters, the content version is silently updated — no modal appears
+- Character creation flow now works end-to-end without any blocking overlay
+
+**Why This Matters**: New users and anyone clearing their browser data could not create characters at all — the invisible modal silently ate all clicks.
+
 ## Version 0.5.3-beta - June 22, 2026
 
 **Beta Release Notice**: Quality-of-life overhaul — DM editing tools, spell filtering, multi-select spells, new Necromancer cantrips, and critical crash fixes.
