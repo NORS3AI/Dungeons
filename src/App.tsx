@@ -2,6 +2,7 @@ import { Suspense, lazy } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { Layout } from './components/Layout'
 import { PasswordGate } from './components/PasswordGate'
+import { ErrorBoundary } from './components/ErrorBoundary'
 
 // Lazy load pages for code splitting
 const HomePage = lazy(() => import('./pages/HomePage').then(m => ({ default: m.HomePage })))
@@ -24,18 +25,20 @@ function PageLoader() {
 
 function App() {
   return (
-    <PasswordGate>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Suspense fallback={<PageLoader />}><HomePage /></Suspense>} />
-          <Route path="create" element={<Suspense fallback={<PageLoader />}><CharacterCreatePage /></Suspense>} />
-          <Route path="character/:id" element={<Suspense fallback={<PageLoader />}><CharacterSheetPage /></Suspense>} />
-          <Route path="campaign" element={<Suspense fallback={<PageLoader />}><CampaignPage /></Suspense>} />
-          <Route path="adventure/:id" element={<Suspense fallback={<PageLoader />}><AdventurePage /></Suspense>} />
-          <Route path="register" element={<Suspense fallback={<PageLoader />}><HomePage /></Suspense>} />
-        </Route>
-      </Routes>
-    </PasswordGate>
+    <ErrorBoundary>
+      <PasswordGate>
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<ErrorBoundary><Suspense fallback={<PageLoader />}><HomePage /></Suspense></ErrorBoundary>} />
+            <Route path="create" element={<ErrorBoundary><Suspense fallback={<PageLoader />}><CharacterCreatePage /></Suspense></ErrorBoundary>} />
+            <Route path="character/:id" element={<ErrorBoundary><Suspense fallback={<PageLoader />}><CharacterSheetPage /></Suspense></ErrorBoundary>} />
+            <Route path="campaign" element={<ErrorBoundary><Suspense fallback={<PageLoader />}><CampaignPage /></Suspense></ErrorBoundary>} />
+            <Route path="adventure/:id" element={<ErrorBoundary><Suspense fallback={<PageLoader />}><AdventurePage /></Suspense></ErrorBoundary>} />
+            <Route path="register" element={<ErrorBoundary><Suspense fallback={<PageLoader />}><HomePage /></Suspense></ErrorBoundary>} />
+          </Route>
+        </Routes>
+      </PasswordGate>
+    </ErrorBoundary>
   )
 }
 

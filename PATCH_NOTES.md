@@ -1,5 +1,92 @@
 # Dungeons - Patch Notes
 
+## Version 0.5.3-beta - June 22, 2026
+
+**Beta Release Notice**: Quality-of-life overhaul — DM editing tools, spell filtering, multi-select spells, new Necromancer cantrips, and critical crash fixes.
+
+### Character Sheet Actions Dropdown
+
+The character sheet header now uses a clean **Actions dropdown menu** instead of 6 inline buttons. Adventure mode gets its own prominent standalone button next to the dropdown.
+
+#### **What Changed**
+- Level Up, Level Down, Print, Export PDF, Export JSON, Export HTML, and Edit Details all live in a single dropdown
+- Adventure button sits next to the dropdown for one-tap access
+- Click-outside closes the dropdown automatically
+
+### DM Editing Tools
+
+New DM-only edit controls on the character sheet (requires DM Mode enabled in Settings).
+
+#### **Languages Editor**
+- Click the edit icon next to Languages to open an inline editor
+- Add any language from the full D&D language list (standard, exotic, and secret)
+- Remove languages with one tap
+- Changes save immediately
+
+#### **Vision Override**
+- DMs can now change a character's vision type via dropdown: Normal, Darkvision (60 ft), Superior Darkvision (120 ft), Blindsight (30 ft), or Truesight (120 ft)
+- Overrides racial defaults without changing the race selection
+
+#### **Ocean Weather DM Control**
+- DMs now get a dropdown to pick exact weather conditions instead of relying on random rolls
+- All 20 weather options available by name
+- Random d20 roll still available as a button below the dropdown
+- Non-DM players still see the classic roll button
+
+### Spell Selector Improvements
+
+The Add Spells screen now has powerful filtering and a better selection flow.
+
+#### **School Filter**
+- Filter spells by school: Abjuration, Conjuration, Divination, Enchantment, Evocation, Illusion, Necromancy, or Transmutation
+- "No results" message with clear-filter shortcut when filters are too narrow
+
+#### **Class Sorting**
+- Sort spells with your class's spells listed first, or sort by any other class
+- Helps find class-appropriate spells quickly in large spell lists
+
+#### **Multi-Select & Add Button**
+- Tapping spells toggles selection on/off (multi-select)
+- Selected spell summary now groups by spell level
+- "Add N Spells" button clearly shows how many you're adding
+
+### Gemini Settings Improvements
+
+- Added direct link to create a free Gemini API key at aistudio.google.com
+- Added "Test Connection" button to verify your API key works before adventuring
+
+### Necromancer Cantrips Expansion
+
+The Necromancer now has **12 cantrips** (up from 4), including 5 original Diablo-inspired cantrips.
+
+#### **Borrowed Cantrips**
+- **Minor Illusion** — utility illusion cantrip
+- **Poison Spray** — 1d12 poison, CON save
+- **Sapping Sting** — 1d4 necrotic + prone, CON save
+
+#### **Diablo-Inspired Cantrips**
+- **Bone Splinter** — 1d8 piercing ranged attack, splinters near corpses/undead for 1d4 splash
+- **Corpse Burst** — 1d6 necrotic AoE around a corpse, DEX save (destroys the corpse)
+- **Grasp of the Dead** — 1d6 necrotic + speed reduction, STR save
+- **Blood Siphon** — 1d6 necrotic + temp HP on fail, CON save
+- **Spectral Scythe** — 1d10 necrotic melee spell attack, bonus temp HP on killing blow
+
+All cantrips scale at 5th, 11th, and 17th level.
+
+### Bug Fixes
+
+#### **Spell Black Screen Crashes (Fixed)**
+- Fixed crash when viewing spells with missing `castingTime` or `range` data (e.g., Remove Curse, Death and Decay)
+- Added null guards on spell property access throughout the character sheet
+- Added missing `concentration` field to ManualSpellAdder and SpellScroll modal spell construction
+- Added `ErrorBoundary` component wrapping every route — a single render error no longer takes down the entire app
+- `QuickRefTooltip` now shows proper loading/error states instead of flashing "Reference not found" before data loads
+- Added try-catch protection in reference content rendering
+
+**Why This Matters**: Players can now browse and select any spell without risk of the app going black.
+
+---
+
 ## Version 0.5.1-beta - June 22, 2026
 
 **Beta Release Notice**: The AI Dungeon Master now defaults to Google Gemini 2.5 Flash — a free, highly capable AI provider. No paid API credits required.

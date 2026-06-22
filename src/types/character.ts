@@ -274,6 +274,8 @@ export interface Character {
   hitPoints: HitPoints
   armorClass: number
   acOverride?: number // DM manual AC override — when set, bypasses calculated AC
+  visionOverride?: 'normal' | 'darkvision' | 'superiorDarkvision' | 'blindsight' | 'truesight'
+  visionRangeOverride?: number
   initiative: number
   speed: number
   deathSaves: DeathSaves

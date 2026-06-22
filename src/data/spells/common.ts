@@ -48,7 +48,7 @@ export const MINOR_ILLUSION: Spell = {
   duration: { type: 'timed', amount: 1, unit: 'minute' },
   ritual: false,
   concentration: false,
-  classes: ['warlock', 'wizard', 'sorcerer', 'bard'],
+  classes: ['necromancer', 'warlock', 'wizard', 'sorcerer', 'bard'],
 }
 
 export const PRESTIDIGITATION: Spell = {

@@ -201,11 +201,22 @@ export const useSettingsStore = create<SettingsState>()(
     {
       name: 'dungeons-settings',
       onRehydrateStorage: () => (state) => {
-        // Apply settings on load
         if (state) {
           applyTheme(state.theme)
           applyFontSize(state.fontSize)
           applyFontFamily(state.fontFamily)
+          // Migrate groq → gemini for users with old persisted state
+          if ((state.aiProvider as string) === 'groq') {
+            state.aiProvider = 'gemini'
+            const stored = JSON.parse(localStorage.getItem('dungeons-settings') || '{}')
+            if (stored?.state?.groqApiKey) {
+              state.geminiApiKey = stored.state.groqApiKey
+            }
+          }
+          // Auto-select claude if user has a claude key but no gemini key
+          if (state.apiKey && !state.geminiApiKey && state.aiProvider === 'gemini') {
+            state.aiProvider = 'claude'
+          }
         }
       },
     }
