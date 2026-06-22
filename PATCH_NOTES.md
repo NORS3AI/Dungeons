@@ -2,15 +2,15 @@
 
 ## Version 0.5.1-beta - June 22, 2026
 
-**Beta Release Notice**: The AI Dungeon Master now supports free Llama 3.3 70B via Groq alongside the existing Claude option. No paid API credits required.
+**Beta Release Notice**: The AI Dungeon Master now defaults to Google Gemini 2.5 Flash — a free, highly capable AI provider. No paid API credits required.
 
-### Free AI Provider (Groq + Llama)
+### Free AI Provider (Google Gemini)
 
-The Adventure System now defaults to **Groq's Llama 3.3 70B** — a completely free AI provider. No credit card, no paid API credits.
+The Adventure System now defaults to **Google Gemini 2.5 Flash** — a free AI provider with strong creative writing and structured output capabilities. Much more capable than Llama for DM narration.
 
 #### **What Changed**
-- New AI provider selector in Settings: **Groq (Free)** or **Claude (Paid)**
-- Groq uses Llama 3.3 70B with free API key from console.groq.com
+- New AI provider selector in Settings: **Gemini (Free)** or **Claude (Paid)**
+- Gemini 2.5 Flash with free API key from aistudio.google.com
 - Claude option still available using Opus 4.7 for users with API credits
 - Streaming works identically on both providers
 - All game mechanics (combat, skill checks, loot) work the same regardless of provider
@@ -39,7 +39,7 @@ The adventure sidebar is now a full character reference with **4 tabs** — no m
 Click the gold **Adventure** button on any character sheet to begin a fully AI-driven text RPG. The AI Dungeon Master weaves narrative, combat encounters, skill checks, and treasure based on your character's actual stats, equipment, and spells.
 
 #### **AI Dungeon Master**
-- Choose between Groq (Llama 3.3, free) or Claude (Opus 4.7, paid) in Settings
+- Choose between Gemini (2.5 Flash, free) or Claude (Opus 4.7, paid) in Settings
 - Your API key is stored locally, never leaves your browser
 - Narrates in second person — "You walk into a dimly lit tavern..."
 - Reacts to free-form player input — type anything and the world responds

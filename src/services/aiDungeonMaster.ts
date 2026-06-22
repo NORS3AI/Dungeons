@@ -6,8 +6,8 @@ import type { AIProvider } from '../stores/settingsStore'
 const CLAUDE_API_URL = 'https://api.anthropic.com/v1/messages'
 const CLAUDE_MODEL = 'claude-opus-4-7'
 
-const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
-const GROQ_MODEL = 'llama-3.3-70b-versatile'
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions'
+const GEMINI_MODEL = 'gemini-2.5-flash'
 
 const MAX_CONTEXT_MESSAGES = 40
 
@@ -280,27 +280,27 @@ async function sendClaude(
 
 // --- Groq (Llama) provider ---
 
-async function sendGroq(
+async function sendGemini(
   apiKey: string,
   systemPrompt: string,
   messages: { role: 'user' | 'assistant'; content: string }[],
   onStream?: (text: string) => void,
 ): Promise<string> {
-  const groqMessages = [
+  const geminiMessages = [
     { role: 'system' as const, content: systemPrompt },
     ...messages,
   ]
 
-  const response = await fetch(GROQ_API_URL, {
+  const response = await fetch(GEMINI_API_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: GROQ_MODEL,
+      model: GEMINI_MODEL,
       max_tokens: 1024,
-      messages: groqMessages,
+      messages: geminiMessages,
       stream: !!onStream,
     }),
   })
@@ -366,7 +366,7 @@ export async function sendToAIDM(
   conversationHistory: ConversationEntry[],
   playerMessage: string,
   onStream?: (chunk: string) => void,
-  provider: AIProvider = 'groq',
+  provider: AIProvider = 'gemini',
 ): Promise<DMResponse> {
   const systemPrompt = buildSystemPrompt(character, gameState, location)
   const trimmed = trimContext(conversationHistory)
@@ -379,7 +379,7 @@ export async function sendToAIDM(
     { role: 'user' as const, content: playerMessage },
   ]
 
-  const send = provider === 'claude' ? sendClaude : sendGroq
+  const send = provider === 'claude' ? sendClaude : sendGemini
   const fullText = await send(apiKey, systemPrompt, messages, onStream)
   return parseGameActions(fullText)
 }

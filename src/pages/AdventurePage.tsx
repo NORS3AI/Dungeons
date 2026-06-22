@@ -66,8 +66,8 @@ export function AdventurePage() {
   const navigate = useNavigate()
   const { loadCharacter, updateHitPoints, addCondition, removeCondition, useSpellSlot, shortRest, longRest, updateCurrency, saveCharacter } = useCharacterStore()
   const character = useCharacterStore((s) => s.currentCharacter)
-  const { aiProvider, apiKey, groqApiKey } = useSettingsStore()
-  const activeApiKey = aiProvider === 'claude' ? apiKey : groqApiKey
+  const { aiProvider, apiKey, geminiApiKey } = useSettingsStore()
+  const activeApiKey = aiProvider === 'claude' ? apiKey : geminiApiKey
 
   const {
     isActive, gameState, messages, combatState, currentLocation,
@@ -386,7 +386,7 @@ export function AdventurePage() {
   }
 
   if (!activeApiKey) {
-    const providerName = aiProvider === 'claude' ? 'Claude' : 'Groq'
+    const providerName = aiProvider === 'claude' ? 'Claude' : 'Gemini'
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center max-w-md">
@@ -394,9 +394,9 @@ export function AdventurePage() {
           <h2 className="text-xl text-gray-400 mb-2">API Key Required</h2>
           <p className="text-gray-500 mb-4">
             Open Settings and add your {providerName} API key to use the AI Dungeon Master.
-            {aiProvider === 'groq' && (
+            {aiProvider === 'gemini' && (
               <span className="block mt-2 text-green-400/70">
-                Groq is free — get a key at console.groq.com
+                Gemini is free — get a key at aistudio.google.com
               </span>
             )}
           </p>
