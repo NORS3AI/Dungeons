@@ -15,6 +15,19 @@ The Adventure System now defaults to **Groq's Llama 3.3 70B** — a completely f
 - Streaming works identically on both providers
 - All game mechanics (combat, skill checks, loot) work the same regardless of provider
 
+### Adventure Side Panel Overhaul
+
+The adventure sidebar is now a full character reference with **4 tabs** — no more switching back to your character sheet mid-session.
+
+#### **Tabbed Panel**
+- **Adventure** — combat tracker, ability scores, spell slots, gold/XP, quest log (same as before)
+- **Spells** — all known spells grouped by level, spell slot tracker with remaining counts
+- **Skills** — full skill list with modifiers, proficiency markers, saving throws, proficiency bonus
+- **Gear** — equipped weapon/armor details, full equipment list with equipped indicators, currency breakdown, class features by level, race traits
+
+#### **Toggle Fix**
+- Sidebar can now be reliably shown/hidden — the toggle button sits in the layout flow instead of using absolute positioning that could get hidden behind content
+
 ---
 
 ## Version 0.5.0-beta - June 21, 2026
