@@ -5,6 +5,7 @@ import { KeyboardShortcutsModal } from './KeyboardShortcutsModal'
 import { PatchNotesModal } from './PatchNotesModal'
 import { SyncUpdateModal } from './SyncUpdateModal'
 import { useSettingsStore } from '../stores/settingsStore'
+import { useCharacterStore } from '../stores/characterStore'
 import { CONTENT_VERSION } from '../data/contentVersion'
 
 export function Layout() {
@@ -13,12 +14,18 @@ export function Layout() {
   const [showPatchNotes, setShowPatchNotes] = useState(false)
   const [showSyncModal, setShowSyncModal] = useState(false)
   const lastSyncedVersion = useSettingsStore((s) => s.lastSyncedContentVersion)
+  const { setLastSyncedContentVersion } = useSettingsStore()
+  const characters = useCharacterStore((s) => s.characters)
 
   useEffect(() => {
     if (lastSyncedVersion < CONTENT_VERSION) {
-      setShowSyncModal(true)
+      if (characters.length > 0) {
+        setShowSyncModal(true)
+      } else {
+        setLastSyncedContentVersion(CONTENT_VERSION)
+      }
     }
-  }, [lastSyncedVersion])
+  }, [lastSyncedVersion, characters.length, setLastSyncedContentVersion])
 
   // Global keyboard shortcut listener
   useEffect(() => {
