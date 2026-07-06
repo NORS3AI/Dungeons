@@ -1,10 +1,10 @@
 import type { AmmoType, Ship, ShipCondition, ShipFaction } from '../types/naval'
 
-function roll(sides: number): number {
+export function roll(sides: number): number {
   return Math.floor(Math.random() * sides) + 1
 }
 
-function rollMultiple(count: number, sides: number): { rolls: number[]; total: number } {
+export function rollMultiple(count: number, sides: number): { rolls: number[]; total: number } {
   const rolls: number[] = []
   for (let i = 0; i < count; i++) {
     rolls.push(roll(sides))
@@ -35,7 +35,7 @@ export function rollReload(totalCannons: number): {
   }
 
   const functionalCannons = Math.max(1, Math.ceil(totalCannons * percentage))
-  const selfDamage = fumble ? roll(4) : 0
+  const selfDamage = 0
 
   return { roll: d20, functionalCannons, fumble, critical, selfDamage }
 }
@@ -71,8 +71,12 @@ export function rollCannonDamage(
   critical: boolean,
   notationOverride?: string,
 ): { notation: string; total: number; rolls: number[]; hullDamage: number; conditionApplied: ShipCondition | null } {
-  const notation = notationOverride || getDamageNotation(loadedCannons)
-  const match = notation.match(/^(\d+)d(\d+)$/)!
+  const rawNotation = notationOverride || getDamageNotation(loadedCannons)
+  const match = rawNotation.match(/^(\d+)d(\d+)$/)
+  if (!match) {
+    return rollCannonDamage(loadedCannons, ammoType, critical)
+  }
+  const notation = rawNotation
   const count = parseInt(match[1])
   const sides = parseInt(match[2])
 
@@ -107,9 +111,9 @@ export function rollRepairDuration(): { roll: number; turns: number } {
 
 export function getHealingAmount(d20: number): number {
   if (d20 === 1) return 5
-  if (d20 <= 5) return 15
-  if (d20 <= 14) return 10
-  if (d20 <= 19) return 15
+  if (d20 <= 5) return 10
+  if (d20 <= 14) return 15
+  if (d20 <= 19) return 20
   return 25
 }
 
@@ -147,7 +151,7 @@ export function applyConditionEffects(ship: Ship): { damage: number; messages: s
 export function getACWithConditions(ship: Ship): number {
   let ac = ship.ac
   if (ship.conditions.includes('taking_water')) ac -= 2
-  if (ship.conditions.includes('bracing' as ShipCondition)) ac += 2
+  if (ship.conditions.includes('bracing')) ac += 2
   return ac
 }
 

@@ -1,5 +1,23 @@
 # Dungeons - Patch Notes
 
+## Version 0.6.5-beta - July 06, 2026
+
+**Beta Release Notice**: Naval combat bug-fix pass and loadout overwrite.
+
+### Naval Combat Fixes & Polish
+
+#### **Loadout Overwrite Button**
+- Each saved fleet loadout now has an **Update** button — overwrites that loadout with the current ships on the board, preserving the loadout name.
+
+#### **Bug Fixes**
+- Fixed crash when firing cannons with a custom damage notation that includes a modifier (e.g. `2d6+2`). Invalid overrides now fall back to the auto-calculated tier instead of throwing a TypeError.
+- Fixed `bracing` condition causing a crash in the battle UI. "Bracing" is now a proper `ShipCondition` with a shield icon and light-blue label.
+- Fixed repair heal values using a non-monotonic progression (5→15→10→15→25). Values are now a clean 5→10→15→20→25 scale.
+- Reload fumble (d20=1) no longer deals self-damage in addition to the 20%-cannons penalty — consistent with the new 1–5 tier behaviour.
+- Exported `roll()` and `rollMultiple()` helpers so ability damage dice use the same RNG path as all other rolls.
+
+**Why This Matters**: Eliminates several crashes that could occur during normal play and makes fleet loadout management more convenient.
+
 ## Version 0.6.4-beta - July 06, 2026
 
 **Beta Release Notice**: Reload roll rebalance and post-battle ship editing.

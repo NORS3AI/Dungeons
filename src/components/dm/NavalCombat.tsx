@@ -16,6 +16,7 @@ const CONDITION_LABELS: Record<ShipCondition, { label: string; icon: string; col
   taking_water: { label: 'Taking Water', icon: '🌊', color: 'text-blue-400' },
   mast_damaged: { label: 'Mast Damaged', icon: '⚓', color: 'text-yellow-400' },
   crew_swept: { label: 'Crew Swept', icon: '💀', color: 'text-red-400' },
+  bracing: { label: 'Bracing', icon: '🛡️', color: 'text-sky-400' },
 }
 
 const LOG_COLORS: Record<BattleLogEntry['type'], string> = {
@@ -757,6 +758,7 @@ function FleetLoadoutPanel({
   loadouts,
   onSaveLoadout,
   onDeleteLoadout,
+  onOverwriteLoadout,
 }: {
   faction: ShipFaction
   currentShips: Ship[]
@@ -764,6 +766,7 @@ function FleetLoadoutPanel({
   loadouts: FleetLoadout[]
   onSaveLoadout: (loadout: FleetLoadout) => void
   onDeleteLoadout: (id: string) => void
+  onOverwriteLoadout: (id: string) => void
 }) {
   const [saving, setSaving] = useState(false)
   const [saveName, setSaveName] = useState('')
@@ -858,6 +861,15 @@ function FleetLoadoutPanel({
           >
             Load
           </button>
+          {currentShips.length > 0 && (
+            <button
+              onClick={() => onOverwriteLoadout(loadout.id)}
+              className="px-2 py-0.5 rounded text-xs font-bold bg-blue-900/50 text-blue-400 hover:bg-blue-800 transition-colors whitespace-nowrap"
+              title="Overwrite this loadout with the current fleet"
+            >
+              Update
+            </button>
+          )}
           <button
             onClick={() => onDeleteLoadout(loadout.id)}
             className="text-gray-600 hover:text-red-400 transition-colors p-0.5"
@@ -941,6 +953,31 @@ export function NavalCombat() {
     persistLoadouts(updated)
   }
 
+  const overwriteLoadout = (id: string, faction: ShipFaction) => {
+    const currentShips = ships.filter(s => s.faction === faction)
+    if (currentShips.length === 0) return
+    const updated = loadouts.map(l =>
+      l.id === id
+        ? {
+            ...l,
+            ships: currentShips.map(s => ({
+              name: s.name,
+              ac: s.ac,
+              maxHP: s.maxHP,
+              speed: s.speed,
+              crew: s.crew,
+              totalCannons: s.totalCannons,
+              damageOverride: s.damageOverride,
+              abilities: [...s.abilities],
+            })),
+            savedAt: Date.now(),
+          }
+        : l
+    )
+    setLoadouts(updated)
+    persistLoadouts(updated)
+  }
+
   // ── Ship Management ──────────────────────────────────────────────────────
 
   const [editingShip, setEditingShip] = useState<Ship | null>(null)
@@ -999,10 +1036,10 @@ export function NavalCombat() {
     if (!currentShip) return
 
     // Clear bracing from this ship's previous turn
-    if (currentShip.conditions.includes('bracing' as ShipCondition)) {
+    if (currentShip.conditions.includes('bracing')) {
       setShips(prev => prev.map(s =>
         s.id === currentShip.id
-          ? { ...s, conditions: s.conditions.filter(c => c !== ('bracing' as ShipCondition)) }
+          ? { ...s, conditions: s.conditions.filter(c => c !== ('bracing')) }
           : s
       ))
     }
@@ -1079,30 +1116,16 @@ export function NavalCombat() {
     setHitResult(null)
     setDamageResult(null)
 
-    effectiveHP = Math.max(0, effectiveHP - result.selfDamage)
-
     setShips(prev => prev.map(s =>
-      s.id === currentShip.id
-        ? {
-            ...s,
-            functionalCannons: adjusted,
-            currentHP: Math.max(0, s.currentHP - result.selfDamage),
-            status: Math.max(0, s.currentHP - result.selfDamage) <= 0 ? 'sunk' as const : s.status,
-          }
-        : s
+      s.id === currentShip.id ? { ...s, functionalCannons: adjusted } : s
     ))
 
     if (result.fumble) {
       addLog(currentShip.id, currentShip.name,
-        `FUMBLE! Cannon misfire deals ${result.selfDamage} damage to own ship! Only ${adjusted} cannons functional`,
+        `FUMBLE! Chaotic reload — only ${adjusted} cannons functional (rolled ${result.roll})`,
         'fumble',
-        { rolls: [{ notation: '1d20', result: result.roll }], damage: result.selfDamage },
+        { rolls: [{ notation: '1d20', result: result.roll }] },
       )
-      if (effectiveHP <= 0) {
-        addLog(currentShip.id, currentShip.name, `${currentShip.name} has been sunk by its own cannon misfire!`, 'damage')
-        advanceTurn()
-        return
-      }
     } else if (result.critical) {
       addLog(currentShip.id, currentShip.name,
         `PERFECT reload! All ${adjusted} cannons ready and crew is inspired!`,
@@ -1362,9 +1385,9 @@ export function NavalCombat() {
         break
       }
       case 'brace': {
-        if (!ship.conditions.includes('bracing' as ShipCondition)) {
+        if (!ship.conditions.includes('bracing')) {
           setShips(prev => prev.map(s =>
-            s.id === shipId ? { ...s, conditions: [...s.conditions, 'bracing' as ShipCondition] } : s
+            s.id === shipId ? { ...s, conditions: [...s.conditions, 'bracing'] } : s
           ))
         }
         addLog(shipId, ship.name, 'Braces for impact! +2 AC until next turn', 'ability')
@@ -1431,8 +1454,8 @@ export function NavalCombat() {
       case 'aft-cannons': {
         if (!target) return
         setShips(prev => prev.map(s =>
-          s.id === shipId && !s.conditions.includes('bracing' as ShipCondition)
-            ? { ...s, conditions: [...s.conditions, 'bracing' as ShipCondition] }
+          s.id === shipId && !s.conditions.includes('bracing')
+            ? { ...s, conditions: [...s.conditions, 'bracing'] }
             : s
         ))
         const aftHit = rollToHit(getACWithConditions(target))
@@ -1452,8 +1475,8 @@ export function NavalCombat() {
       }
       case 'smoke-screen': {
         setShips(prev => prev.map(s =>
-          s.id === shipId && !s.conditions.includes('bracing' as ShipCondition)
-            ? { ...s, conditions: [...s.conditions, 'bracing' as ShipCondition] }
+          s.id === shipId && !s.conditions.includes('bracing')
+            ? { ...s, conditions: [...s.conditions, 'bracing'] }
             : s
         ))
         addLog(shipId, ship.name, 'Deploys smoke screen! Attackers suffer -2 to hit this ship (+2 AC) until next turn', 'ability')
@@ -1606,7 +1629,7 @@ export function NavalCombat() {
               onCancelEdit={() => setEditingShip(null)}
             />
             <div className="mt-3">
-              <FleetLoadoutPanel faction="player" currentShips={playerShips} onLoadFleet={loadFleet} loadouts={loadouts} onSaveLoadout={saveLoadout} onDeleteLoadout={deleteLoadout} />
+              <FleetLoadoutPanel faction="player" currentShips={playerShips} onLoadFleet={loadFleet} loadouts={loadouts} onSaveLoadout={saveLoadout} onDeleteLoadout={deleteLoadout} onOverwriteLoadout={id => overwriteLoadout(id, 'player')} />
             </div>
           </div>
 
@@ -1639,7 +1662,7 @@ export function NavalCombat() {
               onCancelEdit={() => setEditingShip(null)}
             />
             <div className="mt-3">
-              <FleetLoadoutPanel faction="enemy" currentShips={enemyShips} onLoadFleet={loadFleet} loadouts={loadouts} onSaveLoadout={saveLoadout} onDeleteLoadout={deleteLoadout} />
+              <FleetLoadoutPanel faction="enemy" currentShips={enemyShips} onLoadFleet={loadFleet} loadouts={loadouts} onSaveLoadout={saveLoadout} onDeleteLoadout={deleteLoadout} onOverwriteLoadout={id => overwriteLoadout(id, 'enemy')} />
             </div>
           </div>
         </div>

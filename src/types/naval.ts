@@ -1,7 +1,7 @@
 export type AmmoType = 'ball' | 'chain'
 export type ShipFaction = 'player' | 'enemy'
 export type ShipStatus = 'active' | 'repairing' | 'sinking' | 'sunk'
-export type ShipCondition = 'on_fire' | 'taking_water' | 'mast_damaged' | 'crew_swept'
+export type ShipCondition = 'on_fire' | 'taking_water' | 'mast_damaged' | 'crew_swept' | 'bracing'
 
 export interface ShipAbility {
   id: string
