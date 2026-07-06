@@ -611,12 +611,17 @@ function FleetLoadoutPanel({
   faction,
   currentShips,
   onLoadFleet,
+  loadouts,
+  onSaveLoadout,
+  onDeleteLoadout,
 }: {
   faction: ShipFaction
   currentShips: Ship[]
   onLoadFleet: (ships: ShipTemplate[], faction: ShipFaction) => void
+  loadouts: FleetLoadout[]
+  onSaveLoadout: (loadout: FleetLoadout) => void
+  onDeleteLoadout: (id: string) => void
 }) {
-  const [loadouts, setLoadouts] = useState<FleetLoadout[]>(loadSavedLoadouts)
   const [saving, setSaving] = useState(false)
   const [saveName, setSaveName] = useState('')
 
@@ -625,7 +630,7 @@ function FleetLoadoutPanel({
 
   const handleSave = () => {
     if (!saveName.trim() || currentShips.length === 0) return
-    const newLoadout: FleetLoadout = {
+    onSaveLoadout({
       id: `loadout-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       name: saveName.trim(),
       faction,
@@ -637,18 +642,9 @@ function FleetLoadoutPanel({
         abilities: [...s.abilities],
       })),
       savedAt: Date.now(),
-    }
-    const updated = [...loadouts, newLoadout]
-    setLoadouts(updated)
-    persistLoadouts(updated)
+    })
     setSaveName('')
     setSaving(false)
-  }
-
-  const handleDelete = (id: string) => {
-    const updated = loadouts.filter(l => l.id !== id)
-    setLoadouts(updated)
-    persistLoadouts(updated)
   }
 
   const handleLoad = (loadout: FleetLoadout) => {
@@ -717,7 +713,7 @@ function FleetLoadoutPanel({
             Load
           </button>
           <button
-            onClick={() => handleDelete(loadout.id)}
+            onClick={() => onDeleteLoadout(loadout.id)}
             className="text-gray-600 hover:text-red-400 transition-colors p-0.5"
             title="Delete loadout"
           >
@@ -782,6 +778,22 @@ export function NavalCombat() {
       ...extra,
     }])
   }, [round])
+
+  // ── Loadout Management ───────────────────────────────────────────────────
+
+  const [loadouts, setLoadouts] = useState<FleetLoadout[]>(loadSavedLoadouts)
+
+  const saveLoadout = (loadout: FleetLoadout) => {
+    const updated = [...loadouts, loadout]
+    setLoadouts(updated)
+    persistLoadouts(updated)
+  }
+
+  const deleteLoadout = (id: string) => {
+    const updated = loadouts.filter(l => l.id !== id)
+    setLoadouts(updated)
+    persistLoadouts(updated)
+  }
 
   // ── Ship Management ──────────────────────────────────────────────────────
 
@@ -1301,7 +1313,7 @@ export function NavalCombat() {
               onCancelEdit={() => setEditingShip(null)}
             />
             <div className="mt-3">
-              <FleetLoadoutPanel faction="player" currentShips={playerShips} onLoadFleet={loadFleet} />
+              <FleetLoadoutPanel faction="player" currentShips={playerShips} onLoadFleet={loadFleet} loadouts={loadouts} onSaveLoadout={saveLoadout} onDeleteLoadout={deleteLoadout} />
             </div>
           </div>
 
@@ -1334,7 +1346,7 @@ export function NavalCombat() {
               onCancelEdit={() => setEditingShip(null)}
             />
             <div className="mt-3">
-              <FleetLoadoutPanel faction="enemy" currentShips={enemyShips} onLoadFleet={loadFleet} />
+              <FleetLoadoutPanel faction="enemy" currentShips={enemyShips} onLoadFleet={loadFleet} loadouts={loadouts} onSaveLoadout={saveLoadout} onDeleteLoadout={deleteLoadout} />
             </div>
           </div>
         </div>
