@@ -32,8 +32,6 @@ export function rollReload(totalCannons: number): {
     percentage = 0.5
   } else if (d20 <= 15) {
     percentage = 0.75
-  } else if (d20 <= 19) {
-    percentage = 1.0
   } else {
     percentage = 1.0
   }
@@ -147,6 +145,7 @@ export function applyConditionEffects(ship: Ship): { damage: number; messages: s
 export function getACWithConditions(ship: Ship): number {
   let ac = ship.ac
   if (ship.conditions.includes('taking_water')) ac -= 2
+  if (ship.conditions.includes('bracing' as ShipCondition)) ac += 2
   return ac
 }
 

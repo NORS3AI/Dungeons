@@ -56,9 +56,7 @@ function ShipSVG({ faction, size = 80, sinking = false }: { faction: ShipFaction
     <svg width={size} height={size} viewBox="0 0 100 100" className={sinking ? 'opacity-40' : ''}>
       {/* Hull */}
       <path
-        d={faction === 'player'
-          ? 'M15,65 Q20,80 50,82 Q80,80 85,65 L80,55 L20,55 Z'
-          : 'M15,65 Q20,80 50,82 Q80,80 85,65 L80,55 L20,55 Z'}
+        d="M15,65 Q20,80 50,82 Q80,80 85,65 L80,55 L20,55 Z"
         fill={color}
         stroke="#1e293b"
         strokeWidth="2"
@@ -524,6 +522,14 @@ export function NavalCombat() {
   const [projectiles, setProjectiles] = useState<Projectile[]>([])
   const [victor, setVictor] = useState<ShipFaction | null>(null)
 
+  const projectileTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (projectileTimerRef.current) clearTimeout(projectileTimerRef.current)
+    }
+  }, [])
+
   // Turn state
   const [reloadResult, setReloadResult] = useState<{ roll: number; functional: number; fumble: boolean; critical: boolean } | null>(null)
   const [cannonsToLoad, setCannonsToLoad] = useState(0)
@@ -568,9 +574,11 @@ export function NavalCombat() {
     setRound(1)
     setPhase('combat')
     setTurnPhase('reload')
-    setBattleLog([])
     setProjectiles([])
-    addLog('system', 'Battle', 'Naval combat begins! All hands to battle stations!', 'info')
+    setBattleLog([{
+      id: createLogId(), round: 1, shipId: 'system', shipName: 'Battle',
+      message: 'Naval combat begins! All hands to battle stations!', type: 'info', timestamp: Date.now(),
+    }])
   }
 
   // ── Combat Actions ───────────────────────────────────────────────────────
@@ -578,15 +586,29 @@ export function NavalCombat() {
   const handleReload = () => {
     if (!currentShip) return
 
+    // Clear bracing from this ship's previous turn
+    if (currentShip.conditions.includes('bracing' as ShipCondition)) {
+      setShips(prev => prev.map(s =>
+        s.id === currentShip.id
+          ? { ...s, conditions: s.conditions.filter(c => c !== ('bracing' as ShipCondition)) }
+          : s
+      ))
+    }
+
+    // Track effective HP through this function to avoid stale-closure reads
+    let effectiveHP = currentShip.currentHP
+
     // Apply condition effects first
     const conditionEffects = applyConditionEffects(currentShip)
     if (conditionEffects.damage > 0) {
+      effectiveHP = Math.max(0, effectiveHP - conditionEffects.damage)
       setShips(prev => prev.map(s =>
         s.id === currentShip.id
           ? {
               ...s,
               currentHP: Math.max(0, s.currentHP - conditionEffects.damage),
               conditions: s.conditions.filter(c => !conditionEffects.removedConditions.includes(c)),
+              status: Math.max(0, s.currentHP - conditionEffects.damage) <= 0 ? 'sunk' as const : s.status,
             }
           : s
       ))
@@ -595,17 +617,24 @@ export function NavalCombat() {
       })
     }
 
+    // Ship killed by condition damage — skip
+    if (effectiveHP <= 0) {
+      addLog(currentShip.id, currentShip.name, `${currentShip.name} has been sunk by condition damage!`, 'damage')
+      advanceTurn()
+      return
+    }
+
     // Handle repairing ships
     if (currentShip.status === 'repairing') {
       const remaining = currentShip.repairTurnsRemaining - 1
       if (remaining <= 0) {
         const repair = rollRepairResult()
-        const healed = Math.min(repair.healAmount, currentShip.maxHP - currentShip.currentHP)
         setShips(prev => prev.map(s =>
           s.id === currentShip.id
-            ? { ...s, status: 'active', repairTurnsRemaining: 0, currentHP: Math.min(s.maxHP, s.currentHP + healed) }
+            ? { ...s, status: 'active', repairTurnsRemaining: 0, currentHP: Math.min(s.maxHP, s.currentHP + repair.healAmount) }
             : s
         ))
+        const healed = Math.min(repair.healAmount, currentShip.maxHP - effectiveHP)
         addLog(currentShip.id, currentShip.name,
           `Repairs complete! Rolled ${repair.roll} — restored ${healed} HP`,
           'heal',
@@ -638,12 +667,15 @@ export function NavalCombat() {
     setHitResult(null)
     setDamageResult(null)
 
+    effectiveHP = Math.max(0, effectiveHP - result.selfDamage)
+
     setShips(prev => prev.map(s =>
       s.id === currentShip.id
         ? {
             ...s,
             functionalCannons: adjusted,
             currentHP: Math.max(0, s.currentHP - result.selfDamage),
+            status: Math.max(0, s.currentHP - result.selfDamage) <= 0 ? 'sunk' as const : s.status,
           }
         : s
     ))
@@ -654,6 +686,11 @@ export function NavalCombat() {
         'fumble',
         { rolls: [{ notation: '1d20', result: result.roll }], damage: result.selfDamage },
       )
+      if (effectiveHP <= 0) {
+        addLog(currentShip.id, currentShip.name, `${currentShip.name} has been sunk by its own cannon misfire!`, 'damage')
+        advanceTurn()
+        return
+      }
     } else if (result.critical) {
       addLog(currentShip.id, currentShip.name,
         `PERFECT reload! All ${adjusted} cannons ready and crew is inspired!`,
@@ -714,7 +751,8 @@ export function NavalCombat() {
         damage: dmg.hullDamage,
         startTime: Date.now(),
       }])
-      setTimeout(() => setProjectiles([]), 1500)
+      if (projectileTimerRef.current) clearTimeout(projectileTimerRef.current)
+      projectileTimerRef.current = setTimeout(() => setProjectiles([]), 1500)
 
       const critText = result.critical ? 'CRITICAL HIT! ' : ''
       const chainText = selectedAmmo === 'chain'
@@ -746,7 +784,8 @@ export function NavalCombat() {
         damage: 0,
         startTime: Date.now(),
       }])
-      setTimeout(() => setProjectiles([]), 1500)
+      if (projectileTimerRef.current) clearTimeout(projectileTimerRef.current)
+      projectileTimerRef.current = setTimeout(() => setProjectiles([]), 1500)
 
       const fumbleText = result.fumble ? 'FUMBLE! ' : ''
       addLog(currentShip.id, currentShip.name,
@@ -762,6 +801,9 @@ export function NavalCombat() {
     setTurnPhase('resolve')
   }
 
+  const shipsRef = useRef(ships)
+  shipsRef.current = ships
+
   const advanceTurn = useCallback(() => {
     setReloadResult(null)
     setHitResult(null)
@@ -769,18 +811,26 @@ export function NavalCombat() {
     setCannonsToLoad(0)
     setSelectedTarget(null)
 
+    // Use ref to read current ships (avoids stale closure)
+    const currentShips = shipsRef.current
+
     // Check victory
-    const updatedShips = ships
-    if (isFleetDefeated(updatedShips, 'enemy')) {
+    if (isFleetDefeated(currentShips, 'enemy')) {
       setVictor('player')
       setPhase('finished')
-      addLog('system', 'Battle', 'VICTORY! The enemy fleet has been destroyed!', 'info')
+      setBattleLog(prev => [...prev, {
+        id: createLogId(), round: 0, shipId: 'system', shipName: 'Battle',
+        message: 'VICTORY! The enemy fleet has been destroyed!', type: 'info', timestamp: Date.now(),
+      }])
       return
     }
-    if (isFleetDefeated(updatedShips, 'player')) {
+    if (isFleetDefeated(currentShips, 'player')) {
       setVictor('enemy')
       setPhase('finished')
-      addLog('system', 'Battle', 'DEFEAT! Your fleet has been destroyed...', 'info')
+      setBattleLog(prev => [...prev, {
+        id: createLogId(), round: 0, shipId: 'system', shipName: 'Battle',
+        message: 'DEFEAT! Your fleet has been destroyed...', type: 'info', timestamp: Date.now(),
+      }])
       return
     }
 
@@ -794,7 +844,7 @@ export function NavalCombat() {
     // Skip sunk ships
     let attempts = 0
     while (attempts < turnOrder.length) {
-      const nextShip = ships.find(s => s.id === turnOrder[nextIndex])
+      const nextShip = currentShips.find(s => s.id === turnOrder[nextIndex])
       if (nextShip && nextShip.currentHP > 0 && nextShip.status !== 'sunk') break
       nextIndex++
       if (nextIndex >= turnOrder.length) {
@@ -807,7 +857,7 @@ export function NavalCombat() {
     setCurrentTurnIndex(nextIndex)
     setRound(nextRound)
     setTurnPhase('reload')
-  }, [ships, currentTurnIndex, turnOrder, round, addLog])
+  }, [currentTurnIndex, turnOrder, round])
 
   const handleEndTurn = () => {
     setTurnPhase('dm_actions')
@@ -900,9 +950,11 @@ export function NavalCombat() {
         break
       }
       case 'brace': {
-        setShips(prev => prev.map(s =>
-          s.id === shipId ? { ...s, ac: s.ac + 2 } : s
-        ))
+        if (!ship.conditions.includes('bracing' as ShipCondition)) {
+          setShips(prev => prev.map(s =>
+            s.id === shipId ? { ...s, conditions: [...s.conditions, 'bracing' as ShipCondition] } : s
+          ))
+        }
         addLog(shipId, ship.name, 'Braces for impact! +2 AC until next turn', 'ability')
         break
       }
@@ -918,7 +970,9 @@ export function NavalCombat() {
         )
         if (success) {
           setShips(prev => prev.map(s =>
-            s.id === targetId ? { ...s, conditions: [...s.conditions, 'crew_swept'] } : s
+            s.id === targetId && !s.conditions.includes('crew_swept')
+              ? { ...s, conditions: [...s.conditions, 'crew_swept'] }
+              : s
           ))
         }
         break
@@ -927,6 +981,7 @@ export function NavalCombat() {
   }
 
   const resetBattle = () => {
+    if (projectileTimerRef.current) clearTimeout(projectileTimerRef.current)
     setShips([])
     setPhase('setup')
     setTurnOrder([])
@@ -1048,16 +1103,20 @@ export function NavalCombat() {
         <div className={`text-center p-8 rounded-xl border-2 ${
           victor === 'player'
             ? 'bg-green-900/30 border-green-500'
-            : 'bg-red-900/30 border-red-500'
+            : victor === 'enemy'
+              ? 'bg-red-900/30 border-red-500'
+              : 'bg-gray-800/50 border-gray-500'
         }`}>
-          <div className="text-6xl mb-4">{victor === 'player' ? '🏆' : '💀'}</div>
-          <h2 className="text-4xl font-bold mb-2" style={{ color: victor === 'player' ? '#4ade80' : '#f87171' }}>
-            {victor === 'player' ? 'VICTORY!' : 'DEFEAT!'}
+          <div className="text-6xl mb-4">{victor === 'player' ? '🏆' : victor === 'enemy' ? '💀' : '⚓'}</div>
+          <h2 className="text-4xl font-bold mb-2" style={{ color: victor === 'player' ? '#4ade80' : victor === 'enemy' ? '#f87171' : '#9ca3af' }}>
+            {victor === 'player' ? 'VICTORY!' : victor === 'enemy' ? 'DEFEAT!' : 'Battle Ended'}
           </h2>
           <p className="text-gray-300">
             {victor === 'player'
               ? 'The enemy fleet has been destroyed! Collect the spoils!'
-              : 'Your fleet has been sunk... The sea claims all.'}
+              : victor === 'enemy'
+                ? 'Your fleet has been sunk... The sea claims all.'
+                : 'The DM has ended the battle.'}
           </p>
           <div className="mt-4 text-sm text-gray-400">
             Battle lasted {round} round{round !== 1 ? 's' : ''} | {battleLog.length} actions logged
