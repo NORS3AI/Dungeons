@@ -59,8 +59,11 @@ export function rollToHit(targetAC: number, bonus = 0): {
 }
 
 export function getDamageNotation(loadedCannons: number): string {
-  if (loadedCannons <= 20) return '2d8'
-  if (loadedCannons <= 60) return '4d8'
+  if (loadedCannons <= 8) return '1d8'
+  if (loadedCannons <= 15) return '2d8'
+  if (loadedCannons <= 25) return '3d8'
+  if (loadedCannons <= 40) return '4d8'
+  if (loadedCannons <= 58) return '5d8'
   return '6d8'
 }
 
@@ -68,8 +71,9 @@ export function rollCannonDamage(
   loadedCannons: number,
   ammoType: AmmoType,
   critical: boolean,
+  notationOverride?: string,
 ): { notation: string; total: number; rolls: number[]; hullDamage: number; conditionApplied: ShipCondition | null } {
-  const notation = getDamageNotation(loadedCannons)
+  const notation = notationOverride || getDamageNotation(loadedCannons)
   const match = notation.match(/^(\d+)d(\d+)$/)!
   const count = parseInt(match[1])
   const sides = parseInt(match[2])
@@ -164,11 +168,7 @@ export function isFleetDefeated(ships: Ship[], faction: ShipFaction): boolean {
 
 export function buildTurnOrder(ships: Ship[]): string[] {
   const active = ships.filter(s => s.status !== 'sunk' && s.currentHP > 0)
-  const withInit = active.map(s => ({
-    id: s.id,
-    initiative: roll(20),
-    faction: s.faction,
-  }))
-  withInit.sort((a, b) => b.initiative - a.initiative)
-  return withInit.map(s => s.id)
+  const allies = active.filter(s => s.faction === 'player')
+  const enemies = active.filter(s => s.faction === 'enemy')
+  return [...allies.map(s => s.id), ...enemies.map(s => s.id)]
 }

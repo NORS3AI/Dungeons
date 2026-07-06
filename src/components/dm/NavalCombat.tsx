@@ -37,6 +37,12 @@ const DEFAULT_ABILITIES: ShipAbility[] = [
   { id: 'boarding', name: 'Boarding Party', description: 'Send crew to board enemy ship (contested d20 check)' },
   { id: 'greek-fire', name: 'Greek Fire', description: 'Launch incendiary projectile — sets target on fire' },
   { id: 'brace', name: 'Brace for Impact', description: '+2 AC until next turn, but cannot fire' },
+  { id: 'harpoon', name: 'Harpoon Shot', description: '1d20 vs AC — 1d8 damage + entangles target (applies Mast Damaged)' },
+  { id: 'fore-cannons', name: 'Fore Cannons', description: 'Fire bow chasers: 1d20+2 vs AC for 1d10 damage — no reload needed' },
+  { id: 'aft-cannons', name: 'Aft Cannons', description: 'Fire stern chasers while retreating: 1d20 vs AC for 1d8 damage + +2 AC until next turn' },
+  { id: 'smoke-screen', name: 'Smoke Screen', description: 'Deploy smoke — attackers suffer -2 to hit this ship until next turn (+2 AC)' },
+  { id: 'grapeshot', name: 'Grapeshot', description: 'Anti-crew scatter fire: 1d20 vs AC, half damage but always applies Crew Swept' },
+  { id: 'broadside-volley', name: 'Broadside Volley', description: 'All-out broadside: double cannon damage dice but applies Mast Damaged to self' },
 ]
 
 function createShipId(): string {
@@ -129,18 +135,39 @@ function ShipForm({
   onCancelEdit?: () => void
 }) {
   const [name, setName] = useState('')
-  const [ac, setAc] = useState(15)
-  const [hp, setHp] = useState(100)
-  const [cannons, setCannons] = useState(20)
+  const [acStr, setAcStr] = useState('15')
+  const [hpStr, setHpStr] = useState('100')
+  const [cannonsStr, setCannonsStr] = useState('20')
+  const [speedStr, setSpeedStr] = useState('30')
+  const [crewStr, setCrewStr] = useState('20')
+  const [damageStr, setDamageStr] = useState(getDamageNotation(20))
+  const [damageIsAuto, setDamageIsAuto] = useState(true)
   const [abilities, setAbilities] = useState<ShipAbility[]>([])
   const [showAbilities, setShowAbilities] = useState(false)
+  const [customAbilityName, setCustomAbilityName] = useState('')
+  const [customAbilityDesc, setCustomAbilityDesc] = useState('')
+
+  const acVal = Math.max(1, parseInt(acStr) || 0)
+  const hpVal = Math.max(1, parseInt(hpStr) || 0)
+  const cannonsVal = Math.max(1, parseInt(cannonsStr) || 1)
+  const speedVal = Math.max(10, parseInt(speedStr) || 10)
+  const crewVal = Math.max(0, parseInt(crewStr) || 0)
 
   useEffect(() => {
     if (editingShip) {
       setName(editingShip.name)
-      setAc(editingShip.ac)
-      setHp(editingShip.maxHP)
-      setCannons(editingShip.totalCannons)
+      setAcStr(String(editingShip.ac))
+      setHpStr(String(editingShip.maxHP))
+      setCannonsStr(String(editingShip.totalCannons))
+      setSpeedStr(String(editingShip.speed))
+      setCrewStr(String(editingShip.crew))
+      if (editingShip.damageOverride) {
+        setDamageStr(editingShip.damageOverride)
+        setDamageIsAuto(false)
+      } else {
+        setDamageStr(getDamageNotation(editingShip.totalCannons))
+        setDamageIsAuto(true)
+      }
       setAbilities([...editingShip.abilities])
       setShowAbilities(editingShip.abilities.length > 0)
     }
@@ -148,24 +175,35 @@ function ShipForm({
 
   const resetForm = () => {
     setName('')
-    setAc(15)
-    setHp(100)
-    setCannons(20)
+    setAcStr('15')
+    setHpStr('100')
+    setCannonsStr('20')
+    setSpeedStr('30')
+    setCrewStr('20')
+    setDamageStr(getDamageNotation(20))
+    setDamageIsAuto(true)
     setAbilities([])
+    setShowAbilities(false)
+    setCustomAbilityName('')
+    setCustomAbilityDesc('')
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!name.trim()) return
+    const dmgOverride = damageIsAuto ? undefined : (damageStr.trim() || undefined)
     if (editingShip && onUpdate) {
       onUpdate({
         ...editingShip,
         name: name.trim(),
-        ac,
-        maxHP: hp,
-        currentHP: hp,
-        totalCannons: cannons,
-        functionalCannons: cannons,
+        ac: acVal,
+        maxHP: hpVal,
+        currentHP: hpVal,
+        speed: speedVal,
+        crew: crewVal,
+        totalCannons: cannonsVal,
+        functionalCannons: cannonsVal,
+        damageOverride: dmgOverride,
         abilities: [...abilities],
       })
       resetForm()
@@ -175,13 +213,16 @@ function ShipForm({
       id: createShipId(),
       name: name.trim(),
       faction,
-      ac,
-      maxHP: hp,
-      currentHP: hp,
-      totalCannons: cannons,
-      functionalCannons: cannons,
+      ac: acVal,
+      maxHP: hpVal,
+      currentHP: hpVal,
+      speed: speedVal,
+      crew: crewVal,
+      totalCannons: cannonsVal,
+      functionalCannons: cannonsVal,
       loadedCannons: 0,
       ammoType: 'ball',
+      damageOverride: dmgOverride,
       abilities: [...abilities],
       status: 'active',
       repairTurnsRemaining: 0,
@@ -198,6 +239,20 @@ function ShipForm({
     )
   }
 
+  const addCustomAbility = () => {
+    if (!customAbilityName.trim()) return
+    setAbilities(prev => [...prev, {
+      id: `custom-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      name: customAbilityName.trim(),
+      description: customAbilityDesc.trim(),
+    }])
+    setCustomAbilityName('')
+    setCustomAbilityDesc('')
+  }
+
+  const customAbilities = abilities.filter(a => !DEFAULT_ABILITIES.find(d => d.id === a.id))
+  const inputClass = 'w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white text-sm focus:border-dnd-gold focus:outline-none'
+
   return (
     <form onSubmit={handleSubmit} className={`bg-gray-800 rounded-lg p-3 sm:p-4 border ${editingShip ? 'border-blue-500 ring-1 ring-blue-500/30' : 'border-gray-700'}`}>
       {editingShip && (
@@ -211,49 +266,75 @@ function ShipForm({
             value={name}
             onChange={e => setName(e.target.value)}
             placeholder={faction === 'player' ? 'HMS Victory' : 'The Black Pearl'}
-            className="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white text-sm
-                       focus:border-dnd-gold focus:outline-none"
+            className={inputClass}
           />
         </div>
         <div>
           <label className="block text-xs text-gray-400 mb-1">Armor Class</label>
-          <input
-            type="number"
-            value={ac}
-            onChange={e => setAc(Number(e.target.value))}
-            min={1}
-            max={30}
-            className="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white text-sm
-                       focus:border-dnd-gold focus:outline-none"
-          />
+          <input type="text" inputMode="numeric" value={acStr}
+            onChange={e => setAcStr(e.target.value)}
+            onBlur={e => setAcStr(String(Math.max(1, parseInt(e.target.value) || 15)))}
+            className={inputClass} />
         </div>
         <div>
           <label className="block text-xs text-gray-400 mb-1">Hit Points</label>
-          <input
-            type="number"
-            value={hp}
-            onChange={e => setHp(Number(e.target.value))}
-            min={1}
-            className="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white text-sm
-                       focus:border-dnd-gold focus:outline-none"
-          />
+          <input type="text" inputMode="numeric" value={hpStr}
+            onChange={e => setHpStr(e.target.value)}
+            onBlur={e => setHpStr(String(Math.max(1, parseInt(e.target.value) || 100)))}
+            className={inputClass} />
         </div>
         <div>
           <label className="block text-xs text-gray-400 mb-1">Cannon Count</label>
-          <input
-            type="number"
-            value={cannons}
-            onChange={e => setCannons(Number(e.target.value))}
-            min={1}
-            className="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white text-sm
-                       focus:border-dnd-gold focus:outline-none"
-          />
+          <input type="text" inputMode="numeric" value={cannonsStr}
+            onChange={e => {
+              setCannonsStr(e.target.value)
+              if (damageIsAuto) {
+                const n = Math.max(1, parseInt(e.target.value) || 1)
+                setDamageStr(getDamageNotation(n))
+              }
+            }}
+            onBlur={e => setCannonsStr(String(Math.max(1, parseInt(e.target.value) || 1)))}
+            className={inputClass} />
         </div>
         <div>
-          <label className="block text-xs text-gray-400 mb-1">Damage</label>
-          <div className="bg-gray-900 border border-gray-600 rounded px-3 py-2 text-dnd-gold text-sm font-mono">
-            {getDamageNotation(cannons)}
-          </div>
+          <label className="block text-xs text-gray-400 mb-1">
+            Speed (ft) <span className="text-cyan-500 text-[10px]">+{Math.floor(speedVal / 10)} init</span>
+          </label>
+          <input type="text" inputMode="numeric" value={speedStr}
+            onChange={e => setSpeedStr(e.target.value)}
+            onBlur={e => setSpeedStr(String(Math.max(10, parseInt(e.target.value) || 30)))}
+            className={inputClass} />
+        </div>
+        <div>
+          <label className="block text-xs text-gray-400 mb-1">Crew Size</label>
+          <input type="text" inputMode="numeric" value={crewStr}
+            onChange={e => setCrewStr(e.target.value)}
+            onBlur={e => setCrewStr(String(Math.max(0, parseInt(e.target.value) || 0)))}
+            className={inputClass} />
+        </div>
+        <div>
+          <label className="block text-xs text-gray-400 mb-1 flex items-center gap-1">
+            Damage
+            {!damageIsAuto && (
+              <button
+                type="button"
+                onClick={() => { setDamageIsAuto(true); setDamageStr(getDamageNotation(cannonsVal)) }}
+                className="ml-1 text-[10px] text-cyan-400 hover:text-cyan-300 underline"
+              >
+                ↺ auto
+              </button>
+            )}
+          </label>
+          <input
+            type="text"
+            value={damageStr}
+            onChange={e => { setDamageStr(e.target.value); setDamageIsAuto(false) }}
+            placeholder={getDamageNotation(cannonsVal)}
+            className={`${inputClass} font-mono ${damageIsAuto ? 'text-dnd-gold' : 'text-white'}`}
+          />
+          {damageIsAuto && (
+            <div className="text-[10px] text-gray-600 mt-0.5">Auto from cannon count</div>
+          )}
         </div>
       </div>
 
@@ -281,11 +362,64 @@ function ShipForm({
                 </div>
               </label>
             ))}
+
+            {/* Custom abilities already added */}
+            {customAbilities.length > 0 && (
+              <div className="border-t border-gray-700 pt-2 mt-1">
+                <div className="text-[10px] text-purple-400 uppercase tracking-wider mb-1">Custom Abilities</div>
+                {customAbilities.map(a => (
+                  <div key={a.id} className="flex items-start gap-2 p-1.5 rounded bg-purple-900/20 border border-purple-700/30 mb-1">
+                    <div className="flex-1 min-w-0">
+                      <span className="text-sm text-purple-300 font-medium">{a.name}</span>
+                      {a.description && <p className="text-xs text-gray-400">{a.description}</p>}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setAbilities(prev => prev.filter(x => x.id !== a.id))}
+                      className="text-gray-600 hover:text-red-400 transition-colors text-xs flex-shrink-0 mt-0.5"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Add custom ability */}
+            <div className="border-t border-gray-700 pt-2 mt-1">
+              <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-1.5">Add custom ability</div>
+              <div className="flex gap-2 mb-1.5">
+                <input
+                  type="text"
+                  value={customAbilityName}
+                  onChange={e => setCustomAbilityName(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addCustomAbility() } }}
+                  placeholder="Ability name..."
+                  className="flex-1 bg-gray-900 border border-gray-600 rounded px-2 py-1 text-white text-xs focus:border-purple-500 focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={addCustomAbility}
+                  disabled={!customAbilityName.trim()}
+                  className="px-2 py-1 rounded text-xs font-bold bg-purple-900 text-purple-300 hover:bg-purple-800
+                             disabled:opacity-40 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
+                >
+                  + Add
+                </button>
+              </div>
+              <input
+                type="text"
+                value={customAbilityDesc}
+                onChange={e => setCustomAbilityDesc(e.target.value)}
+                placeholder="Description (optional)..."
+                className="w-full bg-gray-900 border border-gray-600 rounded px-2 py-1 text-white text-xs focus:border-purple-500 focus:outline-none"
+              />
+            </div>
           </div>
         )}
       </div>
 
-      <div className={`mt-3 flex gap-2 ${editingShip ? '' : ''}`}>
+      <div className="mt-3 flex gap-2">
         <button
           type="submit"
           disabled={!name.trim()}
@@ -324,7 +458,7 @@ function SetupShipCard({ ship, onRemove, onEdit, onDuplicate }: {
       <div className="flex-1 min-w-0">
         <div className="font-bold text-white text-sm truncate">{ship.name}</div>
         <div className="text-xs text-gray-400">
-          AC {ship.ac} | HP {ship.maxHP} | {ship.totalCannons} cannons ({getDamageNotation(ship.totalCannons)})
+          AC {ship.ac} | HP {ship.maxHP} | {ship.totalCannons} cannons ({ship.damageOverride || getDamageNotation(ship.totalCannons)}) | Spd {ship.speed}ft{ship.crew > 0 ? ` | Crew ${ship.crew}` : ''}
         </div>
         {ship.abilities.length > 0 && (
           <div className="text-xs text-purple-400 mt-0.5">
@@ -421,6 +555,9 @@ function BattleScene({
                     <span className="text-[10px] bg-gray-800 px-1 rounded text-cyan-300">
                       {ship.functionalCannons}/{ship.totalCannons} guns
                     </span>
+                    <span className="text-[10px] bg-gray-800 px-1 rounded text-green-300">
+                      {ship.speed}ft
+                    </span>
                     {ship.conditions.map(c => (
                       <span key={c} className={`text-[10px] ${CONDITION_LABELS[c].color}`}>
                         {CONDITION_LABELS[c].icon}
@@ -474,6 +611,9 @@ function BattleScene({
                     <span className="text-[10px] bg-gray-800 px-1 rounded text-gray-300">AC {getACWithConditions(ship)}</span>
                     <span className="text-[10px] bg-gray-800 px-1 rounded text-cyan-300">
                       {ship.functionalCannons}/{ship.totalCannons} guns
+                    </span>
+                    <span className="text-[10px] bg-gray-800 px-1 rounded text-green-300">
+                      {ship.speed}ft
                     </span>
                     {ship.conditions.map(c => (
                       <span key={c} className={`text-[10px] ${CONDITION_LABELS[c].color}`}>
@@ -580,7 +720,10 @@ interface ShipTemplate {
   name: string
   ac: number
   maxHP: number
+  speed: number
+  crew: number
   totalCannons: number
+  damageOverride?: string
   abilities: ShipAbility[]
 }
 
@@ -638,7 +781,10 @@ function FleetLoadoutPanel({
         name: s.name,
         ac: s.ac,
         maxHP: s.maxHP,
+        speed: s.speed,
+        crew: s.crew,
         totalCannons: s.totalCannons,
+        damageOverride: s.damageOverride,
         abilities: [...s.abilities],
       })),
       savedAt: Date.now(),
@@ -816,10 +962,13 @@ export function NavalCombat() {
       ac: t.ac,
       maxHP: t.maxHP,
       currentHP: t.maxHP,
+      speed: t.speed ?? 30,
+      crew: t.crew ?? 0,
       totalCannons: t.totalCannons,
       functionalCannons: t.totalCannons,
       loadedCannons: 0,
       ammoType: 'ball' as const,
+      damageOverride: t.damageOverride,
       abilities: [...t.abilities],
       status: 'active' as const,
       repairTurnsRemaining: 0,
@@ -986,7 +1135,7 @@ export function NavalCombat() {
     setHitResult(result)
 
     if (result.hit) {
-      const dmg = rollCannonDamage(cannonsToLoad, selectedAmmo, result.critical)
+      const dmg = rollCannonDamage(cannonsToLoad, selectedAmmo, result.critical, currentShip.damageOverride)
       setDamageResult(dmg)
 
       setShips(prev => prev.map(s => {
@@ -1240,6 +1389,130 @@ export function NavalCombat() {
         }
         break
       }
+      case 'harpoon': {
+        if (!target) return
+        const harpoonHit = rollToHit(getACWithConditions(target))
+        if (harpoonHit.hit) {
+          const dmg = Math.floor(Math.random() * 8) + 1
+          setShips(prev => prev.map(s => {
+            if (s.id === targetId) {
+              const newConds = [...s.conditions]
+              if (!newConds.includes('mast_damaged')) newConds.push('mast_damaged')
+              return { ...s, currentHP: Math.max(0, s.currentHP - dmg), conditions: newConds, status: Math.max(0, s.currentHP - dmg) <= 0 ? 'sunk' as const : s.status }
+            }
+            return s
+          }))
+          addLog(shipId, ship.name, `Harpoon Shot HITS ${target.name} for ${dmg} damage! Target entangled (Mast Damaged)`, 'ability', {
+            damage: dmg, targetShipName: target.name,
+            rolls: [{ notation: '1d20', result: harpoonHit.roll, details: `vs AC ${getACWithConditions(target)}` }, { notation: '1d8', result: dmg }],
+          })
+        } else {
+          addLog(shipId, ship.name, `Harpoon Shot misses ${target.name}! (rolled ${harpoonHit.roll})`, 'miss', { targetShipName: target.name })
+        }
+        break
+      }
+      case 'fore-cannons': {
+        if (!target) return
+        const foreHit = rollToHit(getACWithConditions(target), 2)
+        if (foreHit.hit) {
+          const dmg = Math.floor(Math.random() * 10) + 1
+          setShips(prev => prev.map(s =>
+            s.id === targetId ? { ...s, currentHP: Math.max(0, s.currentHP - dmg), status: Math.max(0, s.currentHP - dmg) <= 0 ? 'sunk' as const : s.status } : s
+          ))
+          addLog(shipId, ship.name, `Fore Cannons HITS ${target.name} for ${dmg} damage! (bow chasers, no reload required)`, 'ability', {
+            damage: dmg, targetShipName: target.name,
+            rolls: [{ notation: '1d20+2', result: foreHit.total, details: `vs AC ${getACWithConditions(target)}` }, { notation: '1d10', result: dmg }],
+          })
+        } else {
+          addLog(shipId, ship.name, `Fore Cannons miss ${target.name}! (rolled ${foreHit.roll}+2=${foreHit.total})`, 'miss', { targetShipName: target.name })
+        }
+        break
+      }
+      case 'aft-cannons': {
+        if (!target) return
+        setShips(prev => prev.map(s =>
+          s.id === shipId && !s.conditions.includes('bracing' as ShipCondition)
+            ? { ...s, conditions: [...s.conditions, 'bracing' as ShipCondition] }
+            : s
+        ))
+        const aftHit = rollToHit(getACWithConditions(target))
+        if (aftHit.hit) {
+          const dmg = Math.floor(Math.random() * 8) + 1
+          setShips(prev => prev.map(s =>
+            s.id === targetId ? { ...s, currentHP: Math.max(0, s.currentHP - dmg), status: Math.max(0, s.currentHP - dmg) <= 0 ? 'sunk' as const : s.status } : s
+          ))
+          addLog(shipId, ship.name, `Aft Cannons HITS ${target.name} for ${dmg} damage while retreating! (+2 AC until next turn)`, 'ability', {
+            damage: dmg, targetShipName: target.name,
+            rolls: [{ notation: '1d20', result: aftHit.roll, details: `vs AC ${getACWithConditions(target)}` }, { notation: '1d8', result: dmg }],
+          })
+        } else {
+          addLog(shipId, ship.name, `Aft Cannons miss ${target.name}! Retreating with +2 AC. (rolled ${aftHit.roll})`, 'miss', { targetShipName: target.name })
+        }
+        break
+      }
+      case 'smoke-screen': {
+        setShips(prev => prev.map(s =>
+          s.id === shipId && !s.conditions.includes('bracing' as ShipCondition)
+            ? { ...s, conditions: [...s.conditions, 'bracing' as ShipCondition] }
+            : s
+        ))
+        addLog(shipId, ship.name, 'Deploys smoke screen! Attackers suffer -2 to hit this ship (+2 AC) until next turn', 'ability')
+        break
+      }
+      case 'grapeshot': {
+        if (!target) return
+        const grapeHit = rollToHit(getACWithConditions(target))
+        if (grapeHit.hit) {
+          const fullDmg = rollCannonDamage(ship.functionalCannons, 'ball', grapeHit.critical, ship.damageOverride)
+          const dmg = Math.floor(fullDmg.total / 2)
+          setShips(prev => prev.map(s => {
+            if (s.id === targetId) {
+              const newConds = [...s.conditions]
+              if (!newConds.includes('crew_swept')) newConds.push('crew_swept')
+              return { ...s, currentHP: Math.max(0, s.currentHP - dmg), conditions: newConds, status: Math.max(0, s.currentHP - dmg) <= 0 ? 'sunk' as const : s.status }
+            }
+            return s
+          }))
+          addLog(shipId, ship.name, `Grapeshot HITS ${target.name} for ${dmg} scatter damage — Crew Swept!`, 'ability', {
+            damage: dmg, targetShipName: target.name,
+            rolls: [{ notation: '1d20', result: grapeHit.roll, details: `vs AC ${getACWithConditions(target)}` }],
+          })
+        } else {
+          addLog(shipId, ship.name, `Grapeshot misses ${target.name}! (rolled ${grapeHit.roll})`, 'miss', { targetShipName: target.name })
+        }
+        break
+      }
+      case 'broadside-volley': {
+        if (!target) return
+        setShips(prev => prev.map(s =>
+          s.id === shipId && !s.conditions.includes('mast_damaged')
+            ? { ...s, conditions: [...s.conditions, 'mast_damaged'] }
+            : s
+        ))
+        const broadsideHit = rollToHit(getACWithConditions(target))
+        if (broadsideHit.hit) {
+          const dmg = rollCannonDamage(ship.functionalCannons, 'ball', true, ship.damageOverride)
+          setShips(prev => prev.map(s =>
+            s.id === targetId ? { ...s, currentHP: Math.max(0, s.currentHP - dmg.hullDamage), status: Math.max(0, s.currentHP - dmg.hullDamage) <= 0 ? 'sunk' as const : s.status } : s
+          ))
+          addLog(shipId, ship.name, `BROADSIDE VOLLEY HITS ${target.name} for ${dmg.hullDamage} damage! (double dice — Mast Damaged to self)`, 'critical', {
+            damage: dmg.hullDamage, targetShipName: target.name,
+            rolls: [
+              { notation: '1d20', result: broadsideHit.roll, details: `vs AC ${getACWithConditions(target)}` },
+              { notation: dmg.notation, result: dmg.total, details: `[${dmg.rolls.join(', ')}]` },
+            ],
+          })
+        } else {
+          addLog(shipId, ship.name, `Broadside Volley misses ${target.name}! Took Mast Damaged for nothing. (rolled ${broadsideHit.roll})`, 'fumble', { targetShipName: target.name })
+        }
+        break
+      }
+      default: {
+        addLog(shipId, ship.name, `Uses ${ability.name}${target ? ` on ${target.name}` : ''}: ${ability.description}`, 'ability', {
+          targetShipName: target?.name,
+        })
+        break
+      }
     }
   }
 
@@ -1354,18 +1627,30 @@ export function NavalCombat() {
         {/* Damage Reference */}
         <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
           <h4 className="text-sm font-bold text-dnd-gold mb-2">Cannon Damage Reference</h4>
-          <div className="grid grid-cols-3 gap-2 sm:gap-4 text-center">
-            <div className="bg-gray-900 p-3 rounded">
-              <div className="text-2xl font-bold text-white font-mono">2d8</div>
-              <div className="text-xs text-gray-400 mt-1">1-20 cannons loaded</div>
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 text-center">
+            <div className="bg-gray-900 p-2 rounded">
+              <div className="text-lg font-bold text-gray-300 font-mono">1d8</div>
+              <div className="text-[10px] text-gray-500 mt-0.5">1–8 cannons</div>
             </div>
-            <div className="bg-gray-900 p-3 rounded">
-              <div className="text-2xl font-bold text-dnd-gold font-mono">4d8</div>
-              <div className="text-xs text-gray-400 mt-1">21-60 cannons loaded</div>
+            <div className="bg-gray-900 p-2 rounded">
+              <div className="text-lg font-bold text-white font-mono">2d8</div>
+              <div className="text-[10px] text-gray-500 mt-0.5">9–15 cannons</div>
             </div>
-            <div className="bg-gray-900 p-3 rounded">
-              <div className="text-2xl font-bold text-red-400 font-mono">6d8</div>
-              <div className="text-xs text-gray-400 mt-1">61+ cannons loaded</div>
+            <div className="bg-gray-900 p-2 rounded">
+              <div className="text-lg font-bold text-yellow-300 font-mono">3d8</div>
+              <div className="text-[10px] text-gray-500 mt-0.5">16–25 cannons</div>
+            </div>
+            <div className="bg-gray-900 p-2 rounded">
+              <div className="text-lg font-bold text-dnd-gold font-mono">4d8</div>
+              <div className="text-[10px] text-gray-500 mt-0.5">26–40 cannons</div>
+            </div>
+            <div className="bg-gray-900 p-2 rounded">
+              <div className="text-lg font-bold text-orange-400 font-mono">5d8</div>
+              <div className="text-[10px] text-gray-500 mt-0.5">41–58 cannons</div>
+            </div>
+            <div className="bg-gray-900 p-2 rounded">
+              <div className="text-lg font-bold text-red-400 font-mono">6d8</div>
+              <div className="text-[10px] text-gray-500 mt-0.5">59+ cannons</div>
             </div>
           </div>
           <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 text-xs text-gray-400">
@@ -1536,7 +1821,7 @@ export function NavalCombat() {
                     <span className="text-white font-mono w-10 text-right">{cannonsToLoad}</span>
                   </div>
                   <div className="text-xs text-gray-500 mt-1">
-                    Damage: <span className="text-dnd-gold font-mono">{getDamageNotation(cannonsToLoad)}</span>
+                    Damage: <span className="text-dnd-gold font-mono">{currentShip?.damageOverride || getDamageNotation(cannonsToLoad)}</span>
                   </div>
                 </div>
 
@@ -1759,7 +2044,7 @@ export function NavalCombat() {
                           <button
                             key={ability.id}
                             onClick={() => {
-                              const needsTarget = ['ram', 'greek-fire', 'boarding'].includes(ability.id)
+                              const needsTarget = ['ram', 'greek-fire', 'boarding', 'harpoon', 'fore-cannons', 'aft-cannons', 'grapeshot', 'broadside-volley'].includes(ability.id)
                               if (needsTarget) {
                                 const targets = ships.filter(s => s.faction !== ship.faction && s.currentHP > 0)
                                 if (targets.length === 1) {

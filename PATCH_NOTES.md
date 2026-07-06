@@ -1,5 +1,44 @@
 # Dungeons - Patch Notes
 
+## Version 0.6.3-beta - July 06, 2026
+
+**Beta Release Notice**: Naval ship stats expansion — crew, custom damage, 6 new abilities, and smarter turn order.
+
+### Naval Battle Simulator Enhancements
+
+#### **Expanded Ship Stats**
+- **Crew Size** field added to ship forms — track how many sailors are on board
+- **Editable Damage** — damage notation now editable per ship; auto-calculates from cannon count but DM can override (e.g. `2d10` for a special ship). Click "↺ auto" to reset to auto.
+- Revised damage tiers: 1–8 cannons = 1d8, 9–15 = 2d8, 16–25 = 3d8, 26–40 = 4d8, 41–58 = 5d8, 59+ = 6d8
+- Speed field now shows inline initiative bonus (+X) next to the label
+- Ship setup cards show crew size when > 0
+
+#### **Custom Abilities**
+- DMs can now add hand-written ship abilities with a name and description
+- Appears in the abilities section — custom abilities show in purple with an X to remove
+- Custom abilities fire in combat and log the description — the DM decides the mechanical effect
+
+#### **6 New Built-in Abilities**
+- **Harpoon Shot** — 1d20 vs AC, 1d8 damage + applies Mast Damaged to target
+- **Fore Cannons** — bow chasers, 1d20+2 vs AC, 1d10 damage, no reload required
+- **Aft Cannons** — stern chasers while retreating: 1d20 vs AC, 1d8 + gains +2 AC until next turn
+- **Smoke Screen** — deploys smoke for +2 AC until next turn, no target needed
+- **Grapeshot** — scatter shot: 1d20 vs AC, half cannon damage but always applies Crew Swept
+- **Broadside Volley** — all-out broadside: double damage dice but applies Mast Damaged to self
+
+#### **Faction-Based Turn Order**
+- All ally ships now take their turns first (in setup order), then all enemy ships
+- Removes random initiative — DM controls pacing more predictably
+
+#### **Input Fixes**
+- Number fields (AC, HP, Cannons, Speed, Crew) now use text input mode — no more "020" glitch when clearing and retyping values
+- Fields normalize to valid minimums on blur
+
+#### **Save/Load Updated**
+- Fleet loadouts now preserve crew size, custom damage notation, and speed correctly
+
+**Why This Matters**: DMs get full control over ship customization without being locked to fixed stats.
+
 ## Version 0.6.2-beta - July 06, 2026
 
 **Beta Release Notice**: Fleet loadout save/load system for the Naval Battle Simulator.

@@ -16,10 +16,13 @@ export interface Ship {
   ac: number
   maxHP: number
   currentHP: number
+  speed: number
+  crew: number
   totalCannons: number
   functionalCannons: number
   loadedCannons: number
   ammoType: AmmoType
+  damageOverride?: string
   abilities: ShipAbility[]
   status: ShipStatus
   repairTurnsRemaining: number
