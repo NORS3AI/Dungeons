@@ -301,8 +301,17 @@ export const useCharacterStore = create<CharacterState>()(
         loadCharacter: (id: string) => {
           const character = get().characters.find((c) => c.id === id)
           if (character) {
+            const loaded = needsMigration(character)
+              ? migrateCharacter(character)
+              : { ...character }
+
+            const updatedCharacters = needsMigration(character)
+              ? get().characters.map((c) => (c.id === id ? loaded : c))
+              : get().characters
+
             set({
-              currentCharacter: { ...character },
+              currentCharacter: loaded,
+              characters: updatedCharacters,
               history: { past: [], future: [] },
             })
           }
@@ -1166,13 +1175,14 @@ export const useCharacterStore = create<CharacterState>()(
         grantMaterialToAllCharacters: (material: Material, quantity: number) => {
           const { characters } = get()
           const updatedCharacters = characters.map((character) => {
-            const existingIndex = character.materials.findIndex((m) => m.id === material.id)
+            const mats = character.materials ?? []
+            const existingIndex = mats.findIndex((m) => m.id === material.id)
             const updatedMaterials =
               existingIndex >= 0
-                ? character.materials.map((m, i) =>
+                ? mats.map((m, i) =>
                     i === existingIndex ? { ...m, quantity: m.quantity + quantity } : m
                   )
-                : [...character.materials, { ...material, quantity }]
+                : [...mats, { ...material, quantity }]
             return { ...character, materials: updatedMaterials }
           })
           set({ characters: updatedCharacters })
@@ -1787,6 +1797,13 @@ export const useCharacterStore = create<CharacterState>()(
         partialize: (state) => ({
           characters: state.characters,
         }),
+        merge: (persisted, current) => {
+          const p = persisted as { characters?: any[] }
+          const chars = (p?.characters ?? []).map((c: any) =>
+            needsMigration(c) ? migrateCharacter(c) : c
+          )
+          return { ...current, characters: chars } as any
+        },
       }
     ),
     { name: 'CharacterStore' }

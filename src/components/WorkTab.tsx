@@ -232,7 +232,7 @@ export function WorkTab({ character }: WorkTabProps) {
   const skillValue = skills[info.skill]
 
   const ownedMats = useMemo(() => {
-    const filtered = character.materials.filter((m) =>
+    const filtered = (character.materials ?? []).filter((m) =>
       info.matCategory.includes(m.category as Material['category'])
     )
     // Consolidate duplicate IDs into single entries

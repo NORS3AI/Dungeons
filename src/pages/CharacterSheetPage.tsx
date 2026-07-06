@@ -157,14 +157,14 @@ export function CharacterSheetPage() {
 
   // Initialize resource pools if character doesn't have any
   useEffect(() => {
-    if (currentCharacter && currentCharacter.class && currentCharacter.resourcePools.length === 0) {
+    if (currentCharacter && currentCharacter.class && (currentCharacter.resourcePools?.length ?? 0) === 0) {
       initializeResourcePools()
     }
   }, [currentCharacter?.id, currentCharacter?.class?.id, initializeResourcePools])
 
   // Initialize feature charges if character doesn't have any
   useEffect(() => {
-    if (currentCharacter && currentCharacter.class && currentCharacter.featureCharges.length === 0) {
+    if (currentCharacter && currentCharacter.class && (currentCharacter.featureCharges?.length ?? 0) === 0) {
       initializeFeatureCharges()
     }
   }, [currentCharacter?.id, currentCharacter?.class?.id, currentCharacter?.level, initializeFeatureCharges])
@@ -181,6 +181,38 @@ export function CharacterSheetPage() {
   }, [showActionsMenu])
 
   const character = currentCharacter
+
+  const consolidatedMaterials = useMemo(() => {
+    const mats = currentCharacter?.materials ?? []
+    const map = new Map<string, Material>()
+    for (const m of mats) {
+      const existing = map.get(m.id)
+      if (existing) {
+        map.set(m.id, { ...existing, quantity: existing.quantity + m.quantity })
+      } else {
+        map.set(m.id, { ...m })
+      }
+    }
+    return Array.from(map.values())
+  }, [currentCharacter?.materials])
+
+  const bagsOfHolding = useMemo(
+    () => (currentCharacter?.equipment ?? []).filter((i) => (i.weightReduction ?? 0) > 0),
+    [currentCharacter?.equipment]
+  )
+
+  const armorAddonRegex = /^armor\s*\+(\d+)$/i
+  const armorAddonItems = useMemo(
+    () => (currentCharacter?.equipment ?? []).filter((i) => armorAddonRegex.test(i.name.trim())),
+    [currentCharacter?.equipment]
+  )
+  const armorAddonBonus = useMemo(
+    () => armorAddonItems.reduce((sum, i) => {
+      const match = i.name.match(/\+(\d+)/)
+      return sum + (match ? parseInt(match[1]) : 0)
+    }, 0),
+    [armorAddonItems]
+  )
 
   if (!character) {
     return (
@@ -260,7 +292,7 @@ export function CharacterSheetPage() {
     baseAC += addonBonus
 
     // Apply enraged condition penalty
-    if (character.conditions.includes('enraged')) {
+    if (character.conditions?.includes('enraged')) {
       baseAC -= 1
     }
 
@@ -564,7 +596,7 @@ export function CharacterSheetPage() {
   }
 
   const handleSellMaterial = (materialId: string) => {
-    const material = character.materials.find(m => m.id === materialId)
+    const material = (character.materials ?? []).find(m => m.id === materialId)
     if (!material) return
 
     // Calculate sell price based on rarity and category
@@ -755,7 +787,7 @@ export function CharacterSheetPage() {
   const handleRollSpellAttack = (spellId: string, spellcastingAbility: string) => {
     // Death Knights spend 1 Runic Power when casting spells
     if (character.class?.id === 'death-knight') {
-      const runicPower = character.resourcePools.find(pool => pool.id === 'runic-power')
+      const runicPower = (character.resourcePools ?? []).find(pool => pool.id === 'runic-power')
       if (!runicPower || runicPower.current < 1) {
         // Not enough Runic Power
         return
@@ -792,7 +824,7 @@ export function CharacterSheetPage() {
   const handleRollSpellDamage = (spellId: string, damageDice: string) => {
     // Death Knights spend 1 Runic Power when casting spells
     if (character.class?.id === 'death-knight') {
-      const runicPower = character.resourcePools.find(pool => pool.id === 'runic-power')
+      const runicPower = (character.resourcePools ?? []).find(pool => pool.id === 'runic-power')
       if (!runicPower || runicPower.current < 1) {
         // Not enough Runic Power
         return
@@ -823,7 +855,7 @@ export function CharacterSheetPage() {
   const handleRollSpellHealing = (spellId: string, healingDice: string) => {
     // Death Knights spend 1 Runic Power when casting spells
     if (character.class?.id === 'death-knight') {
-      const runicPower = character.resourcePools.find(pool => pool.id === 'runic-power')
+      const runicPower = (character.resourcePools ?? []).find(pool => pool.id === 'runic-power')
       if (!runicPower || runicPower.current < 1) {
         // Not enough Runic Power
         return
@@ -912,7 +944,7 @@ export function CharacterSheetPage() {
 
   const handleUseAbility = (featureId: string, featureName: string) => {
     // Check if character has charges remaining
-    const feature = character.featureCharges.find(f => f.id === featureId)
+    const feature = (character.featureCharges ?? []).find(f => f.id === featureId)
     if (!feature || feature.current <= 0) {
       setAbilityNotification({
         featureName,
@@ -1129,40 +1161,6 @@ export function CharacterSheetPage() {
     })
     setTimeout(() => setShowConsumableNotification(null), 3000)
   }
-
-  // Consolidate duplicate material IDs for display and operations
-  const consolidatedMaterials = useMemo(() => {
-    const map = new Map<string, Material>()
-    for (const m of character.materials) {
-      const existing = map.get(m.id)
-      if (existing) {
-        map.set(m.id, { ...existing, quantity: existing.quantity + m.quantity })
-      } else {
-        map.set(m.id, { ...m })
-      }
-    }
-    return Array.from(map.values())
-  }, [character.materials])
-
-  // Detect Bag of Holding items (weightReduction > 0)
-  const bagsOfHolding = useMemo(
-    () => character.equipment.filter((i) => (i.weightReduction ?? 0) > 0),
-    [character.equipment]
-  )
-
-  // Detect Armor +X addon items
-  const armorAddonRegex = /^armor\s*\+(\d+)$/i
-  const armorAddonItems = useMemo(
-    () => character.equipment.filter((i) => armorAddonRegex.test(i.name.trim())),
-    [character.equipment]
-  )
-  const armorAddonBonus = useMemo(
-    () => armorAddonItems.reduce((sum, i) => {
-      const match = i.name.match(/\+(\d+)/)
-      return sum + (match ? parseInt(match[1]) : 0)
-    }, 0),
-    [armorAddonItems]
-  )
 
   const tabs = [
     { id: 'main', label: 'Overview' },
@@ -1489,7 +1487,7 @@ export function CharacterSheetPage() {
                   ) : (
                     <div className="text-2xl font-bold text-white">
                       {calculateAC()}
-                      {character.conditions.includes('enraged') && (
+                      {character.conditions?.includes('enraged') && (
                         <span className="text-xs text-orange-400 ml-1">(-1)</span>
                       )}
                     </div>
@@ -3535,11 +3533,11 @@ export function CharacterSheetPage() {
           </div>
 
           {/* Resource Pools */}
-          {character.resourcePools.length > 0 && (
+          {(character.resourcePools ?? []).length > 0 && (
             <div className="card bg-gray-800 border-gray-700 p-4 sm:p-6">
               <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4">💎 Resource Pools</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-                {character.resourcePools.map((pool) => (
+                {(character.resourcePools ?? []).map((pool) => (
                   <div key={pool.id} className="p-4 bg-gray-900 border border-gray-700 rounded-lg">
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-bold text-cyan-400 text-sm sm:text-base">{pool.name}</h4>
@@ -3847,7 +3845,7 @@ export function CharacterSheetPage() {
                   {character.class.features
                     .filter(feature => character.level >= feature.level)
                     .map((feature) => {
-                      const featureCharge = character.featureCharges.find(fc => fc.id === feature.id)
+                      const featureCharge = (character.featureCharges ?? []).find(fc => fc.id === feature.id)
                       return (
                         <ClassFeatureCard
                           key={feature.id}
@@ -4081,7 +4079,7 @@ export function CharacterSheetPage() {
           </div>
 
           {/* Special Abilities & Features */}
-          {(character.featureCharges.length > 0 || character.itemFeatures.length > 0) && (
+          {((character.featureCharges ?? []).length > 0 || (character.itemFeatures ?? []).length > 0) && (
             <div className="card bg-gradient-to-br from-amber-900/30 to-yellow-900/30 border-2 border-yellow-600 p-4 sm:p-6">
               <h3 className="text-xl sm:text-2xl font-bold text-yellow-400 mb-3 sm:mb-4">⚡ Class Abilities & Features</h3>
 
@@ -4098,7 +4096,7 @@ export function CharacterSheetPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 {/* Class Features with Charges */}
-                {character.featureCharges.map((feature) => {
+                {(character.featureCharges ?? []).map((feature) => {
                   // Get full feature info from class
                   const classFeature = character.class?.features.find(f => f.id === feature.id)
                   const isUsable = feature.current > 0
@@ -4153,7 +4151,7 @@ export function CharacterSheetPage() {
                 })}
 
                 {/* Item Features */}
-                {character.itemFeatures.map((feature) => (
+                {(character.itemFeatures ?? []).map((feature) => (
                   <div key={feature.id} className="p-4 bg-cyan-900/40 border-2 border-cyan-700 rounded-lg hover:border-cyan-600 transition-all">
                     <h4 className="font-bold text-base sm:text-lg text-cyan-400 mb-2">{feature.name}</h4>
                     <p className="text-xs sm:text-sm text-gray-300">{feature.description}</p>

@@ -241,9 +241,9 @@ function PartyCharacterCard({
         </div>
 
         {/* Conditions */}
-        {character.conditions.length > 0 && (
+        {(character.conditions ?? []).length > 0 && (
           <div className="flex flex-wrap gap-1">
-            {character.conditions.map((condition) => (
+            {(character.conditions ?? []).map((condition) => (
               <span
                 key={condition}
                 className="px-2 py-0.5 bg-red-900/50 text-red-300 text-xs rounded-full"

@@ -55,7 +55,7 @@ const EXHAUSTION_CONDITIONS: Condition[] = [
 export function ConditionManager({ character, onAddCondition, onRemoveCondition, onClose }: ConditionManagerProps) {
   const [activeCategory, setActiveCategory] = useState<'injury' | 'standard' | 'combat' | 'exhaustion'>('injury')
 
-  const hasCondition = (condition: Condition) => character.conditions.includes(condition)
+  const hasCondition = (condition: Condition) => (character.conditions ?? []).includes(condition)
 
   const toggleCondition = (condition: Condition) => {
     if (hasCondition(condition)) {
@@ -151,11 +151,11 @@ export function ConditionManager({ character, onAddCondition, onRemoveCondition,
         </div>
 
         {/* Active Conditions Summary */}
-        {character.conditions.length > 0 && (
+        {(character.conditions ?? []).length > 0 && (
           <div className="bg-yellow-900/30 border-b border-yellow-700 p-4">
             <h3 className="text-sm font-semibold text-yellow-400 mb-2">Active Conditions</h3>
             <div className="flex flex-wrap gap-2">
-              {character.conditions.map((condition) => (
+              {(character.conditions ?? []).map((condition) => (
                 <span
                   key={condition}
                   className="px-3 py-1 bg-yellow-900/50 border border-yellow-600 text-yellow-300 text-sm rounded-lg"
