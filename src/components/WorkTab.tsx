@@ -260,7 +260,7 @@ export function WorkTab({ character }: WorkTabProps) {
   // Build a quantity Map for O(1) lookups in CraftCard — sums duplicates
   const materialsMap = useMemo(() => {
     const map = new Map<string, number>()
-    for (const m of character.materials) {
+    for (const m of (character.materials ?? [])) {
       map.set(m.id, (map.get(m.id) ?? 0) + m.quantity)
     }
     return map
