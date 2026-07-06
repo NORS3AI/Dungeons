@@ -1,5 +1,45 @@
 # Dungeons - Patch Notes
 
+## Version 0.6.6-beta - July 06, 2026
+
+**Beta Release Notice**: Mast collapse, crew casualty reports, manual dice entry, extended cannon tiers, and dramatic sinking narratives.
+
+### Naval Combat Enhancements
+
+#### **Mast Damage — Three Strikes and She Falls**
+- Mast can now be struck up to 3 times before collapsing.
+- First and second hits apply the existing **Mast Damaged** condition.
+- On the **third hit** the mast collapses — the ship is dead in the water and a dramatic log entry is shown: *"THE MAST HAS FALLEN! [Ship] cannot move!"*
+- New **Mast Fallen** condition (🪵) tracks this permanently on the ship.
+
+#### **Crew Swept — Casualty Report**
+- Whenever a ship is hit by chain shot, grapeshot, or a boarding raid that causes Crew Swept, **1d4 crewmen are now lost**.
+- The battle log reports exactly how many sailors were swept overboard and how many remain.
+
+#### **Manual Dice Mode**
+- New toggle in the combat header: **🎲 Digital Dice / Manual Dice**.
+- When Manual Dice is active, input fields appear before each roll — enter the result from your real d20 and the system calculates everything as if that number had been rolled.
+- Damage total can also be entered manually for the fire phase.
+- Fields clear automatically after use.
+
+#### **Extended Damage Tiers**
+- Cannon damage now scales all the way to massive flagship-class vessels:
+  - 59–90 cannons → 6d8 | 91–199 → 7d8 | 200–299 → 8d8 | 300–399 → 9d8 | 400+ → 10d8
+
+#### **Sinking Narratives**
+- When a ship is destroyed, the battle log now shows a dramatic flavour message based on how it sank: cannonballs, chain shot, ramming, fire, grapeshot, harpoon, broadside volley, or condition damage.
+
+#### **Bug Fixes**
+- Fixed crash when firing cannons with a custom damage notation that includes a modifier (e.g. `2d6+2`). Invalid overrides now fall back to the auto-calculated tier instead of throwing a TypeError.
+- Fixed `bracing` condition causing a crash in the battle UI. "Bracing" is now a proper `ShipCondition` with a shield icon and light-blue label.
+- Fixed repair heal values using a non-monotonic progression (5→15→10→15→25). Values are now a clean 5→10→15→20→25 scale.
+- Reload fumble (d20=1) no longer deals self-damage in addition to the 20%-cannons penalty — consistent with the new 1–5 tier behaviour.
+- Removed misleading "+N init" speed label (speed is flavour only; turn order is allies-first).
+- Exported `roll()` and `rollMultiple()` helpers; all ability damage dice now use the same RNG path.
+- Loadout overwrite: each saved fleet now has an **Update** button to overwrite it with the current fleet.
+
+**Why This Matters**: Naval combat is now more dramatic, more detailed, and playable with physical dice for DMs who prefer rolling at the table.
+
 ## Version 0.6.5-beta - July 06, 2026
 
 **Beta Release Notice**: Naval combat bug-fix pass and loadout overwrite.

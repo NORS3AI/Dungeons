@@ -1,7 +1,7 @@
 export type AmmoType = 'ball' | 'chain'
 export type ShipFaction = 'player' | 'enemy'
 export type ShipStatus = 'active' | 'repairing' | 'sinking' | 'sunk'
-export type ShipCondition = 'on_fire' | 'taking_water' | 'mast_damaged' | 'crew_swept' | 'bracing'
+export type ShipCondition = 'on_fire' | 'taking_water' | 'mast_damaged' | 'mast_collapsed' | 'crew_swept' | 'bracing'
 
 export interface ShipAbility {
   id: string
@@ -27,6 +27,7 @@ export interface Ship {
   status: ShipStatus
   repairTurnsRemaining: number
   conditions: ShipCondition[]
+  mastHits: number
 }
 
 export interface BattleLogEntry {

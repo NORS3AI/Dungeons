@@ -12,14 +12,14 @@ export function rollMultiple(count: number, sides: number): { rolls: number[]; t
   return { rolls, total: rolls.reduce((a, b) => a + b, 0) }
 }
 
-export function rollReload(totalCannons: number): {
+export function rollReload(totalCannons: number, rollOverride?: number): {
   roll: number
   functionalCannons: number
   fumble: boolean
   critical: boolean
   selfDamage: number
 } {
-  const d20 = roll(20)
+  const d20 = rollOverride !== undefined ? Math.min(20, Math.max(1, rollOverride)) : roll(20)
   const fumble = d20 === 1
   const critical = d20 === 20
 
@@ -40,14 +40,14 @@ export function rollReload(totalCannons: number): {
   return { roll: d20, functionalCannons, fumble, critical, selfDamage }
 }
 
-export function rollToHit(targetAC: number, bonus = 0): {
+export function rollToHit(targetAC: number, bonus = 0, rollOverride?: number): {
   roll: number
   total: number
   hit: boolean
   critical: boolean
   fumble: boolean
 } {
-  const d20 = roll(20)
+  const d20 = rollOverride !== undefined ? Math.min(20, Math.max(1, rollOverride)) : roll(20)
   const total = d20 + bonus
   const critical = d20 === 20
   const fumble = d20 === 1
@@ -62,7 +62,11 @@ export function getDamageNotation(loadedCannons: number): string {
   if (loadedCannons <= 25) return '3d8'
   if (loadedCannons <= 40) return '4d8'
   if (loadedCannons <= 58) return '5d8'
-  return '6d8'
+  if (loadedCannons <= 90) return '6d8'
+  if (loadedCannons <= 199) return '7d8'
+  if (loadedCannons <= 299) return '8d8'
+  if (loadedCannons <= 399) return '9d8'
+  return '10d8'
 }
 
 export function rollCannonDamage(
@@ -70,17 +74,20 @@ export function rollCannonDamage(
   ammoType: AmmoType,
   critical: boolean,
   notationOverride?: string,
+  totalOverride?: number,
 ): { notation: string; total: number; rolls: number[]; hullDamage: number; conditionApplied: ShipCondition | null } {
   const rawNotation = notationOverride || getDamageNotation(loadedCannons)
   const match = rawNotation.match(/^(\d+)d(\d+)$/)
   if (!match) {
-    return rollCannonDamage(loadedCannons, ammoType, critical)
+    return rollCannonDamage(loadedCannons, ammoType, critical, undefined, totalOverride)
   }
   const notation = rawNotation
   const count = parseInt(match[1])
   const sides = parseInt(match[2])
 
-  let result = rollMultiple(critical ? count * 2 : count, sides)
+  let result = totalOverride !== undefined
+    ? { rolls: [totalOverride], total: totalOverride }
+    : rollMultiple(critical ? count * 2 : count, sides)
 
   if (ammoType === 'chain') {
     const hullDamage = Math.floor(result.total / 2)

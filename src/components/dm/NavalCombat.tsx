@@ -4,10 +4,64 @@ import type {
   BattleLogEntry, Projectile, CombatTurnPhase,
 } from '../../types/naval'
 import {
+  roll,
   rollReload, rollToHit, rollCannonDamage, rollRepairDuration, rollRepairResult,
   applyConditionEffects, getACWithConditions, getFunctionalCannonsWithConditions,
   isFleetDefeated, buildTurnOrder, getDamageNotation,
 } from '../../utils/navalCombat'
+
+// ─── Sinking Narrative ────────────────────────────────────────────────────────
+
+type SinkCause = 'ball' | 'chain' | 'ram' | 'fire_ability' | 'fire_condition' | 'water' | 'boarding' | 'harpoon' | 'grapeshot' | 'broadside'
+
+function getSinkingNarrative(shipName: string, cause?: SinkCause): string {
+  const pick = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)]
+  const narratives: Record<SinkCause | 'default', string[]> = {
+    ball: [
+      `The hull splinters under a final barrage of iron — ${shipName} breaks apart and slips beneath the waves!`,
+      `A devastating broadside tears ${shipName} asunder. She lists hard to starboard and vanishes into the deep.`,
+      `The last cannonball finds the powder magazine — a thunderous explosion tears ${shipName} apart. Then silence.`,
+    ],
+    chain: [
+      `Chain shot shreds the rigging and bites through the hull — ${shipName} rolls, capsizes, and spirals into darkness!`,
+      `With her masts in ruin, ${shipName} loses all headway, rolls in the swells, and drowns.`,
+    ],
+    ram: [
+      `Rammed amidships, ${shipName} is cleaved nearly in two — she plunges beneath the waves with a terrible groan!`,
+      `The impact splits ${shipName}'s keel. She shatters like driftwood and sinks without a trace.`,
+    ],
+    fire_ability: [
+      `Hellfire consumes every plank — ${shipName} burns to the waterline and hisses into the deep!`,
+      `Engulfed in unquenchable flames, ${shipName} sinks in a column of black smoke and ash.`,
+    ],
+    fire_condition: [
+      `${shipName} burns to the waterline. The fire wins. She hisses into the sea and is gone.`,
+      `The fire aboard ${shipName} reaches the powder stores — a blinding flash, then nothing.`,
+    ],
+    water: [
+      `${shipName} takes on too much water, her pumps overwhelmed. She settles slowly and sinks in silence.`,
+      `The sea rushes in unopposed — ${shipName} groans, tilts, and disappears beneath the surface.`,
+    ],
+    boarding: [
+      `With her crew captured and no one left at the helm, ${shipName} drifts unmanned until the sea claims her.`,
+    ],
+    harpoon: [
+      `Tangled in harpoon ropes, ${shipName} is dragged beneath the waves in a churn of white water!`,
+    ],
+    grapeshot: [
+      `Her crew silenced by grapeshot, ${shipName} founders unmanned — a ghost ship swallowed by the sea.`,
+    ],
+    broadside: [
+      `A furious broadside volley reduces ${shipName} to splinters. She sinks almost immediately.`,
+    ],
+    default: [
+      `${shipName} shudders one final time and slips beneath the waves — gone forever.`,
+      `The sea claims ${shipName} at last. She sinks with all hands into the dark.`,
+      `With a great groan of breaking timber, ${shipName} is no more.`,
+    ],
+  }
+  return pick(narratives[cause ?? 'default'])
+}
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -15,6 +69,7 @@ const CONDITION_LABELS: Record<ShipCondition, { label: string; icon: string; col
   on_fire: { label: 'On Fire', icon: '🔥', color: 'text-orange-400' },
   taking_water: { label: 'Taking Water', icon: '🌊', color: 'text-blue-400' },
   mast_damaged: { label: 'Mast Damaged', icon: '⚓', color: 'text-yellow-400' },
+  mast_collapsed: { label: 'Mast Fallen', icon: '🪵', color: 'text-red-500' },
   crew_swept: { label: 'Crew Swept', icon: '💀', color: 'text-red-400' },
   bracing: { label: 'Bracing', icon: '🛡️', color: 'text-sky-400' },
 }
@@ -228,6 +283,7 @@ function ShipForm({
       status: 'active',
       repairTurnsRemaining: 0,
       conditions: [],
+      mastHits: 0,
     })
     resetForm()
   }
@@ -299,7 +355,7 @@ function ShipForm({
         </div>
         <div>
           <label className="block text-xs text-gray-400 mb-1">
-            Speed (ft) <span className="text-cyan-500 text-[10px]">+{Math.floor(speedVal / 10)} init</span>
+            Speed (ft)
           </label>
           <input type="text" inputMode="numeric" value={speedStr}
             onChange={e => setSpeedStr(e.target.value)}
@@ -915,6 +971,12 @@ export function NavalCombat() {
   const [hitResult, setHitResult] = useState<{ roll: number; total: number; hit: boolean; critical: boolean; fumble: boolean } | null>(null)
   const [damageResult, setDamageResult] = useState<{ total: number; hullDamage: number; notation: string; rolls: number[]; conditionApplied: ShipCondition | null } | null>(null)
 
+  // Manual dice mode
+  const [manualDiceMode, setManualDiceMode] = useState(false)
+  const [manualReloadStr, setManualReloadStr] = useState('')
+  const [manualHitStr, setManualHitStr] = useState('')
+  const [manualDamageStr, setManualDamageStr] = useState('')
+
   const currentShipId = turnOrder[currentTurnIndex] ?? null
   const currentShip = ships.find(s => s.id === currentShipId) ?? null
 
@@ -1010,6 +1072,7 @@ export function NavalCombat() {
       status: 'active' as const,
       repairTurnsRemaining: 0,
       conditions: [],
+      mastHits: 0,
     }))
     setShips(prev => [...prev.filter(s => s.faction !== faction), ...newShips])
   }
@@ -1068,7 +1131,8 @@ export function NavalCombat() {
 
     // Ship killed by condition damage — skip
     if (effectiveHP <= 0) {
-      addLog(currentShip.id, currentShip.name, `${currentShip.name} has been sunk by condition damage!`, 'damage')
+      const sinkCause: SinkCause = currentShip.conditions.includes('on_fire') ? 'fire_condition' : 'water'
+      addLog(currentShip.id, currentShip.name, getSinkingNarrative(currentShip.name, sinkCause), 'damage')
       advanceTurn()
       return
     }
@@ -1106,7 +1170,9 @@ export function NavalCombat() {
       return
     }
 
-    const result = rollReload(currentShip.totalCannons)
+    const reloadOverride = manualDiceMode && manualReloadStr ? parseInt(manualReloadStr) || undefined : undefined
+    if (manualDiceMode) setManualReloadStr('')
+    const result = rollReload(currentShip.totalCannons, reloadOverride)
     const adjusted = getFunctionalCannonsWithConditions(result.functionalCannons, currentShip.conditions)
 
     setReloadResult({ roll: result.roll, functional: adjusted, fumble: result.fumble, critical: result.critical })
@@ -1154,28 +1220,32 @@ export function NavalCombat() {
 
     const targetAC = getACWithConditions(target)
     const bonus = reloadResult?.critical ? 2 : 0
-    const result = rollToHit(targetAC, bonus)
+    const hitOverride = manualDiceMode && manualHitStr ? parseInt(manualHitStr) || undefined : undefined
+    const dmgOverrideTotal = manualDiceMode && manualDamageStr ? parseInt(manualDamageStr) || undefined : undefined
+    const result = rollToHit(targetAC, bonus, hitOverride)
     setHitResult(result)
+    if (manualDiceMode) { setManualHitStr(''); setManualDamageStr('') }
 
     if (result.hit) {
-      const dmg = rollCannonDamage(cannonsToLoad, selectedAmmo, result.critical, currentShip.damageOverride)
+      const dmg = rollCannonDamage(cannonsToLoad, selectedAmmo, result.critical, currentShip.damageOverride, dmgOverrideTotal)
       setDamageResult(dmg)
 
       setShips(prev => prev.map(s => {
         if (s.id === selectedTarget) {
-          const newConditions = [...s.conditions]
-          if (dmg.conditionApplied && !newConditions.includes(dmg.conditionApplied)) {
-            newConditions.push(dmg.conditionApplied)
-          }
           return {
             ...s,
             currentHP: Math.max(0, s.currentHP - dmg.hullDamage),
-            conditions: newConditions,
             status: Math.max(0, s.currentHP - dmg.hullDamage) <= 0 ? 'sunk' as const : s.status,
           }
         }
         return s
       }))
+
+      if (dmg.conditionApplied === 'mast_damaged') {
+        applyMastDamage(selectedTarget)
+      } else if (dmg.conditionApplied === 'crew_swept') {
+        applyCrewSwept(selectedTarget)
+      }
 
       setProjectiles([{
         id: createLogId(),
@@ -1207,7 +1277,7 @@ export function NavalCombat() {
       )
 
       if (target.currentHP - dmg.hullDamage <= 0) {
-        addLog(selectedTarget, target.name, `${target.name} has been sunk!`, 'damage')
+        addLog(selectedTarget, target.name, getSinkingNarrative(target.name, selectedAmmo === 'chain' ? 'chain' : 'ball'), 'damage')
       }
     } else {
       setProjectiles([{
@@ -1304,7 +1374,74 @@ export function NavalCombat() {
 
   // ── DM Actions ───────────────────────────────────────────────────────────
 
+  const applyMastDamage = (shipId: string) => {
+    const ship = ships.find(s => s.id === shipId)
+    if (!ship) return
+    const newMastHits = ship.mastHits + 1
+    if (newMastHits >= 3) {
+      setShips(prev => prev.map(s =>
+        s.id === shipId
+          ? {
+              ...s,
+              mastHits: newMastHits,
+              conditions: [
+                ...s.conditions.filter(c => c !== 'mast_damaged'),
+                'mast_collapsed' as ShipCondition,
+              ],
+            }
+          : s
+      ))
+      addLog(shipId, ship.name,
+        `🪵 THE MAST HAS FALLEN! ${ship.name} is dead in the water — cannot move!`,
+        'damage',
+      )
+    } else {
+      setShips(prev => prev.map(s =>
+        s.id === shipId
+          ? {
+              ...s,
+              mastHits: newMastHits,
+              conditions: s.conditions.includes('mast_damaged')
+                ? s.conditions
+                : [...s.conditions, 'mast_damaged' as ShipCondition],
+            }
+          : s
+      ))
+      addLog(shipId, ship.name, `⚓ Mast Damaged!`, 'status')
+    }
+  }
+
+  const applyCrewSwept = (shipId: string) => {
+    const ship = ships.find(s => s.id === shipId)
+    if (!ship) return
+    const deaths = roll(4)
+    const newCrew = Math.max(0, ship.crew - deaths)
+    setShips(prev => prev.map(s =>
+      s.id === shipId
+        ? {
+            ...s,
+            crew: newCrew,
+            conditions: s.conditions.includes('crew_swept')
+              ? s.conditions
+              : [...s.conditions, 'crew_swept' as ShipCondition],
+          }
+        : s
+    ))
+    addLog(shipId, ship.name,
+      `💀 Crew Swept! ${deaths} crewman${deaths !== 1 ? 'men' : ''} swept overboard! (${newCrew} remaining)`,
+      'damage',
+    )
+  }
+
   const applyCondition = (shipId: string, condition: ShipCondition) => {
+    if (condition === 'mast_damaged' || condition === 'mast_collapsed') {
+      applyMastDamage(shipId)
+      return
+    }
+    if (condition === 'crew_swept') {
+      applyCrewSwept(shipId)
+      return
+    }
     const ship = ships.find(s => s.id === shipId)
     if (!ship) return
     setShips(prev => prev.map(s =>
@@ -1366,16 +1503,18 @@ export function NavalCombat() {
     switch (ability.id) {
       case 'ram': {
         if (!target) return
-        const ramDmg = Math.floor(Math.random() * 10) + Math.floor(Math.random() * 10) + 2
-        const selfDmg = Math.floor(Math.random() * 6) + 1
+        const ramDmg = roll(10) + roll(10)
+        const selfDmg = roll(6)
+        const ramTargetHP = Math.max(0, target.currentHP - ramDmg)
         setShips(prev => prev.map(s => {
-          if (s.id === targetId) return { ...s, currentHP: Math.max(0, s.currentHP - ramDmg) }
+          if (s.id === targetId) return { ...s, currentHP: ramTargetHP, status: ramTargetHP <= 0 ? 'sunk' as const : s.status }
           if (s.id === shipId) return { ...s, currentHP: Math.max(0, s.currentHP - selfDmg) }
           return s
         }))
         addLog(shipId, ship.name, `RAMS ${target.name} for ${ramDmg} damage! (takes ${selfDmg} self damage)`, 'ability', {
           damage: ramDmg, targetShipName: target.name,
         })
+        if (ramTargetHP <= 0) addLog(targetId!, target.name, getSinkingNarrative(target.name, 'ram'), 'damage')
         break
       }
       case 'greek-fire': {
@@ -1395,8 +1534,8 @@ export function NavalCombat() {
       }
       case 'boarding': {
         if (!target) return
-        const attackRoll = Math.floor(Math.random() * 20) + 1
-        const defendRoll = Math.floor(Math.random() * 20) + 1
+        const attackRoll = roll(20)
+        const defendRoll = roll(20)
         const success = attackRoll > defendRoll
         addLog(shipId, ship.name,
           `Sends boarding party to ${target.name}! Attack: ${attackRoll} vs Defense: ${defendRoll} — ${success ? 'SUCCESS! Enemy crew captured!' : 'FAILED! Boarding party repelled!'}`,
@@ -1404,11 +1543,7 @@ export function NavalCombat() {
           { targetShipName: target.name },
         )
         if (success) {
-          setShips(prev => prev.map(s =>
-            s.id === targetId && !s.conditions.includes('crew_swept')
-              ? { ...s, conditions: [...s.conditions, 'crew_swept'] }
-              : s
-          ))
+          applyCrewSwept(targetId!)
         }
         break
       }
@@ -1416,19 +1551,19 @@ export function NavalCombat() {
         if (!target) return
         const harpoonHit = rollToHit(getACWithConditions(target))
         if (harpoonHit.hit) {
-          const dmg = Math.floor(Math.random() * 8) + 1
-          setShips(prev => prev.map(s => {
-            if (s.id === targetId) {
-              const newConds = [...s.conditions]
-              if (!newConds.includes('mast_damaged')) newConds.push('mast_damaged')
-              return { ...s, currentHP: Math.max(0, s.currentHP - dmg), conditions: newConds, status: Math.max(0, s.currentHP - dmg) <= 0 ? 'sunk' as const : s.status }
-            }
-            return s
-          }))
-          addLog(shipId, ship.name, `Harpoon Shot HITS ${target.name} for ${dmg} damage! Target entangled (Mast Damaged)`, 'ability', {
+          const dmg = roll(8)
+          const harpoonNewHP = Math.max(0, target.currentHP - dmg)
+          setShips(prev => prev.map(s =>
+            s.id === targetId
+              ? { ...s, currentHP: harpoonNewHP, status: harpoonNewHP <= 0 ? 'sunk' as const : s.status }
+              : s
+          ))
+          addLog(shipId, ship.name, `Harpoon Shot HITS ${target.name} for ${dmg} damage!`, 'ability', {
             damage: dmg, targetShipName: target.name,
             rolls: [{ notation: '1d20', result: harpoonHit.roll, details: `vs AC ${getACWithConditions(target)}` }, { notation: '1d8', result: dmg }],
           })
+          if (harpoonNewHP <= 0) addLog(targetId!, target.name, getSinkingNarrative(target.name, 'harpoon'), 'damage')
+          applyMastDamage(targetId!)
         } else {
           addLog(shipId, ship.name, `Harpoon Shot misses ${target.name}! (rolled ${harpoonHit.roll})`, 'miss', { targetShipName: target.name })
         }
@@ -1438,14 +1573,16 @@ export function NavalCombat() {
         if (!target) return
         const foreHit = rollToHit(getACWithConditions(target), 2)
         if (foreHit.hit) {
-          const dmg = Math.floor(Math.random() * 10) + 1
+          const dmg = roll(10)
+          const foreNewHP = Math.max(0, target.currentHP - dmg)
           setShips(prev => prev.map(s =>
-            s.id === targetId ? { ...s, currentHP: Math.max(0, s.currentHP - dmg), status: Math.max(0, s.currentHP - dmg) <= 0 ? 'sunk' as const : s.status } : s
+            s.id === targetId ? { ...s, currentHP: foreNewHP, status: foreNewHP <= 0 ? 'sunk' as const : s.status } : s
           ))
           addLog(shipId, ship.name, `Fore Cannons HITS ${target.name} for ${dmg} damage! (bow chasers, no reload required)`, 'ability', {
             damage: dmg, targetShipName: target.name,
             rolls: [{ notation: '1d20+2', result: foreHit.total, details: `vs AC ${getACWithConditions(target)}` }, { notation: '1d10', result: dmg }],
           })
+          if (foreNewHP <= 0) addLog(targetId!, target.name, getSinkingNarrative(target.name, 'ball'), 'damage')
         } else {
           addLog(shipId, ship.name, `Fore Cannons miss ${target.name}! (rolled ${foreHit.roll}+2=${foreHit.total})`, 'miss', { targetShipName: target.name })
         }
@@ -1460,14 +1597,16 @@ export function NavalCombat() {
         ))
         const aftHit = rollToHit(getACWithConditions(target))
         if (aftHit.hit) {
-          const dmg = Math.floor(Math.random() * 8) + 1
+          const dmg = roll(8)
+          const aftNewHP = Math.max(0, target.currentHP - dmg)
           setShips(prev => prev.map(s =>
-            s.id === targetId ? { ...s, currentHP: Math.max(0, s.currentHP - dmg), status: Math.max(0, s.currentHP - dmg) <= 0 ? 'sunk' as const : s.status } : s
+            s.id === targetId ? { ...s, currentHP: aftNewHP, status: aftNewHP <= 0 ? 'sunk' as const : s.status } : s
           ))
           addLog(shipId, ship.name, `Aft Cannons HITS ${target.name} for ${dmg} damage while retreating! (+2 AC until next turn)`, 'ability', {
             damage: dmg, targetShipName: target.name,
             rolls: [{ notation: '1d20', result: aftHit.roll, details: `vs AC ${getACWithConditions(target)}` }, { notation: '1d8', result: dmg }],
           })
+          if (aftNewHP <= 0) addLog(targetId!, target.name, getSinkingNarrative(target.name, 'ball'), 'damage')
         } else {
           addLog(shipId, ship.name, `Aft Cannons miss ${target.name}! Retreating with +2 AC. (rolled ${aftHit.roll})`, 'miss', { targetShipName: target.name })
         }
@@ -1488,18 +1627,17 @@ export function NavalCombat() {
         if (grapeHit.hit) {
           const fullDmg = rollCannonDamage(ship.functionalCannons, 'ball', grapeHit.critical, ship.damageOverride)
           const dmg = Math.floor(fullDmg.total / 2)
-          setShips(prev => prev.map(s => {
-            if (s.id === targetId) {
-              const newConds = [...s.conditions]
-              if (!newConds.includes('crew_swept')) newConds.push('crew_swept')
-              return { ...s, currentHP: Math.max(0, s.currentHP - dmg), conditions: newConds, status: Math.max(0, s.currentHP - dmg) <= 0 ? 'sunk' as const : s.status }
-            }
-            return s
-          }))
-          addLog(shipId, ship.name, `Grapeshot HITS ${target.name} for ${dmg} scatter damage — Crew Swept!`, 'ability', {
+          setShips(prev => prev.map(s =>
+            s.id === targetId
+              ? { ...s, currentHP: Math.max(0, s.currentHP - dmg), status: Math.max(0, s.currentHP - dmg) <= 0 ? 'sunk' as const : s.status }
+              : s
+          ))
+          addLog(shipId, ship.name, `Grapeshot HITS ${target.name} for ${dmg} scatter damage!`, 'ability', {
             damage: dmg, targetShipName: target.name,
             rolls: [{ notation: '1d20', result: grapeHit.roll, details: `vs AC ${getACWithConditions(target)}` }],
           })
+          if (Math.max(0, target.currentHP - dmg) <= 0) addLog(targetId!, target.name, getSinkingNarrative(target.name, 'grapeshot'), 'damage')
+          applyCrewSwept(targetId!)
         } else {
           addLog(shipId, ship.name, `Grapeshot misses ${target.name}! (rolled ${grapeHit.roll})`, 'miss', { targetShipName: target.name })
         }
@@ -1507,16 +1645,13 @@ export function NavalCombat() {
       }
       case 'broadside-volley': {
         if (!target) return
-        setShips(prev => prev.map(s =>
-          s.id === shipId && !s.conditions.includes('mast_damaged')
-            ? { ...s, conditions: [...s.conditions, 'mast_damaged'] }
-            : s
-        ))
+        applyMastDamage(shipId)
         const broadsideHit = rollToHit(getACWithConditions(target))
         if (broadsideHit.hit) {
           const dmg = rollCannonDamage(ship.functionalCannons, 'ball', true, ship.damageOverride)
+          const broadsideNewHP = Math.max(0, target.currentHP - dmg.hullDamage)
           setShips(prev => prev.map(s =>
-            s.id === targetId ? { ...s, currentHP: Math.max(0, s.currentHP - dmg.hullDamage), status: Math.max(0, s.currentHP - dmg.hullDamage) <= 0 ? 'sunk' as const : s.status } : s
+            s.id === targetId ? { ...s, currentHP: broadsideNewHP, status: broadsideNewHP <= 0 ? 'sunk' as const : s.status } : s
           ))
           addLog(shipId, ship.name, `BROADSIDE VOLLEY HITS ${target.name} for ${dmg.hullDamage} damage! (double dice — Mast Damaged to self)`, 'critical', {
             damage: dmg.hullDamage, targetShipName: target.name,
@@ -1525,6 +1660,7 @@ export function NavalCombat() {
               { notation: dmg.notation, result: dmg.total, details: `[${dmg.rolls.join(', ')}]` },
             ],
           })
+          if (broadsideNewHP <= 0) addLog(targetId!, target.name, getSinkingNarrative(target.name, 'broadside'), 'damage')
         } else {
           addLog(shipId, ship.name, `Broadside Volley misses ${target.name}! Took Mast Damaged for nothing. (rolled ${broadsideHit.roll})`, 'fumble', { targetShipName: target.name })
         }
@@ -1561,6 +1697,7 @@ export function NavalCombat() {
       status: 'active' as const,
       repairTurnsRemaining: 0,
       conditions: [],
+      mastHits: 0,
     })))
     setPhase('setup')
     setTurnOrder([])
@@ -1800,16 +1937,29 @@ export function NavalCombat() {
           <h2 className="text-xl font-bold text-dnd-gold">⚓ Naval Combat</h2>
           <div className="text-sm text-gray-400">Round {round}</div>
         </div>
-        <button
-          onClick={() => {
-            setPhase('finished')
-            setVictor(null)
-            addLog('system', 'Battle', 'Battle ended by DM', 'info')
-          }}
-          className="px-4 py-2 rounded bg-red-900 text-red-300 hover:bg-red-800 transition-colors text-sm font-bold"
-        >
-          End Battle
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setManualDiceMode(m => !m)}
+            className={`px-3 py-1.5 rounded text-xs font-bold transition-colors ${
+              manualDiceMode
+                ? 'bg-dnd-gold text-gray-900 hover:bg-yellow-400'
+                : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+            }`}
+            title={manualDiceMode ? 'Using physical dice — click to switch to digital rolls' : 'Click to enter physical dice results'}
+          >
+            🎲 {manualDiceMode ? 'Manual Dice' : 'Digital Dice'}
+          </button>
+          <button
+            onClick={() => {
+              setPhase('finished')
+              setVictor(null)
+              addLog('system', 'Battle', 'Battle ended by DM', 'info')
+            }}
+            className="px-4 py-2 rounded bg-red-900 text-red-300 hover:bg-red-800 transition-colors text-sm font-bold"
+          >
+            End Battle
+          </button>
+        </div>
       </div>
 
       {/* Battle Visualization */}
@@ -1837,11 +1987,23 @@ export function NavalCombat() {
           {turnPhase === 'reload' && (
             <div className="text-center py-4">
               <p className="text-gray-300 mb-3">Roll to reload cannons and check how many are functional this round</p>
+              {manualDiceMode && (
+                <div className="flex items-center justify-center gap-2 mb-3">
+                  <label className="text-xs text-gray-400">Your d20 roll:</label>
+                  <input
+                    type="number" min="1" max="20"
+                    value={manualReloadStr}
+                    onChange={e => setManualReloadStr(e.target.value)}
+                    placeholder="1–20"
+                    className="w-16 bg-gray-900 border border-dnd-gold rounded px-2 py-1 text-white text-xs text-center focus:outline-none focus:ring-1 focus:ring-dnd-gold"
+                  />
+                </div>
+              )}
               <button
                 onClick={handleReload}
                 className="px-8 py-3 rounded-lg bg-cyan-700 text-white font-bold text-lg hover:bg-cyan-600 transition-colors"
               >
-                🔄 Roll Reload (1d20)
+                🔄 {manualDiceMode && manualReloadStr ? `Apply Roll (${manualReloadStr})` : 'Roll Reload (1d20)'}
               </button>
             </div>
           )}
@@ -1954,6 +2116,30 @@ export function NavalCombat() {
                 <span className="text-gray-400">{selectedAmmo === 'chain' ? 'chain shot' : 'cannonballs'} at</span>{' '}
                 <span className="text-red-400 font-bold">{ships.find(s => s.id === selectedTarget)?.name}</span>
               </div>
+              {manualDiceMode && (
+                <div className="flex items-center justify-center gap-4 mb-3">
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-gray-400">To-hit d20:</label>
+                    <input
+                      type="number" min="1" max="20"
+                      value={manualHitStr}
+                      onChange={e => setManualHitStr(e.target.value)}
+                      placeholder="1–20"
+                      className="w-16 bg-gray-900 border border-dnd-gold rounded px-2 py-1 text-white text-xs text-center focus:outline-none focus:ring-1 focus:ring-dnd-gold"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-gray-400">Damage total:</label>
+                    <input
+                      type="number" min="1"
+                      value={manualDamageStr}
+                      onChange={e => setManualDamageStr(e.target.value)}
+                      placeholder="optional"
+                      className="w-20 bg-gray-900 border border-gray-600 rounded px-2 py-1 text-white text-xs text-center focus:outline-none focus:ring-1 focus:ring-gray-400"
+                    />
+                  </div>
+                </div>
+              )}
               <button
                 onClick={handleFire}
                 className="px-10 py-4 rounded-lg bg-gradient-to-r from-red-700 to-orange-600 text-white font-bold text-xl
