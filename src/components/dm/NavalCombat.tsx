@@ -1528,6 +1528,26 @@ export function NavalCombat() {
     setVictor(null)
   }
 
+  const returnToSetup = () => {
+    if (projectileTimerRef.current) clearTimeout(projectileTimerRef.current)
+    setShips(prev => prev.map(s => ({
+      ...s,
+      currentHP: s.maxHP,
+      functionalCannons: s.totalCannons,
+      loadedCannons: 0,
+      status: 'active' as const,
+      repairTurnsRemaining: 0,
+      conditions: [],
+    })))
+    setPhase('setup')
+    setTurnOrder([])
+    setCurrentTurnIndex(0)
+    setRound(1)
+    setBattleLog([])
+    setProjectiles([])
+    setVictor(null)
+  }
+
   // ── Render ───────────────────────────────────────────────────────────────
 
   const playerShips = ships.filter(s => s.faction === 'player')
@@ -1729,12 +1749,20 @@ export function NavalCombat() {
           <BattleLog entries={battleLog} />
         </div>
 
-        <button
-          onClick={resetBattle}
-          className="w-full py-3 rounded-lg font-bold bg-gray-700 text-white hover:bg-gray-600 transition-colors"
-        >
-          New Battle
-        </button>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button
+            onClick={returnToSetup}
+            className="flex-1 py-3 rounded-lg font-bold bg-blue-700 text-white hover:bg-blue-600 transition-colors"
+          >
+            ⚙️ Edit Ships & Rematch
+          </button>
+          <button
+            onClick={resetBattle}
+            className="flex-1 py-3 rounded-lg font-bold bg-gray-700 text-white hover:bg-gray-600 transition-colors"
+          >
+            🆕 New Battle (Clear Ships)
+          </button>
+        </div>
       </div>
     )
   }

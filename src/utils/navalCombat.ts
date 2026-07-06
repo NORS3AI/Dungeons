@@ -24,12 +24,10 @@ export function rollReload(totalCannons: number): {
   const critical = d20 === 20
 
   let percentage: number
-  if (fumble) {
-    percentage = 0.1
-  } else if (d20 <= 5) {
-    percentage = 0.25
+  if (d20 <= 5) {
+    percentage = 0.20
   } else if (d20 <= 10) {
-    percentage = 0.5
+    percentage = 0.45
   } else if (d20 <= 15) {
     percentage = 0.75
   } else {

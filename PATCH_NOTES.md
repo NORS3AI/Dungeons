@@ -1,5 +1,24 @@
 # Dungeons - Patch Notes
 
+## Version 0.6.4-beta - July 06, 2026
+
+**Beta Release Notice**: Reload roll rebalance and post-battle ship editing.
+
+### Naval Combat Tweaks
+
+#### **Reload Roll Rebalanced**
+- 1–5: 20% of cannons functional
+- 6–10: 45% of cannons functional
+- 11–15: 75% of cannons functional
+- 16–20: 100% of cannons functional
+
+#### **Post-Battle: Edit Ships & Rematch**
+- After a battle ends, the report card now shows two buttons:
+  - **Edit Ships & Rematch** — returns to setup with all ships restored to full HP; add/remove/edit ships, then engage again
+  - **New Battle (Clear Ships)** — clears everything and starts fresh as before
+
+**Why This Matters**: DMs can now tweak ship rosters between rematches without rebuilding from scratch.
+
 ## Version 0.6.3-beta - July 06, 2026
 
 **Beta Release Notice**: Naval ship stats expansion — crew, custom damage, 6 new abilities, and smarter turn order.
