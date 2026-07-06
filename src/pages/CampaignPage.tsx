@@ -61,9 +61,11 @@ export function CampaignPage() {
       id: 'naval' as Tab,
       label: 'Naval',
       icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 17h1l1-5h14l1 5h1M5 17l-2 4h18l-2-4M8 12V6l4-3 4 3v6" />
-        </svg>
+        <img
+          src={`${import.meta.env.BASE_URL}images/ship-icon.png`}
+          alt=""
+          className="w-5 h-5 naval-icon"
+        />
       ),
     },
   ]
@@ -80,6 +82,7 @@ export function CampaignPage() {
 
   return (
     <div className="min-h-screen bg-gray-900">
+      <style>{`.naval-icon { filter: brightness(0) invert(0.7); } .text-dnd-gold .naval-icon { filter: brightness(0) invert(0.85) sepia(1) saturate(5) hue-rotate(10deg); }`}</style>
       {/* Header - mobile optimized */}
       <div className="bg-gray-800 border-b border-gray-700">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
