@@ -1,5 +1,21 @@
 # Dungeons - Patch Notes
 
+## Version 0.5.5-beta - July 06, 2026
+
+**Beta Release Notice**: Critical crash fix — old saved characters no longer crash the app when switching tabs or using professions.
+
+### Bug Fix: App Crash with Existing Characters
+
+Characters saved in earlier versions were missing required data fields (conditions, materials, resourcePools, featureCharges, itemFeatures, craftingSkills, foodRations, waterSupply). Accessing these undefined fields during render caused React to crash with "Something went wrong."
+
+#### **What Changed**
+- Characters are now automatically migrated when loaded from localStorage — missing fields get safe defaults instantly
+- The Zustand store's persistence layer runs migration on rehydration, so stale data is fixed before any component renders
+- Added defensive null guards across CharacterSheetPage, ConditionManager, ClassFeatureCard, WorkTab, PartyOverview, and other components
+- Fixed React hooks ordering violation — useMemo hooks that ran after an early return are now placed before it, preventing "Rendered more hooks than during the previous render" crashes
+
+**Why This Matters**: Players with characters saved before recent updates would see the app crash when typing in Story, rolling/changing professions, or switching to the Profession tab. Now old characters load and work seamlessly.
+
 ## Version 0.5.4-beta - June 22, 2026
 
 **Beta Release Notice**: Critical fix — character creation was blocked on fresh browser sessions by the Content Sync modal.

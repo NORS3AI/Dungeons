@@ -147,9 +147,9 @@ export function PartyMemberSwitcher({ currentCharacterId, compact = false }: Par
                     </div>
 
                     {/* Conditions */}
-                    {character.conditions.length > 0 && (
+                    {(character.conditions ?? []).length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-2">
-                        {character.conditions.slice(0, 3).map((condition) => (
+                        {(character.conditions ?? []).slice(0, 3).map((condition) => (
                           <span
                             key={condition}
                             className="px-1.5 py-0.5 bg-red-900/50 text-red-300 text-[10px] rounded"
@@ -157,9 +157,9 @@ export function PartyMemberSwitcher({ currentCharacterId, compact = false }: Par
                             {condition}
                           </span>
                         ))}
-                        {character.conditions.length > 3 && (
+                        {(character.conditions ?? []).length > 3 && (
                           <span className="px-1.5 py-0.5 bg-red-900/50 text-red-300 text-[10px] rounded">
-                            +{character.conditions.length - 3}
+                            +{(character.conditions ?? []).length - 3}
                           </span>
                         )}
                       </div>

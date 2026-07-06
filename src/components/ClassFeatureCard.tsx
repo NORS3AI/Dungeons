@@ -20,7 +20,7 @@ export function ClassFeatureCard({
 }: ClassFeatureCardProps) {
   // Check resource pool availability
   const resourcePool = feature.resourceCost
-    ? character.resourcePools.find((pool) => pool.id === feature.resourceCost!.poolId)
+    ? (character.resourcePools ?? []).find((pool) => pool.id === feature.resourceCost!.poolId)
     : undefined
   const hasEnoughResource =
     !feature.resourceCost ||

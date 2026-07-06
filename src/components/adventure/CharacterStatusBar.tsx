@@ -59,9 +59,9 @@ export function CharacterStatusBar({ character, combatState, gameState, location
         </div>
 
         {/* Conditions */}
-        {character.conditions.length > 0 && (
+        {(character.conditions ?? []).length > 0 && (
           <div className="flex items-center gap-1 flex-wrap">
-            {character.conditions.map((c) => (
+            {(character.conditions ?? []).map((c) => (
               <span key={c} className="text-xs px-1.5 py-0.5 bg-red-900/50 border border-red-700 text-red-300 rounded">
                 {c}
               </span>
