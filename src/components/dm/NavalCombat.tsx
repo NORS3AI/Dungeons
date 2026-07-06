@@ -118,9 +118,15 @@ function HPBar({ current, max, showText = true }: { current: number; max: number
 function ShipForm({
   faction,
   onAdd,
+  editingShip,
+  onUpdate,
+  onCancelEdit,
 }: {
   faction: ShipFaction
   onAdd: (ship: Ship) => void
+  editingShip?: Ship | null
+  onUpdate?: (ship: Ship) => void
+  onCancelEdit?: () => void
 }) {
   const [name, setName] = useState('')
   const [ac, setAc] = useState(15)
@@ -129,9 +135,42 @@ function ShipForm({
   const [abilities, setAbilities] = useState<ShipAbility[]>([])
   const [showAbilities, setShowAbilities] = useState(false)
 
+  useEffect(() => {
+    if (editingShip) {
+      setName(editingShip.name)
+      setAc(editingShip.ac)
+      setHp(editingShip.maxHP)
+      setCannons(editingShip.totalCannons)
+      setAbilities([...editingShip.abilities])
+      setShowAbilities(editingShip.abilities.length > 0)
+    }
+  }, [editingShip])
+
+  const resetForm = () => {
+    setName('')
+    setAc(15)
+    setHp(100)
+    setCannons(20)
+    setAbilities([])
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!name.trim()) return
+    if (editingShip && onUpdate) {
+      onUpdate({
+        ...editingShip,
+        name: name.trim(),
+        ac,
+        maxHP: hp,
+        currentHP: hp,
+        totalCannons: cannons,
+        functionalCannons: cannons,
+        abilities: [...abilities],
+      })
+      resetForm()
+      return
+    }
     onAdd({
       id: createShipId(),
       name: name.trim(),
@@ -148,11 +187,7 @@ function ShipForm({
       repairTurnsRemaining: 0,
       conditions: [],
     })
-    setName('')
-    setAc(15)
-    setHp(100)
-    setCannons(20)
-    setAbilities([])
+    resetForm()
   }
 
   const toggleAbility = (ability: ShipAbility) => {
@@ -164,7 +199,10 @@ function ShipForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+    <form onSubmit={handleSubmit} className={`bg-gray-800 rounded-lg p-3 sm:p-4 border ${editingShip ? 'border-blue-500 ring-1 ring-blue-500/30' : 'border-gray-700'}`}>
+      {editingShip && (
+        <div className="text-xs text-blue-400 font-bold mb-2">Editing: {editingShip.name}</div>
+      )}
       <div className="grid grid-cols-2 gap-3">
         <div className="col-span-2">
           <label className="block text-xs text-gray-400 mb-1">Ship Name</label>
@@ -247,19 +285,35 @@ function ShipForm({
         )}
       </div>
 
-      <button
-        type="submit"
-        disabled={!name.trim()}
-        className="mt-3 w-full py-2 rounded font-bold text-sm transition-colors
-                   bg-dnd-gold text-gray-900 hover:bg-yellow-400 disabled:opacity-40 disabled:cursor-not-allowed"
-      >
-        Add {faction === 'player' ? 'Ally' : 'Enemy'} Ship
-      </button>
+      <div className={`mt-3 flex gap-2 ${editingShip ? '' : ''}`}>
+        <button
+          type="submit"
+          disabled={!name.trim()}
+          className="flex-1 py-2 rounded font-bold text-sm transition-colors
+                     bg-dnd-gold text-gray-900 hover:bg-yellow-400 disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          {editingShip ? 'Save Changes' : `Add ${faction === 'player' ? 'Ally' : 'Enemy'} Ship`}
+        </button>
+        {editingShip && onCancelEdit && (
+          <button
+            type="button"
+            onClick={() => { resetForm(); onCancelEdit() }}
+            className="px-4 py-2 rounded font-bold text-sm bg-gray-700 text-gray-300 hover:bg-gray-600 transition-colors"
+          >
+            Cancel
+          </button>
+        )}
+      </div>
     </form>
   )
 }
 
-function SetupShipCard({ ship, onRemove }: { ship: Ship; onRemove: () => void }) {
+function SetupShipCard({ ship, onRemove, onEdit, onDuplicate }: {
+  ship: Ship
+  onRemove: () => void
+  onEdit: () => void
+  onDuplicate: () => void
+}) {
   return (
     <div className={`flex items-center gap-3 p-3 rounded-lg border ${
       ship.faction === 'player'
@@ -278,11 +332,23 @@ function SetupShipCard({ ship, onRemove }: { ship: Ship; onRemove: () => void })
           </div>
         )}
       </div>
-      <button onClick={onRemove} className="text-gray-500 hover:text-red-400 transition-colors p-1" title="Remove ship">
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
+      <div className="flex items-center gap-1">
+        <button onClick={onEdit} className="text-gray-500 hover:text-blue-400 transition-colors p-1" title="Edit ship">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+        </button>
+        <button onClick={onDuplicate} className="text-gray-500 hover:text-green-400 transition-colors p-1" title="Duplicate ship">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+        </button>
+        <button onClick={onRemove} className="text-gray-500 hover:text-red-400 transition-colors p-1" title="Remove ship">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
     </div>
   )
 }
@@ -304,7 +370,7 @@ function BattleScene({
 
   return (
     <div className="relative w-full rounded-xl overflow-hidden border border-gray-700"
-         style={{ minHeight: '320px', background: 'linear-gradient(180deg, #0c4a6e 0%, #164e63 30%, #155e75 60%, #0e7490 100%)' }}>
+         style={{ minHeight: '200px', background: 'linear-gradient(180deg, #0c4a6e 0%, #164e63 30%, #155e75 60%, #0e7490 100%)' }}>
       {/* Waves */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute w-[200%] bottom-0 left-0" style={{ height: '60px' }}>
@@ -320,9 +386,9 @@ function BattleScene({
       </div>
 
       {/* Ships */}
-      <div className="relative z-10 flex justify-between items-start px-4 pt-4 pb-2 gap-4" style={{ minHeight: '300px' }}>
+      <div className="relative z-10 flex flex-col sm:flex-row justify-between items-stretch sm:items-start px-3 sm:px-4 pt-3 sm:pt-4 pb-2 gap-3 sm:gap-4">
         {/* Player Fleet */}
-        <div className="flex flex-col gap-3 flex-1">
+        <div className="flex flex-col gap-2 sm:gap-3 flex-1">
           <div className="text-xs font-bold text-blue-300 uppercase tracking-wider text-center mb-1">Ally Fleet</div>
           {playerShips.map(ship => (
             <div
@@ -368,16 +434,16 @@ function BattleScene({
         </div>
 
         {/* Center Battle Area */}
-        <div className="flex flex-col items-center justify-center px-2 py-8 min-w-[80px]">
-          <div className="text-4xl mb-2">⚔️</div>
+        <div className="flex sm:flex-col items-center justify-center px-2 py-2 sm:py-8 sm:min-w-[80px]">
+          <div className="text-2xl sm:text-4xl sm:mb-2 mr-2 sm:mr-0">⚔️</div>
           <div className="text-xs text-gray-300 font-bold uppercase tracking-widest">VS</div>
           {projectiles.length > 0 && (
-            <div className="mt-2 text-2xl animate-bounce">💥</div>
+            <div className="ml-2 sm:ml-0 sm:mt-2 text-xl sm:text-2xl animate-bounce">💥</div>
           )}
         </div>
 
         {/* Enemy Fleet */}
-        <div className="flex flex-col gap-3 flex-1">
+        <div className="flex flex-col gap-2 sm:gap-3 flex-1">
           <div className="text-xs font-bold text-red-300 uppercase tracking-wider text-center mb-1">Enemy Fleet</div>
           {enemyShips.map(ship => (
             <div
@@ -489,19 +555,19 @@ function PhaseIndicator({ phase }: { phase: CombatTurnPhase }) {
   ]
 
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex flex-wrap items-center gap-1">
       {phases.map((p, i) => (
         <div key={p.key} className="flex items-center">
-          <div className={`px-2 py-1 rounded text-xs font-bold transition-all ${
+          <div className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-[10px] sm:text-xs font-bold transition-all ${
             p.key === phase
               ? 'bg-dnd-gold text-gray-900 scale-110'
               : phases.findIndex(x => x.key === phase) > i
                 ? 'bg-green-800 text-green-300'
                 : 'bg-gray-800 text-gray-500'
           }`}>
-            {p.icon} {p.label}
+            <span className="hidden sm:inline">{p.icon} </span>{p.label}
           </div>
-          {i < phases.length - 1 && <span className="text-gray-600 mx-0.5">›</span>}
+          {i < phases.length - 1 && <span className="text-gray-600 mx-0.5 hidden sm:inline">›</span>}
         </div>
       ))}
     </div>
@@ -562,8 +628,17 @@ export function NavalCombat() {
 
   // ── Ship Management ──────────────────────────────────────────────────────
 
+  const [editingShip, setEditingShip] = useState<Ship | null>(null)
+
   const addShip = (ship: Ship) => setShips(prev => [...prev, ship])
   const removeShip = (id: string) => setShips(prev => prev.filter(s => s.id !== id))
+  const updateShip = (ship: Ship) => {
+    setShips(prev => prev.map(s => s.id === ship.id ? ship : s))
+    setEditingShip(null)
+  }
+  const duplicateShip = (ship: Ship) => {
+    setShips(prev => [...prev, { ...ship, id: createShipId(), name: `${ship.name} (Copy)` }])
+  }
 
   // ── Start Battle ─────────────────────────────────────────────────────────
 
@@ -1002,6 +1077,12 @@ export function NavalCombat() {
     s.faction !== currentShip?.faction && s.currentHP > 0 && s.status !== 'sunk'
   )
 
+  useEffect(() => {
+    if (turnPhase === 'load' && enemyTargets.length === 1 && !selectedTarget) {
+      setSelectedTarget(enemyTargets[0].id)
+    }
+  }, [turnPhase, enemyTargets.length, selectedTarget])
+
   // ── Setup Phase ──────────────────────────────────────────────────────────
 
   if (phase === 'setup') {
@@ -1022,7 +1103,13 @@ export function NavalCombat() {
             </h3>
             <div className="space-y-2 mb-3">
               {playerShips.map(ship => (
-                <SetupShipCard key={ship.id} ship={ship} onRemove={() => removeShip(ship.id)} />
+                <SetupShipCard
+                  key={ship.id}
+                  ship={ship}
+                  onRemove={() => removeShip(ship.id)}
+                  onEdit={() => setEditingShip(ship)}
+                  onDuplicate={() => duplicateShip(ship)}
+                />
               ))}
               {playerShips.length === 0 && (
                 <div className="text-center text-gray-500 text-sm py-4 border border-dashed border-gray-700 rounded-lg">
@@ -1030,7 +1117,13 @@ export function NavalCombat() {
                 </div>
               )}
             </div>
-            <ShipForm faction="player" onAdd={addShip} />
+            <ShipForm
+              faction="player"
+              onAdd={addShip}
+              editingShip={editingShip?.faction === 'player' ? editingShip : null}
+              onUpdate={updateShip}
+              onCancelEdit={() => setEditingShip(null)}
+            />
           </div>
 
           {/* Enemy Fleet */}
@@ -1040,7 +1133,13 @@ export function NavalCombat() {
             </h3>
             <div className="space-y-2 mb-3">
               {enemyShips.map(ship => (
-                <SetupShipCard key={ship.id} ship={ship} onRemove={() => removeShip(ship.id)} />
+                <SetupShipCard
+                  key={ship.id}
+                  ship={ship}
+                  onRemove={() => removeShip(ship.id)}
+                  onEdit={() => setEditingShip(ship)}
+                  onDuplicate={() => duplicateShip(ship)}
+                />
               ))}
               {enemyShips.length === 0 && (
                 <div className="text-center text-gray-500 text-sm py-4 border border-dashed border-gray-700 rounded-lg">
@@ -1048,14 +1147,20 @@ export function NavalCombat() {
                 </div>
               )}
             </div>
-            <ShipForm faction="enemy" onAdd={addShip} />
+            <ShipForm
+              faction="enemy"
+              onAdd={addShip}
+              editingShip={editingShip?.faction === 'enemy' ? editingShip : null}
+              onUpdate={updateShip}
+              onCancelEdit={() => setEditingShip(null)}
+            />
           </div>
         </div>
 
         {/* Damage Reference */}
         <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
           <h4 className="text-sm font-bold text-dnd-gold mb-2">Cannon Damage Reference</h4>
-          <div className="grid grid-cols-3 gap-4 text-center">
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 text-center">
             <div className="bg-gray-900 p-3 rounded">
               <div className="text-2xl font-bold text-white font-mono">2d8</div>
               <div className="text-xs text-gray-400 mt-1">1-20 cannons loaded</div>
@@ -1069,7 +1174,7 @@ export function NavalCombat() {
               <div className="text-xs text-gray-400 mt-1">61+ cannons loaded</div>
             </div>
           </div>
-          <div className="mt-3 grid grid-cols-2 gap-3 text-xs text-gray-400">
+          <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 text-xs text-gray-400">
             <div className="bg-gray-900 p-2 rounded">
               <span className="text-white font-bold">Ball Shot</span> — Standard cannonball. Full damage to hull.
             </div>
@@ -1125,7 +1230,7 @@ export function NavalCombat() {
 
         <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
           <h3 className="text-lg font-bold text-dnd-gold mb-3">Battle Report</h3>
-          <div className="grid grid-cols-2 gap-4 mb-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
             {ships.map(ship => (
               <div key={ship.id} className={`p-3 rounded-lg border ${
                 ship.faction === 'player' ? 'border-blue-700/50' : 'border-red-700/50'
@@ -1185,11 +1290,11 @@ export function NavalCombat() {
         <div className={`rounded-xl p-4 border-2 ${
           currentShip.faction === 'player' ? 'border-blue-500 bg-blue-950/30' : 'border-red-500 bg-red-950/30'
         }`}>
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 gap-2">
             <div className="flex items-center gap-3">
               <ShipSVG faction={currentShip.faction} size={40} />
               <div>
-                <h3 className="text-lg font-bold text-white">{currentShip.name}'s Turn</h3>
+                <h3 className="text-base sm:text-lg font-bold text-white">{currentShip.name}'s Turn</h3>
                 <div className="text-xs text-gray-400">
                   HP: {currentShip.currentHP}/{currentShip.maxHP} | AC: {getACWithConditions(currentShip)} | Cannons: {currentShip.totalCannons}
                 </div>
@@ -1290,11 +1395,11 @@ export function NavalCombat() {
                 </div>
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <button
                   onClick={handleConfirmLoad}
                   disabled={cannonsToLoad === 0 || !selectedTarget}
-                  className="flex-1 py-2 rounded-lg font-bold transition-colors
+                  className="flex-1 py-2 rounded-lg font-bold transition-colors text-sm sm:text-base
                              bg-dnd-gold text-gray-900 hover:bg-yellow-400
                              disabled:opacity-40 disabled:cursor-not-allowed"
                 >
@@ -1333,8 +1438,8 @@ export function NavalCombat() {
           {/* Phase: Resolve */}
           {turnPhase === 'resolve' && hitResult && (
             <div className="space-y-3">
-              <div className="grid grid-cols-2 gap-3">
-                <div className={`p-4 rounded-lg text-center ${
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className={`p-3 sm:p-4 rounded-lg text-center ${
                   hitResult.hit ? 'bg-green-900/40 border border-green-500' : 'bg-red-900/40 border border-red-500'
                 }`}>
                   <div className="text-xs text-gray-400 mb-1">Attack Roll</div>
@@ -1358,7 +1463,7 @@ export function NavalCombat() {
                 </div>
 
                 {hitResult.hit && damageResult && (
-                  <div className="p-4 rounded-lg text-center bg-orange-900/40 border border-orange-500">
+                  <div className="p-3 sm:p-4 rounded-lg text-center bg-orange-900/40 border border-orange-500">
                     <div className="text-xs text-gray-400 mb-1">Damage ({damageResult.notation})</div>
                     <div className="text-4xl font-bold font-mono text-orange-300">
                       {damageResult.hullDamage}
@@ -1390,7 +1495,7 @@ export function NavalCombat() {
               <div className="text-sm text-gray-400 mb-2">Apply conditions, use abilities, heal/damage ships, then advance to next turn.</div>
 
               {/* Quick Actions */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
                 {ships.filter(s => s.currentHP > 0 && s.status !== 'sunk').map(ship => (
                   <div key={ship.id} className={`p-2 rounded-lg border text-xs ${
                     ship.faction === 'player' ? 'border-blue-700/50' : 'border-red-700/50'

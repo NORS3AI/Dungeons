@@ -1,5 +1,33 @@
 # Dungeons - Patch Notes
 
+## Version 0.6.1-beta - July 06, 2026
+
+**Beta Release Notice**: Naval combat quality-of-life — ship editing, duplication, mobile support, and auto-targeting.
+
+### Naval Combat Improvements
+
+#### **Ship Edit & Duplicate**
+- Edit button on setup ship cards — click to populate the form with existing ship data, modify stats, and save
+- Duplicate button — instantly clone a ship with "(Copy)" suffix, keeping all stats and abilities
+- Edit mode highlights the form with a blue border and shows "Editing: [name]" label
+- Cancel button to exit edit mode without saving changes
+
+#### **Mobile Responsiveness**
+- Battle scene fleets now stack vertically on small screens instead of overflowing off-screen
+- Phase indicator wraps and uses compact text on mobile (icons hidden below sm breakpoint)
+- Combat turn header stacks ship info above phase indicator on narrow screens
+- Resolve phase attack/damage cards stack to single column on mobile
+- DM actions grid adapts from 4 columns (desktop) to 2 (tablet) to 1 (mobile)
+- Confirm Load and Skip Fire buttons stack vertically on mobile
+- Battle report and ammo type reference grids become single-column on small screens
+- Zero horizontal overflow confirmed at 375px viewport width
+
+#### **Auto-Target**
+- When only one enemy ship remains, it is automatically selected as the target in the load phase
+- No more manually picking the only available target each turn — streamlines 1v1 encounters
+
+**Why This Matters**: DMs on phones/tablets can now run naval encounters without content spilling off-screen, and the edit/duplicate buttons make fleet setup much faster when running similar ship configurations.
+
 ## Version 0.6.0-beta - July 06, 2026
 
 **Beta Release Notice**: Naval Battle Simulator — full ship-to-ship combat system for DM campaign tools.
