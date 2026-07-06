@@ -1001,7 +1001,7 @@ export function CharacterSheetPage() {
     saveCharacter()
 
     // Check if this is a spellcaster and if they gain spells
-    const isSpellcaster = character.class?.spellcasting !== undefined
+    const isSpellcaster = character.class?.spellcasting !== undefined && character.class?.spellcasting !== 'none'
 
     if (isSpellcaster) {
       // Set the level they're leveling up to and show spell selector
@@ -3554,7 +3554,7 @@ export function CharacterSheetPage() {
                     <div className="mt-3 h-2 bg-gray-700 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300"
-                        style={{ width: `${(pool.current / pool.maximum) * 100}%` }}
+                        style={{ width: `${pool.maximum > 0 ? (pool.current / pool.maximum) * 100 : 0}%` }}
                       />
                     </div>
                   </div>
@@ -3662,12 +3662,14 @@ export function CharacterSheetPage() {
                   <div className="flex flex-wrap gap-2">
                     {Object.entries(character.spellSlots).map(([level, slots]) => {
                       if (slots.max === 0) return null
+                      const lvlNum = level.replace('level', '')
+                      const remaining = slots.max - slots.used
                       return (
                         <div key={level} className="px-3 py-2 bg-purple-900/30 rounded border border-purple-500/50">
                           <span className="text-purple-300 font-bold">
-                            {level === '1' ? '1st' : level === '2' ? '2nd' : level === '3' ? '3rd' : `${level}th`}:
+                            {lvlNum === '1' ? '1st' : lvlNum === '2' ? '2nd' : lvlNum === '3' ? '3rd' : `${lvlNum}th`}:
                           </span>{' '}
-                          <span className="text-white">{slots.current}/{slots.max}</span>
+                          <span className="text-white">{remaining}/{slots.max}</span>
                         </div>
                       )
                     })}
@@ -4865,7 +4867,7 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
 
   if (isWeapon(item)) {
     const weapon = item as Weapon
-    const isFinesse = weapon.properties.includes('finesse')
+    const isFinesse = weapon.properties?.includes('finesse') ?? false
     const attackMod = isFinesse
       ? Math.max(getAbilityMod('strength'), getAbilityMod('dexterity'))
       : weapon.weaponCategory === 'ranged'
@@ -4906,7 +4908,7 @@ function EquipmentItem({ item, character, onRemove, onToggleEquip, onChangeQuant
               <span className="text-gray-500 ml-1">x{weapon.quantity}</span>
             )}
             <div className="text-sm text-gray-400">
-              {weapon.damage.dice} {weapon.damage.type}
+              {weapon.damage?.dice ?? '1d4'} {weapon.damage?.type ?? 'bludgeoning'}
             </div>
           </div>
         </div>

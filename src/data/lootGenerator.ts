@@ -164,8 +164,8 @@ const UNCOMMON_LOOT: LootItem[] = [
   { id: 'greater-healing', name: 'Potion of Greater Healing', category: 'Consumable', description: 'Restores 4d4+4 hit points', rarity: 'uncommon', value: 150 },
   { id: 'preserved-food', name: 'Preserved Rations', category: 'Food', description: '10 days of preserved food', rarity: 'uncommon', value: 15, foodDays: 10 },
   { id: 'spell-scroll-1', name: 'Spell Scroll (1st Level)', category: 'Consumable', description: 'Contains a 1st level spell', rarity: 'uncommon', value: 100 },
-  { id: 'masterwork-weapon', name: 'Masterwork Weapon', category: 'Weapon', description: '+1 to attack and damage rolls', rarity: 'uncommon', value: 300, weaponDamageBonus: 1, attackBonus: 1 },
-  { id: 'cloak-protection', name: 'Cloak of Protection', category: 'Armor', description: '+1 to AC and saving throws', rarity: 'uncommon', value: 250 },
+  { id: 'masterwork-weapon', name: 'Masterwork Weapon', category: 'weapon', description: '+1 to attack and damage rolls', rarity: 'uncommon', value: 300, weaponDamageBonus: 1, attackBonus: 1 },
+  { id: 'cloak-protection', name: 'Cloak of Protection', category: 'armor', description: '+1 to AC and saving throws', rarity: 'uncommon', value: 250 },
   { id: 'bag-holding', name: 'Bag of Holding', category: 'Wondrous', description: 'Reduces total carry weight by 50 lbs', rarity: 'uncommon', value: 400, weightReduction: 50 },
   { id: 'boots-speed', name: 'Boots of Speed', category: 'Wondrous', description: 'Double movement speed for 1 minute', rarity: 'uncommon', value: 350 },
   // Crafting Materials — Ore
@@ -194,8 +194,8 @@ const RARE_LOOT: LootItem[] = [
   { id: 'purifying-flask', name: 'Decanter of Endless Water', category: 'Water', description: '20 days of pure water', rarity: 'rare', value: 30, waterDays: 20 },
   { id: 'spell-scroll-3', name: 'Spell Scroll (3rd Level)', category: 'Consumable', description: 'Contains a 3rd level spell', rarity: 'rare', value: 300 },
   { id: 'bag-holding-rare', name: 'Bag of Holding (Rare)', category: 'Wondrous', description: 'Reduces total carry weight by 100 lbs', rarity: 'rare', value: 800, weightReduction: 100 },
-  { id: 'weapon-plus-2', name: 'Weapon +2', category: 'Weapon', description: '+2 to attack and damage rolls', rarity: 'rare', value: 1000, weaponDamageBonus: 2, attackBonus: 2 },
-  { id: 'armor-plus-2', name: 'Armor +2', category: 'Armor', description: '+2 to AC', rarity: 'rare', value: 1200 },
+  { id: 'weapon-plus-2', name: 'Weapon +2', category: 'weapon', description: '+2 to attack and damage rolls', rarity: 'rare', value: 1000, weaponDamageBonus: 2, attackBonus: 2 },
+  { id: 'armor-plus-2', name: 'Armor +2', category: 'armor', description: '+2 to AC', rarity: 'rare', value: 1200 },
   { id: 'ring-protection', name: 'Ring of Protection', category: 'Wondrous', description: '+1 to AC and saving throws', rarity: 'rare', value: 800 },
   { id: 'wand-fireballs', name: 'Wand of Fireballs', category: 'Wondrous', description: '7 charges, cast fireball', rarity: 'rare', value: 1500 },
   // Crafting Materials — Ore
@@ -220,8 +220,8 @@ const MORE_EPIC_LOOT: LootItem[] = [
   { id: 'platinum-hoard', name: 'Small Gold Pouch', category: 'Currency', description: '1-10 gold pieces', rarity: 'epic', value: 550 }, // 5.5 gold (550 copper)
   { id: 'spell-scroll-5', name: 'Spell Scroll (5th Level)', category: 'Consumable', description: 'Contains a 5th level spell', rarity: 'epic', value: 800 },
   { id: 'bag-holding-epic', name: 'Bag of Holding (Epic)', category: 'Wondrous', description: 'Reduces total carry weight by 150 lbs', rarity: 'epic', value: 1500, weightReduction: 150 },
-  { id: 'weapon-plus-3', name: 'Weapon +3', category: 'Weapon', description: '+3 to attack and damage rolls', rarity: 'epic', value: 3000, weaponDamageBonus: 3, attackBonus: 3 },
-  { id: 'armor-plus-3', name: 'Armor +3', category: 'Armor', description: '+3 to AC', rarity: 'epic', value: 3500 },
+  { id: 'weapon-plus-3', name: 'Weapon +3', category: 'weapon', description: '+3 to attack and damage rolls', rarity: 'epic', value: 3000, weaponDamageBonus: 3, attackBonus: 3 },
+  { id: 'armor-plus-3', name: 'Armor +3', category: 'armor', description: '+3 to AC', rarity: 'epic', value: 3500 },
   { id: 'cloak-invisibility', name: 'Cloak of Invisibility', category: 'Cloak', description: 'Become invisible at will', rarity: 'epic', value: 5000 },
   { id: 'belt-giant-strength', name: 'Belt of Giant Strength', category: 'Wondrous', description: 'Set Strength to 23', rarity: 'epic', value: 4000 },
   // Crafting Materials — Ore
@@ -245,8 +245,8 @@ const MORE_EPIC_LOOT: LootItem[] = [
 const EPIC_LOOT: LootItem[] = [
   { id: 'epic-fortune', name: 'Gold Pouch', category: 'Currency', description: '10-15 gold pieces', rarity: 'epic', value: 1250 }, // 12.5 gold (1250 copper)
   { id: 'spell-scroll-7', name: 'Spell Scroll (7th Level)', category: 'Consumable', description: 'Contains a 7th level spell', rarity: 'epic', value: 2000 },
-  { id: 'dragonslayer-greatsword', name: 'Dragonslayer Greatsword', category: 'Weapon', description: '+3 greatsword, deals 3d6 extra damage to dragons', rarity: 'epic', value: 6000, weaponDamageBonus: 3, attackBonus: 3 },
-  { id: 'plate-ethereal', name: 'Ethereal Plate Armor', category: 'Armor', description: '+3 plate, can phase through objects once per day', rarity: 'epic', value: 7000 },
+  { id: 'dragonslayer-greatsword', name: 'Dragonslayer Greatsword', category: 'weapon', description: '+3 greatsword, deals 3d6 extra damage to dragons', rarity: 'epic', value: 6000, weaponDamageBonus: 3, attackBonus: 3 },
+  { id: 'plate-ethereal', name: 'Ethereal Plate Armor', category: 'armor', description: '+3 plate, can phase through objects once per day', rarity: 'epic', value: 7000 },
   { id: 'shield-lion', name: 'Shield of the Lion', category: 'Shield', description: '+3 shield, grants immunity to fear and advantage on saves', rarity: 'epic', value: 5500 },
   { id: 'ring-three-wishes', name: 'Ring of Three Wishes', category: 'Wondrous', description: 'Grants 3 wishes (weaker than spell)', rarity: 'epic', value: 8000 },
   { id: 'boots-seven-leagues', name: 'Boots of Seven Leagues', category: 'Wondrous', description: 'Teleport up to 1 mile once per day', rarity: 'epic', value: 6500 },
@@ -264,9 +264,9 @@ const LEGENDARY_LOOT: LootItem[] = [
   { id: 'spell-scroll-9', name: 'Spell Scroll (9th Level)', category: 'Consumable', description: 'Contains a 9th level spell', rarity: 'legendary', value: 5000 },
   { id: 'tome-class-change', name: 'Tome of Reincarnation', category: 'Consumable', description: 'Allows you to completely change your class. All old class features, spells, and abilities are lost and replaced with your new class.', rarity: 'legendary', value: 25000 },
   { id: 'bag-holding-legendary', name: 'Bag of Holding (Legendary)', category: 'Wondrous', description: 'Reduces total carry weight by 225 lbs', rarity: 'legendary', value: 3000, weightReduction: 225 },
-  { id: 'holy-avenger', name: 'Holy Avenger', category: 'Weapon', description: '+3 longsword with divine powers', rarity: 'legendary', value: 10000, weaponDamageBonus: 3, attackBonus: 3 },
-  { id: 'armor-invulnerability', name: 'Armor of Invulnerability', category: 'Armor', description: 'Resistance to nonmagical damage', rarity: 'legendary', value: 12000 },
-  { id: 'vorpal-sword', name: 'Vorpal Sword', category: 'Weapon', description: 'Decapitates on critical hit', rarity: 'legendary', value: 15000, weaponDamageBonus: 4, attackBonus: 4 },
+  { id: 'holy-avenger', name: 'Holy Avenger', category: 'weapon', description: '+3 longsword with divine powers', rarity: 'legendary', value: 10000, weaponDamageBonus: 3, attackBonus: 3 },
+  { id: 'armor-invulnerability', name: 'Armor of Invulnerability', category: 'armor', description: 'Resistance to nonmagical damage', rarity: 'legendary', value: 12000 },
+  { id: 'vorpal-sword', name: 'Vorpal Sword', category: 'weapon', description: 'Decapitates on critical hit', rarity: 'legendary', value: 15000, weaponDamageBonus: 4, attackBonus: 4 },
   { id: 'staff-magi', name: 'Staff of the Magi', category: 'Wondrous', description: 'Ultimate spellcasting focus', rarity: 'legendary', value: 20000 },
   // Crafting Materials — Ore
   { id: 'obsidian-steel-ore', name: 'Obsidian-Steel Ore Nugget', category: 'Crafting Material', description: 'Mythical volcanic metal forged in dragon fire', rarity: 'legendary', value: 2500, quantity: 2, worth: { gold: 0, silver: 10 } },
@@ -286,15 +286,15 @@ const LEGENDARY_LOOT: LootItem[] = [
  * Artifact loot pool - game-breaking items (0.5% chance)
  */
 const ARTIFACT_LOOT: LootItem[] = [
-  { id: 'artifact-godslayer', name: 'Godslayer Blade', category: 'Weapon', description: '+5 weapon that can kill gods. Deals 6d12 extra radiant damage. Crits on 15-20. Grants immunity to death.', rarity: 'artifact', value: 100000, weaponDamageBonus: 5, attackBonus: 5 },
-  { id: 'artifact-immortal-plate', name: 'Armor of Immortality', category: 'Armor', description: '+5 plate armor that grants true immortality. Regenerate 50 HP per turn. Cannot be killed by any means.', rarity: 'artifact', value: 120000 },
+  { id: 'artifact-godslayer', name: 'Godslayer Blade', category: 'weapon', description: '+5 weapon that can kill gods. Deals 6d12 extra radiant damage. Crits on 15-20. Grants immunity to death.', rarity: 'artifact', value: 100000, weaponDamageBonus: 5, attackBonus: 5 },
+  { id: 'artifact-immortal-plate', name: 'Armor of Immortality', category: 'armor', description: '+5 plate armor that grants true immortality. Regenerate 50 HP per turn. Cannot be killed by any means.', rarity: 'artifact', value: 120000 },
   { id: 'artifact-shield-cosmos', name: 'Shield of the Cosmos', category: 'Shield', description: '+5 shield that reflects all spells and attacks. Grants immunity to all damage types. Can absorb one Wish spell per day.', rarity: 'artifact', value: 110000 },
   { id: 'artifact-crown-dominion', name: 'Crown of Absolute Dominion', category: 'Wondrous', description: 'Control the minds of any number of creatures. Cast Dominate Monster at will. Immunity to all mind effects.', rarity: 'artifact', value: 150000 },
   { id: 'artifact-orb-omniscience', name: 'Orb of Omniscience', category: 'Wondrous', description: 'Know everything that has happened or will happen. Automatic success on all Knowledge checks. See invisible and through all illusions.', rarity: 'artifact', value: 140000 },
   { id: 'artifact-boots-infinity', name: 'Boots of Infinite Speed', category: 'Wondrous', description: 'Move at the speed of light. Take 10 actions per turn. Cannot be hit by attacks or spells.', rarity: 'artifact', value: 130000 },
   { id: 'artifact-ring-god', name: 'Ring of the God-King', category: 'Wondrous', description: 'Become a deity. All stats become 30. Cast any spell at will. Reshape reality once per day.', rarity: 'artifact', value: 200000 },
   { id: 'artifact-tome-eternity', name: 'Tome of Eternity', category: 'Wondrous', description: 'Contains all knowledge in the universe. Learn any spell instantly. Gain proficiency in all skills. +10 to all stats.', rarity: 'artifact', value: 180000 },
-  { id: 'artifact-cloak-void', name: 'Cloak of the Void', category: 'Armor', description: 'Become intangible at will. Teleport anywhere in the multiverse. Erase enemies from existence with a touch.', rarity: 'artifact', value: 160000 },
+  { id: 'artifact-cloak-void', name: 'Cloak of the Void', category: 'armor', description: 'Become intangible at will. Teleport anywhere in the multiverse. Erase enemies from existence with a touch.', rarity: 'artifact', value: 160000 },
   { id: 'artifact-gauntlet-creation', name: 'Gauntlet of Creation', category: 'Wondrous', description: 'Create any object or creature from nothing. Reshape terrain at will. Grant or remove life force.', rarity: 'artifact', value: 170000 },
   // Precious Gems for Crafting
   { id: 'gem-diamond', name: 'Flawless Diamond', category: 'Crafting Material', description: 'Perfect diamond for the most powerful enchantments and jewelry', rarity: 'artifact', value: 5000, quantity: 1 },

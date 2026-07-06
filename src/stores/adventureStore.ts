@@ -92,6 +92,9 @@ export const useAdventureStore = create<AdventureStore>()(
           combatState: null,
           isAIResponding: false,
           conversationContext: [],
+          questLog: [],
+          totalXPEarned: 0,
+          currentLocation: 'Unknown',
         })
       },
 
