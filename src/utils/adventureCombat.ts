@@ -306,7 +306,8 @@ export function buildCharacterSummary(character: Character): string {
     .map(([lvl, v]) => `L${lvl}: ${(v as any).max - ((v as any).used || 0)}/${(v as any).max}`)
     .join(', ')
 
-  const conditions = (character.conditions ?? []).length > 0 ? character.conditions.join(', ') : 'none'
+  const conds = character.conditions ?? []
+  const conditions = conds.length > 0 ? conds.join(', ') : 'none'
 
   return [
     `Name: ${character.name}`,

@@ -43,7 +43,7 @@ export function EncounterBuilder() {
       currentHP: char.hitPoints.current,
       maxHP: char.hitPoints.maximum,
       ac: char.armorClass,
-      conditions: [...char.conditions],
+      conditions: [...(char.conditions ?? [])],
     }))
     setCombatants([...combatants, ...newCombatants])
   }

@@ -57,6 +57,8 @@ type SkillKey = 'acrobatics' | 'animalHandling' | 'arcana' | 'athletics' | 'dece
   'history' | 'insight' | 'intimidation' | 'investigation' | 'medicine' | 'nature' |
   'perception' | 'performance' | 'persuasion' | 'religion' | 'sleightOfHand' | 'stealth' | 'survival'
 
+const ARMOR_ADDON_REGEX = /^armor\s*\+(\d+)$/i
+
 const SKILLS: { name: string; ability: Ability; key: SkillKey; refId: string }[] = [
   { name: 'Acrobatics', ability: 'dexterity', key: 'acrobatics', refId: 'acrobatics' },
   { name: 'Animal Handling', ability: 'wisdom', key: 'animalHandling', refId: 'animal-handling' },
@@ -201,9 +203,8 @@ export function CharacterSheetPage() {
     [currentCharacter?.equipment]
   )
 
-  const armorAddonRegex = /^armor\s*\+(\d+)$/i
   const armorAddonItems = useMemo(
-    () => (currentCharacter?.equipment ?? []).filter((i) => armorAddonRegex.test(i.name.trim())),
+    () => (currentCharacter?.equipment ?? []).filter((i) => ARMOR_ADDON_REGEX.test(i.name.trim())),
     [currentCharacter?.equipment]
   )
   const armorAddonBonus = useMemo(

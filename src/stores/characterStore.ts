@@ -301,11 +301,12 @@ export const useCharacterStore = create<CharacterState>()(
         loadCharacter: (id: string) => {
           const character = get().characters.find((c) => c.id === id)
           if (character) {
-            const loaded = needsMigration(character)
+            const shouldMigrate = needsMigration(character)
+            const loaded = shouldMigrate
               ? migrateCharacter(character)
               : { ...character }
 
-            const updatedCharacters = needsMigration(character)
+            const updatedCharacters = shouldMigrate
               ? get().characters.map((c) => (c.id === id ? loaded : c))
               : get().characters
 

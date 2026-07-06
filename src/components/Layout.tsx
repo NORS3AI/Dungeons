@@ -15,17 +15,17 @@ export function Layout() {
   const [showSyncModal, setShowSyncModal] = useState(false)
   const lastSyncedVersion = useSettingsStore((s) => s.lastSyncedContentVersion)
   const { setLastSyncedContentVersion } = useSettingsStore()
-  const characters = useCharacterStore((s) => s.characters)
+  const characterCount = useCharacterStore((s) => s.characters.length)
 
   useEffect(() => {
     if (lastSyncedVersion < CONTENT_VERSION) {
-      if (characters.length > 0) {
+      if (characterCount > 0) {
         setShowSyncModal(true)
       } else {
         setLastSyncedContentVersion(CONTENT_VERSION)
       }
     }
-  }, [lastSyncedVersion, characters.length, setLastSyncedContentVersion])
+  }, [lastSyncedVersion, characterCount, setLastSyncedContentVersion])
 
   // Global keyboard shortcut listener
   useEffect(() => {
