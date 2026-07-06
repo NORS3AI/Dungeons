@@ -1,5 +1,55 @@
 # Dungeons - Patch Notes
 
+## Version 0.5.6-beta - July 06, 2026
+
+**Beta Release Notice**: Deep codebase audit — 15+ bugs fixed across character migration, store actions, combat, spell slots, loot, and adventure system.
+
+### Deep Audit: Migration & Data Integrity
+
+Character migration now preserves all optional fields (professionData, firstName, surname, nickname, gender, acOverride, etc.) that were previously silently dropped during migration. Imported characters now run through the migration pipeline automatically.
+
+#### **What Changed**
+- Character migration spreads the original character data first, so optional fields are no longer lost
+- Imported characters (JSON import) now run migration to fill missing fields
+- The `needsMigration()` check now includes `conditions` — old characters missing this field are caught
+- Persist merge wraps migration in try-catch so a corrupted single character can't kill the entire save
+- Loading a non-existent character ID now clears `currentCharacter` instead of showing stale data
+
+### Bug Fix: Short Rest D&D Rule Violation
+
+Short rest was incorrectly restoring long-rest-only resource pools (like Runic Power) at 50% capacity. Per D&D 5e rules, long-rest-only resources do NOT recharge on short rest.
+
+### Bug Fix: Spell Slots Display & Level-Up Spells
+
+- Spell slots summary now correctly shows remaining/max instead of `undefined/max`
+- Spell slot level labels now display correctly (1st, 2nd, 3rd) instead of showing raw key names
+- Level-up spell selector no longer opens for non-caster classes (Fighter, Barbarian, etc.)
+
+### Bug Fix: Store Action Crash Guards
+
+Added null-coalescing guards to 10+ store actions (useFeatureCharge, addItemFeature, removeItemFeature, spendResource, restoreResource, shortRest, longRest, addCondition, removeCondition) preventing crashes on unmigrated characters.
+
+### Bug Fix: Feature Charges Scale on Level-Up
+
+Feature charges now update their maximum values when leveling up, instead of keeping stale maximums from when the feature was first initialized.
+
+### Bug Fix: Loot Generator Category Casing
+
+Fixed loot items using `'Weapon'`/`'Armor'` (uppercase) instead of `'weapon'`/`'armor'` (lowercase) — items were not being recognized as equippable weapons/armor.
+
+### Bug Fix: Combat & Adventure System
+
+- `buildCombatContext` no longer crashes when enemies from old saves are missing the `conditions` field
+- `endAdventure` now properly resets `questLog`, `totalXPEarned`, and `currentLocation`
+- Weapon property checks in equipment display use optional chaining to prevent crashes on malformed weapon data
+- Resource pool progress bars handle zero-maximum pools without division-by-zero
+
+### Cleanup
+
+- Removed stale `public/PATCH_NOTES.md` (dead file — app uses root `PATCH_NOTES.md` via `?raw` import)
+
+**Why This Matters**: Players with old saved data, imported characters, or characters created before recent updates will no longer hit crashes or data loss. Short rests now follow D&D 5e rules correctly, spell slots display properly, and the loot system generates usable equipment.
+
 ## Version 0.5.5-beta - July 06, 2026
 
 **Beta Release Notice**: Critical crash fix — old saved characters no longer crash the app when switching tabs or using professions.

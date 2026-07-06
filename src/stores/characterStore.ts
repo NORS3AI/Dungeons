@@ -315,6 +315,11 @@ export const useCharacterStore = create<CharacterState>()(
               characters: updatedCharacters,
               history: { past: [], future: [] },
             })
+          } else {
+            set({
+              currentCharacter: null,
+              history: { past: [], future: [] },
+            })
           }
         },
 
@@ -380,9 +385,12 @@ export const useCharacterStore = create<CharacterState>()(
         },
 
         importCharacter: (character: Character) => {
+          const migrated = needsMigration(character)
+            ? migrateCharacter(character)
+            : character
           set((state) => ({
-            characters: [...state.characters, character],
-            currentCharacter: character,
+            characters: [...state.characters, migrated],
+            currentCharacter: migrated,
           }))
         },
 
@@ -1277,12 +1285,13 @@ export const useCharacterStore = create<CharacterState>()(
 
         addCondition: (condition: Condition) => {
           const { currentCharacter } = get()
-          if (!currentCharacter || currentCharacter.conditions.includes(condition)) return
+          const conditions = currentCharacter?.conditions ?? []
+          if (!currentCharacter || conditions.includes(condition)) return
 
           set({
             currentCharacter: {
               ...currentCharacter,
-              conditions: [...currentCharacter.conditions, condition],
+              conditions: [...conditions, condition],
             },
           })
         },
@@ -1294,7 +1303,7 @@ export const useCharacterStore = create<CharacterState>()(
           set({
             currentCharacter: {
               ...currentCharacter,
-              conditions: currentCharacter.conditions.filter((c) => c !== condition),
+              conditions: (currentCharacter.conditions ?? []).filter((c) => c !== condition),
             },
           })
         },
@@ -1306,7 +1315,7 @@ export const useCharacterStore = create<CharacterState>()(
           set({
             currentCharacter: {
               ...currentCharacter,
-              featureCharges: currentCharacter.featureCharges.map((f) =>
+              featureCharges: (currentCharacter.featureCharges ?? []).map((f) =>
                 f.id === featureId && f.current > 0
                   ? { ...f, current: f.current - 1 }
                   : f
@@ -1322,7 +1331,7 @@ export const useCharacterStore = create<CharacterState>()(
           set({
             currentCharacter: {
               ...currentCharacter,
-              featureCharges: currentCharacter.featureCharges.map((f) =>
+              featureCharges: (currentCharacter.featureCharges ?? []).map((f) =>
                 f.id === featureId
                   ? { ...f, current: Math.min(f.current + amount, f.maximum) }
                   : f
@@ -1335,14 +1344,14 @@ export const useCharacterStore = create<CharacterState>()(
           const { currentCharacter } = get()
           if (!currentCharacter) return
 
-          // Check if feature already exists (don't add duplicates)
-          const exists = currentCharacter.itemFeatures.some(f => f.id === feature.id)
+          const itemFeatures = currentCharacter.itemFeatures ?? []
+          const exists = itemFeatures.some(f => f.id === feature.id)
           if (exists) return
 
           set({
             currentCharacter: {
               ...currentCharacter,
-              itemFeatures: [...currentCharacter.itemFeatures, feature],
+              itemFeatures: [...itemFeatures, feature],
             },
           })
         },
@@ -1354,7 +1363,7 @@ export const useCharacterStore = create<CharacterState>()(
           set({
             currentCharacter: {
               ...currentCharacter,
-              itemFeatures: currentCharacter.itemFeatures.filter(f => f.id !== featureId),
+              itemFeatures: (currentCharacter.itemFeatures ?? []).filter(f => f.id !== featureId),
             },
           })
         },
@@ -1482,35 +1491,42 @@ export const useCharacterStore = create<CharacterState>()(
 
           classFeatures.forEach((feature) => {
             if (feature.charges) {
-              // Check if this feature already exists to avoid duplicates
-              const existingFeature = currentCharacter.featureCharges.find(fc => fc.id === feature.id)
-              if (!existingFeature) {
-                // Calculate actual charge amount
-                let chargeAmount = 1
-                if (typeof feature.charges.amount === 'number') {
-                  chargeAmount = feature.charges.amount
-                } else if (feature.charges.amount === 'proficiencyBonus') {
-                  chargeAmount = Math.floor((level - 1) / 4) + 2
-                } else if (feature.charges.amount === 'abilityModifier' && feature.charges.abilityModifier) {
-                  const abilityScore = currentCharacter.abilityScores[feature.charges.abilityModifier]
-                  chargeAmount = Math.max(1, Math.floor((abilityScore - 10) / 2))
-                }
-
-                featureCharges.push({
-                  id: feature.id,
-                  name: feature.name,
-                  current: chargeAmount,
-                  maximum: chargeAmount,
-                  rechargeOn: feature.charges.rechargeOn,
-                })
+              // Calculate actual charge amount
+              let chargeAmount = 1
+              if (typeof feature.charges.amount === 'number') {
+                chargeAmount = feature.charges.amount
+              } else if (feature.charges.amount === 'proficiencyBonus') {
+                chargeAmount = Math.floor((level - 1) / 4) + 2
+              } else if (feature.charges.amount === 'abilityModifier' && feature.charges.abilityModifier) {
+                const abilityScore = currentCharacter.abilityScores[feature.charges.abilityModifier]
+                chargeAmount = Math.max(1, Math.floor((abilityScore - 10) / 2))
               }
+
+              featureCharges.push({
+                id: feature.id,
+                name: feature.name,
+                current: chargeAmount,
+                maximum: chargeAmount,
+                rechargeOn: feature.charges.rechargeOn,
+              })
             }
           })
 
-          // Merge with existing featureCharges to avoid overwriting
-          const mergedCharges = [...currentCharacter.featureCharges]
+          // Merge: update max for existing charges (level-up scaling), add new ones
+          const existingCharges = currentCharacter.featureCharges ?? []
+          const mergedCharges = [...existingCharges]
           featureCharges.forEach((newCharge) => {
-            if (!mergedCharges.find(fc => fc.id === newCharge.id)) {
+            const existingIdx = mergedCharges.findIndex(fc => fc.id === newCharge.id)
+            if (existingIdx >= 0) {
+              const existing = mergedCharges[existingIdx]
+              if (existing.maximum !== newCharge.maximum) {
+                mergedCharges[existingIdx] = {
+                  ...existing,
+                  maximum: newCharge.maximum,
+                  current: Math.min(existing.current + (newCharge.maximum - existing.maximum), newCharge.maximum),
+                }
+              }
+            } else {
               mergedCharges.push(newCharge)
             }
           })
@@ -1527,7 +1543,7 @@ export const useCharacterStore = create<CharacterState>()(
           const { currentCharacter } = get()
           if (!currentCharacter) return
 
-          const resourcePools = currentCharacter.resourcePools.map((pool) =>
+          const resourcePools = (currentCharacter.resourcePools ?? []).map((pool) =>
             pool.id === poolId
               ? { ...pool, current: Math.max(0, pool.current - amount) }
               : pool
@@ -1545,7 +1561,7 @@ export const useCharacterStore = create<CharacterState>()(
           const { currentCharacter } = get()
           if (!currentCharacter) return
 
-          const resourcePools = currentCharacter.resourcePools.map((pool) =>
+          const resourcePools = (currentCharacter.resourcePools ?? []).map((pool) =>
             pool.id === poolId
               ? { ...pool, current: Math.min(pool.maximum, pool.current + amount) }
               : pool
@@ -1563,16 +1579,16 @@ export const useCharacterStore = create<CharacterState>()(
           const { currentCharacter } = get()
           if (!currentCharacter) return
 
-          // Restore short rest features
-          const featureCharges = currentCharacter.featureCharges.map((f) =>
+          // Restore short rest features only
+          const featureCharges = (currentCharacter.featureCharges ?? []).map((f) =>
             f.rechargeOn === 'shortRest' ? { ...f, current: f.maximum } : f
           )
 
-          // Restore short rest resource pools (half restoration for longRest pools, full for shortRest pools)
-          const resourcePools = currentCharacter.resourcePools.map((pool) =>
+          // Only restore shortRest pools — longRest pools do NOT recharge on short rest per D&D 5e rules
+          const resourcePools = (currentCharacter.resourcePools ?? []).map((pool) =>
             pool.rechargeOn === 'shortRest'
               ? { ...pool, current: pool.maximum }
-              : { ...pool, current: Math.min(pool.current + Math.floor(pool.maximum / 2), pool.maximum) }
+              : pool
           )
 
           set({
@@ -1589,14 +1605,14 @@ export const useCharacterStore = create<CharacterState>()(
           if (!currentCharacter) return
 
           // Restore all features and spell slots
-          const featureCharges = currentCharacter.featureCharges.map((f) =>
+          const featureCharges = (currentCharacter.featureCharges ?? []).map((f) =>
             f.rechargeOn === 'shortRest' || f.rechargeOn === 'longRest'
               ? { ...f, current: f.maximum }
               : f
           )
 
           // Restore all resource pools (full restore on long rest)
-          const resourcePools = currentCharacter.resourcePools.map((pool) => ({
+          const resourcePools = (currentCharacter.resourcePools ?? []).map((pool) => ({
             ...pool,
             current: pool.maximum,
           }))
@@ -1800,9 +1816,13 @@ export const useCharacterStore = create<CharacterState>()(
         }),
         merge: (persisted, current) => {
           const p = persisted as { characters?: any[] }
-          const chars = (p?.characters ?? []).map((c: any) =>
-            needsMigration(c) ? migrateCharacter(c) : c
-          )
+          const chars = (p?.characters ?? []).map((c: any) => {
+            try {
+              return needsMigration(c) ? migrateCharacter(c) : c
+            } catch {
+              return c
+            }
+          })
           return { ...current, characters: chars } as any
         },
       }

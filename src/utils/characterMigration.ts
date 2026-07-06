@@ -26,8 +26,11 @@ function consolidateMaterials(materials: Material[]): Material[] {
 export function migrateCharacter(character: Partial<Character>): Character {
   const now = new Date().toISOString()
 
-  // Create a fully migrated character with all required fields
+  // Spread the original first to preserve any optional fields (professionData, firstName, etc.)
+  // then override with defaults for any missing required fields
   const migrated: Character = {
+    ...character as any,
+
     // Identity - required
     id: character.id || `char-${Date.now()}`,
     name: character.name || 'Unnamed Character',
@@ -162,6 +165,7 @@ export function needsMigration(character: any): boolean {
 
   // Check for missing fields that were added in updates
   const checks = [
+    character.conditions === undefined,
     character.materials === undefined,
     character.itemFeatures === undefined,
     character.resourcePools === undefined,

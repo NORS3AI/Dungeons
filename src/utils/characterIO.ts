@@ -1,5 +1,6 @@
 import type { Character } from '../types'
 import html2pdf from 'html2pdf.js'
+import { migrateCharacter } from './characterMigration'
 
 /**
  * Export character to JSON file
@@ -21,16 +22,14 @@ export function exportCharacterToJSON(character: Character): void {
 /**
  * Validate imported character data
  */
-function validateCharacterData(data: unknown): data is Character {
+function validateCharacterData(data: unknown): data is Partial<Character> {
   if (!data || typeof data !== 'object') return false
 
   const char = data as Record<string, unknown>
 
-  // Check required fields
-  if (typeof char.id !== 'string') return false
   if (typeof char.name !== 'string') return false
-  if (typeof char.level !== 'number') return false
-  if (!char.abilityScores || typeof char.abilityScores !== 'object') return false
+  if (char.level !== undefined && typeof char.level !== 'number') return false
+  if (char.abilityScores !== undefined && typeof char.abilityScores !== 'object') return false
 
   return true
 }
@@ -58,12 +57,11 @@ export async function importCharacterFromJSON(file: File): Promise<Character[]> 
           const imported: Character[] = []
           for (const item of data) {
             if (validateCharacterData(item)) {
-              imported.push({
+              const migrated = migrateCharacter({
                 ...item,
                 id: crypto.randomUUID(),
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
               })
+              imported.push(migrated)
             }
           }
           if (imported.length === 0) {
@@ -78,13 +76,10 @@ export async function importCharacterFromJSON(file: File): Promise<Character[]> 
           throw new Error('Invalid character data format')
         }
 
-        const importedCharacter: Character = {
+        const importedCharacter = migrateCharacter({
           ...data,
           id: crypto.randomUUID(),
-          name: data.name || 'Imported Character',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        }
+        })
 
         resolve([importedCharacter])
       } catch (error) {

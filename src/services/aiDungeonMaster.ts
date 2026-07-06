@@ -392,7 +392,7 @@ export function buildCombatContext(
 
   const enemyStatus = combatState.enemies
     .filter((e) => e.isActive)
-    .map((e) => `${e.name}: ${e.currentHP}/${e.maxHP} HP, AC ${e.ac}${e.conditions.length > 0 ? ` [${e.conditions.join(', ')}]` : ''}`)
+    .map((e) => `${e.name}: ${e.currentHP}/${e.maxHP} HP, AC ${e.ac}${(e.conditions ?? []).length > 0 ? ` [${e.conditions.join(', ')}]` : ''}`)
     .join('\n')
 
   return `\n\n[COMBAT - Round ${combatState.round}]\nEnemies:\n${enemyStatus}\nIt is ${combatState.isPlayerTurn ? 'the player\'s' : 'the enemies\''} turn.`
