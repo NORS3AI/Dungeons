@@ -1,5 +1,28 @@
 # Dungeons - Patch Notes
 
+## Version 0.6.2-beta - July 06, 2026
+
+**Beta Release Notice**: Fleet loadout save/load system for the Naval Battle Simulator.
+
+### Fleet Loadout System
+
+Save and load fleet configurations for instant battle setup across sessions.
+
+#### **Save & Load**
+- **Save Current Fleet** button appears when ships exist in a fleet panel
+- Name your loadout and save — stores all ship names, AC, HP, cannon counts, and abilities
+- **Load** button instantly restores a saved fleet, replacing any current ships of that faction
+- Separate ally and enemy loadout lists so you can mix and match configurations
+
+#### **Management**
+- Delete individual loadouts with the X button
+- Loadouts persist in localStorage — survive page refreshes and browser restarts
+- Each loadout shows ship count and names at a glance
+- Keyboard support: Enter to save, Escape to cancel the save form
+- Save button disabled when name is empty (prevents blank entries)
+
+**Why This Matters**: No more recreating the same fleet every session. Save "3 Galleons" and "5 Pirate Sloops" once, load them in seconds next time.
+
 ## Version 0.6.1-beta - July 06, 2026
 
 **Beta Release Notice**: Naval combat quality-of-life — ship editing, duplication, mobile support, and auto-targeting.

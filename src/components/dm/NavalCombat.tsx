@@ -574,6 +574,163 @@ function PhaseIndicator({ phase }: { phase: CombatTurnPhase }) {
   )
 }
 
+// ─── Fleet Loadouts ─────────────────────────────────────────────────────────
+
+interface ShipTemplate {
+  name: string
+  ac: number
+  maxHP: number
+  totalCannons: number
+  abilities: ShipAbility[]
+}
+
+interface FleetLoadout {
+  id: string
+  name: string
+  faction: ShipFaction
+  ships: ShipTemplate[]
+  savedAt: number
+}
+
+const LOADOUT_STORAGE_KEY = 'dungeons-naval-loadouts'
+
+function loadSavedLoadouts(): FleetLoadout[] {
+  try {
+    const raw = localStorage.getItem(LOADOUT_STORAGE_KEY)
+    return raw ? JSON.parse(raw) : []
+  } catch {
+    return []
+  }
+}
+
+function persistLoadouts(loadouts: FleetLoadout[]) {
+  localStorage.setItem(LOADOUT_STORAGE_KEY, JSON.stringify(loadouts))
+}
+
+function FleetLoadoutPanel({
+  faction,
+  currentShips,
+  onLoadFleet,
+}: {
+  faction: ShipFaction
+  currentShips: Ship[]
+  onLoadFleet: (ships: ShipTemplate[], faction: ShipFaction) => void
+}) {
+  const [loadouts, setLoadouts] = useState<FleetLoadout[]>(loadSavedLoadouts)
+  const [saving, setSaving] = useState(false)
+  const [saveName, setSaveName] = useState('')
+
+  const factionLoadouts = loadouts.filter(l => l.faction === faction)
+  const factionLabel = faction === 'player' ? 'Ally' : 'Enemy'
+
+  const handleSave = () => {
+    if (!saveName.trim() || currentShips.length === 0) return
+    const newLoadout: FleetLoadout = {
+      id: `loadout-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      name: saveName.trim(),
+      faction,
+      ships: currentShips.map(s => ({
+        name: s.name,
+        ac: s.ac,
+        maxHP: s.maxHP,
+        totalCannons: s.totalCannons,
+        abilities: [...s.abilities],
+      })),
+      savedAt: Date.now(),
+    }
+    const updated = [...loadouts, newLoadout]
+    setLoadouts(updated)
+    persistLoadouts(updated)
+    setSaveName('')
+    setSaving(false)
+  }
+
+  const handleDelete = (id: string) => {
+    const updated = loadouts.filter(l => l.id !== id)
+    setLoadouts(updated)
+    persistLoadouts(updated)
+  }
+
+  const handleLoad = (loadout: FleetLoadout) => {
+    onLoadFleet(loadout.ships, faction)
+  }
+
+  return (
+    <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700 space-y-2">
+      <div className="flex items-center justify-between">
+        <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Saved {factionLabel} Fleets</h4>
+        {currentShips.length > 0 && !saving && (
+          <button
+            onClick={() => setSaving(true)}
+            className="text-xs px-2 py-1 rounded bg-gray-700 text-dnd-gold hover:bg-gray-600 transition-colors"
+          >
+            Save Current Fleet
+          </button>
+        )}
+      </div>
+
+      {saving && (
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={saveName}
+            onChange={e => setSaveName(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') setSaving(false) }}
+            placeholder="Fleet name..."
+            autoFocus
+            className="flex-1 bg-gray-900 border border-gray-600 rounded px-2 py-1 text-white text-xs
+                       focus:border-dnd-gold focus:outline-none"
+          />
+          <button
+            onClick={handleSave}
+            disabled={!saveName.trim()}
+            className="px-2 py-1 rounded text-xs font-bold bg-dnd-gold text-gray-900 hover:bg-yellow-400
+                       disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            Save
+          </button>
+          <button
+            onClick={() => { setSaving(false); setSaveName('') }}
+            className="px-2 py-1 rounded text-xs bg-gray-700 text-gray-300 hover:bg-gray-600 transition-colors"
+          >
+            Cancel
+          </button>
+        </div>
+      )}
+
+      {factionLoadouts.length === 0 && !saving && (
+        <div className="text-xs text-gray-600 text-center py-2">No saved fleets</div>
+      )}
+
+      {factionLoadouts.map(loadout => (
+        <div key={loadout.id} className="flex items-center gap-2 bg-gray-900/50 rounded px-2 py-1.5">
+          <div className="flex-1 min-w-0">
+            <div className="text-xs font-bold text-white truncate">{loadout.name}</div>
+            <div className="text-[10px] text-gray-500">
+              {loadout.ships.length} ship{loadout.ships.length !== 1 ? 's' : ''}: {loadout.ships.map(s => s.name).join(', ')}
+            </div>
+          </div>
+          <button
+            onClick={() => handleLoad(loadout)}
+            className="px-2 py-0.5 rounded text-xs font-bold bg-green-900/50 text-green-400 hover:bg-green-800 transition-colors whitespace-nowrap"
+          >
+            Load
+          </button>
+          <button
+            onClick={() => handleDelete(loadout.id)}
+            className="text-gray-600 hover:text-red-400 transition-colors p-0.5"
+            title="Delete loadout"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 // ─── Main Component ──────────────────────────────────────────────────────────
 
 export function NavalCombat() {
@@ -638,6 +795,25 @@ export function NavalCombat() {
   }
   const duplicateShip = (ship: Ship) => {
     setShips(prev => [...prev, { ...ship, id: createShipId(), name: `${ship.name} (Copy)` }])
+  }
+  const loadFleet = (templates: ShipTemplate[], faction: ShipFaction) => {
+    const newShips: Ship[] = templates.map(t => ({
+      id: createShipId(),
+      name: t.name,
+      faction,
+      ac: t.ac,
+      maxHP: t.maxHP,
+      currentHP: t.maxHP,
+      totalCannons: t.totalCannons,
+      functionalCannons: t.totalCannons,
+      loadedCannons: 0,
+      ammoType: 'ball' as const,
+      abilities: [...t.abilities],
+      status: 'active' as const,
+      repairTurnsRemaining: 0,
+      conditions: [],
+    }))
+    setShips(prev => [...prev.filter(s => s.faction !== faction), ...newShips])
   }
 
   // ── Start Battle ─────────────────────────────────────────────────────────
@@ -1124,6 +1300,9 @@ export function NavalCombat() {
               onUpdate={updateShip}
               onCancelEdit={() => setEditingShip(null)}
             />
+            <div className="mt-3">
+              <FleetLoadoutPanel faction="player" currentShips={playerShips} onLoadFleet={loadFleet} />
+            </div>
           </div>
 
           {/* Enemy Fleet */}
@@ -1154,6 +1333,9 @@ export function NavalCombat() {
               onUpdate={updateShip}
               onCancelEdit={() => setEditingShip(null)}
             />
+            <div className="mt-3">
+              <FleetLoadoutPanel faction="enemy" currentShips={enemyShips} onLoadFleet={loadFleet} />
+            </div>
           </div>
         </div>
 
