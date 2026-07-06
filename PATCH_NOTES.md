@@ -1,5 +1,49 @@
 # Dungeons - Patch Notes
 
+## Version 0.6.0-beta - July 06, 2026
+
+**Beta Release Notice**: Naval Battle Simulator — full ship-to-ship combat system for DM campaign tools.
+
+### Naval Battle Simulator
+
+A complete naval combat simulator in the DM Campaign Tools, accessible via the new **Naval** tab. Configure player and enemy fleets, then engage in turn-based ship-to-ship combat with D&D dice mechanics.
+
+#### **Fleet Setup**
+- Add multiple player/ally and enemy ships with custom names, AC, HP, and cannon counts
+- Select ship abilities (Ram, Boarding Party, Greek Fire, Brace for Impact)
+- Damage scales with cannon count: 2d8 (1-20 cannons), 4d8 (21-60), 6d8 (61+)
+- Cannon damage reference table shown during setup
+
+#### **Turn-Based Combat Phases**
+- **Reload** — 1d20 determines how many cannons are functional this round (fumble on 1 = 10% + self damage, critical on 20 = full broadside)
+- **Load & Aim** — Choose how many cannons to load, select Ball or Chain shot ammunition, pick target ship
+- **Fire** — 1d20 attack roll against target AC with critical hit/fumble support
+- **Resolve** — Damage applied with full dice breakdown display (individual rolls shown)
+- **DM Actions** — Apply conditions (fire, taking water, mast damage, crew swept), use ship abilities, heal/damage ships directly
+
+#### **Ammunition Types**
+- **Ball Shot** — Standard cannonball dealing full hull damage
+- **Chain Shot** — Targets mast and deck: half hull damage + applies Mast Damaged or Crew Swept condition
+
+#### **Ship Conditions & Effects**
+- **On Fire** — 1d6 damage per turn, crew attempts to extinguish (DC 12)
+- **Taking Water** — 1d4 damage per turn, -2 AC penalty
+- **Mast Damaged** — Reduced mobility (visual indicator)
+- **Crew Swept** — Functional cannons halved
+
+#### **Repair System**
+- Ships can enter repair mode (1d4 turns out of combat)
+- On completion, roll 1d20 for healing: 1→+5 HP, 2-5→+15 HP, 6-14→+10 HP, 15-19→+15 HP, 20→+25 HP
+
+#### **Battle Visualization**
+- Animated ocean scene with wave effects and ship cards showing real-time HP, AC, and cannon status
+- Projectile animations between ships during fire phase
+- Color-coded condition indicators on ship cards
+- Scrolling battle log with round markers, damage reports, and dice roll details
+- Phase indicator breadcrumb showing current combat step
+
+**Why This Matters**: DMs can now run full naval encounters directly in the app — no more tracking ship combat on paper. The visual battle scene and detailed log make ocean combat immersive and easy to manage.
+
 ## Version 0.5.6-beta - July 06, 2026
 
 **Beta Release Notice**: Deep codebase audit — 15+ bugs fixed across character migration, store actions, combat, spell slots, loot, and adventure system.

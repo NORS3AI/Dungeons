@@ -1,0 +1,1453 @@
+import { useState, useRef, useEffect, useCallback } from 'react'
+import type {
+  Ship, ShipFaction, ShipAbility, AmmoType, ShipCondition,
+  BattleLogEntry, Projectile, CombatTurnPhase,
+} from '../../types/naval'
+import {
+  rollReload, rollToHit, rollCannonDamage, rollRepairDuration, rollRepairResult,
+  applyConditionEffects, getACWithConditions, getFunctionalCannonsWithConditions,
+  isFleetDefeated, buildTurnOrder, getDamageNotation,
+} from '../../utils/navalCombat'
+
+// ─── Constants ────────────────────────────────────────────────────────────────
+
+const CONDITION_LABELS: Record<ShipCondition, { label: string; icon: string; color: string }> = {
+  on_fire: { label: 'On Fire', icon: '🔥', color: 'text-orange-400' },
+  taking_water: { label: 'Taking Water', icon: '🌊', color: 'text-blue-400' },
+  mast_damaged: { label: 'Mast Damaged', icon: '⚓', color: 'text-yellow-400' },
+  crew_swept: { label: 'Crew Swept', icon: '💀', color: 'text-red-400' },
+}
+
+const LOG_COLORS: Record<BattleLogEntry['type'], string> = {
+  attack: 'text-white',
+  reload: 'text-cyan-300',
+  repair: 'text-green-300',
+  ability: 'text-purple-300',
+  status: 'text-gray-400',
+  damage: 'text-red-400',
+  heal: 'text-green-400',
+  info: 'text-blue-300',
+  critical: 'text-yellow-300',
+  fumble: 'text-red-500',
+  miss: 'text-gray-500',
+}
+
+const DEFAULT_ABILITIES: ShipAbility[] = [
+  { id: 'ram', name: 'Ram', description: 'Ram the enemy ship for 2d10 damage (takes 1d6 self damage)' },
+  { id: 'boarding', name: 'Boarding Party', description: 'Send crew to board enemy ship (contested d20 check)' },
+  { id: 'greek-fire', name: 'Greek Fire', description: 'Launch incendiary projectile — sets target on fire' },
+  { id: 'brace', name: 'Brace for Impact', description: '+2 AC until next turn, but cannot fire' },
+]
+
+function createShipId(): string {
+  return `ship-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+}
+
+function createLogId(): string {
+  return `log-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+}
+
+// ─── Ship SVG ─────────────────────────────────────────────────────────────────
+
+function ShipSVG({ faction, size = 80, sinking = false }: { faction: ShipFaction; size?: number; sinking?: boolean }) {
+  const color = faction === 'player' ? '#3b82f6' : '#ef4444'
+  const sail = faction === 'player' ? '#60a5fa' : '#f87171'
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100" className={sinking ? 'opacity-40' : ''}>
+      {/* Hull */}
+      <path
+        d={faction === 'player'
+          ? 'M15,65 Q20,80 50,82 Q80,80 85,65 L80,55 L20,55 Z'
+          : 'M15,65 Q20,80 50,82 Q80,80 85,65 L80,55 L20,55 Z'}
+        fill={color}
+        stroke="#1e293b"
+        strokeWidth="2"
+      />
+      {/* Deck */}
+      <rect x="22" y="52" width="56" height="6" rx="2" fill="#92400e" stroke="#78350f" strokeWidth="1" />
+      {/* Mast */}
+      <line x1="50" y1="52" x2="50" y2="15" stroke="#78350f" strokeWidth="3" />
+      {/* Sail */}
+      <path
+        d={faction === 'player'
+          ? 'M50,18 Q65,30 50,48 Q35,30 50,18'
+          : 'M50,18 Q35,30 50,48 Q65,30 50,18'}
+        fill={sail}
+        stroke="#1e293b"
+        strokeWidth="1.5"
+        opacity="0.9"
+      />
+      {/* Flag */}
+      <line x1="50" y1="15" x2="50" y2="8" stroke="#78350f" strokeWidth="2" />
+      <polygon
+        points={faction === 'player' ? '50,8 62,13 50,16' : '50,8 38,13 50,16'}
+        fill={faction === 'player' ? '#fbbf24' : '#9333ea'}
+      />
+      {/* Cannon ports */}
+      <circle cx="28" cy="60" r="2" fill="#1e293b" />
+      <circle cx="38" cy="60" r="2" fill="#1e293b" />
+      <circle cx="50" cy="60" r="2" fill="#1e293b" />
+      <circle cx="62" cy="60" r="2" fill="#1e293b" />
+      <circle cx="72" cy="60" r="2" fill="#1e293b" />
+    </svg>
+  )
+}
+
+// ─── HP Bar ───────────────────────────────────────────────────────────────────
+
+function HPBar({ current, max, showText = true }: { current: number; max: number; showText?: boolean }) {
+  const pct = max > 0 ? Math.max(0, (current / max) * 100) : 0
+  const color = pct > 60 ? 'bg-green-500' : pct > 30 ? 'bg-yellow-500' : 'bg-red-500'
+  return (
+    <div>
+      <div className="h-3 bg-gray-700 rounded-full overflow-hidden border border-gray-600">
+        <div
+          className={`h-full ${color} transition-all duration-500`}
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+      {showText && (
+        <div className="text-xs text-center mt-0.5 text-gray-300 font-mono">
+          {current}/{max} HP
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Ship Card (Setup) ───────────────────────────────────────────────────────
+
+function ShipForm({
+  faction,
+  onAdd,
+}: {
+  faction: ShipFaction
+  onAdd: (ship: Ship) => void
+}) {
+  const [name, setName] = useState('')
+  const [ac, setAc] = useState(15)
+  const [hp, setHp] = useState(100)
+  const [cannons, setCannons] = useState(20)
+  const [abilities, setAbilities] = useState<ShipAbility[]>([])
+  const [showAbilities, setShowAbilities] = useState(false)
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!name.trim()) return
+    onAdd({
+      id: createShipId(),
+      name: name.trim(),
+      faction,
+      ac,
+      maxHP: hp,
+      currentHP: hp,
+      totalCannons: cannons,
+      functionalCannons: cannons,
+      loadedCannons: 0,
+      ammoType: 'ball',
+      abilities: [...abilities],
+      status: 'active',
+      repairTurnsRemaining: 0,
+      conditions: [],
+    })
+    setName('')
+    setAc(15)
+    setHp(100)
+    setCannons(20)
+    setAbilities([])
+  }
+
+  const toggleAbility = (ability: ShipAbility) => {
+    setAbilities(prev =>
+      prev.find(a => a.id === ability.id)
+        ? prev.filter(a => a.id !== ability.id)
+        : [...prev, ability]
+    )
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+      <div className="grid grid-cols-2 gap-3">
+        <div className="col-span-2">
+          <label className="block text-xs text-gray-400 mb-1">Ship Name</label>
+          <input
+            type="text"
+            value={name}
+            onChange={e => setName(e.target.value)}
+            placeholder={faction === 'player' ? 'HMS Victory' : 'The Black Pearl'}
+            className="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white text-sm
+                       focus:border-dnd-gold focus:outline-none"
+          />
+        </div>
+        <div>
+          <label className="block text-xs text-gray-400 mb-1">Armor Class</label>
+          <input
+            type="number"
+            value={ac}
+            onChange={e => setAc(Number(e.target.value))}
+            min={1}
+            max={30}
+            className="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white text-sm
+                       focus:border-dnd-gold focus:outline-none"
+          />
+        </div>
+        <div>
+          <label className="block text-xs text-gray-400 mb-1">Hit Points</label>
+          <input
+            type="number"
+            value={hp}
+            onChange={e => setHp(Number(e.target.value))}
+            min={1}
+            className="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white text-sm
+                       focus:border-dnd-gold focus:outline-none"
+          />
+        </div>
+        <div>
+          <label className="block text-xs text-gray-400 mb-1">Cannon Count</label>
+          <input
+            type="number"
+            value={cannons}
+            onChange={e => setCannons(Number(e.target.value))}
+            min={1}
+            className="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white text-sm
+                       focus:border-dnd-gold focus:outline-none"
+          />
+        </div>
+        <div>
+          <label className="block text-xs text-gray-400 mb-1">Damage</label>
+          <div className="bg-gray-900 border border-gray-600 rounded px-3 py-2 text-dnd-gold text-sm font-mono">
+            {getDamageNotation(cannons)}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-3">
+        <button
+          type="button"
+          onClick={() => setShowAbilities(!showAbilities)}
+          className="text-xs text-gray-400 hover:text-white transition-colors"
+        >
+          {showAbilities ? '▼' : '▶'} Ship Abilities ({abilities.length} selected)
+        </button>
+        {showAbilities && (
+          <div className="mt-2 space-y-1">
+            {DEFAULT_ABILITIES.map(ability => (
+              <label key={ability.id} className="flex items-start gap-2 cursor-pointer p-1.5 rounded hover:bg-gray-700">
+                <input
+                  type="checkbox"
+                  checked={abilities.some(a => a.id === ability.id)}
+                  onChange={() => toggleAbility(ability)}
+                  className="mt-0.5 accent-dnd-gold"
+                />
+                <div>
+                  <span className="text-sm text-white font-medium">{ability.name}</span>
+                  <p className="text-xs text-gray-400">{ability.description}</p>
+                </div>
+              </label>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <button
+        type="submit"
+        disabled={!name.trim()}
+        className="mt-3 w-full py-2 rounded font-bold text-sm transition-colors
+                   bg-dnd-gold text-gray-900 hover:bg-yellow-400 disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        Add {faction === 'player' ? 'Ally' : 'Enemy'} Ship
+      </button>
+    </form>
+  )
+}
+
+function SetupShipCard({ ship, onRemove }: { ship: Ship; onRemove: () => void }) {
+  return (
+    <div className={`flex items-center gap-3 p-3 rounded-lg border ${
+      ship.faction === 'player'
+        ? 'bg-blue-900/20 border-blue-700/50'
+        : 'bg-red-900/20 border-red-700/50'
+    }`}>
+      <ShipSVG faction={ship.faction} size={50} />
+      <div className="flex-1 min-w-0">
+        <div className="font-bold text-white text-sm truncate">{ship.name}</div>
+        <div className="text-xs text-gray-400">
+          AC {ship.ac} | HP {ship.maxHP} | {ship.totalCannons} cannons ({getDamageNotation(ship.totalCannons)})
+        </div>
+        {ship.abilities.length > 0 && (
+          <div className="text-xs text-purple-400 mt-0.5">
+            {ship.abilities.map(a => a.name).join(', ')}
+          </div>
+        )}
+      </div>
+      <button onClick={onRemove} className="text-gray-500 hover:text-red-400 transition-colors p-1" title="Remove ship">
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+  )
+}
+
+// ─── Battle Visualization ────────────────────────────────────────────────────
+
+function BattleScene({
+  ships,
+  projectiles,
+  currentShipId,
+}: {
+  ships: Ship[]
+  projectiles: Projectile[]
+  currentShipId: string | null
+}) {
+  const playerShips = ships.filter(s => s.faction === 'player')
+  const enemyShips = ships.filter(s => s.faction === 'enemy')
+  const shipRefs = useRef<Record<string, HTMLDivElement | null>>({})
+
+  return (
+    <div className="relative w-full rounded-xl overflow-hidden border border-gray-700"
+         style={{ minHeight: '320px', background: 'linear-gradient(180deg, #0c4a6e 0%, #164e63 30%, #155e75 60%, #0e7490 100%)' }}>
+      {/* Waves */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute w-[200%] bottom-0 left-0" style={{ height: '60px' }}>
+          <svg viewBox="0 0 1200 60" className="w-full h-full opacity-20 animate-wave-slow">
+            <path d="M0,30 Q150,10 300,30 Q450,50 600,30 Q750,10 900,30 Q1050,50 1200,30 L1200,60 L0,60 Z" fill="#67e8f9" />
+          </svg>
+        </div>
+        <div className="absolute w-[200%] bottom-0 left-0" style={{ height: '40px' }}>
+          <svg viewBox="0 0 1200 40" className="w-full h-full opacity-15 animate-wave-fast">
+            <path d="M0,20 Q150,5 300,20 Q450,35 600,20 Q750,5 900,20 Q1050,35 1200,20 L1200,40 L0,40 Z" fill="#a5f3fc" />
+          </svg>
+        </div>
+      </div>
+
+      {/* Ships */}
+      <div className="relative z-10 flex justify-between items-start px-4 pt-4 pb-2 gap-4" style={{ minHeight: '300px' }}>
+        {/* Player Fleet */}
+        <div className="flex flex-col gap-3 flex-1">
+          <div className="text-xs font-bold text-blue-300 uppercase tracking-wider text-center mb-1">Ally Fleet</div>
+          {playerShips.map(ship => (
+            <div
+              key={ship.id}
+              ref={el => { shipRefs.current[ship.id] = el }}
+              className={`relative p-2 rounded-lg border transition-all duration-300 ${
+                ship.currentHP <= 0
+                  ? 'bg-gray-900/60 border-gray-700 opacity-50'
+                  : currentShipId === ship.id
+                    ? 'bg-blue-900/50 border-blue-400 ring-2 ring-blue-400/50'
+                    : 'bg-gray-900/40 border-blue-700/40'
+              }`}
+            >
+              {ship.conditions.includes('on_fire') && (
+                <div className="absolute -top-2 -right-2 text-lg animate-pulse">🔥</div>
+              )}
+              {ship.conditions.includes('taking_water') && (
+                <div className="absolute -bottom-2 -right-2 text-lg animate-bounce">🌊</div>
+              )}
+              {ship.status === 'repairing' && (
+                <div className="absolute -top-2 -left-2 text-lg animate-spin-slow">🔧</div>
+              )}
+              <div className="flex items-center gap-2">
+                <ShipSVG faction="player" size={48} sinking={ship.currentHP <= 0} />
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs font-bold text-white truncate">{ship.name}</div>
+                  <HPBar current={ship.currentHP} max={ship.maxHP} />
+                  <div className="flex gap-1 mt-1 flex-wrap">
+                    <span className="text-[10px] bg-gray-800 px-1 rounded text-gray-300">AC {getACWithConditions(ship)}</span>
+                    <span className="text-[10px] bg-gray-800 px-1 rounded text-cyan-300">
+                      {ship.functionalCannons}/{ship.totalCannons} guns
+                    </span>
+                    {ship.conditions.map(c => (
+                      <span key={c} className={`text-[10px] ${CONDITION_LABELS[c].color}`}>
+                        {CONDITION_LABELS[c].icon}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Center Battle Area */}
+        <div className="flex flex-col items-center justify-center px-2 py-8 min-w-[80px]">
+          <div className="text-4xl mb-2">⚔️</div>
+          <div className="text-xs text-gray-300 font-bold uppercase tracking-widest">VS</div>
+          {projectiles.length > 0 && (
+            <div className="mt-2 text-2xl animate-bounce">💥</div>
+          )}
+        </div>
+
+        {/* Enemy Fleet */}
+        <div className="flex flex-col gap-3 flex-1">
+          <div className="text-xs font-bold text-red-300 uppercase tracking-wider text-center mb-1">Enemy Fleet</div>
+          {enemyShips.map(ship => (
+            <div
+              key={ship.id}
+              ref={el => { shipRefs.current[ship.id] = el }}
+              className={`relative p-2 rounded-lg border transition-all duration-300 ${
+                ship.currentHP <= 0
+                  ? 'bg-gray-900/60 border-gray-700 opacity-50'
+                  : currentShipId === ship.id
+                    ? 'bg-red-900/50 border-red-400 ring-2 ring-red-400/50'
+                    : 'bg-gray-900/40 border-red-700/40'
+              }`}
+            >
+              {ship.conditions.includes('on_fire') && (
+                <div className="absolute -top-2 -right-2 text-lg animate-pulse">🔥</div>
+              )}
+              {ship.conditions.includes('taking_water') && (
+                <div className="absolute -bottom-2 -right-2 text-lg animate-bounce">🌊</div>
+              )}
+              {ship.status === 'repairing' && (
+                <div className="absolute -top-2 -left-2 text-lg animate-spin-slow">🔧</div>
+              )}
+              <div className="flex items-center gap-2">
+                <div className="flex-1 min-w-0 text-right">
+                  <div className="text-xs font-bold text-white truncate">{ship.name}</div>
+                  <HPBar current={ship.currentHP} max={ship.maxHP} />
+                  <div className="flex gap-1 mt-1 flex-wrap justify-end">
+                    <span className="text-[10px] bg-gray-800 px-1 rounded text-gray-300">AC {getACWithConditions(ship)}</span>
+                    <span className="text-[10px] bg-gray-800 px-1 rounded text-cyan-300">
+                      {ship.functionalCannons}/{ship.totalCannons} guns
+                    </span>
+                    {ship.conditions.map(c => (
+                      <span key={c} className={`text-[10px] ${CONDITION_LABELS[c].color}`}>
+                        {CONDITION_LABELS[c].icon}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <ShipSVG faction="enemy" size={48} sinking={ship.currentHP <= 0} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* CSS Animations */}
+      <style>{`
+        @keyframes wave-slow {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        @keyframes wave-fast {
+          0% { transform: translateX(-25%); }
+          100% { transform: translateX(-75%); }
+        }
+        .animate-wave-slow { animation: wave-slow 8s linear infinite; }
+        .animate-wave-fast { animation: wave-fast 5s linear infinite; }
+        .animate-spin-slow { animation: spin 3s linear infinite; }
+      `}</style>
+    </div>
+  )
+}
+
+// ─── Battle Log ──────────────────────────────────────────────────────────────
+
+function BattleLog({ entries }: { entries: BattleLogEntry[] }) {
+  const logRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight
+  }, [entries.length])
+
+  if (entries.length === 0) {
+    return (
+      <div className="text-center text-gray-500 text-sm py-8">
+        Battle log will appear here...
+      </div>
+    )
+  }
+
+  return (
+    <div ref={logRef} className="space-y-1 max-h-[300px] overflow-y-auto pr-2 scrollbar-thin">
+      {entries.map(entry => (
+        <div key={entry.id} className={`text-xs py-1 border-b border-gray-800 ${LOG_COLORS[entry.type]}`}>
+          <span className="text-gray-600 font-mono mr-1">R{entry.round}</span>
+          <span className="font-bold">{entry.shipName}</span>
+          {entry.targetShipName && <span className="text-gray-500"> → {entry.targetShipName}</span>}
+          <span className="ml-1">{entry.message}</span>
+          {entry.rolls && entry.rolls.length > 0 && (
+            <span className="ml-1 text-gray-500">
+              [{entry.rolls.map(r => `${r.notation}: ${r.result}`).join(', ')}]
+            </span>
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// ─── Turn Phase Indicator ────────────────────────────────────────────────────
+
+function PhaseIndicator({ phase }: { phase: CombatTurnPhase }) {
+  const phases: { key: CombatTurnPhase; label: string; icon: string }[] = [
+    { key: 'reload', label: 'Reload', icon: '🔄' },
+    { key: 'load', label: 'Load', icon: '💣' },
+    { key: 'aim', label: 'Aim', icon: '🎯' },
+    { key: 'fire', label: 'Fire!', icon: '💥' },
+    { key: 'resolve', label: 'Resolve', icon: '📊' },
+    { key: 'dm_actions', label: 'DM', icon: '🎭' },
+  ]
+
+  return (
+    <div className="flex items-center gap-1">
+      {phases.map((p, i) => (
+        <div key={p.key} className="flex items-center">
+          <div className={`px-2 py-1 rounded text-xs font-bold transition-all ${
+            p.key === phase
+              ? 'bg-dnd-gold text-gray-900 scale-110'
+              : phases.findIndex(x => x.key === phase) > i
+                ? 'bg-green-800 text-green-300'
+                : 'bg-gray-800 text-gray-500'
+          }`}>
+            {p.icon} {p.label}
+          </div>
+          {i < phases.length - 1 && <span className="text-gray-600 mx-0.5">›</span>}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// ─── Main Component ──────────────────────────────────────────────────────────
+
+export function NavalCombat() {
+  // State
+  const [ships, setShips] = useState<Ship[]>([])
+  const [phase, setPhase] = useState<'setup' | 'combat' | 'finished'>('setup')
+  const [turnOrder, setTurnOrder] = useState<string[]>([])
+  const [currentTurnIndex, setCurrentTurnIndex] = useState(0)
+  const [round, setRound] = useState(1)
+  const [turnPhase, setTurnPhase] = useState<CombatTurnPhase>('reload')
+  const [battleLog, setBattleLog] = useState<BattleLogEntry[]>([])
+  const [projectiles, setProjectiles] = useState<Projectile[]>([])
+  const [victor, setVictor] = useState<ShipFaction | null>(null)
+
+  // Turn state
+  const [reloadResult, setReloadResult] = useState<{ roll: number; functional: number; fumble: boolean; critical: boolean } | null>(null)
+  const [cannonsToLoad, setCannonsToLoad] = useState(0)
+  const [selectedAmmo, setSelectedAmmo] = useState<AmmoType>('ball')
+  const [selectedTarget, setSelectedTarget] = useState<string | null>(null)
+  const [hitResult, setHitResult] = useState<{ roll: number; total: number; hit: boolean; critical: boolean; fumble: boolean } | null>(null)
+  const [damageResult, setDamageResult] = useState<{ total: number; hullDamage: number; notation: string; rolls: number[]; conditionApplied: ShipCondition | null } | null>(null)
+
+  const currentShipId = turnOrder[currentTurnIndex] ?? null
+  const currentShip = ships.find(s => s.id === currentShipId) ?? null
+
+  const addLog = useCallback((
+    shipId: string,
+    shipName: string,
+    message: string,
+    type: BattleLogEntry['type'],
+    extra?: Partial<BattleLogEntry>,
+  ) => {
+    setBattleLog(prev => [...prev, {
+      id: createLogId(),
+      round,
+      shipId,
+      shipName,
+      message,
+      type,
+      timestamp: Date.now(),
+      ...extra,
+    }])
+  }, [round])
+
+  // ── Ship Management ──────────────────────────────────────────────────────
+
+  const addShip = (ship: Ship) => setShips(prev => [...prev, ship])
+  const removeShip = (id: string) => setShips(prev => prev.filter(s => s.id !== id))
+
+  // ── Start Battle ─────────────────────────────────────────────────────────
+
+  const startBattle = () => {
+    const order = buildTurnOrder(ships)
+    setTurnOrder(order)
+    setCurrentTurnIndex(0)
+    setRound(1)
+    setPhase('combat')
+    setTurnPhase('reload')
+    setBattleLog([])
+    setProjectiles([])
+    addLog('system', 'Battle', 'Naval combat begins! All hands to battle stations!', 'info')
+  }
+
+  // ── Combat Actions ───────────────────────────────────────────────────────
+
+  const handleReload = () => {
+    if (!currentShip) return
+
+    // Apply condition effects first
+    const conditionEffects = applyConditionEffects(currentShip)
+    if (conditionEffects.damage > 0) {
+      setShips(prev => prev.map(s =>
+        s.id === currentShip.id
+          ? {
+              ...s,
+              currentHP: Math.max(0, s.currentHP - conditionEffects.damage),
+              conditions: s.conditions.filter(c => !conditionEffects.removedConditions.includes(c)),
+            }
+          : s
+      ))
+      conditionEffects.messages.forEach(msg => {
+        addLog(currentShip.id, currentShip.name, msg, 'status')
+      })
+    }
+
+    // Handle repairing ships
+    if (currentShip.status === 'repairing') {
+      const remaining = currentShip.repairTurnsRemaining - 1
+      if (remaining <= 0) {
+        const repair = rollRepairResult()
+        const healed = Math.min(repair.healAmount, currentShip.maxHP - currentShip.currentHP)
+        setShips(prev => prev.map(s =>
+          s.id === currentShip.id
+            ? { ...s, status: 'active', repairTurnsRemaining: 0, currentHP: Math.min(s.maxHP, s.currentHP + healed) }
+            : s
+        ))
+        addLog(currentShip.id, currentShip.name,
+          `Repairs complete! Rolled ${repair.roll} — restored ${healed} HP`,
+          'heal',
+          { rolls: [{ notation: '1d20', result: repair.roll, details: `+${repair.healAmount} HP` }] },
+        )
+      } else {
+        setShips(prev => prev.map(s =>
+          s.id === currentShip.id ? { ...s, repairTurnsRemaining: remaining } : s
+        ))
+        addLog(currentShip.id, currentShip.name, `Still repairing... ${remaining} turn(s) remaining`, 'repair')
+      }
+      advanceTurn()
+      return
+    }
+
+    // Sunk or dead ship — skip
+    if (currentShip.currentHP <= 0) {
+      addLog(currentShip.id, currentShip.name, 'Ship is sunk — skipping turn', 'status')
+      advanceTurn()
+      return
+    }
+
+    const result = rollReload(currentShip.totalCannons)
+    const adjusted = getFunctionalCannonsWithConditions(result.functionalCannons, currentShip.conditions)
+
+    setReloadResult({ roll: result.roll, functional: adjusted, fumble: result.fumble, critical: result.critical })
+    setCannonsToLoad(adjusted)
+    setSelectedAmmo('ball')
+    setSelectedTarget(null)
+    setHitResult(null)
+    setDamageResult(null)
+
+    setShips(prev => prev.map(s =>
+      s.id === currentShip.id
+        ? {
+            ...s,
+            functionalCannons: adjusted,
+            currentHP: Math.max(0, s.currentHP - result.selfDamage),
+          }
+        : s
+    ))
+
+    if (result.fumble) {
+      addLog(currentShip.id, currentShip.name,
+        `FUMBLE! Cannon misfire deals ${result.selfDamage} damage to own ship! Only ${adjusted} cannons functional`,
+        'fumble',
+        { rolls: [{ notation: '1d20', result: result.roll }], damage: result.selfDamage },
+      )
+    } else if (result.critical) {
+      addLog(currentShip.id, currentShip.name,
+        `PERFECT reload! All ${adjusted} cannons ready and crew is inspired!`,
+        'critical',
+        { rolls: [{ notation: '1d20', result: result.roll }] },
+      )
+    } else {
+      addLog(currentShip.id, currentShip.name,
+        `Reload: ${adjusted} of ${currentShip.totalCannons} cannons functional`,
+        'reload',
+        { rolls: [{ notation: '1d20', result: result.roll }] },
+      )
+    }
+
+    setTurnPhase('load')
+  }
+
+  const handleConfirmLoad = () => {
+    setTurnPhase('aim')
+  }
+
+  const handleFire = () => {
+    if (!currentShip || !selectedTarget) return
+    const target = ships.find(s => s.id === selectedTarget)
+    if (!target) return
+
+    const targetAC = getACWithConditions(target)
+    const bonus = reloadResult?.critical ? 2 : 0
+    const result = rollToHit(targetAC, bonus)
+    setHitResult(result)
+
+    if (result.hit) {
+      const dmg = rollCannonDamage(cannonsToLoad, selectedAmmo, result.critical)
+      setDamageResult(dmg)
+
+      setShips(prev => prev.map(s => {
+        if (s.id === selectedTarget) {
+          const newConditions = [...s.conditions]
+          if (dmg.conditionApplied && !newConditions.includes(dmg.conditionApplied)) {
+            newConditions.push(dmg.conditionApplied)
+          }
+          return {
+            ...s,
+            currentHP: Math.max(0, s.currentHP - dmg.hullDamage),
+            conditions: newConditions,
+            status: Math.max(0, s.currentHP - dmg.hullDamage) <= 0 ? 'sunk' as const : s.status,
+          }
+        }
+        return s
+      }))
+
+      setProjectiles([{
+        id: createLogId(),
+        fromShipId: currentShip.id,
+        toShipId: selectedTarget,
+        ammoType: selectedAmmo,
+        hit: true,
+        damage: dmg.hullDamage,
+        startTime: Date.now(),
+      }])
+      setTimeout(() => setProjectiles([]), 1500)
+
+      const critText = result.critical ? 'CRITICAL HIT! ' : ''
+      const chainText = selectedAmmo === 'chain'
+        ? ` (Chain shot: ${dmg.hullDamage} hull damage${dmg.conditionApplied ? ` + ${CONDITION_LABELS[dmg.conditionApplied].label}` : ''})`
+        : ''
+      addLog(currentShip.id, currentShip.name,
+        `${critText}HIT! ${cannonsToLoad} cannons fire ${selectedAmmo === 'chain' ? 'chain shot' : 'cannonballs'} at ${target.name} for ${dmg.hullDamage} damage!${chainText}`,
+        result.critical ? 'critical' : 'attack',
+        {
+          rolls: [
+            { notation: '1d20', result: result.roll, details: `vs AC ${targetAC}` },
+            { notation: dmg.notation, result: dmg.total, details: `[${dmg.rolls.join(', ')}]` },
+          ],
+          damage: dmg.hullDamage,
+          targetShipName: target.name,
+        },
+      )
+
+      if (target.currentHP - dmg.hullDamage <= 0) {
+        addLog(selectedTarget, target.name, `${target.name} has been sunk!`, 'damage')
+      }
+    } else {
+      setProjectiles([{
+        id: createLogId(),
+        fromShipId: currentShip.id,
+        toShipId: selectedTarget,
+        ammoType: selectedAmmo,
+        hit: false,
+        damage: 0,
+        startTime: Date.now(),
+      }])
+      setTimeout(() => setProjectiles([]), 1500)
+
+      const fumbleText = result.fumble ? 'FUMBLE! ' : ''
+      addLog(currentShip.id, currentShip.name,
+        `${fumbleText}MISS! Cannonballs splash harmlessly past ${target.name}`,
+        result.fumble ? 'fumble' : 'miss',
+        {
+          rolls: [{ notation: '1d20', result: result.roll, details: `vs AC ${targetAC}` }],
+          targetShipName: target.name,
+        },
+      )
+    }
+
+    setTurnPhase('resolve')
+  }
+
+  const advanceTurn = useCallback(() => {
+    setReloadResult(null)
+    setHitResult(null)
+    setDamageResult(null)
+    setCannonsToLoad(0)
+    setSelectedTarget(null)
+
+    // Check victory
+    const updatedShips = ships
+    if (isFleetDefeated(updatedShips, 'enemy')) {
+      setVictor('player')
+      setPhase('finished')
+      addLog('system', 'Battle', 'VICTORY! The enemy fleet has been destroyed!', 'info')
+      return
+    }
+    if (isFleetDefeated(updatedShips, 'player')) {
+      setVictor('enemy')
+      setPhase('finished')
+      addLog('system', 'Battle', 'DEFEAT! Your fleet has been destroyed...', 'info')
+      return
+    }
+
+    let nextIndex = currentTurnIndex + 1
+    let nextRound = round
+    if (nextIndex >= turnOrder.length) {
+      nextIndex = 0
+      nextRound += 1
+    }
+
+    // Skip sunk ships
+    let attempts = 0
+    while (attempts < turnOrder.length) {
+      const nextShip = ships.find(s => s.id === turnOrder[nextIndex])
+      if (nextShip && nextShip.currentHP > 0 && nextShip.status !== 'sunk') break
+      nextIndex++
+      if (nextIndex >= turnOrder.length) {
+        nextIndex = 0
+        nextRound += 1
+      }
+      attempts++
+    }
+
+    setCurrentTurnIndex(nextIndex)
+    setRound(nextRound)
+    setTurnPhase('reload')
+  }, [ships, currentTurnIndex, turnOrder, round, addLog])
+
+  const handleEndTurn = () => {
+    setTurnPhase('dm_actions')
+  }
+
+  const handleNextTurn = () => {
+    advanceTurn()
+  }
+
+  // ── DM Actions ───────────────────────────────────────────────────────────
+
+  const applyCondition = (shipId: string, condition: ShipCondition) => {
+    const ship = ships.find(s => s.id === shipId)
+    if (!ship) return
+    setShips(prev => prev.map(s =>
+      s.id === shipId && !s.conditions.includes(condition)
+        ? { ...s, conditions: [...s.conditions, condition] }
+        : s
+    ))
+    addLog(shipId, ship.name, `${CONDITION_LABELS[condition].icon} ${CONDITION_LABELS[condition].label} applied!`, 'status')
+  }
+
+  const removeCondition = (shipId: string, condition: ShipCondition) => {
+    setShips(prev => prev.map(s =>
+      s.id === shipId ? { ...s, conditions: s.conditions.filter(c => c !== condition) } : s
+    ))
+  }
+
+  const startRepair = (shipId: string) => {
+    const ship = ships.find(s => s.id === shipId)
+    if (!ship || ship.status === 'repairing') return
+    const duration = rollRepairDuration()
+    setShips(prev => prev.map(s =>
+      s.id === shipId ? { ...s, status: 'repairing', repairTurnsRemaining: duration.turns } : s
+    ))
+    addLog(shipId, ship.name,
+      `Beginning repairs! Will take ${duration.turns} turn(s) (rolled ${duration.roll} on 1d4). Cannot fire during repairs.`,
+      'repair',
+      { rolls: [{ notation: '1d4', result: duration.roll }] },
+    )
+  }
+
+  const dmHealShip = (shipId: string, amount: number) => {
+    const ship = ships.find(s => s.id === shipId)
+    if (!ship) return
+    const healed = Math.min(amount, ship.maxHP - ship.currentHP)
+    setShips(prev => prev.map(s =>
+      s.id === shipId ? { ...s, currentHP: Math.min(s.maxHP, s.currentHP + amount) } : s
+    ))
+    addLog(shipId, ship.name, `DM heals ${healed} HP`, 'heal')
+  }
+
+  const dmDamageShip = (shipId: string, amount: number) => {
+    const ship = ships.find(s => s.id === shipId)
+    if (!ship) return
+    setShips(prev => prev.map(s =>
+      s.id === shipId ? {
+        ...s,
+        currentHP: Math.max(0, s.currentHP - amount),
+        status: Math.max(0, s.currentHP - amount) <= 0 ? 'sunk' as const : s.status,
+      } : s
+    ))
+    addLog(shipId, ship.name, `DM deals ${amount} damage`, 'damage', { damage: amount })
+  }
+
+  const handleAbility = (shipId: string, ability: ShipAbility, targetId?: string) => {
+    const ship = ships.find(s => s.id === shipId)
+    const target = targetId ? ships.find(s => s.id === targetId) : null
+    if (!ship) return
+
+    switch (ability.id) {
+      case 'ram': {
+        if (!target) return
+        const ramDmg = Math.floor(Math.random() * 10) + Math.floor(Math.random() * 10) + 2
+        const selfDmg = Math.floor(Math.random() * 6) + 1
+        setShips(prev => prev.map(s => {
+          if (s.id === targetId) return { ...s, currentHP: Math.max(0, s.currentHP - ramDmg) }
+          if (s.id === shipId) return { ...s, currentHP: Math.max(0, s.currentHP - selfDmg) }
+          return s
+        }))
+        addLog(shipId, ship.name, `RAMS ${target.name} for ${ramDmg} damage! (takes ${selfDmg} self damage)`, 'ability', {
+          damage: ramDmg, targetShipName: target.name,
+        })
+        break
+      }
+      case 'greek-fire': {
+        if (!target) return
+        applyCondition(targetId!, 'on_fire')
+        addLog(shipId, ship.name, `Launches Greek Fire at ${target.name}!`, 'ability', { targetShipName: target.name })
+        break
+      }
+      case 'brace': {
+        setShips(prev => prev.map(s =>
+          s.id === shipId ? { ...s, ac: s.ac + 2 } : s
+        ))
+        addLog(shipId, ship.name, 'Braces for impact! +2 AC until next turn', 'ability')
+        break
+      }
+      case 'boarding': {
+        if (!target) return
+        const attackRoll = Math.floor(Math.random() * 20) + 1
+        const defendRoll = Math.floor(Math.random() * 20) + 1
+        const success = attackRoll > defendRoll
+        addLog(shipId, ship.name,
+          `Sends boarding party to ${target.name}! Attack: ${attackRoll} vs Defense: ${defendRoll} — ${success ? 'SUCCESS! Enemy crew captured!' : 'FAILED! Boarding party repelled!'}`,
+          success ? 'critical' : 'fumble',
+          { targetShipName: target.name },
+        )
+        if (success) {
+          setShips(prev => prev.map(s =>
+            s.id === targetId ? { ...s, conditions: [...s.conditions, 'crew_swept'] } : s
+          ))
+        }
+        break
+      }
+    }
+  }
+
+  const resetBattle = () => {
+    setShips([])
+    setPhase('setup')
+    setTurnOrder([])
+    setCurrentTurnIndex(0)
+    setRound(1)
+    setBattleLog([])
+    setProjectiles([])
+    setVictor(null)
+  }
+
+  // ── Render ───────────────────────────────────────────────────────────────
+
+  const playerShips = ships.filter(s => s.faction === 'player')
+  const enemyShips = ships.filter(s => s.faction === 'enemy')
+  const canStartBattle = playerShips.length > 0 && enemyShips.length > 0
+
+  const enemyTargets = ships.filter(s =>
+    s.faction !== currentShip?.faction && s.currentHP > 0 && s.status !== 'sunk'
+  )
+
+  // ── Setup Phase ──────────────────────────────────────────────────────────
+
+  if (phase === 'setup') {
+    return (
+      <div className="space-y-6">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold text-dnd-gold flex items-center justify-center gap-3">
+            <span className="text-4xl">⚓</span> Naval Battle Simulator <span className="text-4xl">🏴‍☠️</span>
+          </h2>
+          <p className="text-gray-400 text-sm mt-2">Configure your fleets and engage in ship-to-ship combat</p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Player Fleet */}
+          <div>
+            <h3 className="text-lg font-bold text-blue-400 mb-3 flex items-center gap-2">
+              <span className="text-xl">🛡️</span> Player / Ally Fleet
+            </h3>
+            <div className="space-y-2 mb-3">
+              {playerShips.map(ship => (
+                <SetupShipCard key={ship.id} ship={ship} onRemove={() => removeShip(ship.id)} />
+              ))}
+              {playerShips.length === 0 && (
+                <div className="text-center text-gray-500 text-sm py-4 border border-dashed border-gray-700 rounded-lg">
+                  No ally ships added yet
+                </div>
+              )}
+            </div>
+            <ShipForm faction="player" onAdd={addShip} />
+          </div>
+
+          {/* Enemy Fleet */}
+          <div>
+            <h3 className="text-lg font-bold text-red-400 mb-3 flex items-center gap-2">
+              <span className="text-xl">☠️</span> Enemy Fleet
+            </h3>
+            <div className="space-y-2 mb-3">
+              {enemyShips.map(ship => (
+                <SetupShipCard key={ship.id} ship={ship} onRemove={() => removeShip(ship.id)} />
+              ))}
+              {enemyShips.length === 0 && (
+                <div className="text-center text-gray-500 text-sm py-4 border border-dashed border-gray-700 rounded-lg">
+                  No enemy ships added yet
+                </div>
+              )}
+            </div>
+            <ShipForm faction="enemy" onAdd={addShip} />
+          </div>
+        </div>
+
+        {/* Damage Reference */}
+        <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+          <h4 className="text-sm font-bold text-dnd-gold mb-2">Cannon Damage Reference</h4>
+          <div className="grid grid-cols-3 gap-4 text-center">
+            <div className="bg-gray-900 p-3 rounded">
+              <div className="text-2xl font-bold text-white font-mono">2d8</div>
+              <div className="text-xs text-gray-400 mt-1">1-20 cannons loaded</div>
+            </div>
+            <div className="bg-gray-900 p-3 rounded">
+              <div className="text-2xl font-bold text-dnd-gold font-mono">4d8</div>
+              <div className="text-xs text-gray-400 mt-1">21-60 cannons loaded</div>
+            </div>
+            <div className="bg-gray-900 p-3 rounded">
+              <div className="text-2xl font-bold text-red-400 font-mono">6d8</div>
+              <div className="text-xs text-gray-400 mt-1">61+ cannons loaded</div>
+            </div>
+          </div>
+          <div className="mt-3 grid grid-cols-2 gap-3 text-xs text-gray-400">
+            <div className="bg-gray-900 p-2 rounded">
+              <span className="text-white font-bold">Ball Shot</span> — Standard cannonball. Full damage to hull.
+            </div>
+            <div className="bg-gray-900 p-2 rounded">
+              <span className="text-white font-bold">Chain Shot</span> — Targets mast and deck. Half damage + applies condition (Mast Damaged or Crew Swept).
+            </div>
+          </div>
+        </div>
+
+        <button
+          onClick={startBattle}
+          disabled={!canStartBattle}
+          className="w-full py-4 rounded-lg text-xl font-bold transition-all
+                     bg-gradient-to-r from-red-700 to-orange-600 text-white
+                     hover:from-red-600 hover:to-orange-500 hover:shadow-lg hover:shadow-red-900/50
+                     disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-none"
+        >
+          ⚔️ Engage! Begin Naval Combat ⚔️
+        </button>
+      </div>
+    )
+  }
+
+  // ── Victory / Defeat Screen ──────────────────────────────────────────────
+
+  if (phase === 'finished') {
+    return (
+      <div className="space-y-6">
+        <BattleScene ships={ships} projectiles={[]} currentShipId={null} />
+
+        <div className={`text-center p-8 rounded-xl border-2 ${
+          victor === 'player'
+            ? 'bg-green-900/30 border-green-500'
+            : 'bg-red-900/30 border-red-500'
+        }`}>
+          <div className="text-6xl mb-4">{victor === 'player' ? '🏆' : '💀'}</div>
+          <h2 className="text-4xl font-bold mb-2" style={{ color: victor === 'player' ? '#4ade80' : '#f87171' }}>
+            {victor === 'player' ? 'VICTORY!' : 'DEFEAT!'}
+          </h2>
+          <p className="text-gray-300">
+            {victor === 'player'
+              ? 'The enemy fleet has been destroyed! Collect the spoils!'
+              : 'Your fleet has been sunk... The sea claims all.'}
+          </p>
+          <div className="mt-4 text-sm text-gray-400">
+            Battle lasted {round} round{round !== 1 ? 's' : ''} | {battleLog.length} actions logged
+          </div>
+        </div>
+
+        <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+          <h3 className="text-lg font-bold text-dnd-gold mb-3">Battle Report</h3>
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            {ships.map(ship => (
+              <div key={ship.id} className={`p-3 rounded-lg border ${
+                ship.faction === 'player' ? 'border-blue-700/50' : 'border-red-700/50'
+              } ${ship.currentHP <= 0 ? 'opacity-50' : ''}`}>
+                <div className="flex items-center gap-2">
+                  <ShipSVG faction={ship.faction} size={30} sinking={ship.currentHP <= 0} />
+                  <div>
+                    <span className="text-white font-bold text-sm">{ship.name}</span>
+                    <span className={`ml-2 text-xs ${ship.currentHP <= 0 ? 'text-red-400' : 'text-green-400'}`}>
+                      {ship.currentHP <= 0 ? 'SUNK' : `${ship.currentHP}/${ship.maxHP} HP`}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <BattleLog entries={battleLog} />
+        </div>
+
+        <button
+          onClick={resetBattle}
+          className="w-full py-3 rounded-lg font-bold bg-gray-700 text-white hover:bg-gray-600 transition-colors"
+        >
+          New Battle
+        </button>
+      </div>
+    )
+  }
+
+  // ── Combat Phase ─────────────────────────────────────────────────────────
+
+  return (
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-bold text-dnd-gold">⚓ Naval Combat</h2>
+          <div className="text-sm text-gray-400">Round {round}</div>
+        </div>
+        <button
+          onClick={() => {
+            setPhase('finished')
+            setVictor(null)
+            addLog('system', 'Battle', 'Battle ended by DM', 'info')
+          }}
+          className="px-4 py-2 rounded bg-red-900 text-red-300 hover:bg-red-800 transition-colors text-sm font-bold"
+        >
+          End Battle
+        </button>
+      </div>
+
+      {/* Battle Visualization */}
+      <BattleScene ships={ships} projectiles={projectiles} currentShipId={currentShipId} />
+
+      {/* Current Turn */}
+      {currentShip && (
+        <div className={`rounded-xl p-4 border-2 ${
+          currentShip.faction === 'player' ? 'border-blue-500 bg-blue-950/30' : 'border-red-500 bg-red-950/30'
+        }`}>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <ShipSVG faction={currentShip.faction} size={40} />
+              <div>
+                <h3 className="text-lg font-bold text-white">{currentShip.name}'s Turn</h3>
+                <div className="text-xs text-gray-400">
+                  HP: {currentShip.currentHP}/{currentShip.maxHP} | AC: {getACWithConditions(currentShip)} | Cannons: {currentShip.totalCannons}
+                </div>
+              </div>
+            </div>
+            <PhaseIndicator phase={turnPhase} />
+          </div>
+
+          {/* Phase: Reload */}
+          {turnPhase === 'reload' && (
+            <div className="text-center py-4">
+              <p className="text-gray-300 mb-3">Roll to reload cannons and check how many are functional this round</p>
+              <button
+                onClick={handleReload}
+                className="px-8 py-3 rounded-lg bg-cyan-700 text-white font-bold text-lg hover:bg-cyan-600 transition-colors"
+              >
+                🔄 Roll Reload (1d20)
+              </button>
+            </div>
+          )}
+
+          {/* Phase: Load */}
+          {turnPhase === 'load' && reloadResult && (
+            <div className="space-y-4">
+              <div className="bg-gray-900 rounded-lg p-3">
+                <div className="text-center mb-2">
+                  <span className="text-3xl font-bold font-mono text-dnd-gold">{reloadResult.roll}</span>
+                  <span className="text-gray-400 ml-2">→ {reloadResult.functional} cannons functional</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {/* Cannon Count */}
+                <div>
+                  <label className="block text-xs text-gray-400 mb-1">Cannons to Load</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="range"
+                      min={0}
+                      max={reloadResult.functional}
+                      value={cannonsToLoad}
+                      onChange={e => setCannonsToLoad(Number(e.target.value))}
+                      className="flex-1 accent-dnd-gold"
+                    />
+                    <span className="text-white font-mono w-10 text-right">{cannonsToLoad}</span>
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    Damage: <span className="text-dnd-gold font-mono">{getDamageNotation(cannonsToLoad)}</span>
+                  </div>
+                </div>
+
+                {/* Ammo Type */}
+                <div>
+                  <label className="block text-xs text-gray-400 mb-1">Ammunition</label>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setSelectedAmmo('ball')}
+                      className={`flex-1 py-2 rounded text-sm font-bold transition-colors ${
+                        selectedAmmo === 'ball'
+                          ? 'bg-orange-700 text-white ring-2 ring-orange-400'
+                          : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                      }`}
+                    >
+                      🔴 Ball
+                    </button>
+                    <button
+                      onClick={() => setSelectedAmmo('chain')}
+                      className={`flex-1 py-2 rounded text-sm font-bold transition-colors ${
+                        selectedAmmo === 'chain'
+                          ? 'bg-purple-700 text-white ring-2 ring-purple-400'
+                          : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                      }`}
+                    >
+                      ⛓️ Chain
+                    </button>
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    {selectedAmmo === 'ball' ? 'Full hull damage' : 'Half damage + condition'}
+                  </div>
+                </div>
+
+                {/* Target */}
+                <div>
+                  <label className="block text-xs text-gray-400 mb-1">Target</label>
+                  <select
+                    value={selectedTarget || ''}
+                    onChange={e => setSelectedTarget(e.target.value || null)}
+                    className="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white text-sm
+                               focus:border-dnd-gold focus:outline-none"
+                  >
+                    <option value="">Select target...</option>
+                    {enemyTargets.map(ship => (
+                      <option key={ship.id} value={ship.id}>
+                        {ship.name} (HP: {ship.currentHP}/{ship.maxHP}, AC: {getACWithConditions(ship)})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={handleConfirmLoad}
+                  disabled={cannonsToLoad === 0 || !selectedTarget}
+                  className="flex-1 py-2 rounded-lg font-bold transition-colors
+                             bg-dnd-gold text-gray-900 hover:bg-yellow-400
+                             disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  🎯 Confirm Load & Aim ({cannonsToLoad} cannons, {selectedAmmo} shot)
+                </button>
+                <button
+                  onClick={handleEndTurn}
+                  className="px-4 py-2 rounded-lg bg-gray-700 text-gray-300 hover:bg-gray-600 transition-colors text-sm"
+                >
+                  Skip Fire
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Phase: Aim / Fire */}
+          {turnPhase === 'aim' && (
+            <div className="text-center py-4">
+              <div className="mb-3">
+                <span className="text-gray-400">Firing</span>{' '}
+                <span className="text-dnd-gold font-bold">{cannonsToLoad}</span>{' '}
+                <span className="text-gray-400">{selectedAmmo === 'chain' ? 'chain shot' : 'cannonballs'} at</span>{' '}
+                <span className="text-red-400 font-bold">{ships.find(s => s.id === selectedTarget)?.name}</span>
+              </div>
+              <button
+                onClick={handleFire}
+                className="px-10 py-4 rounded-lg bg-gradient-to-r from-red-700 to-orange-600 text-white font-bold text-xl
+                           hover:from-red-600 hover:to-orange-500 transition-all hover:shadow-lg hover:shadow-red-900/50
+                           animate-pulse"
+              >
+                💥 FIRE! (1d20 to Hit)
+              </button>
+            </div>
+          )}
+
+          {/* Phase: Resolve */}
+          {turnPhase === 'resolve' && hitResult && (
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div className={`p-4 rounded-lg text-center ${
+                  hitResult.hit ? 'bg-green-900/40 border border-green-500' : 'bg-red-900/40 border border-red-500'
+                }`}>
+                  <div className="text-xs text-gray-400 mb-1">Attack Roll</div>
+                  <div className={`text-4xl font-bold font-mono ${
+                    hitResult.critical ? 'text-yellow-300' : hitResult.fumble ? 'text-red-500' : 'text-white'
+                  }`}>
+                    {hitResult.roll}
+                  </div>
+                  <div className="text-sm mt-1">
+                    {hitResult.critical && <span className="text-yellow-300 font-bold">NATURAL 20!</span>}
+                    {hitResult.fumble && <span className="text-red-500 font-bold">NATURAL 1!</span>}
+                    {!hitResult.critical && !hitResult.fumble && (
+                      <span className={hitResult.hit ? 'text-green-400' : 'text-red-400'}>
+                        Total: {hitResult.total} vs AC {getACWithConditions(ships.find(s => s.id === selectedTarget)!)}
+                      </span>
+                    )}
+                  </div>
+                  <div className={`text-lg font-bold mt-1 ${hitResult.hit ? 'text-green-400' : 'text-red-400'}`}>
+                    {hitResult.hit ? 'HIT!' : 'MISS!'}
+                  </div>
+                </div>
+
+                {hitResult.hit && damageResult && (
+                  <div className="p-4 rounded-lg text-center bg-orange-900/40 border border-orange-500">
+                    <div className="text-xs text-gray-400 mb-1">Damage ({damageResult.notation})</div>
+                    <div className="text-4xl font-bold font-mono text-orange-300">
+                      {damageResult.hullDamage}
+                    </div>
+                    <div className="text-xs text-gray-400 mt-1">
+                      [{damageResult.rolls.join(' + ')}]{selectedAmmo === 'chain' ? ` = ${damageResult.total} ÷ 2` : ''}
+                    </div>
+                    {damageResult.conditionApplied && (
+                      <div className={`text-sm mt-1 font-bold ${CONDITION_LABELS[damageResult.conditionApplied].color}`}>
+                        {CONDITION_LABELS[damageResult.conditionApplied].icon} {CONDITION_LABELS[damageResult.conditionApplied].label}!
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <button
+                onClick={handleEndTurn}
+                className="w-full py-2 rounded-lg bg-dnd-gold text-gray-900 font-bold hover:bg-yellow-400 transition-colors"
+              >
+                Continue → DM Actions
+              </button>
+            </div>
+          )}
+
+          {/* Phase: DM Actions */}
+          {turnPhase === 'dm_actions' && (
+            <div className="space-y-4">
+              <div className="text-sm text-gray-400 mb-2">Apply conditions, use abilities, heal/damage ships, then advance to next turn.</div>
+
+              {/* Quick Actions */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {ships.filter(s => s.currentHP > 0 && s.status !== 'sunk').map(ship => (
+                  <div key={ship.id} className={`p-2 rounded-lg border text-xs ${
+                    ship.faction === 'player' ? 'border-blue-700/50' : 'border-red-700/50'
+                  }`}>
+                    <div className="font-bold text-white truncate mb-1">{ship.name}</div>
+                    <HPBar current={ship.currentHP} max={ship.maxHP} />
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      <button
+                        onClick={() => applyCondition(ship.id, 'on_fire')}
+                        className="px-1.5 py-0.5 rounded bg-orange-900/50 text-orange-300 hover:bg-orange-800 transition-colors"
+                        title="Set On Fire"
+                      >
+                        🔥
+                      </button>
+                      <button
+                        onClick={() => applyCondition(ship.id, 'taking_water')}
+                        className="px-1.5 py-0.5 rounded bg-blue-900/50 text-blue-300 hover:bg-blue-800 transition-colors"
+                        title="Taking Water"
+                      >
+                        🌊
+                      </button>
+                      <button
+                        onClick={() => startRepair(ship.id)}
+                        className="px-1.5 py-0.5 rounded bg-green-900/50 text-green-300 hover:bg-green-800 transition-colors"
+                        title="Start Repairs"
+                      >
+                        🔧
+                      </button>
+                      <button
+                        onClick={() => {
+                          const amt = prompt(`Heal ${ship.name} — enter HP amount:`)
+                          if (amt && !isNaN(Number(amt))) dmHealShip(ship.id, Number(amt))
+                        }}
+                        className="px-1.5 py-0.5 rounded bg-green-900/50 text-green-300 hover:bg-green-800 transition-colors"
+                        title="DM Heal"
+                      >
+                        💚
+                      </button>
+                      <button
+                        onClick={() => {
+                          const amt = prompt(`Damage ${ship.name} — enter HP amount:`)
+                          if (amt && !isNaN(Number(amt))) dmDamageShip(ship.id, Number(amt))
+                        }}
+                        className="px-1.5 py-0.5 rounded bg-red-900/50 text-red-300 hover:bg-red-800 transition-colors"
+                        title="DM Damage"
+                      >
+                        💔
+                      </button>
+                      {ship.conditions.length > 0 && (
+                        <span className="text-gray-500">|</span>
+                      )}
+                      {ship.conditions.map(c => (
+                        <button
+                          key={c}
+                          onClick={() => removeCondition(ship.id, c)}
+                          className="px-1.5 py-0.5 rounded bg-gray-800 hover:bg-red-900 transition-colors"
+                          title={`Remove ${CONDITION_LABELS[c].label}`}
+                        >
+                          <span className={CONDITION_LABELS[c].color}>{CONDITION_LABELS[c].icon}✕</span>
+                        </button>
+                      ))}
+                    </div>
+                    {/* Abilities */}
+                    {ship.abilities.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-1 pt-1 border-t border-gray-700">
+                        {ship.abilities.map(ability => (
+                          <button
+                            key={ability.id}
+                            onClick={() => {
+                              const needsTarget = ['ram', 'greek-fire', 'boarding'].includes(ability.id)
+                              if (needsTarget) {
+                                const targets = ships.filter(s => s.faction !== ship.faction && s.currentHP > 0)
+                                if (targets.length === 1) {
+                                  handleAbility(ship.id, ability, targets[0].id)
+                                } else if (targets.length > 1) {
+                                  const targetName = prompt(`Target for ${ability.name}?\n${targets.map((t, i) => `${i + 1}. ${t.name}`).join('\n')}`)
+                                  const idx = parseInt(targetName || '') - 1
+                                  if (idx >= 0 && idx < targets.length) {
+                                    handleAbility(ship.id, ability, targets[idx].id)
+                                  }
+                                }
+                              } else {
+                                handleAbility(ship.id, ability)
+                              }
+                            }}
+                            className="px-1.5 py-0.5 rounded bg-purple-900/50 text-purple-300 hover:bg-purple-800 transition-colors"
+                            title={ability.description}
+                          >
+                            {ability.name}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              <button
+                onClick={handleNextTurn}
+                className="w-full py-3 rounded-lg bg-dnd-gold text-gray-900 font-bold text-lg
+                           hover:bg-yellow-400 transition-colors"
+              >
+                ⚓ Next Ship's Turn
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Battle Log */}
+      <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+        <h3 className="text-sm font-bold text-dnd-gold mb-2 flex items-center gap-2">
+          📜 Battle Log
+        </h3>
+        <BattleLog entries={battleLog} />
+      </div>
+    </div>
+  )
+}

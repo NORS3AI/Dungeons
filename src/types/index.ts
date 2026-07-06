@@ -245,3 +245,17 @@ export {
   calculateModifier,
   calculateProficiencyBonus,
 } from './dice'
+
+// Naval combat types
+export type {
+  AmmoType,
+  ShipFaction,
+  ShipStatus,
+  ShipCondition,
+  ShipAbility,
+  Ship,
+  BattleLogEntry,
+  Projectile,
+  CombatTurnPhase,
+  NavalBattleState,
+} from './naval'
