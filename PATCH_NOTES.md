@@ -1,5 +1,22 @@
 # Dungeons - Patch Notes
 
+## Version 0.6.7-beta - July 07, 2026
+
+**Beta Release Notice**: DM class-change tool for character sheets.
+
+### DM Tools
+
+#### **Change Class from Character Sheet**
+- When **DM Mode** is enabled, a new **✏️ Change Class** button appears next to the character's class name on the character sheet.
+- Clicking it opens a class picker showing all 16 classes (Amazon, Barbarian, Bard, Cleric, Death Knight, Demon Hunter, Druid, Fighter, Monk, Necromancer, Paladin, Ranger, Rogue, Sorcerer, Warlock, Wizard).
+- The class swap is **non-destructive**: level, HP, spells, and inventory are preserved. Only the class data and saving throw proficiencies are updated.
+- A success notification confirms the change.
+- Distinct from the Tome of Reincarnation flow (which resets to level 1) — DM mode class change is intended for mid-campaign corrections or respec scenarios.
+
+**Why This Matters**: DMs can now fix a wrong class selection or support class-change story events without rebuilding the character from scratch.
+
+---
+
 ## Version 0.6.6-beta - July 06, 2026
 
 **Beta Release Notice**: Mast collapse, crew casualty reports, manual dice entry, extended cannon tiers, and dramatic sinking narratives.

@@ -20,6 +20,10 @@ import {
   PALADIN,
   RANGER,
   SORCERER,
+  DEATH_KNIGHT,
+  NECROMANCER,
+  DEMON_HUNTER,
+  AMAZON,
 } from '../types'
 import { ALL_PROFESSIONS, CATEGORY_INFO, formatIncome, getProfessionByRoll, type Profession } from '../data/professions'
 import { exportCharacterToJSON, exportCharacterToPDF } from '../utils/characterIO'
@@ -99,6 +103,7 @@ export function CharacterSheetPage() {
   const [levelingUpTo, setLevelingUpTo] = useState<number | null>(null)
   const [isExportingPDF, setIsExportingPDF] = useState(false)
   const [showClassChangeModal, setShowClassChangeModal] = useState(false)
+  const [dmClassChangeMode, setDmClassChangeMode] = useState(false)
   const [showSpellScrollModal, setShowSpellScrollModal] = useState(false)
   const [spellScrollLevel, setSpellScrollLevel] = useState<number | null>(null)
   const [consumableItemToRemove, setConsumableItemToRemove] = useState<string | null>(null)
@@ -1147,6 +1152,30 @@ export function CharacterSheetPage() {
     setTimeout(() => setShowConsumableNotification(null), 3000)
   }
 
+  const handleDMClassChange = (newClass: Class) => {
+    if (!character) return
+    const savingThrows = { ...character.savingThrows }
+    Object.keys(savingThrows).forEach(key => {
+      savingThrows[key as keyof typeof savingThrows] = false
+    })
+    newClass.savingThrows.forEach((ability) => {
+      savingThrows[ability as keyof typeof savingThrows] = true
+    })
+    useCharacterStore.setState({
+      currentCharacter: {
+        ...character,
+        class: newClass,
+        subclass: null,
+        savingThrows,
+      },
+    })
+    saveCharacter()
+    setShowClassChangeModal(false)
+    setDmClassChangeMode(false)
+    setShowConsumableNotification({ message: `Class changed to ${newClass.name}!`, type: 'success' })
+    setTimeout(() => setShowConsumableNotification(null), 3000)
+  }
+
   const handleSpellScrollUse = (spell: Spell) => {
     addSpell(spell)
     if (consumableItemToRemove) {
@@ -1207,10 +1236,21 @@ export function CharacterSheetPage() {
               </span>
             )}
           </h1>
-          <p className="text-xl text-gray-400">
-            Level {character.level} {character.race?.name || 'Unknown'}{' '}
-            {character.class?.name || 'Unknown'}
-            {character.subclass && ` (${character.subclass.name})`}
+          <p className="text-xl text-gray-400 flex items-center gap-2 flex-wrap">
+            <span>
+              Level {character.level} {character.race?.name || 'Unknown'}{' '}
+              {character.class?.name || 'Unknown'}
+              {character.subclass && ` (${character.subclass.name})`}
+            </span>
+            {dmModeEnabled && (
+              <button
+                onClick={() => { setDmClassChangeMode(true); setShowClassChangeModal(true) }}
+                className="text-xs px-2 py-0.5 rounded bg-gray-700 text-purple-400 hover:bg-purple-700 hover:text-white transition-colors"
+                title="DM: Change this character's class"
+              >
+                ✏️ Change Class
+              </button>
+            )}
           </p>
           {character.background && (
             <p className="text-gray-500">{character.background.name} Background</p>
@@ -4599,11 +4639,13 @@ export function CharacterSheetPage() {
       {/* Class Change Modal */}
       {showClassChangeModal && (
         <ClassChangeModal
-          onSelectClass={handleClassChange}
+          onSelectClass={dmClassChangeMode ? handleDMClassChange : handleClassChange}
           onClose={() => {
             setShowClassChangeModal(false)
             setConsumableItemToRemove(null)
+            setDmClassChangeMode(false)
           }}
+          dmMode={dmClassChangeMode}
         />
       )}
 
@@ -5576,27 +5618,19 @@ function DailyIncomeRoller({
 function ClassChangeModal({
   onSelectClass,
   onClose,
+  dmMode = false,
 }: {
   onSelectClass: (classData: Class) => void
   onClose: () => void
+  dmMode?: boolean
 }) {
   const [selectedClass, setSelectedClass] = useState<Class | null>(null)
   const [showConfirmation, setShowConfirmation] = useState(false)
 
-  // All available classes
   const allClasses = [
-    FIGHTER,
-    WARLOCK,
-    ROGUE,
-    WIZARD,
-    CLERIC,
-    BARBARIAN,
-    BARD,
-    DRUID,
-    MONK,
-    PALADIN,
-    RANGER,
-    SORCERER,
+    AMAZON, BARBARIAN, BARD, CLERIC, DEATH_KNIGHT, DEMON_HUNTER,
+    DRUID, FIGHTER, MONK, NECROMANCER, PALADIN, RANGER,
+    ROGUE, SORCERER, WARLOCK, WIZARD,
   ]
 
   const handleClassSelect = (classData: Class) => {
@@ -5605,36 +5639,44 @@ function ClassChangeModal({
   }
 
   const handleConfirm = () => {
-    if (selectedClass) {
-      onSelectClass(selectedClass)
-    }
+    if (selectedClass) onSelectClass(selectedClass)
   }
+
+  const headerGradient = dmMode
+    ? 'bg-gradient-to-r from-purple-700 to-indigo-700'
+    : 'bg-gradient-to-r from-orange-600 to-red-600'
+  const headerSubText = dmMode
+    ? 'DM override: change the class without resetting level, HP, or spells. Subclass will be cleared.'
+    : 'Choose your new class. Warning: This will reset you to level 1 and remove all current spells and class features!'
+  const confirmTitle = dmMode ? 'Confirm Class Change' : 'Confirm Reincarnation'
+  const confirmBtn = dmMode ? 'Change Class' : 'Confirm Reincarnation'
+  const confirmBtnColor = dmMode ? 'bg-purple-600 hover:bg-purple-700' : 'bg-orange-600 hover:bg-orange-700'
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70">
       <div className="bg-gray-900 border-2 border-dnd-gold rounded-xl max-w-6xl w-full max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
         {/* Header */}
-        <div className="bg-gradient-to-r from-orange-600 to-red-600 p-6">
-          <h2 className="text-3xl font-bold text-white">Tome of Reincarnation</h2>
-          <p className="text-orange-100 mt-2">
-            Choose your new class. Warning: This will reset you to level 1 and remove all current spells and class features!
-          </p>
+        <div className={`${headerGradient} p-6`}>
+          <h2 className="text-3xl font-bold text-white">
+            {dmMode ? '✏️ Change Class (DM)' : 'Tome of Reincarnation'}
+          </h2>
+          <p className="text-orange-100 mt-2">{headerSubText}</p>
         </div>
 
         {/* Content */}
         {!showConfirmation ? (
           <div className="flex-1 overflow-y-auto p-6">
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-3">
               {allClasses.map((classData) => (
                 <button
                   key={classData.id}
                   onClick={() => handleClassSelect(classData)}
                   className="p-4 bg-gray-800 border-2 border-gray-700 hover:border-dnd-gold rounded-lg text-left transition-all"
                 >
-                  <div className="font-bold text-dnd-gold text-lg mb-2">{classData.name}</div>
-                  <div className="text-sm text-gray-400 mb-2">{classData.description}</div>
-                  <div className="text-xs text-gray-500">
-                    Hit Die: {classData.hitDie} | Primary: {classData.primaryAbility.join(', ')}
+                  <div className="font-bold text-dnd-gold text-sm mb-1">{classData.name}</div>
+                  <div className="text-xs text-gray-400 mb-2 line-clamp-2">{classData.description}</div>
+                  <div className="text-[10px] text-gray-500">
+                    {classData.hitDie} · {classData.primaryAbility.join('/')}
                   </div>
                 </button>
               ))}
@@ -5642,21 +5684,31 @@ function ClassChangeModal({
           </div>
         ) : (
           <div className="flex-1 overflow-y-auto p-6">
-            <div className="max-w-2xl mx-auto bg-gray-800 border-2 border-orange-500 rounded-lg p-6">
-              <h3 className="text-2xl font-bold text-orange-400 mb-4">Confirm Reincarnation</h3>
+            <div className="max-w-2xl mx-auto bg-gray-800 border-2 border-purple-500 rounded-lg p-6">
+              <h3 className="text-2xl font-bold text-purple-300 mb-4">{confirmTitle}</h3>
               <p className="text-white mb-4">
-                You are about to reincarnate as a <span className="font-bold text-dnd-gold">{selectedClass?.name}</span>.
+                Change class to <span className="font-bold text-dnd-gold">{selectedClass?.name}</span>?
               </p>
-              <div className="bg-red-900/30 border border-red-500 rounded-lg p-4 mb-6">
-                <h4 className="font-bold text-red-400 mb-2">Warning:</h4>
-                <ul className="text-sm text-red-300 space-y-1 list-disc list-inside">
-                  <li>Your character will be reset to level 1</li>
-                  <li>All current spells will be removed</li>
-                  <li>All class features will be removed</li>
-                  <li>Hit points will be recalculated for the new class</li>
-                  <li>This action cannot be undone</li>
-                </ul>
-              </div>
+              {dmMode ? (
+                <div className="bg-purple-900/30 border border-purple-500 rounded-lg p-4 mb-6">
+                  <ul className="text-sm text-purple-300 space-y-1 list-disc list-inside">
+                    <li>Class features, hit die, and saving throws update to match the new class</li>
+                    <li>Subclass is cleared (re-select after changing)</li>
+                    <li>Level, HP, spells, and equipment are kept unchanged</li>
+                  </ul>
+                </div>
+              ) : (
+                <div className="bg-red-900/30 border border-red-500 rounded-lg p-4 mb-6">
+                  <h4 className="font-bold text-red-400 mb-2">Warning:</h4>
+                  <ul className="text-sm text-red-300 space-y-1 list-disc list-inside">
+                    <li>Your character will be reset to level 1</li>
+                    <li>All current spells will be removed</li>
+                    <li>All class features will be removed</li>
+                    <li>Hit points will be recalculated for the new class</li>
+                    <li>This action cannot be undone</li>
+                  </ul>
+                </div>
+              )}
               <div className="flex gap-4">
                 <button
                   onClick={() => setShowConfirmation(false)}
@@ -5666,9 +5718,9 @@ function ClassChangeModal({
                 </button>
                 <button
                   onClick={handleConfirm}
-                  className="flex-1 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-bold"
+                  className={`flex-1 px-4 py-2 ${confirmBtnColor} text-white rounded-lg transition-colors font-bold`}
                 >
-                  Confirm Reincarnation
+                  {confirmBtn}
                 </button>
               </div>
             </div>
