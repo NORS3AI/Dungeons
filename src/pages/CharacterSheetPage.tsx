@@ -1803,7 +1803,7 @@ export function CharacterSheetPage() {
                       </QuickRefTooltip>
                       <div className="flex items-center gap-2">
                         <span className="text-gray-300">
-                          {character.languages?.map(id => getLanguageById(id)?.name ?? id.charAt(0).toUpperCase() + id.slice(1)).join(', ') || 'None'}
+                          {character.languages?.map(id => getLanguageById(id)?.name ?? id.split(/[-\s]+/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')).join(', ') || 'None'}
                         </span>
                         {dmModeEnabled && (
                           <button
@@ -1823,7 +1823,7 @@ export function CharacterSheetPage() {
                             const lang = getLanguageById(langId)
                             return (
                               <span key={langId} className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-700 rounded text-xs text-gray-300">
-                                {lang?.name ?? langId}
+                                {lang?.name ?? langId.split(/[-\s]+/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
                                 <button
                                   onClick={() => {
                                     setLanguages(character.languages.filter(l => l !== langId))
@@ -1869,8 +1869,8 @@ export function CharacterSheetPage() {
                             onChange={(e) => setCustomLanguageInput(e.target.value)}
                             onKeyDown={(e) => {
                               if (e.key === 'Enter' && customLanguageInput.trim()) {
-                                const id = customLanguageInput.trim().toLowerCase().replace(/\s+/g, '-')
-                                if (!character.languages?.includes(id)) {
+                                const id = customLanguageInput.trim().split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+                                if (!character.languages?.map(l => l.toLowerCase()).includes(id.toLowerCase())) {
                                   setLanguages([...(character.languages || []), id])
                                   saveCharacter()
                                 }
@@ -1884,8 +1884,8 @@ export function CharacterSheetPage() {
                             onClick={() => {
                               const name = customLanguageInput.trim()
                               if (!name) return
-                              const id = name.toLowerCase().replace(/\s+/g, '-')
-                              if (!character.languages?.includes(id)) {
+                              const id = name.split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+                              if (!character.languages?.map(l => l.toLowerCase()).includes(id.toLowerCase())) {
                                 setLanguages([...(character.languages || []), id])
                                 saveCharacter()
                               }
