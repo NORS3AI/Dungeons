@@ -136,6 +136,7 @@ export function CharacterSheetPage() {
   const actionsMenuRef = useRef<HTMLDivElement>(null)
   const [showLanguageEditor, setShowLanguageEditor] = useState(false)
   const [newLanguageInput, setNewLanguageInput] = useState('')
+  const [customLanguageInput, setCustomLanguageInput] = useState('')
   const [dmWeatherOverride, setDmWeatherOverride] = useState<number | null>(null)
   // Collapsible section state for inventory
   const [showBagsSection, setShowBagsSection] = useState(false)
@@ -1834,13 +1835,14 @@ export function CharacterSheetPage() {
                             )
                           })}
                         </div>
-                        <div className="flex gap-2">
+                        {/* Known language dropdown */}
+                        <div className="flex gap-2 mb-2">
                           <select
                             value={newLanguageInput}
                             onChange={(e) => setNewLanguageInput(e.target.value)}
                             className="flex-1 bg-gray-800 border border-gray-600 rounded px-2 py-1 text-sm text-gray-300 focus:outline-none focus:border-dnd-gold"
                           >
-                            <option value="">Add a language...</option>
+                            <option value="">Known language…</option>
                             {ALL_LANGUAGES.filter(l => !character.languages?.includes(l.id)).map(l => (
                               <option key={l.id} value={l.id}>{l.name} ({l.type})</option>
                             ))}
@@ -1857,6 +1859,42 @@ export function CharacterSheetPage() {
                             className="px-3 py-1 bg-dnd-gold text-gray-900 rounded text-sm font-medium hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             Add
+                          </button>
+                        </div>
+                        {/* Custom / homebrew language */}
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={customLanguageInput}
+                            onChange={(e) => setCustomLanguageInput(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' && customLanguageInput.trim()) {
+                                const id = customLanguageInput.trim().toLowerCase().replace(/\s+/g, '-')
+                                if (!character.languages?.includes(id)) {
+                                  setLanguages([...(character.languages || []), id])
+                                  saveCharacter()
+                                }
+                                setCustomLanguageInput('')
+                              }
+                            }}
+                            placeholder="Custom language name…"
+                            className="flex-1 bg-gray-800 border border-gray-600 rounded px-2 py-1 text-sm text-gray-300 placeholder-gray-600 focus:outline-none focus:border-purple-500"
+                          />
+                          <button
+                            onClick={() => {
+                              const name = customLanguageInput.trim()
+                              if (!name) return
+                              const id = name.toLowerCase().replace(/\s+/g, '-')
+                              if (!character.languages?.includes(id)) {
+                                setLanguages([...(character.languages || []), id])
+                                saveCharacter()
+                              }
+                              setCustomLanguageInput('')
+                            }}
+                            disabled={!customLanguageInput.trim()}
+                            className="px-3 py-1 bg-purple-700 text-white rounded text-sm font-medium hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            + Custom
                           </button>
                         </div>
                       </div>
@@ -3549,8 +3587,8 @@ export function CharacterSheetPage() {
                 </div>
               </button>
 
-              {/* Trance (Elf Only) */}
-              {character.race?.id === 'elf' || character.race?.id === 'drow' ? (
+              {/* Trance (All elf subraces) */}
+              {['elf', 'drow', 'high-elf', 'wood-elf', 'eladrin', 'sea-elf', 'shadar-kai'].includes(character.race?.id ?? '') ? (
                 <button
                   onClick={handleTrance}
                   className="p-4 bg-gradient-to-br from-cyan-600 to-cyan-800 hover:from-cyan-500 hover:to-cyan-700 border-2 border-cyan-400 rounded-lg transition-all transform hover:scale-105 active:scale-95"
@@ -3558,7 +3596,7 @@ export function CharacterSheetPage() {
                   <div className="text-3xl sm:text-4xl mb-2">🧘</div>
                   <div className="font-bold text-base sm:text-lg text-white mb-1">Trance</div>
                   <div className="text-xs sm:text-sm text-cyan-100">
-                    4 hours (Elf/Drow). Counts as a long rest. Fully restores everything.
+                    4 hours (Elf). Counts as a long rest. Fully restores everything.
                   </div>
                 </button>
               ) : (
@@ -3566,7 +3604,7 @@ export function CharacterSheetPage() {
                   <div className="text-3xl sm:text-4xl mb-2">🧘</div>
                   <div className="font-bold text-base sm:text-lg text-gray-400 mb-1">Trance</div>
                   <div className="text-xs sm:text-sm text-gray-500">
-                    Only available for Elves and Drow
+                    Only available for Elves (all subraces)
                   </div>
                 </div>
               )}

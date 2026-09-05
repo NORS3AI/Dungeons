@@ -1,5 +1,28 @@
 # Dungeons - Patch Notes
 
+## Version 0.6.8-beta - September 05, 2026
+
+**Beta Release Notice**: Trance for all elf subraces, proper racial-language locking, and DM custom-language entry.
+
+### Bug Fixes & DM Quality of Life
+
+#### **Trance for All Elf Subraces**
+- Previously only raw `elf` and `drow` ids activated the Trance button. Shadar-kai, High Elf, Wood Elf, Eladrin, and Sea Elf characters now correctly show the active Trance button.
+- The inactive placeholder now reads "Only available for Elves (all subraces)".
+
+#### **Language Selection — Racial Languages Now Locked Correctly**
+- The language step in character creation now distinguishes between racial languages (always known) and bonus choices (player picks).
+- Racial languages (e.g. Common + Elvish for an elf) are shown as locked "Racial" badges — they can no longer be accidentally overwritten by the bonus language picker.
+- High Elf's **Extra Language** trait (id `extra-language`) is detected automatically and grants **2** bonus language choice slots instead of 1 on top of Common + Elvish.
+- All other races continue to receive 1 bonus language choice slot (the standard D&D character-creation grant) on top of their fixed racial languages.
+
+#### **DM — Add Custom / Homebrew Languages**
+- The language editor (✎ button, DM mode only) now includes a second row: a free-text input for typing any custom or homebrew language name.
+- Press **Enter** or click **+ Custom** to add it. The name is converted to a slug id and displayed with its typed name in the character sheet.
+- Duplicate entries are silently prevented. Standard-language dropdown remains unchanged alongside the new custom input.
+
+---
+
 ## Version 0.6.7-beta - July 07, 2026
 
 **Beta Release Notice**: DM class-change tool for character sheets.

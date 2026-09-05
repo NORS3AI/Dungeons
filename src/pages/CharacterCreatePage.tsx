@@ -334,13 +334,26 @@ export function CharacterCreatePage() {
 
                 {/* Languages */}
                 <div className="card bg-gray-800 border border-gray-700 p-6">
-                  <LanguageSelector
-                    currentLanguages={currentCharacter.languages}
-                    raceName={currentCharacter.race?.name}
-                    className={currentCharacter.class?.name}
-                    backgroundName={currentCharacter.background?.name}
-                    onChange={(languages) => setLanguages(languages)}
-                  />
+                  {(() => {
+                    const race = currentCharacter.race
+                    // Racial languages are fixed — e.g. ['Common', 'Elvish'] for elves
+                    const racialLangs = race?.languages?.map(l => l.toLowerCase()) ?? ['common']
+                    // Extra bonus slots beyond the standard 1:
+                    // High Elf gets "Extra Language" trait → bonusLanguageCount = 2 (1 standard + 1 trait)
+                    const hasExtraLanguageTrait = race?.traits?.some(t => t.id === 'extra-language')
+                    const bonusLanguageCount = hasExtraLanguageTrait ? 2 : 1
+                    return (
+                      <LanguageSelector
+                        currentLanguages={currentCharacter.languages}
+                        racialLanguages={racialLangs}
+                        bonusLanguageCount={bonusLanguageCount}
+                        raceName={race?.name}
+                        className={currentCharacter.class?.name}
+                        backgroundName={currentCharacter.background?.name}
+                        onChange={(languages) => setLanguages(languages)}
+                      />
+                    )
+                  })()}
                 </div>
 
                 {/* Starting HP Roll */}
